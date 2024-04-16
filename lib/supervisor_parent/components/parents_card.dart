@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
+import 'package:school_account/supervisor_parent/components/supervisor_card.dart';
+import 'package:school_account/main.dart';
+import 'package:school_account/supervisor_parent/screens/add_parents.dart';
+import 'package:school_account/supervisor_parent/screens/parents_view.dart';
+import 'package:school_account/supervisor_parent/screens/track_parent.dart';
+import 'elevated_simple_button.dart';
+
+class ParentsCard extends StatefulWidget {
+  ParentsCard({super.key, });
+
+  @override
+  State<ParentsCard> createState() => _ParentsCardState();
+}
+
+class _ParentsCardState extends State<ParentsCard> {
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height:  98,
+      child: Card(
+        color: Color(0xffA79FD9).withOpacity(0.44),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Padding(
+          padding: (sharedpref?.getString('lang') == 'ar')?
+          EdgeInsets.only(right: 25, ):
+          EdgeInsets.only(left: 30, ),
+          child:  Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/parent 1.png',
+                width: 60,
+                height: 60,),
+              SizedBox(width: 18,),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Parents'.tr,
+                    style: TextStyle(
+                      color: Color(0xff442B72),
+                      fontSize: 15,
+                      fontFamily: 'Poppins-Bold',
+                      fontWeight: FontWeight.w700,
+                      // height: 1,
+                    ),),
+                  Text('#15',
+                    style: TextStyle(
+                      color: Color(0xff442B72),
+                      fontSize: 12,
+                      fontFamily: 'Poppins-Regular',
+                      fontWeight: FontWeight.w400,
+                    ),)
+                ],
+              ),
+              Padding(
+                padding: (sharedpref?.getString('lang') == 'ar')?
+                EdgeInsets.only( right: 100):
+                EdgeInsets.only( left: 79),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap:(){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>
+                              AddParents()),);
+                      },
+                      child: Image.asset('assets/images/icons8_add_1 1 (1).png',
+                      width: 30,
+                      height: 30,),
+                    ),
+                    SizedBox(height: 25,),
+                    GestureDetector(
+                      onTap:(){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>
+                              ParentsView()),);
+                      },
+                      child: Container(
+                        width: 53,
+                        height: 27,
+                        decoration: BoxDecoration(
+                          color: Color(0xff442B72),
+                          borderRadius:
+                          (sharedpref?.getString('lang') == 'ar')?
+                          BorderRadius.only(
+                              topRight: Radius.circular(15),
+                              bottomLeft: Radius.circular(5)):
+                          BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              bottomRight: Radius.circular(5))
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(7.0),
+                          child: Image.asset(
+                            (sharedpref?.getString('lang') == 'ar')?
+                            'assets/images/Vector (13)leftpng.png':
+                            'assets/images/Vector (13)right.png',
+                          width: 17.71,
+                          height: 17.71,),
+                        ),
+                      )
+
+
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 4.0 , bottom: 0),
+                      //   child: Image.asset('assets/images/Group 237683.png',
+                      //   height: 43,
+                      //   width: 53,),
+                      // ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),),
+      ),
+    );
+  }
+}
