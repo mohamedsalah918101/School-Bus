@@ -7,7 +7,7 @@ import 'package:school_account/supervisor_parent/components/add_children_card.da
 import 'package:school_account/supervisor_parent/components/add_children_card_edit.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
 import 'package:school_account/main.dart';
@@ -47,7 +47,7 @@ class _EditAddParentsState extends State<EditAddParents> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
-        endDrawer: HomeDrawer(),
+        endDrawer: ParentDrawer(),
         body: Column(
           children: [
             SizedBox(

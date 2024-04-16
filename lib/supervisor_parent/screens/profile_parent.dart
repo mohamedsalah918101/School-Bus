@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
@@ -29,7 +29,7 @@ class _ProfileParentState extends State<ProfileParent> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        endDrawer: HomeDrawer(),
+        endDrawer: ParentDrawer(),
         key: _scaffoldKey,
         appBar: PreferredSize(
           child: Container(

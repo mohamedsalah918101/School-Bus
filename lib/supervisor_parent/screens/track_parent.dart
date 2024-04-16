@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
@@ -76,7 +76,7 @@ class _TrackParentState extends State<TrackParent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: HomeDrawer(),
+      endDrawer: ParentDrawer(),
         key: _scaffoldKey,
         appBar:PreferredSize(
           child: Container(
