@@ -10,7 +10,7 @@ import 'controller/local_controller.dart';
 
 SharedPreferences? sharedpref;
 
-void main()async  {
+void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     name: 'school_account',
