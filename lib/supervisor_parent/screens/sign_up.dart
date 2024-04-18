@@ -458,26 +458,28 @@ class _SignupScreenState extends State<SignupScreen> {
                                     SizedBox(
                                       width: constrains.maxWidth ,
                                       child: Center(
-                                        child: ElevatedSimpleButton(
-                                          txt: 'Create Account'.tr,
-                                          onPress: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                  // children.isNotEmpty?
-                                                    OtpScreen(
-                                                      selectedImage: selectedImage,
-                                                    )
-                                                  //no data
-                                                // : NoInvitation( selectedImage: selectedImage)
-                                              )),
-                                                    // NoInvitation())),
-                                          width: constrains.maxWidth ,
-                                          hight: 48,
-                                          color: const Color(0xFF442B72),
-                                          fontSize: 16,
-                                          fontFamily: 'Poppins-Regular',
-                                        ),
+                                        // child: ElevatedSimpleButton(
+                                        //   txt: 'Create Account'.tr,
+                                        //   onPress: () =>
+                                        //       Navigator.push(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //           builder: (context) =>
+                                        //           // children.isNotEmpty?
+                                        //             OtpScreen(
+                                        //               selectedImage: selectedImage,
+                                        //             )
+                                        //           //no data
+                                        //         // : NoInvitation( selectedImage: selectedImage)
+                                        //       )
+                                        //   ),
+                                        //             // NoInvitation())),
+                                        //   width: constrains.maxWidth ,
+                                        //   hight: 48,
+                                        //   color: const Color(0xFF442B72),
+                                        //   fontSize: 16,
+                                        //   fontFamily: 'Poppins-Regular',
+                                        // ),
                                       ),
                                     ) ,
                                     SizedBox( height:2),

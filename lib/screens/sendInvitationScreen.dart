@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -14,7 +15,7 @@ import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 
 
 class SendInvitation extends StatefulWidget{
@@ -25,11 +26,39 @@ class SendInvitation extends StatefulWidget{
 
 
 class _SendInvitationState extends State<SendInvitation> {
-
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   MyLocalController ControllerLang = Get.find();
-  TextEditingController _namesupervisor=TextEditingController();
-  TextEditingController _numbersupervisor=TextEditingController();
-  TextEditingController _emailsupervisor=TextEditingController();
+  // TextEditingController _namesupervisor=TextEditingController();
+  // TextEditingController _numbersupervisor=TextEditingController();
+  // TextEditingController _emailsupervisor=TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _firestore = FirebaseFirestore.instance;
+  void _addDataToFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+      // Define the data to add
+      Map<String, dynamic> data = {
+        'name': _nameController.text,
+        'email': _emailController.text,
+        'phoneNumber': _phoneNumberController.text,
+      };
+      // Add the data to the Firestore collection
+      await _firestore.collection('supervisor').add(data).then((docRef) {
+        print('Data added with document ID: ${docRef.id}');
+        showSnackBarFun(context);
+      }).catchError((error) {
+        print('Failed to add data: $error');
+      });
+      // Clear the text fields
+      _nameController.clear();
+      _phoneNumberController.clear();
+      _emailController.clear();
+    }
+ // }
+  bool _validateName = false;
+  bool _validatePhone = false;
   final _nameSupervisorFocus = FocusNode();
   final _numberSupervisorFocus = FocusNode();
   final _emailSupervisorFocus = FocusNode();
@@ -212,7 +241,7 @@ class _SendInvitationState extends State<SendInvitation> {
                               width: constrains.maxWidth / 1.2,
                               height: 44,
                               child: TextFormField(
-                                controller: _namesupervisor,
+                                controller: _nameController,
                                 focusNode: _nameSupervisorFocus,
                                 cursorColor: const Color(0xFF442B72),
                                 style: TextStyle(color: Color(0xFF442B72)),
@@ -225,6 +254,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
+                                  errorText: _validateName ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -245,7 +275,6 @@ class _SendInvitationState extends State<SendInvitation> {
                                   // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
                                   focusedBorder: myFocusBorder(),
                                 ),
-
                               ),
                             ),
 
@@ -295,18 +324,6 @@ class _SendInvitationState extends State<SendInvitation> {
                             const SizedBox(
                               height:15,
                             ),
-
-                            // دا كان كلمه السر
-                            // Text(
-                            //   'Password'.tr,
-                            //   style: TextStyle(
-                            //     color: Color(0xFF442B72),
-                            //     fontSize: 15,
-                            //     fontFamily: 'Poppins-Bold',
-                            //     fontWeight: FontWeight.w700,
-                            //     height: 1.07,
-                            //   ),
-                            // ),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
                               child: Align(
@@ -354,10 +371,10 @@ class _SendInvitationState extends State<SendInvitation> {
                             SizedBox(height: 10,),
                             Container(
                               width: constrains.maxWidth / 1.2,
-                              height: 45,
+                              height: 44,
                               child: TextFormField(
                                 style: TextStyle(color: Color(0xFF442B72)),
-                                controller: _numbersupervisor,
+                                controller: _phoneNumberController,
                                 focusNode: _numberSupervisorFocus,
                                 cursorColor: const Color(0xFF442B72),
                                 onFieldSubmitted: (value) {
@@ -369,6 +386,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                     vertical: 40),
                                 keyboardType: TextInputType.number,
                                 decoration:  InputDecoration(
+                                  errorText: _validatePhone ? "Please Enter Your Phone number": null,
                                   // labelText: 'Shady Ayman'.tr,
                                   hintText:'Your Number'.tr ,
                                   hintStyle:  const TextStyle(
@@ -383,12 +401,17 @@ class _SendInvitationState extends State<SendInvitation> {
                                   fillColor: const Color(0xFFF1F1F1),
                                   filled: true,
                                   contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 5, 10, 5),
+                                      8, 30, 10, 5),
                                   floatingLabelBehavior:  FloatingLabelBehavior.never,
                                   enabledBorder: myInputBorder(),
                                   focusedBorder: myFocusBorder(),
                                 ),
-
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Please enter a phone number";
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
                             // Container(
@@ -478,7 +501,7 @@ class _SendInvitationState extends State<SendInvitation> {
                               width: constrains.maxWidth / 1.2,
                               height: 44,
                               child: TextFormField(
-                                controller: _emailsupervisor,
+                                controller: _emailController,
                                 focusNode: _emailSupervisorFocus,
                                 cursorColor: const Color(0xFF442B72),
                                 style: TextStyle(color: Color(0xFF442B72)),
@@ -532,14 +555,23 @@ class _SendInvitationState extends State<SendInvitation> {
                               child: Center(
                                 child: ElevatedSimpleButton(
                                   txt: "Send invitation".tr,
-                                 onPress: (){
+                                 onPress: ()
+                                 //async
+                                 {
                                     // Navigator.push(
                                     //     context ,
                                     //     MaterialPageRoute(
                                     //         builder: (context) =>  HomeScreen(),
                                     //         maintainState: false)
                                     // );
-                                    showSnackBarFun(context);
+                                   setState(() {
+                                     _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                                     _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                   });
+                                   if(! _nameController.text.isEmpty && ! _phoneNumberController.text.isEmpty){
+                                     _addDataToFirestore();
+                                   }
+                                //   _addDataToFirestore();
                                   },
                                   width: constrains.maxWidth /1.2,
                                   hight: 48,

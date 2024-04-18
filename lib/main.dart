@@ -15,13 +15,13 @@ void main()async {
   await Firebase.initializeApp(
     name: 'school_account',
     options: FirebaseOptions(
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "YOUR_MEASUREMENT_ID",
+        apiKey: "AIzaSyDid2iv9pn1QZrPDCAbXGM7zTgcg6dWI1E",
+        authDomain: "loginschoolaccount.firebaseapp.com",
+        projectId: "loginschoolaccount",
+        storageBucket: "loginschoolaccount.appspot.com",
+        messagingSenderId: "615571135320",
+        appId: "1:615571135320:web:38d8b8404aed2721dea32d",
+        measurementId: "G-3YG0J7RYWM"
     ),
   );
   sharedpref = await SharedPreferences.getInstance();

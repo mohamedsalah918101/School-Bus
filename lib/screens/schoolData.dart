@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import '../components/bottom_bar_item.dart';
@@ -34,6 +37,7 @@ class _SchoolDataState extends State<SchoolData> {
   final _AddressFocus = FocusNode();
   final _CoordinatorFocus = FocusNode();
   final _SupporterFocus = FocusNode();
+
 
 // to lock in landscape view
   @override
@@ -198,17 +202,20 @@ class _SchoolDataState extends State<SchoolData> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Align(alignment: AlignmentDirectional.center,
+
+                                  FDottedLine(
+                                    color:Color(0xFF442B72),
+                                    strokeWidth: 2.0,
+                                    dottedLength: 8.0,
+                                    space: 3.0,
+                                    corner: FDottedLineCorner.all(6.0),
+
+                                    /// add widget
                                     child: Container(
-                                      width: 100, // Adjust width as needed
-                                      height: 100, // Adjust height as needed
-                                      decoration: BoxDecoration(
-                                       // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
-                                        image: DecorationImage(
-                                          image: AssetImage('assets/imgs/school/Frame 61.png'), // Provide the path to your image
-                                          fit: BoxFit.fill, // Adjust the fit as needed
-                                        ),
-                                      ),
+                                      width: 100,
+                                      height: 100,
+                                      alignment: Alignment.center,
+                                      child: Text("School logo",style: TextStyle(color:Color(0xFF442B72),fontSize:11,fontFamily:'Poppins-Regular'   ),),
                                     ),
                                   ),
                                   const SizedBox(
