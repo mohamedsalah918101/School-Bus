@@ -7,6 +7,7 @@ import 'package:school_account/supervisor_parent/components/child_data_item.dart
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/login_screen.dart';
 import '../../controller/local_controller.dart';
+import '../../screens/otpScreen.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/text_form_field_login_custom.dart';
 
@@ -460,23 +461,23 @@ class _SignupScreenState extends State<SignupScreen> {
                                       child: Center(
                                         child: ElevatedSimpleButton(
                                           txt: 'Create Account'.tr,
-                                          onPress: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                  // children.isNotEmpty?
-                                                    OtpScreen(
-                                                      selectedImage: selectedImage,
-                                                    )
-                                                  //no data
-                                                // : NoInvitation( selectedImage: selectedImage)
-                                              )),
+                                          // onPress: () => Navigator.push(
+                                          //     context,
+                                          //     MaterialPageRoute(
+                                          //         builder: (context) =>
+                                          //         // children.isNotEmpty?
+                                          //           OtpScreen(
+                                          //             selectedImage: selectedImage,
+                                          //           )
+                                          //         //no data
+                                          //       // : NoInvitation( selectedImage: selectedImage)
+                                          //     )),
                                                     // NoInvitation())),
                                           width: constrains.maxWidth ,
                                           hight: 48,
                                           color: const Color(0xFF442B72),
                                           fontSize: 16,
-                                          fontFamily: 'Poppins-Regular',
+                                          fontFamily: 'Poppins-Regular', onPress: () {  },
                                         ),
                                       ),
                                     ) ,

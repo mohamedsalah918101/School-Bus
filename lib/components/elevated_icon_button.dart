@@ -28,6 +28,7 @@ class ElevatedIconButton extends StatelessWidget {
             padding: const EdgeInsets.all(0),
             primary: color,
             onPrimary: Colors.transparent // Background color
+
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
