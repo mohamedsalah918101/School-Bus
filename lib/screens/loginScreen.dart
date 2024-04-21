@@ -27,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String enteredPhoneNumber = '';
+  int selectedImage = 0;
   String phoneNumber = '';
   MyLocalController ControllerLang = Get.find();
   bool _phoneNumberEntered = true;
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Auto-retrieve verification code
         await _auth.signInWithCredential(credential);
-Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber, selectedImage: selectedImage,)) );
       },
       verificationFailed: (FirebaseAuthException e) {
         // Verification failed
@@ -97,7 +98,7 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
 
-       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId)));
+       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId, selectedImage: selectedImage,)));
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),
@@ -488,7 +489,7 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => SignupScreen(),
+                                          builder: (context) => SignUpScreen(),
                                         ),
                                       );
                                     },

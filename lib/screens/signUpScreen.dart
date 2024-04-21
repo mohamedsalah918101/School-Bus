@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:school_account/screens/loginScreen.dart';
-
 import '../components/elevated_simple_button.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
@@ -32,6 +31,7 @@ class SignUpScreen extends StatefulWidget{
 
 class _SignUpScreenState extends State<SignUpScreen> {
   String enteredPhoneNumber = '';
+  int selectedImage = 0;
   String phoneNumber = '';
   bool _phoneNumberEntered = true;
   MyLocalController ControllerLang = Get.find();
@@ -51,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Auto-retrieve verification code
         await _auth.signInWithCredential(credential);
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber, selectedImage: selectedImage,)) );
       },
       verificationFailed: (FirebaseAuthException e) {
         // Verification failed
@@ -60,7 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
 
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId, selectedImage: selectedImage,)));
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),
@@ -238,23 +238,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                          ],
                                        ),
                                      ),
-                                     // Text(textAlign:TextAlign.start,
-                                     //   'Name *'.tr,
-                                     //   style: TextStyle(
-                                     //     color: Color(0xFF442B72),
-                                     //     fontSize: 15,
-                                     //     fontFamily: 'Poppins-Bold',
-                                     //     fontWeight: FontWeight.w700,
-                                     //     height: 1.07,
-                                     //   ),
-                                     // ),
                                    ),
                                  ),
-                              // TextFormFieldCustom(
-                              //   width: constrains.maxWidth / 1.4,
-                              //   hintTxt: 'Name'.tr,
-                              //
-                              // ),
                                   const SizedBox(
                                     height: 15,
                                   ),

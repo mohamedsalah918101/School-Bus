@@ -16,7 +16,7 @@ class OtpScreen extends StatefulWidget {
   // const OtpScreen({super.key});
   //new code
   final String verificationId;
-  const OtpScreen({Key? key, required this.verificationId}) : super(key: key);
+  const OtpScreen({Key? key, required this.verificationId, required int selectedImage}) : super(key: key);
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
@@ -25,9 +25,8 @@ class _OtpScreenState extends State<OtpScreen> {
   Timer? _timer;  // Variable to store the timer
   int _seconds = 60;
   String verificationId = '';
-   TextEditingController _pinCodeController=TextEditingController();
-   String enteredPhoneNumber = '';
-
+  TextEditingController _pinCodeController=TextEditingController();
+  String enteredPhoneNumber = '';
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // Function to start the timer
@@ -236,7 +235,6 @@ class _OtpScreenState extends State<OtpScreen> {
                                 animationDuration: const Duration(milliseconds: 300),
                                 keyboardType: TextInputType.number,
                               ),
-
                               //end
                             ),
 
@@ -286,8 +284,6 @@ class _OtpScreenState extends State<OtpScreen> {
                           // ),
                           // ),
                         ),
-
-
                       ],
                     ),
                     Flexible(child: Container()),
@@ -296,12 +292,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         width: constrains.maxWidth / 1.4,
                         child: Center(
                           child: ClipRect(
-
                             child: ElevatedSimpleButton(
                               txt: 'Verify'.tr,
                               width: constrains.maxWidth / 1.4,
                               color: const Color(0xFF442B72),
-
                               hight: 48,
                               onPress: () async {
                               //erifyPhoneNumber(enteredPhoneNumber);
@@ -320,14 +314,6 @@ class _OtpScreenState extends State<OtpScreen> {
                                         maintainState: false));}catch(e){
                                   print('lllll'+e.toString());
                                 }
-
-
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (context) => MainBottomNavigationBar(
-                                //           pageNum: 0,
-                                //         )));
                               },
                               fontSize: 16,
                               

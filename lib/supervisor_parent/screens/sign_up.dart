@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:school_account/screens/otpScreen.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/login_screen.dart';
@@ -20,6 +21,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   int selectedImage = 0;
+  late String verificationId;
   int selectedContainer = 0;
   bool _isChecked = false;
   MyLocalController ControllerLang = Get.find();
@@ -432,7 +434,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                           color: Colors.white),),
                                                   ],
                                                 )),
-      
+
                                             decoration: BoxDecoration(
                                               // border:  Border.all(
                                                 // width: _isChecked?3 : 0,
@@ -461,10 +463,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                             });
                                           },
                                         ),
-      
+
                                       ],
                                     ),
-      
+
                                     SizedBox(
                                       height: constrains.maxWidth / 13,
                                     ),
@@ -479,6 +481,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                   builder: (context) =>
                                                   // children.isNotEmpty?
                                                     OtpScreen(
+                                                      verificationId: verificationId,
                                                       selectedImage: selectedImage,
                                                     )
                                                   //no data
@@ -538,7 +541,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                     ),
-      
+
                   ],
                 ),
               ),
