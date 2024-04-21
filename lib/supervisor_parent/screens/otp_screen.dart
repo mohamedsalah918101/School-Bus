@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:school_account/screens/homeScreen.dart';
 import 'package:school_account/supervisor_parent/controllers/auth_service.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/accept_invitation_parent.dart';
@@ -241,6 +242,10 @@ class _OtpScreenState extends State<OtpScreen> {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => AcceptInvitationSupervisor(
                                   )));
+                            }else if (selectedImage == 1){
+                            Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => HomeScreen(
+                            )));
                             };
                                   // if(_formKey1.currentState!.validate()) {
                                   //   AuthService.loginWithOtp(Otp: _OtpController.text).

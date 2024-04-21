@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter/material.dart';
 import 'package:school_account/supervisor_parent/components/add_children_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
@@ -31,11 +31,59 @@ class AddParents extends StatefulWidget {
 
 class _AddParentsState extends State<AddParents> {
   late final int selectedImage;
+  var _fireStore = FirebaseFirestore.instance;
+  // void _addDataToFirestore() async {
+  //   //if (_formKey.currentState!.validate()) {
+  //   // Define the data to add
+  //   Map<String, dynamic> data = {
+  //     'name': NameParent.text,
+  //   };
+  //
+  //   // Add the data to the Firestore collection
+  //   _fireStore.collection('parent').add({
+  //     'name' : NameParent.text.toString(),
+  //     'numberOfChildren' : '2',
+  //     'phone' : '01270247163'
+  //   });}
+  // TextEditingController NameParent = TextEditingController();
+
+  final _nameController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
+  final _numberOfChildrenController = TextEditingController();
+  final _firestore = FirebaseFirestore.instance;
+
+  void _addDataToFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+    // Define the data to add
+    Map<String, dynamic> data = {
+      'name': _nameController.text,
+      'numberOfChildren': _numberOfChildrenController.text,
+      'phone': _phoneNumberController.text,
+
+    };
+
+    // Add the data to the Firestore collection
+    await _firestore.collection('parent').add(data).then((docRef) {
+      print('Data added with document ID: ${docRef.id}');
+      // showSnackBarFun(context);
+    }).catchError((error) {
+      print('Failed to add data: $error');
+    });
+
+    // Clear the text fields
+    _nameController.clear();
+    _phoneNumberController.clear();
+    _numberOfChildrenController.clear();
+  }
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
   int ChildrenCount = 0;
   bool NumberOfChildrenCard = false;
+
+
+
 
   void addChild() {
     setState(() {
@@ -43,11 +91,16 @@ class _AddParentsState extends State<AddParents> {
       NumberOfChildren.add(AddChildrenCard());
     });
   }
+  //
+
 
 
 
   @override
   Widget build(BuildContext context) {
+
+
+
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
@@ -271,6 +324,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller: _nameController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: const Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -586,6 +640,16 @@ class _AddParentsState extends State<AddParents> {
                               hight: 48,
                               onPress: (){
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
+                                _addDataToFirestore();
+                                print('object');
+                                setState(() {
+                                });
+                                // _addDataToFirestore();
+                                // _fireStore.collection('parent').add({
+                                //   'name' : NameParent.text.toString(),
+                                //   'numberOfChildren' : '2',
+                                //   'phone' : '01270247163'
+                                // });
                               },
                               color: Color(0xFF442B72),
                               fontSize: 16),

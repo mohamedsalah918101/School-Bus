@@ -20,6 +20,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   int selectedImage = 0;
+  int selectedContainer = 0;
   bool _isChecked = false;
   MyLocalController ControllerLang = Get.find();
   List<ChildDataItem> children = [];
@@ -325,37 +326,48 @@ class _SignupScreenState extends State<SignupScreen> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          child:
-                                          SizedBox(
-                                              width: 84,
-                                              height: 87,
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Image.asset('assets/images/school (1) 1.png' ,
-                                                  width: 32,
-                                                  height: 32,),
-                                                  SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  Text('School'.tr ,
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontFamily: 'Poppins-Regular',
-                                                      fontWeight: FontWeight.w500,
-                                                      color: Colors.white),),
-                                                ],
-                                              )),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                                colors: [ Color(0xff442B72) ,
-                                                  Color(0xffA79FD9)
-                                                ]
-                                            )
+                                        GestureDetector(
+                                          child: Container(
+                                            child:
+                                            SizedBox(
+                                                width: 84,
+                                                height: 87,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Image.asset('assets/images/school (1) 1.png' ,
+                                                    width: 32,
+                                                    height: 32,),
+                                                    SizedBox(
+                                                      height: 8,
+                                                    ),
+                                                    Text('School'.tr ,
+                                                    style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontFamily: 'Poppins-Regular',
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Colors.white),),
+                                                  ],
+                                                )),
+                                            decoration: BoxDecoration(
+                                                // border: Border.all(
+                                                //   color: selectedContainer == 1 ? Color(0xFF442B72) : Colors.transparent,
+                                                //   width: selectedContainer == 1 ? 3 : 0,
+                                                // ),
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                  colors: [ Color(0xff442B72) ,
+                                                    Color(0xffA79FD9)
+                                                  ]
+                                              )
+                                            ),
                                           ),
+                                          onTap: (){
+                                            setState(() {
+                                              selectedImage = 1;
+                                            });
+                                          },
                                         ),
                                         GestureDetector(
                                           onTap: (){
@@ -422,9 +434,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 )),
       
                                             decoration: BoxDecoration(
-                                              border:  Border.all(
-                                                width: _isChecked?3 : 0,
-                                                  color: _isChecked? Color(0xff442B72).withOpacity(0.5) : Colors.transparent),
+                                              // border:  Border.all(
+                                                // width: _isChecked?3 : 0,
+                                                //   color: _isChecked? Color(0xff442B72).withOpacity(0.5) : Colors.transparent),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Color(0xff442B72).withOpacity(0.5),
