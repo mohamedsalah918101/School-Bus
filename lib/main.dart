@@ -13,7 +13,7 @@ SharedPreferences? sharedpref;
 void main()async  {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    name: 'school_account',
+    // name: 'school_account',
     options: FirebaseOptions(
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_AUTH_DOMAIN",

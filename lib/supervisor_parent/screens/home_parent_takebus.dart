@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/children_takebus_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
@@ -34,7 +34,7 @@ class _HomeParentTakeBusState extends State<HomeParentTakeBus> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      endDrawer: HomeDrawer(),
+      endDrawer: ParentDrawer(),
       body: Column(
         children: [
           SizedBox(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
 import 'package:school_account/supervisor_parent/components/parents_card_in_student.dart';
 import 'package:school_account/supervisor_parent/components/student_card_in_student.dart';

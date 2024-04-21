@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/children_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_parent.dart';
@@ -34,7 +34,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        endDrawer: HomeDrawer(),
+        endDrawer: ParentDrawer(),
         key: _scaffoldKey,
         body: Column(
           children: [
