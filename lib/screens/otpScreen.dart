@@ -52,6 +52,23 @@ class _OtpScreenState extends State<OtpScreen> {
   }
   final _firestore = FirebaseFirestore.instance;
 
+  void _addDataToSupervisorFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+    // Define the data to add
+    Map<String, dynamic> data = {
+      'name': widget.name,
+      'phoneNumber': widget.phone,
+    };
+
+    // Add the data to the Firestore collection
+    await _firestore.collection('supervisor').add(data).then((docRef) {
+      print('Data added with document ID: ${docRef.id}');
+      // showSnackBarFun(context);
+    }).catchError((error) {
+      print('Failed to add data: $error');
+    });
+  }
+
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
@@ -333,6 +350,8 @@ class _OtpScreenState extends State<OtpScreen> {
                                     setState(() {
                                       _isLoading =true;
                                     });
+                                    if(widget.type == 2){
+                                    _addDataToSupervisorFirestore();}
                                     //erifyPhoneNumber(enteredPhoneNumber);
                                     //my code
                                     try{
