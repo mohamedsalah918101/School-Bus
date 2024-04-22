@@ -27,11 +27,10 @@ class _LoginScreenState extends State<LoginScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String enteredPhoneNumber = '';
-  int selectedImage = 0;
   String phoneNumber = '';
   MyLocalController ControllerLang = Get.find();
   bool _phoneNumberEntered = true;
- //function to move to sign up page
+  //function to move to sign up page
   void navigateToSignUpScreen(BuildContext context) {
     Navigator.push(
       context,
@@ -89,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Auto-retrieve verification code
         await _auth.signInWithCredential(credential);
-Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber, selectedImage: selectedImage,)) );
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
       },
       verificationFailed: (FirebaseAuthException e) {
         // Verification failed
@@ -98,7 +97,7 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
 
-       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId, selectedImage: selectedImage,)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId)));
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),
@@ -258,143 +257,143 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
                                         subtitle1: TextStyle(color: Color(0xFF442B72)),
                                       ),
                                     ),
-                                   child: Padding(
+                                    child: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 2),
                                       // Adjust horizontal padding
                                       child: SizedBox(
                                         width: constrains.maxWidth / 1.4,
                                         height: 57,
                                         child:
-                                          Directionality(
-                                            textDirection: _phoneNumberController.text.startsWith('0') ? TextDirection.rtl : TextDirection.ltr,
-                                            child: IntlPhoneField(
+                                        Directionality(
+                                          textDirection: _phoneNumberController.text.startsWith('0') ? TextDirection.rtl : TextDirection.ltr,
+                                          child: IntlPhoneField(
 
-                                              cursorColor:Color(0xFF442B72) ,
-                                              controller: _phoneNumberController,
-                                              dropdownIconPosition:IconPosition.trailing,
-                                              invalidNumberMessage:" ",
-                                              style: TextStyle(color: Color(0xFF442B72),height: 1.5),
-                                              dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
-                                              decoration: InputDecoration(
-                                                fillColor: Color(0xffF1F1F1),
-                                                filled: true,
-                                                hintText: 'Phone Number'.tr,
-                                                hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
+                                            cursorColor:Color(0xFF442B72) ,
+                                            controller: _phoneNumberController,
+                                            dropdownIconPosition:IconPosition.trailing,
+                                            invalidNumberMessage:" ",
+                                            style: TextStyle(color: Color(0xFF442B72),height: 1.5),
+                                            dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
+                                            decoration: InputDecoration(
+                                              fillColor: Color(0xffF1F1F1),
+                                              filled: true,
+                                              hintText: 'Phone Number'.tr,
+                                              hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
 
-                                                border:
-                                                OutlineInputBorder(
-                                                  borderRadius: BorderRadius.all(Radius.circular(7)),
-                                                  borderSide:  BorderSide(
-                                                    color: !_phoneNumberEntered
-                                                        ? Colors.red // Red border if phone number not entered
-                                                        : Color(0xFFFFC53E),
-                                                  ),
+                                              border:
+                                              OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                                borderSide:  BorderSide(
+                                                  color: !_phoneNumberEntered
+                                                      ? Colors.red // Red border if phone number not entered
+                                                      : Color(0xFFFFC53E),
                                                 ),
+                                              ),
 
-                                                focusedErrorBorder: OutlineInputBorder(
+                                              focusedErrorBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                                borderSide: BorderSide(
+                                                    color: Colors.red,
+                                                    width: 2
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                                borderSide: BorderSide(
+                                                  color: Color(0xFFFFC53E),
+                                                  width: 0.5,
+                                                ),
+                                              ),
+                                              errorBorder: OutlineInputBorder(
                                                   borderRadius: BorderRadius.all(Radius.circular(7)),
                                                   borderSide: BorderSide(
                                                       color: Colors.red,
                                                       width: 2
-                                                  ),
+                                                  )
+                                              ),
+                                              focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
+                                                borderRadius: BorderRadius.circular(10.0),
+                                                borderSide: BorderSide(
+                                                  color: Color(0xFFFFC53E),
                                                 ),
-                                                        enabledBorder: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                                                          borderSide: BorderSide(
-                                                            color: Color(0xFFFFC53E),
-                                                            width: 0.5,
-                                                          ),
-                                                        ),
-                                                errorBorder: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.all(Radius.circular(7)),
-                                                    borderSide: BorderSide(
-                                                        color: Colors.red,
-                                                        width: 2
-                                                    )
-                                                ),
-                                                focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
-                                                  borderRadius: BorderRadius.circular(10.0),
-                                                  borderSide: BorderSide(
-                                                    color: Color(0xFFFFC53E),
-                                                  ),
-                                                ),
-
-
-                                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-
-
                                               ),
 
-                                              initialCountryCode: 'EG', // Set initial country code if needed
-                                              onChanged: (phone) {
-                                                // Update the enteredPhoneNumber variable with the entered phone number
-                                                setState(() {
-                                                  enteredPhoneNumber = phone.completeNumber;
-                                                });
-                                              },
+
+                                              contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+
 
                                             ),
+
+                                            initialCountryCode: 'EG', // Set initial country code if needed
+                                            onChanged: (phone) {
+                                              // Update the enteredPhoneNumber variable with the entered phone number
+                                              setState(() {
+                                                enteredPhoneNumber = phone.completeNumber;
+                                              });
+                                            },
+
                                           ),
+                                        ),
 
                                       ),
 
 
-                                    //  child: SizedBox(
-                                    //     width: constrains.maxWidth / 1.4,
-                                    //     height: 60,
-                                    //     child:
-                                    //     IntlPhoneField(
-                                    //       showCountryFlag: false,
-                                    //       cursorColor:  Color(0xFF442B72),
-                                    //       decoration: InputDecoration(
-                                    //         counterStyle: TextStyle(height: double.minPositive,),
-                                    //         counterText: "",
-                                    //         filled: true,
-                                    //         fillColor: const Color(0xFFF1F1F1),
-                                    //         contentPadding: const EdgeInsets.all(3),
-                                    //         alignLabelWithHint: true,
-                                    //         labelText: 'Phone Number'.tr,
-                                    //         labelStyle: TextStyle(
-                                    //           color: Color(0xFFC2C2C2),
-                                    //           fontSize: 12,
-                                    //           fontFamily: 'Poppins-Bold',
-                                    //           // fontFamily: 'Inter-Bold',
-                                    //           fontWeight: FontWeight.w700,
-                                    //           height: 1.33,
-                                    //         ),
-                                    //         border: OutlineInputBorder(
-                                    //             borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    //             borderSide: BorderSide(
-                                    //               color:  Color(0xFFFFC53E),
-                                    //               width: 0.5,
-                                    //             )
-                                    //         ),
-                                    //
-                                    //         focusedErrorBorder: OutlineInputBorder(
-                                    //           borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    //           borderSide: BorderSide(
-                                    //             color: Color(0xFFFFC53E),
-                                    //             width: 0.5,
-                                    //           ),
-                                    //         ),
-                                    //         enabledBorder: OutlineInputBorder(
-                                    //           borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    //           borderSide: BorderSide(
-                                    //             color: Color(0xFFFFC53E),
-                                    //             width: 0.5,
-                                    //           ),
-                                    //         ),
-                                    //       ),
-                                    //       languageCode: "Eg",
-                                    //       onChanged: (phone) {
-                                    //         // print(phone.completeNumber);
-                                    //       },
-                                    //       onCountryChanged: (country) {
-                                    //         // print('Country changed to: ' + country.name);
-                                    //       },
-                                    //     ),
-                                    //   ),
-                                     ),
+                                      //  child: SizedBox(
+                                      //     width: constrains.maxWidth / 1.4,
+                                      //     height: 60,
+                                      //     child:
+                                      //     IntlPhoneField(
+                                      //       showCountryFlag: false,
+                                      //       cursorColor:  Color(0xFF442B72),
+                                      //       decoration: InputDecoration(
+                                      //         counterStyle: TextStyle(height: double.minPositive,),
+                                      //         counterText: "",
+                                      //         filled: true,
+                                      //         fillColor: const Color(0xFFF1F1F1),
+                                      //         contentPadding: const EdgeInsets.all(3),
+                                      //         alignLabelWithHint: true,
+                                      //         labelText: 'Phone Number'.tr,
+                                      //         labelStyle: TextStyle(
+                                      //           color: Color(0xFFC2C2C2),
+                                      //           fontSize: 12,
+                                      //           fontFamily: 'Poppins-Bold',
+                                      //           // fontFamily: 'Inter-Bold',
+                                      //           fontWeight: FontWeight.w700,
+                                      //           height: 1.33,
+                                      //         ),
+                                      //         border: OutlineInputBorder(
+                                      //             borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      //             borderSide: BorderSide(
+                                      //               color:  Color(0xFFFFC53E),
+                                      //               width: 0.5,
+                                      //             )
+                                      //         ),
+                                      //
+                                      //         focusedErrorBorder: OutlineInputBorder(
+                                      //           borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      //           borderSide: BorderSide(
+                                      //             color: Color(0xFFFFC53E),
+                                      //             width: 0.5,
+                                      //           ),
+                                      //         ),
+                                      //         enabledBorder: OutlineInputBorder(
+                                      //           borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      //           borderSide: BorderSide(
+                                      //             color: Color(0xFFFFC53E),
+                                      //             width: 0.5,
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       languageCode: "Eg",
+                                      //       onChanged: (phone) {
+                                      //         // print(phone.completeNumber);
+                                      //       },
+                                      //       onCountryChanged: (country) {
+                                      //         // print('Country changed to: ' + country.name);
+                                      //       },
+                                      //     ),
+                                      //   ),
+                                    ),
                                   ),
                                   if (!_phoneNumberEntered)
                                     Align(alignment: AlignmentDirectional.topStart,
@@ -444,7 +443,7 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
                                       // Otp pageلسه معملتهاش ودا الكود اللى بيودينى عليها
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(30)
+                                            borderRadius: BorderRadius.circular(30)
                                         ),
                                         child: ElevatedSimpleButton(
                                           txt: 'Login'.tr,
@@ -535,7 +534,6 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
     );
   }
 }
-
 
 
 

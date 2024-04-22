@@ -36,6 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
     Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: enteredNumber);
     try {
       QuerySnapshot snapshot = await queryOfNumber.get();
+      print(snapshot.docs);
       return snapshot.size > 0;
     } catch (error) {
       print('Error: $error');
@@ -506,14 +507,25 @@ class _SignupScreenState extends State<SignupScreen> {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                   // children.isNotEmpty?
-                                                    OtpScreen(
-                                                      verificationId: verificationId,
-                                                      selectedImage: selectedImage,
+                                                  LoginScreen(
+
                                                     )
                                                   //no data
                                                 // : NoInvitation( selectedImage: selectedImage)
-                                              ));}
+                                              ));
+                                              }
                                               else {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                        // children.isNotEmpty?
+                                                        OtpScreen(verificationId: '',
+
+                                                        )
+                                                      //no data
+                                                      // : NoInvitation( selectedImage: selectedImage)
+                                                    ));
                                                 print('no');
                                                 SnackBar(
                                                   content: Text('Name does not exist in the document.'),
@@ -606,3 +618,4 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
+

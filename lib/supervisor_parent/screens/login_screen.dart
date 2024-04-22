@@ -12,6 +12,7 @@ import 'package:school_account/supervisor_parent/screens/no_invitation.dart';
 import 'package:school_account/supervisor_parent/screens/otp_screen.dart';
 import 'package:school_account/supervisor_parent/screens/sign_up.dart';
 import '../../controller/local_controller.dart';
+import '../../screens/signUpScreen.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/text_form_field_login_custom.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -301,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                const SignupScreen())),
+                                                const SignUpScreen())),
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text.rich(
