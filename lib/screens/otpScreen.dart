@@ -19,8 +19,10 @@ class OtpScreen extends StatefulWidget {
   //new code
   final String verificationId;
   int? type = 0;
+  String? name;
+  String? phone;
 
-  OtpScreen({Key? key, required this.verificationId,this.type}) : super(key: key);
+  OtpScreen({Key? key, required this.verificationId,this.type,this.name,this.phone}) : super(key: key);
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
@@ -47,6 +49,23 @@ class _OtpScreenState extends State<OtpScreen> {
         }
       });
     });
+  }
+  final _firestore = FirebaseFirestore.instance;
+
+  void _addDataToFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+    // Define the data to add
+    Map<String, dynamic> data = {
+      'name': widget.name,
+      'phonenumber': widget.phone,
+    };
+    // Add the data to the Firestore collection
+    await _firestore.collection('schooldata').add(data).then((docRef) {
+      print('Data added with document ID: ${docRef.id}');
+    }).catchError((error) {
+      print('Failed to add data: $error');
+    });
+
   }
   @override
   void initState() {
@@ -321,6 +340,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
                                       if(widget.type == 1){
+                                        _addDataToFirestore();
                                         Navigator.push(
                                             context ,
                                             MaterialPageRoute(

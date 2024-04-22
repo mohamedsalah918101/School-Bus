@@ -79,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         });
         // Auto-retrieve verification code
         await _auth.signInWithCredential(credential);
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber,name:_name.text,phone:_phoneNumberController.text)) );
       },
       verificationFailed: (FirebaseAuthException e) {
         setState(() {
@@ -99,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
 
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId,type:selectedContainer)));
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber,name:_name.text,phone:_phoneNumberController.text)) );
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),
@@ -135,6 +135,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _name = TextEditingController();
   final _phoneNumberFocusNode = FocusNode();
   bool _nameuser = true;
+  TextEditingController PhoneNumberController = TextEditingController();
+  bool isPhoneExiting = false;
+String typeAccount='';
+
+  Future<bool> checkIfNumberExists(String enteredNumber) async {
+    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection(typeAccount);
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: enteredNumber);
+    try {
+      setState(() {
+        _isLoading = false;
+
+      });
+      QuerySnapshot snapshot = await queryOfNumber.get();
+      print(snapshot.docs);
+      return snapshot.size > 0;
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+
+      });
+      print('Error: $error');
+      return false;
+    }
+  }
+
   bool _validatename() {
     //return _name.text.isNotEmpty;
 
@@ -647,7 +672,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           GestureDetector(onTap:(){
                                             setState(() {
                                               selectedContainer =1;
-
+                                              typeAccount ='schooldata';
                                             });
                                           },
                                             child: Padding(
@@ -697,6 +722,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             onTap: (){
                                               setState(() {
                                                 selectedContainer = 2;
+                                                typeAccount ='supervisor';
                                                 borderColor = Color(0xFF150628);
                                               });
 
@@ -745,6 +771,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             onTap: (){
                                               setState(() {
                                                 selectedContainer = 3;
+                                                typeAccount ='parent';
                                                 borderColor = Color(0xFF150628);
                                               });
 
@@ -864,23 +891,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           //     // Handle error, maybe show a Snackbar or similar
                                           //   }
                                           // },
-                                          onPress: () {
-
+                                          onPress: () async {
                                             if (
                                             //_validatename()&&
                                             _validatePhoneNumber()) { // Step 3
                                               _isLoading = true;
+                                              String EnteredPhoneNumber = PhoneNumberController.text;
+                                            bool isNumberExits = await checkIfNumberExists(EnteredPhoneNumber);
+                                            setState(() {
+                                              isPhoneExiting = isNumberExits ;
+                                            });
+                                            if(isNumberExits){
+                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already exist')));
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                      // children.isNotEmpty?
+                                                      LoginScreen(
+
+                                                      )
+                                                    //no data
+                                                    // : NoInvitation( selectedImage: selectedImage)
+                                                  ));
+                                            }
+                                            else {
+                                              _isLoading = true;
+
+
                                               verifyPhoneNumber(enteredPhoneNumber);
-                                              // Navigator.push(
-                                              // context,
-                                              // MaterialPageRoute(builder: (context) =>  OtpScreen(phoneNumber: enteredPhoneNumber)),
-                                              // );
-                                            } else {
+
+
+                                            } } else {
                                               _nameuser=false;
                                               _phoneNumberEntered = false;
                                               //message error if user doesn't enter phone number
 
                                             }
+
+                                            // else{
+                                            // if (
+                                            // //_validatename()&&
+                                            // _validatePhoneNumber()) { // Step 3
+                                            //   _isLoading = true;
+                                            //   verifyPhoneNumber(enteredPhoneNumber);
+                                            //   // Navigator.push(
+                                            //   // context,
+                                            //   // MaterialPageRoute(builder: (context) =>  OtpScreen(phoneNumber: enteredPhoneNumber)),
+                                            //   // );
+                                            // } else {
+                                            //   _nameuser=false;
+                                            //   _phoneNumberEntered = false;
+                                            //   //message error if user doesn't enter phone number
+                                            //
+                                            // }}
 
                                           },
                                           // => Navigator.push(
