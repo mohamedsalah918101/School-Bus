@@ -30,16 +30,17 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController PhoneNumberController = TextEditingController();
   bool isPhoneExiting = false;
 
-  
-  Future<bool> checkIfNumberExists(String enterdNumber){
-      CollectionReference SupervisorCollection = FirebaseFirestore.instance.collection('supervisor');
-      Query queryOfNumber = SupervisorCollection.where('phoneNumber' , isEqualTo: enterdNumber);
-      return queryOfNumber.get().then((QuerySnapshot snapshot){
-        return snapshot.size > 0;
-      }).catchError((error){
-        print('Error: $error');
-        return false;
-      });
+
+  Future<bool> checkIfNumberExists(String enteredNumber) async {
+    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: enteredNumber);
+    try {
+      QuerySnapshot snapshot = await queryOfNumber.get();
+      return snapshot.size > 0;
+    } catch (error) {
+      print('Error: $error');
+      return false;
+    }
   }
 
 // to lock in landscape view
@@ -494,11 +495,12 @@ class _SignupScreenState extends State<SignupScreen> {
                                           txt: 'Create Account'.tr,
                                           onPress: () async {
                                               String EnteredPhoneNumber = PhoneNumberController.text;
-                                              Future<bool> isNumberExits = checkIfNumberExists(EnteredPhoneNumber);
+                                              bool isNumberExits = await checkIfNumberExists(EnteredPhoneNumber);
                                               setState(() {
-                                                isPhoneExiting = isNumberExits as bool;
+                                                isPhoneExiting = isNumberExits ;
                                               });
-                                              if(await isNumberExits){
+                                              if(isNumberExits){
+                                                print('object');
                                               Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -512,6 +514,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 // : NoInvitation( selectedImage: selectedImage)
                                               ));}
                                               else {
+                                                print('no');
                                                 SnackBar(
                                                   content: Text('Name does not exist in the document.'),
                                                 );

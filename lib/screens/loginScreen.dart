@@ -489,7 +489,7 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => SignUpScreen(),
+                                          builder: (context) => SignupScreen(),
                                         ),
                                       );
                                     },
