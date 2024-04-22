@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -26,6 +27,20 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isChecked = false;
   MyLocalController ControllerLang = Get.find();
   List<ChildDataItem> children = [];
+  TextEditingController PhoneNumberController = TextEditingController();
+  bool isPhoneExiting = false;
+
+  
+  Future<bool> checkIfNumberExists(String enterdNumber){
+      CollectionReference SupervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+      Query queryOfNumber = SupervisorCollection.where('phoneNumber' , isEqualTo: enterdNumber);
+      return queryOfNumber.get().then((QuerySnapshot snapshot){
+        return snapshot.size > 0;
+      }).catchError((error){
+        print('Error: $error');
+        return false;
+      });
+  }
 
 // to lock in landscape view
   @override
@@ -217,6 +232,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                         height: 36,
                                         child:
                                         IntlPhoneField(
+                                          controller: PhoneNumberController,
                                           textAlign:  (sharedpref?.getString('lang') == 'ar') ?
                                           TextAlign.right :
                                           TextAlign.left ,
@@ -473,9 +489,17 @@ class _SignupScreenState extends State<SignupScreen> {
                                     SizedBox(
                                       width: constrains.maxWidth ,
                                       child: Center(
+// <<<<<<< HEAD
                                         child: ElevatedSimpleButton(
                                           txt: 'Create Account'.tr,
-                                          onPress: () => Navigator.push(
+                                          onPress: () async {
+                                              String EnteredPhoneNumber = PhoneNumberController.text;
+                                              Future<bool> isNumberExits = checkIfNumberExists(EnteredPhoneNumber);
+                                              setState(() {
+                                                isPhoneExiting = isNumberExits as bool;
+                                              });
+                                              if(await isNumberExits){
+                                              Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
@@ -486,7 +510,12 @@ class _SignupScreenState extends State<SignupScreen> {
                                                     )
                                                   //no data
                                                 // : NoInvitation( selectedImage: selectedImage)
-                                              )),
+                                              ));}
+                                              else {
+                                                SnackBar(
+                                                  content: Text('Name does not exist in the document.'),
+                                                );
+                                              }},
                                                     // NoInvitation())),
                                           width: constrains.maxWidth ,
                                           hight: 48,
@@ -494,6 +523,30 @@ class _SignupScreenState extends State<SignupScreen> {
                                           fontSize: 16,
                                           fontFamily: 'Poppins-Regular',
                                         ),
+// =======
+                                        // child: ElevatedSimpleButton(
+                                        //   txt: 'Create Account'.tr,
+                                        //   onPress: () =>
+                                        //       Navigator.push(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //           builder: (context) =>
+                                        //           // children.isNotEmpty?
+                                        //             OtpScreen(
+                                        //               selectedImage: selectedImage,
+                                        //             )
+                                        //           //no data
+                                        //         // : NoInvitation( selectedImage: selectedImage)
+                                        //       )
+                                        //   ),
+                                        //             // NoInvitation())),
+                                        //   width: constrains.maxWidth ,
+                                        //   hight: 48,
+                                        //   color: const Color(0xFF442B72),
+                                        //   fontSize: 16,
+                                        //   fontFamily: 'Poppins-Regular',
+                                        // ),
+// >>>>>>> 075f556c54a2b6bff59c5d34717861a72a7ae1eb
                                       ),
                                     ) ,
                                     SizedBox( height:2),
