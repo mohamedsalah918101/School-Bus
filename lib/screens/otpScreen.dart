@@ -350,8 +350,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                     setState(() {
                                       _isLoading =true;
                                     });
-                                    _addDataToSupervisorFirestore();
-                                    //verifyPhoneNumber(enteredPhoneNumber);
+                                    if(widget.type == 2){
+                                    _addDataToSupervisorFirestore();}
+                                    //erifyPhoneNumber(enteredPhoneNumber);
                                     //my code
                                     try{
                                       PhoneAuthCredential credential = PhoneAuthProvider.credential(
