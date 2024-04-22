@@ -156,7 +156,7 @@ Reference referenceImageToUpload =referenceDirImages.child('name');
     ]);
     super.dispose();
   }
-  final _yourGoogleAPIKey = 'AIzaSyBrN68Q6VpRE7oHMFsk5K2M-tDLgTnpKzs';
+  final _yourGoogleAPIKey = 'AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA';
   final _textController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
@@ -604,7 +604,7 @@ Reference referenceImageToUpload =referenceDirImages.child('name');
                                   //     textEditingController: _textController,
                                   //     googleAPIKey: _yourGoogleAPIKey,
                                   //     decoration: const InputDecoration(
-                                  //       hintText: 'Enter your address',
+                                  //
                                   //       labelText: 'Address',
                                   //       labelStyle: TextStyle(color: Colors.purple),
                                   //       border: OutlineInputBorder(),
@@ -619,7 +619,7 @@ Reference referenceImageToUpload =referenceDirImages.child('name');
                                   //     maxLines: 1,
                                   //     overlayContainer: (child) => Material(
                                   //       elevation: 1.0,
-                                  //       color: Colors.green,
+                                  //       color: Colors.white,
                                   //       borderRadius: BorderRadius.circular(12),
                                   //       child: child,
                                   //     ),
@@ -630,12 +630,60 @@ Reference referenceImageToUpload =referenceDirImages.child('name');
                                   //     _textController.text = prediction.description!,
                                   //   ),
                                   // ),
-                                  const SizedBox(height: 24),
-                                  TextButton(
-                                    onPressed: _onSubmit,
-                                    child: const Text('Submit'),
-                                  ),
 
+                                  Form(
+                                    key: _formKey,
+                                    autovalidateMode: _autovalidateMode,
+                                    child: GooglePlacesAutoCompleteTextFormField(
+                                      textEditingController: _textController,
+                                      googleAPIKey: _yourGoogleAPIKey,
+                                      decoration: InputDecoration(
+                                        labelText: 'Address',
+                                        labelStyle: TextStyle(color: Colors.purple),
+                                        suffixIcon: Image.asset(
+                                          "assets/imgs/school/icons8_Location.png",
+                                          width: 23,
+                                          height: 23,
+                                        ),
+                                        alignLabelWithHint: true,
+                                        counterText: "",
+                                        fillColor: const Color(0xFFF1F1F1),
+                                        filled: true,
+                                        contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
+                                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                                        hintStyle: const TextStyle(
+                                          color: Color(0xFFC2C2C2),
+                                          fontSize: 12,
+                                          fontFamily: 'Inter-Bold',
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.33,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(color: Colors.black), // Customize border color
+                                        ),
+                                        enabledBorder: myInputBorder(),
+                                        focusedBorder: myFocusBorder(),
+                                      ),
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return 'Please enter some text';
+                                        }
+                                        return null;
+                                      },
+                                      maxLines: 1,
+                                      overlayContainer: (child) => Material(
+                                        elevation: 1.0,
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: child,
+                                      ),
+                                      getPlaceDetailWithLatLng: (prediction) {
+                                        print('placeDetails${prediction.lng}');
+                                      },
+                                      itmClick: (Prediction prediction) => _textController.text = prediction.description!,
+                                    ),
+                                  ),
 
                                   const SizedBox(
                                     height: 25,
