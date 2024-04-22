@@ -45,6 +45,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
     return isValid;
   }
+  // Future<void> verifyPhoneNumber(String phoneNumber) async {
+  //   await _auth.verifyPhoneNumber(
+  //     phoneNumber: phoneNumber,
+  //     verificationCompleted: (PhoneAuthCredential credential) async {
+  //       // Auto-retrieve verification code
+  //       await _auth.signInWithCredential(credential);
+  //       Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+  //     },
+  //     verificationFailed: (FirebaseAuthException e) {
+  //       // Verification failed
+  //     },
+  //     codeSent: (String verificationId, int? resendToken) async {
+  //       // Save the verification ID for future use
+  //       String smsCode = 'xxxxxx'; // Code input by the user
+  //
+  //       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId)));
+  //     },
+  //     codeAutoRetrievalTimeout: (String verificationId) {},
+  //     timeout: Duration(seconds: 60),
+  //   );
+  // }
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
@@ -476,7 +497,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                                                     initialCountryCode: 'EG', // Set initial country code if needed
                                                     onChanged: (phone) {
-                                                      // Handle phone number changes
+                                                      // Update the enteredPhoneNumber variable with the entered phone number
+                                                      setState(() {
+                                                        enteredPhoneNumber = phone.completeNumber;
+                                                      });
                                                     },
 
                                                   ),
@@ -821,7 +845,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       //   }
                                       // },
                                       onPress: () {
-                                  if (_validatename()&&_validatePhoneNumber()) { // Step 3
+                                  if (
+                                  //_validatename()&&
+                                      _validatePhoneNumber()) { // Step 3
                                     verifyPhoneNumber(enteredPhoneNumber);
                                   // Navigator.push(
                                   // context,

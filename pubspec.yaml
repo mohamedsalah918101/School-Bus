@@ -56,6 +56,8 @@ dependencies:
   fdottedline_nullsafety: ^2.0.0
   image_picker: ^1.0.2
   path_provider: ^2.1.1
+  firebase_storage: ^11.6.0
+  google_places_autocomplete_text_field: ^0.1.3
 
 dev_dependencies:
   flutter_test:

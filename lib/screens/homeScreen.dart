@@ -56,8 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // هنا تقوم بتعريف الحالة
   bool _isButtonDisabled= true;
 
-  //هنا بتعريق الدالة التي ستفوم بعمل الزيادة
-
   void _incrementCounter() {
     setState(() {
       _isButtonDisabled = true;

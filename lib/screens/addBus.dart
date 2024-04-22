@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -39,7 +40,30 @@ class _AddBusState extends State<AddBus> {
   final _driverNumberFocus = FocusNode();
   final _busNumberFocus = FocusNode();
   final _supervisorFocus = FocusNode();
+// add to firestore
+  final _firestore = FirebaseFirestore.instance;
+  void _addDataToFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+    // Define the data to add
+    Map<String, dynamic> data = {
+      'namedriver': _driverName.text,
+      'phonedriver': _driverNumber.text,
+      'busnumber': _busNumber.text,
+      'supervisorname':_supervisor.text
+    };
+    // Add the data to the Firestore collection
+    await _firestore.collection('busdata').add(data).then((docRef) {
+      print('Data added with document ID: ${docRef.id}');
 
+    }).catchError((error) {
+      print('Failed to add data: $error');
+    });
+    // Clear the text fields
+    _driverName.clear();
+    _driverNumber.clear();
+    _busNumber.clear();
+    _supervisor.clear();
+  }
 // to lock in landscape view
   @override
   void initState() {
@@ -670,6 +694,7 @@ class _AddBusState extends State<AddBus> {
                                   child: ElevatedSimpleButton(
                                     txt: "Add".tr,
                                     onPress: (){
+                                      _addDataToFirestore();
                                       Navigator.push(
                                           context ,
                                           MaterialPageRoute(
