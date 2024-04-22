@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import '../components/bottom_bar_item.dart';
@@ -36,7 +34,6 @@ class _SchoolDataState extends State<SchoolData> {
   final _AddressFocus = FocusNode();
   final _CoordinatorFocus = FocusNode();
   final _SupporterFocus = FocusNode();
-
 
 // to lock in landscape view
   @override
@@ -81,616 +78,613 @@ class _SchoolDataState extends State<SchoolData> {
     return SafeArea(
       child: Scaffold(
         //غيرت resizeToAvoidBottomInset من false ل true علشان لما اكتب ال تيكست فيلد يظهر
-          resizeToAvoidBottomInset: true,
-          backgroundColor: const Color(0xFFFFFFFF),
-          body: LayoutBuilder(builder: (context, constrains) {
-            return SingleChildScrollView(
-              reverse: true,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        resizeToAvoidBottomInset: true,
+        backgroundColor: const Color(0xFFFFFFFF),
+        body: LayoutBuilder(builder: (context, constrains) {
+          return SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 5,
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                //   child: InkWell(onTap: (){},
+                //     child: const Icon(
+                //       Icons.menu_rounded,
+                //       size: 40,
+                //       color: Color(0xff442B72),
+                //     ),
+                //   ),
+                // ),
+
+                const SizedBox(
+                  height: 45,
+                ),
+                Center(
+                  child: Text(
+                    "Welcome".tr,
+                    style: TextStyle(
+                      color: Color(0xFF993D9A),
+                      fontSize: 25,
+                      fontFamily: 'Poppins-Bold',
+                      fontWeight: FontWeight.bold,
+                      height: 0.64,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Stack(
                     children: [
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      //   child: InkWell(onTap: (){},
-                      //     child: const Icon(
-                      //       Icons.menu_rounded,
-                      //       size: 40,
-                      //       color: Color(0xff442B72),
-                      //     ),
-                      //   ),
-                      // ),
 
-                      const SizedBox(
-                        height: 45,
-                      ),
-                      Center(
-                        child: Text(
-                          "Welcome".tr,
-                          style: TextStyle(
-                            color: Color(0xFF993D9A),
-                            fontSize: 25,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.bold,
-                            height: 0.64,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Stack(
+                        padding: const EdgeInsets.only(top:5),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-
+                            // Padding(
+                            //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            //   child: InkWell(
+                            //     onTap: ()
+                            //     {
+                            //       Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(
+                            //               builder: (context) =>
+                            //                   MainBottomNavigationBar(pageNum: 5),
+                            //               maintainState: false));
+                            //     },
+                            //     // child: Image.asset(
+                            //     //   'assets/imgs/school/Vector (11).png',
+                            //     //   width: 22,
+                            //     //   height: 22,
+                            //     // ),
+                            //   ),
+                            // ),
                             Padding(
-                              padding: const EdgeInsets.only(top:5),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Padding(
-                                  //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                  //   child: InkWell(
-                                  //     onTap: ()
-                                  //     {
-                                  //       Navigator.push(
-                                  //           context,
-                                  //           MaterialPageRoute(
-                                  //               builder: (context) =>
-                                  //                   MainBottomNavigationBar(pageNum: 5),
-                                  //               maintainState: false));
-                                  //     },
-                                  //     // child: Image.asset(
-                                  //     //   'assets/imgs/school/Vector (11).png',
-                                  //     //   width: 22,
-                                  //     //   height: 22,
-                                  //     // ),
-                                  //   ),
-                                  // ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
+                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child:
 
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            //color: Colors.black, // Setting default text color to black
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-Bold',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: "School logo".tr,
-                                              style: TextStyle(color: Color(0xFF442B72)),
-                                            ),
-                                            TextSpan(
-                                              text: " *".tr,
-                                              style: TextStyle(color: Color(0xFFAD1519)),
-                                            ),
-                                          ],
-                                        ),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      //color: Colors.black, // Setting default text color to black
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "School logo".tr,
+                                        style: TextStyle(color: Color(0xFF442B72)),
                                       ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                                    // Adjust horizontal padding
-                                    child: SizedBox(
-                                      width: constrains.maxWidth / 1.4,
-
-
-                                    ),
-
-
-
-                                  ),
-
-
-                                  // TextFormFieldCustom(
-                                  //   width: constrains.maxWidth / 1.4,
-                                  //   hintTxt: 'Your Phone'.tr,
-                                  // ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-
-                                  FDottedLine(
-                                    color:Color(0xFF442B72),
-                                    strokeWidth: 2.0,
-                                    dottedLength: 8.0,
-                                    space: 3.0,
-                                    corner: FDottedLineCorner.all(6.0),
-
-                                    /// add widget
-                                    child: Container(
-                                      width: 100,
-                                      height: 100,
-                                      alignment: Alignment.center,
-                                      child: Text("School logo",style: TextStyle(color:Color(0xFF442B72),fontSize:11,fontFamily:'Poppins-Regular'   ),),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 40,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            //color: Colors.black, // Setting default text color to black
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-Bold',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: "School name in English".tr,
-                                              style: TextStyle(color: Color(0xFF442B72)),
-                                            ),
-                                            TextSpan(
-                                              text: " *".tr,
-                                              style: TextStyle(color: Color(0xFFAD1519)),
-                                            ),
-                                          ],
-                                        ),
+                                      TextSpan(
+                                        text: " *".tr,
+                                        style: TextStyle(color: Color(0xFFAD1519)),
                                       ),
-                                      // Text(
-                                      //   'School name in English'.tr,
-                                      //   style: TextStyle(
-                                      //     color: Color(0xFF442B72),
-                                      //     fontSize: 15,
-                                      //     fontFamily: 'Poppins-Bold',
-                                      //     fontWeight: FontWeight.w700,
-                                      //     height: 1.07,
-                                      //   ),
-                                      // ),
-                                    ),
+                                    ],
                                   ),
-                                  SizedBox(height: 10,),
-                                  Container(
-                                    width: constrains.maxWidth / 1.2,
-                                    height: 44,
-                                    child: TextFormField(
-                                      controller: _nameEnglish,
-                                      cursorColor: const Color(0xFF442B72),
-                                      style: TextStyle(color: Color(0xFF442B72)),
-                                      textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                      onFieldSubmitted: (value) {
-                                        // move to the next field when the user presses the "Done" button
-                                        FocusScope.of(context).requestFocus(_NameArabicFocus);
-                                      },
-                                      //textDirection: TextDirection.ltr,
-                                      scrollPadding: const EdgeInsets.symmetric(
-                                          vertical: 40),
-                                      decoration:  InputDecoration(
-                                        alignLabelWithHint: true,
-                                        counterText: "",
-                                        fillColor: const Color(0xFFF1F1F1),
-                                        filled: true,
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            8, 30, 10, 5),
-                                        hintText:"Your Name".tr,
-                                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                        hintStyle: const TextStyle(
-                                          color: Color(0xFFC2C2C2),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.33,
-                                        ),
-                                         enabledBorder: myInputBorder(),
-                                        // focusedBorder: myFocusBorder(),
-                                       // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                        focusedBorder: myFocusBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                  // TextFormFieldCustom(
-                                  //   width: constrains.maxWidth / 1.2,
-                                  //   hintTxt: 'Your Name'.tr,
-                                  //
-                                  // ),
-                                  const SizedBox(
-                                    height: 25,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            //color: Colors.black, // Setting default text color to black
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-Bold',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: "School name in Arabic".tr,
-                                              style: TextStyle(color: Color(0xFF442B72)),
-                                            ),
-                                            TextSpan(
-                                              text: " *".tr,
-                                              style: TextStyle(color: Color(0xFFAD1519)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Container(
-                                    width: constrains.maxWidth / 1.2,
-                                    height: 44,
-                                    child: TextFormField(
-                                      controller: _nameArabic,
-                                      focusNode: _NameArabicFocus,
-                                      cursorColor: const Color(0xFF442B72),
-                                      style: TextStyle(color: Color(0xFF442B72)),
-                                      textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                      onFieldSubmitted: (value) {
-                                        // move to the next field when the user presses the "Done" button
-                                         FocusScope.of(context).requestFocus(_AddressFocus);
-                                      },
-                                      //textDirection: TextDirection.ltr,
-                                      scrollPadding: const EdgeInsets.symmetric(
-                                          vertical: 40),
-                                      decoration:  InputDecoration(
-                                        alignLabelWithHint: true,
-                                        counterText: "",
-                                        fillColor: const Color(0xFFF1F1F1),
-                                        filled: true,
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            8, 30, 10, 5),
-                                        hintText:"Your Name".tr,
-                                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                        hintStyle: const TextStyle(
-                                          color: Color(0xFFC2C2C2),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.33,
-                                        ),
-                                        enabledBorder: myInputBorder(),
-                                        // focusedBorder: myFocusBorder(),
-                                        // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                        focusedBorder: myFocusBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                  // TextFormFieldCustom(
-                                  //   width: constrains.maxWidth / 1.2,
-                                  //   hintTxt: 'Your Name'.tr,
-                                  // ),
-                                  const SizedBox(
-                                    height: 25,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            //color: Colors.black, // Setting default text color to black
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-Bold',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: "Address".tr,
-                                              style: TextStyle(color: Color(0xFF442B72)),
-                                            ),
-                                            TextSpan(
-                                              text: " *".tr,
-                                              style: TextStyle(color: Color(0xFFAD1519)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  // textform field without icon location
-                                  // TextFormFieldCustom(
-                                  //   width: constrains.maxWidth / 1.2,
-                                  //   hintTxt: ''.tr,
-                                  //
-                                  //
-                                  // ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    width: constrains.maxWidth / 1.2,
-                                    height: 45,
-                                    child: TextFormField(
-                                      controller: _Address,
-                                      focusNode: _AddressFocus,
-                                      cursorColor: const Color(0xFF442B72),
-                                      onFieldSubmitted: (value) {
-                                        // move to the next field when the user presses the "Done" button
-                                        FocusScope.of(context).requestFocus(_CoordinatorFocus);
-                                      },
-                                      style: TextStyle(color: Color(0xFF442B72)),
-                                      //textDirection: TextDirection.ltr,
-                                      scrollPadding: const EdgeInsets.symmetric(
-                                          vertical: 40),
-                                      decoration:  InputDecoration(
-                                          suffixIcon: Image.asset("assets/imgs/school/icons8_Location.png",width: 23,height: 23,),
-                                          //Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
-                                        alignLabelWithHint: true,
-                                        counterText: "",
-                                        fillColor: const Color(0xFFF1F1F1),
-                                        filled: true,
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            8, 30, 10, 5),
-                                      //  hintText:"".tr,
-                                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                        hintStyle: const TextStyle(
-                                          color: Color(0xFFC2C2C2),
-                                          fontSize: 12,
-                                          fontFamily: 'Inter-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.33,
-                                        ),
-                                        enabledBorder: myInputBorder(),
-                                         focusedBorder: myFocusBorder(),
-
-                                      ),
-                                    ),
-                                  ),
-
-
-                                  const SizedBox(
-                                    height: 25,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            //color: Colors.black, // Setting default text color to black
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-Bold',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: "Coordinator Name".tr,
-                                              style: TextStyle(color: Color(0xFF442B72)),
-                                            ),
-                                            TextSpan(
-                                              text: " *".tr,
-                                              style: TextStyle(color: Color(0xFFAD1519)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                    ),
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Container(
-                                    width: constrains.maxWidth / 1.2,
-
-                                    height: 44,
-                                    child: TextFormField(
-                                      controller: _coordinatorName,
-                                      focusNode: _CoordinatorFocus,
-                                      cursorColor: const Color(0xFF442B72),
-                                      style: TextStyle(color: Color(0xFF442B72)),
-                                      textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                      onFieldSubmitted: (value) {
-                                        // move to the next field when the user presses the "Done" button
-                                         FocusScope.of(context).requestFocus(_SupporterFocus);
-                                      },
-                                      //textDirection: TextDirection.ltr,
-                                      scrollPadding: const EdgeInsets.symmetric(
-                                          vertical: 40),
-                                      decoration:  InputDecoration(
-                                        alignLabelWithHint: true,
-                                        counterText: "",
-                                        fillColor: const Color(0xFFF1F1F1),
-                                        filled: true,
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            8, 30, 10, 5),
-                                        hintText:"Name".tr,
-                                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                        hintStyle: const TextStyle(
-                                          color: Color(0xFFC2C2C2),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.33,
-                                        ),
-                                        enabledBorder: myInputBorder(),
-                                        // focusedBorder: myFocusBorder(),
-                                        // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                        focusedBorder: myFocusBorder(),
-                                      ),
-
-                                    ),
-                                  ),
-                                  // TextFormFieldCustom(
-                                  //   width: constrains.maxWidth / 1.2,
-                                  //   hintTxt: "Name".tr,
-                                  // ),
-                                  const SizedBox(
-                                    height: 25,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            //color: Colors.black, // Setting default text color to black
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-Bold',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: "Support Number".tr,
-                                              style: TextStyle(color: Color(0xFF442B72)),
-                                            ),
-                                            TextSpan(
-                                              text: " *".tr,
-                                              style: TextStyle(color: Color(0xFFAD1519)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      // Text(
-                                      //   "Support Number".tr,
-                                      //   style: TextStyle(
-                                      //     color: Color(0xFF442B72),
-                                      //     fontSize: 15,
-                                      //     fontFamily: 'Poppins-Bold',
-                                      //     fontWeight: FontWeight.w700,
-                                      //     height: 1.07,
-                                      //   ),
-                                      // ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Container(
-                                    width: constrains.maxWidth / 1.2,
-                                    height: 44,
-                                    child: TextFormField(
-                                      controller: _supportNumber,
-                                      focusNode: _SupporterFocus,
-                                      keyboardType: TextInputType.number,
-                                      cursorColor: const Color(0xFF442B72),
-                                      style: TextStyle(color: Color(0xFF442B72)),
-                                      textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                      onFieldSubmitted: (value) {
-                                        // move to the next field when the user presses the "Done" button
-                                        // FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                      },
-                                      //textDirection: TextDirection.ltr,
-                                      scrollPadding: const EdgeInsets.symmetric(
-                                          vertical: 40),
-                                      decoration:  InputDecoration(
-                                        alignLabelWithHint: true,
-                                        counterText: "",
-                                        fillColor: const Color(0xFFF1F1F1),
-                                        filled: true,
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            8, 30, 10, 5),
-                                        hintText:"Number".tr,
-                                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                        hintStyle: const TextStyle(
-                                          color: Color(0xFFC2C2C2),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.33,
-                                        ),
-                                        enabledBorder: myInputBorder(),
-                                        // focusedBorder: myFocusBorder(),
-                                        // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                        focusedBorder: myFocusBorder(),
-                                      ),
-                                      // onFieldSubmitted: (value) {
-                                      //   // move to the next field when the user presses the "Done" button
-                                      //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                      // },
-                                    ),
-                                  ),
-                                  // TextFormFieldCustom(
-                                  //   width: constrains.maxWidth / 1.2,
-                                  //   hintTxt: "Number".tr,
-                                  // ),
-
-                                  SizedBox(
-                                    //height: constrains.maxWidth /13,
-                                    height: 40,
-                                  ),
-
-                                  SizedBox(
-                                    width: constrains.maxWidth / 1.2,
-                                    child: Center(
-                                      child: ElevatedSimpleButton(
-                                        txt: "Submit".tr,
-                                        onPress: (){
-                                          Navigator.push(
-                                              context ,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>  HomeScreen(),
-                                                  maintainState: false));
-                                        },
-                                        width: constrains.maxWidth /1.2,
-                                        hight: 48,
-                                        color: const Color(0xFF442B72),
-                                        fontSize: 16,
-
-
-                                      ),
-                                      // end of comment
-                                    ),
-                                  ) ,
-
-                                  const SizedBox(
-                                    height: 60,
-                                  ),
-
-
-                                ],
+                                ),
                               ),
-                            )
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 0),
+                              // Adjust horizontal padding
+                              child: SizedBox(
+                                width: constrains.maxWidth / 1.4,
+
+
+                              ),
+
+
+
+                            ),
+
+
+                            // TextFormFieldCustom(
+                            //   width: constrains.maxWidth / 1.4,
+                            //   hintTxt: 'Your Phone'.tr,
+                            // ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Align(alignment: AlignmentDirectional.center,
+                              child: Container(
+                                width: 100, // Adjust width as needed
+                                height: 100, // Adjust height as needed
+                                decoration: BoxDecoration(
+                                  // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
+                                  image: DecorationImage(
+                                    image: AssetImage('assets/imgs/school/Frame 61.png'), // Provide the path to your image
+                                    fit: BoxFit.fill, // Adjust the fit as needed
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child:
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      //color: Colors.black, // Setting default text color to black
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "School name in English".tr,
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                      ),
+                                      TextSpan(
+                                        text: " *".tr,
+                                        style: TextStyle(color: Color(0xFFAD1519)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Text(
+                                //   'School name in English'.tr,
+                                //   style: TextStyle(
+                                //     color: Color(0xFF442B72),
+                                //     fontSize: 15,
+                                //     fontFamily: 'Poppins-Bold',
+                                //     fontWeight: FontWeight.w700,
+                                //     height: 1.07,
+                                //   ),
+                                // ),
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                            Container(
+                              width: constrains.maxWidth / 1.2,
+                              height: 44,
+                              child: TextFormField(
+                                controller: _nameEnglish,
+                                cursorColor: const Color(0xFF442B72),
+                                style: TextStyle(color: Color(0xFF442B72)),
+                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                onFieldSubmitted: (value) {
+                                  // move to the next field when the user presses the "Done" button
+                                  FocusScope.of(context).requestFocus(_NameArabicFocus);
+                                },
+                                //textDirection: TextDirection.ltr,
+                                scrollPadding: const EdgeInsets.symmetric(
+                                    vertical: 40),
+                                decoration:  InputDecoration(
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                      8, 30, 10, 5),
+                                  hintText:"Your Name".tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFFC2C2C2),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  enabledBorder: myInputBorder(),
+                                  // focusedBorder: myFocusBorder(),
+                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                  focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                            // TextFormFieldCustom(
+                            //   width: constrains.maxWidth / 1.2,
+                            //   hintTxt: 'Your Name'.tr,
+                            //
+                            // ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child:
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      //color: Colors.black, // Setting default text color to black
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "School name in Arabic".tr,
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                      ),
+                                      TextSpan(
+                                        text: " *".tr,
+                                        style: TextStyle(color: Color(0xFFAD1519)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                            Container(
+                              width: constrains.maxWidth / 1.2,
+                              height: 44,
+                              child: TextFormField(
+                                controller: _nameArabic,
+                                focusNode: _NameArabicFocus,
+                                cursorColor: const Color(0xFF442B72),
+                                style: TextStyle(color: Color(0xFF442B72)),
+                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                onFieldSubmitted: (value) {
+                                  // move to the next field when the user presses the "Done" button
+                                  FocusScope.of(context).requestFocus(_AddressFocus);
+                                },
+                                //textDirection: TextDirection.ltr,
+                                scrollPadding: const EdgeInsets.symmetric(
+                                    vertical: 40),
+                                decoration:  InputDecoration(
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                      8, 30, 10, 5),
+                                  hintText:"Your Name".tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFFC2C2C2),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  enabledBorder: myInputBorder(),
+                                  // focusedBorder: myFocusBorder(),
+                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                  focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                            // TextFormFieldCustom(
+                            //   width: constrains.maxWidth / 1.2,
+                            //   hintTxt: 'Your Name'.tr,
+                            // ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child:
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      //color: Colors.black, // Setting default text color to black
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "Address".tr,
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                      ),
+                                      TextSpan(
+                                        text: " *".tr,
+                                        style: TextStyle(color: Color(0xFFAD1519)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // textform field without icon location
+                            // TextFormFieldCustom(
+                            //   width: constrains.maxWidth / 1.2,
+                            //   hintTxt: ''.tr,
+                            //
+                            //
+                            // ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              width: constrains.maxWidth / 1.2,
+                              height: 45,
+                              child: TextFormField(
+                                controller: _Address,
+                                focusNode: _AddressFocus,
+                                cursorColor: const Color(0xFF442B72),
+                                onFieldSubmitted: (value) {
+                                  // move to the next field when the user presses the "Done" button
+                                  FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                                },
+                                style: TextStyle(color: Color(0xFF442B72)),
+                                //textDirection: TextDirection.ltr,
+                                scrollPadding: const EdgeInsets.symmetric(
+                                    vertical: 40),
+                                decoration:  InputDecoration(
+                                  suffixIcon: Image.asset("assets/imgs/school/icons8_Location.png",width: 23,height: 23,),
+                                  //Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                      8, 30, 10, 5),
+                                  //  hintText:"".tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFFC2C2C2),
+                                    fontSize: 12,
+                                    fontFamily: 'Inter-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  enabledBorder: myInputBorder(),
+                                  focusedBorder: myFocusBorder(),
+
+                                ),
+                              ),
+                            ),
+
+
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child:
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      //color: Colors.black, // Setting default text color to black
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "Coordinator Name".tr,
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                      ),
+                                      TextSpan(
+                                        text: " *".tr,
+                                        style: TextStyle(color: Color(0xFFAD1519)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                            Container(
+                              width: constrains.maxWidth / 1.2,
+
+                              height: 44,
+                              child: TextFormField(
+                                controller: _coordinatorName,
+                                focusNode: _CoordinatorFocus,
+                                cursorColor: const Color(0xFF442B72),
+                                style: TextStyle(color: Color(0xFF442B72)),
+                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                onFieldSubmitted: (value) {
+                                  // move to the next field when the user presses the "Done" button
+                                  FocusScope.of(context).requestFocus(_SupporterFocus);
+                                },
+                                //textDirection: TextDirection.ltr,
+                                scrollPadding: const EdgeInsets.symmetric(
+                                    vertical: 40),
+                                decoration:  InputDecoration(
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                      8, 30, 10, 5),
+                                  hintText:"Name".tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFFC2C2C2),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  enabledBorder: myInputBorder(),
+                                  // focusedBorder: myFocusBorder(),
+                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                  focusedBorder: myFocusBorder(),
+                                ),
+
+                              ),
+                            ),
+                            // TextFormFieldCustom(
+                            //   width: constrains.maxWidth / 1.2,
+                            //   hintTxt: "Name".tr,
+                            // ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child:
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      //color: Colors.black, // Setting default text color to black
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "Support Number".tr,
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                      ),
+                                      TextSpan(
+                                        text: " *".tr,
+                                        style: TextStyle(color: Color(0xFFAD1519)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Text(
+                                //   "Support Number".tr,
+                                //   style: TextStyle(
+                                //     color: Color(0xFF442B72),
+                                //     fontSize: 15,
+                                //     fontFamily: 'Poppins-Bold',
+                                //     fontWeight: FontWeight.w700,
+                                //     height: 1.07,
+                                //   ),
+                                // ),
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                            Container(
+                              width: constrains.maxWidth / 1.2,
+                              height: 44,
+                              child: TextFormField(
+                                controller: _supportNumber,
+                                focusNode: _SupporterFocus,
+                                keyboardType: TextInputType.number,
+                                cursorColor: const Color(0xFF442B72),
+                                style: TextStyle(color: Color(0xFF442B72)),
+                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                onFieldSubmitted: (value) {
+                                  // move to the next field when the user presses the "Done" button
+                                  // FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                },
+                                //textDirection: TextDirection.ltr,
+                                scrollPadding: const EdgeInsets.symmetric(
+                                    vertical: 40),
+                                decoration:  InputDecoration(
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                      8, 30, 10, 5),
+                                  hintText:"Number".tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFFC2C2C2),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  enabledBorder: myInputBorder(),
+                                  // focusedBorder: myFocusBorder(),
+                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                  focusedBorder: myFocusBorder(),
+                                ),
+                                // onFieldSubmitted: (value) {
+                                //   // move to the next field when the user presses the "Done" button
+                                //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                // },
+                              ),
+                            ),
+                            // TextFormFieldCustom(
+                            //   width: constrains.maxWidth / 1.2,
+                            //   hintTxt: "Number".tr,
+                            // ),
+
+                            SizedBox(
+                              //height: constrains.maxWidth /13,
+                              height: 40,
+                            ),
+
+                            SizedBox(
+                              width: constrains.maxWidth / 1.2,
+                              child: Center(
+                                child: ElevatedSimpleButton(
+                                  txt: "Submit".tr,
+                                  onPress: (){
+                                    Navigator.push(
+                                        context ,
+                                        MaterialPageRoute(
+                                            builder: (context) =>  HomeScreen(),
+                                            maintainState: false));
+                                  },
+                                  width: constrains.maxWidth /1.2,
+                                  hight: 48,
+                                  color: const Color(0xFF442B72),
+                                  fontSize: 16,
+
+
+                                ),
+                                // end of comment
+                              ),
+                            ) ,
+
+                            const SizedBox(
+                              height: 60,
+                            ),
+
+
                           ],
                         ),
-                      ),
-                      // const SizedBox(
-                      //   height: 20,
-                      // ),
-
+                      )
                     ],
                   ),
-                );
-          }
-          ),
+                ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+
+              ],
+            ),
+          );
+        }
+        ),
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         //
         // floatingActionButton:
 
 
-          //   Padding(
-          //     padding: const EdgeInsets.all(2.0),
-          //     child: SizedBox(
-          //       //height: 100,
-          //       child: FloatingActionButton(
-          //         onPressed: () async {
-          //
-          //         },
-          //         child: Image.asset(
-          //           'assets/imgs/school/Ellipse 2.png',
-          //           fit: BoxFit.fill,
-          //         ),
-          // ),
-          //     ),
-          //   ),
+        //   Padding(
+        //     padding: const EdgeInsets.all(2.0),
+        //     child: SizedBox(
+        //       //height: 100,
+        //       child: FloatingActionButton(
+        //         onPressed: () async {
+        //
+        //         },
+        //         child: Image.asset(
+        //           'assets/imgs/school/Ellipse 2.png',
+        //           fit: BoxFit.fill,
+        //         ),
+        // ),
+        //     ),
+        //   ),
 
 
         // bottomNavigationBar:Directionality(
@@ -822,7 +816,6 @@ class _SchoolDataState extends State<SchoolData> {
     );
   }
 }
-
 
 
 

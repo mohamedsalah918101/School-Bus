@@ -488,7 +488,7 @@ Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificat
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => SignupScreen(),
+                                          builder: (context) => SignUpScreen(),
                                         ),
                                       );
                                     },
