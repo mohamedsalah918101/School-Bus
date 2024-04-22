@@ -86,6 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           _isLoading = false;
 
         });
+        print(e.toString()+'testss');
         ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Faild send code.Check phone number and try again')));
 
         // Verification failed

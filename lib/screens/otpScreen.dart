@@ -21,8 +21,9 @@ class OtpScreen extends StatefulWidget {
   int? type = 0;
   String? name;
   String? phone;
+  String? typeName;
 
-  OtpScreen({Key? key, required this.verificationId,this.type,this.name,this.phone}) : super(key: key);
+  OtpScreen({Key? key, required this.verificationId,this.type,this.name,this.phone,this.typeName}) : super(key: key);
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
@@ -52,22 +53,22 @@ class _OtpScreenState extends State<OtpScreen> {
   }
   final _firestore = FirebaseFirestore.instance;
 
-  void _addDataToSupervisorFirestore() async {
-    //if (_formKey.currentState!.validate()) {
-    // Define the data to add
-    Map<String, dynamic> data = {
-      'name': widget.name,
-      'phoneNumber': widget.phone,
-    };
-
-    // Add the data to the Firestore collection
-    await _firestore.collection('supervisor').add(data).then((docRef) {
-      print('Data added with document ID: ${docRef.id}');
-      // showSnackBarFun(context);
-    }).catchError((error) {
-      print('Failed to add data: $error');
-    });
-  }
+  // void _addDataToSupervisorFirestore() async {
+  //   //if (_formKey.currentState!.validate()) {
+  //   // Define the data to add
+  //   Map<String, dynamic> data = {
+  //     'name': widget.name,
+  //     'phoneNumber': widget.phone,
+  //   };
+  //
+  //   // Add the data to the Firestore collection
+  //   await _firestore.collection('supervisor').add(data).then((docRef) {
+  //     print('Data added with document ID: ${docRef.id}');
+  //     // showSnackBarFun(context);
+  //   }).catchError((error) {
+  //     print('Failed to add data: $error');
+  //   });
+  // }
 
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
@@ -76,11 +77,31 @@ class _OtpScreenState extends State<OtpScreen> {
       'name': widget.name,
       'phoneNumber': widget.phone,
     };
+
     // Add the data to the Firestore collection
-    await _firestore.collection('schooldata').add(data).then((docRef) {
+    await _firestore.collection(widget.typeName!).add(data).then((docRef) {
+      if(widget.type == 1){
+
+        Navigator.push(
+            context ,
+            MaterialPageRoute(
+                builder: (context) =>  SchoolData(),
+                maintainState: false));
+      }else
+      {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NoInvitation(selectedImage: widget.type!,),
+                maintainState: false));
+      }
+
       print('Data added with document ID: ${docRef.id}');
     }).catchError((error) {
       print('Failed to add data: $error');
+      setState(() {
+        _isLoading = false;
+      });
     });
 
   }
@@ -350,8 +371,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                     setState(() {
                                       _isLoading =true;
                                     });
-                                    if(widget.type == 2){
-                                    _addDataToSupervisorFirestore();}
+
                                     //erifyPhoneNumber(enteredPhoneNumber);
                                     //my code
                                     try{
@@ -361,24 +381,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       );
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
-                                      setState(() {
-                                        _isLoading =false;
-                                      });
-                                      if(widget.type == 1){
-                                        _addDataToFirestore();
-                                        Navigator.push(
-                                            context ,
-                                            MaterialPageRoute(
-                                                builder: (context) =>  SchoolData(),
-                                                maintainState: false));
-                                      }else
-                                      {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => NoInvitation(selectedImage: widget.type!,),
-                                                maintainState: false));
-                                      }
+
 
                                     }catch(e){
                                       setState(() {
