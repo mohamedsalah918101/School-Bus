@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_parent.dart';
@@ -82,7 +82,7 @@ class _FAQParentState extends State<FAQParent> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-        endDrawer: HomeDrawer(),
+        endDrawer: ParentDrawer(),
         appBar: PreferredSize(
           child: Container(
             decoration: BoxDecoration(

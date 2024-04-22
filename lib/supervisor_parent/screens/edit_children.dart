@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/children_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/text_form_field_login_custom.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
@@ -40,7 +40,7 @@ class _EditChildrenState extends State<EditChildren> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        endDrawer: HomeDrawer(),
+        endDrawer: ParentDrawer(),
         key: _scaffoldKey,
         body: Column(
           children: [

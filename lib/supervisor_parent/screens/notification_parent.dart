@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/notification_item.dart';
 import 'package:school_account/main.dart';
@@ -54,7 +54,7 @@ class _NotificationsParentState extends State<NotificationsParent> {
     List dates = ['Today'.tr, 'Yesterday'.tr];
     return Scaffold(
       key: _scaffoldKey,
-      endDrawer: HomeDrawer(),
+      endDrawer: ParentDrawer(),
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: PreferredSize(
         child: Container(

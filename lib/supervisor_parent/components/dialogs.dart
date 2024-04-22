@@ -5,6 +5,7 @@ import 'package:school_account/supervisor_parent/screens/decline_invitation_pare
 import 'package:school_account/supervisor_parent/screens/sign_up.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../screens/signUpScreen.dart';
 import '../screens/login_screen.dart';
 import 'elevated_simple_button.dart';
 
@@ -935,7 +936,7 @@ class Dialoge {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) =>
-                                  SignupScreen()),);
+                                  SignUpScreen()),);
                             DeletedAccountSnackBar(context, 'message');
                           },
                           color: const Color(0xFF442B72),

@@ -17,8 +17,8 @@ import 'dialogs.dart';
 import 'main_bottom_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeDrawer extends StatefulWidget {
-  HomeDrawer({
+class ParentDrawer extends StatefulWidget {
+  ParentDrawer({
     Key? key,
   }) : super(key: key);
 
@@ -26,7 +26,7 @@ class HomeDrawer extends StatefulWidget {
   _MainDrawerState createState() => _MainDrawerState();
 }
 
-class _MainDrawerState extends State<HomeDrawer> {
+class _MainDrawerState extends State<ParentDrawer> {
   late final int selectedImage;
   // List<ChildDataItem> children = [];
 

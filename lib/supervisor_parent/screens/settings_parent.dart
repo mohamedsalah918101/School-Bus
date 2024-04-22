@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
@@ -38,7 +38,7 @@ class _SettingsParentState extends State<SettingsParent> {
 
     return Scaffold(
         key: _scaffoldKey,
-        endDrawer: HomeDrawer(),
+        endDrawer: ParentDrawer(),
         appBar: PreferredSize(
           child: Container(
             decoration: BoxDecoration(boxShadow: [

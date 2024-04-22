@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:school_account/screens/signUpScreen.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_icon_button.dart';
 import 'package:school_account/main.dart';
@@ -118,7 +119,7 @@ class _DeclineInvitationParentState extends State<DeclineInvitationParent> {
                              Navigator.push(
                                context,
                                MaterialPageRoute(builder: (context) =>
-                                   SignupScreen()),);                           },
+                                   SignUpScreen()),);                           },
                            child: Text('log out'.tr,
                              style: TextStyle(
                                color: Colors.white,

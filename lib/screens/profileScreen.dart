@@ -238,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             side: BorderSide(color: Color(0xff432B72)),

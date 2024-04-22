@@ -26,11 +26,11 @@ class ElevatedIconButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
             fixedSize: Size(width, hight),
             padding: const EdgeInsets.all(0),
-            primary: color,
+            backgroundColor: color,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5)
             ),
-            onPrimary: Colors.transparent // Background color
+            foregroundColor: Colors.transparent // Background color
             ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

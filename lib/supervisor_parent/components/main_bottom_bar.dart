@@ -15,7 +15,7 @@
 // import '../screens/chat_screen.dart';
 // import '../screens/faq_parent.dart';
 // import '../screens/settings_parent.dart';
-// import 'home_drawer.dart';
+// import 'parent_drawer.dart';
 //
 // class MainBottomNavigationBar extends StatelessWidget {
 //   int pageNum = 0;

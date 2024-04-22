@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
-import 'package:school_account/supervisor_parent/components/home_drawer.dart';
+import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_parent_takebus.dart';
@@ -41,7 +41,7 @@ class HomeParentState extends State<HomeParent> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-          endDrawer: HomeDrawer(),
+          endDrawer: ParentDrawer(),
           body: Column(
             children: [
               SizedBox(
