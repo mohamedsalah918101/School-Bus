@@ -135,20 +135,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _name = TextEditingController();
   final _phoneNumberFocusNode = FocusNode();
   bool _nameuser = true;
-  TextEditingController PhoneNumberController = TextEditingController();
   bool isPhoneExiting = false;
 String typeAccount='';
 
-  Future<bool> checkIfNumberExists(String enteredNumber) async {
+  Future<bool> checkIfNumberExists() async {
+    print(_phoneNumberController.text+'hhh');
     CollectionReference supervisorCollection = FirebaseFirestore.instance.collection(typeAccount);
-    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: enteredNumber);
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: _phoneNumberController.text);
     try {
       setState(() {
         _isLoading = false;
 
       });
       QuerySnapshot snapshot = await queryOfNumber.get();
-      print(snapshot.docs);
+      print(snapshot.docs.toString()+'dataaa');
       return snapshot.size > 0;
     } catch (error) {
       setState(() {
@@ -895,9 +895,12 @@ String typeAccount='';
                                             if (
                                             //_validatename()&&
                                             _validatePhoneNumber()) { // Step 3
-                                              _isLoading = true;
-                                              String EnteredPhoneNumber = PhoneNumberController.text;
-                                            bool isNumberExits = await checkIfNumberExists(EnteredPhoneNumber);
+                                              setState(() {
+                                                _isLoading = true;
+
+                                              });
+                                              // String EnteredPhoneNumber = PhoneNumberController.text;
+                                            bool isNumberExits = await checkIfNumberExists();
                                             setState(() {
                                               isPhoneExiting = isNumberExits ;
                                             });

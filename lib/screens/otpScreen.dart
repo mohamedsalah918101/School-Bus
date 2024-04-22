@@ -57,7 +57,7 @@ class _OtpScreenState extends State<OtpScreen> {
     // Define the data to add
     Map<String, dynamic> data = {
       'name': widget.name,
-      'phonenumber': widget.phone,
+      'phoneNumber': widget.phone,
     };
     // Add the data to the Firestore collection
     await _firestore.collection('schooldata').add(data).then((docRef) {

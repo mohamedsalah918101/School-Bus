@@ -58,7 +58,7 @@ class _AddParentsState extends State<AddParents> {
     Map<String, dynamic> data = {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
-      'phone': _phoneNumberController.text,
+      'phoneNumber': _phoneNumberController.text,
 
     };
 
