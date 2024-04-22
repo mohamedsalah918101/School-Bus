@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:dotted_border/dotted_border.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,8 +16,9 @@ import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
-
-
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
+import 'package:google_places_autocomplete_text_field/model/prediction.dart';
 
 class SchoolData extends StatefulWidget{
   const SchoolData({super.key});
@@ -37,8 +39,86 @@ class _SchoolDataState extends State<SchoolData> {
   final _AddressFocus = FocusNode();
   final _CoordinatorFocus = FocusNode();
   final _SupporterFocus = FocusNode();
+  File ? _selectedImage;
+  String? imageUrl;
+  Future _pickImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+ if(returnedImage ==null) return;
+ setState(() {
+   _selectedImage=File(returnedImage.path);
+ });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
+   // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+Reference referenceImageToUpload =referenceDirImages.child('name');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
 
 
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+      return imageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+
+
+
+//   Future _pickImageFromGallery() async{
+//  final returnedImage=
+//  await ImagePicker().pickImage(source: ImageSource.gallery);
+//  if(returnedImage ==null) return;
+//  setState(() {
+//    _selectedImage=File(returnedImage!.path);
+//  });
+//  // String uniqueFileName=DateTime.now().microsecondsSinceEpoch.toString();
+//  // Reference referenceRoot=FirebaseStorage.instance.ref();
+//  // Reference referenceDirImages = referenceRoot.child('images');
+//  // Reference referenceImageToUpload= referenceDirImages.child(uniqueFileName);
+//
+// }
+// add to firestore schooldata
+  final _firestore = FirebaseFirestore.instance;
+  void _addDataToFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+    // Define the data to add
+    Map<String, dynamic> data = {
+
+      'nameEnglish': _nameEnglish.text,
+      'nameArabic': _nameArabic.text,
+      'address': _Address.text,
+      'coordinatorName':_coordinatorName.text,
+      'supportNumber':_supportNumber.text,
+      'photo': imageUrl,
+    };
+    
+
+    // Add the data to the Firestore collection
+    await _firestore.collection('schooldata').add(data).then((docRef) {
+      print('Data added with document ID: ${docRef.id}');
+
+    }).catchError((error) {
+      print('Failed to add data: $error');
+    });
+    // Clear the text fields
+    _nameEnglish.clear();
+    _nameArabic.clear();
+    _Address.clear();
+    _coordinatorName.clear();
+    _supportNumber.clear();
+  }
 // to lock in landscape view
   @override
   void initState() {
@@ -75,6 +155,19 @@ class _SchoolDataState extends State<SchoolData> {
       DeviceOrientation.portraitDown,
     ]);
     super.dispose();
+  }
+  final _yourGoogleAPIKey = 'AIzaSyBrN68Q6VpRE7oHMFsk5K2M-tDLgTnpKzs';
+  final _textController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+// address new
+  Future<void> _onSubmit() async {
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autovalidateMode = AutovalidateMode.always);
+      return;
+    }
+
+    print(_textController.text);
   }
 
   @override
@@ -202,24 +295,73 @@ class _SchoolDataState extends State<SchoolData> {
                                   const SizedBox(
                                     height: 10,
                                   ),
+                                  GestureDetector(
+                                    onTap:()async {
+                                     await _pickImageFromGallery();}  , // Call function when tapped
+                                    child: _selectedImage != null
+                                        ? Image.file(
+                                      _selectedImage!,  // Display the uploaded image
+                                      width: 83,  // Set width as per your preference
+                                      height: 78.5,  // Set height as per your preference
+                                      fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                    )
+                                        : FDottedLine(
+                                      color: Color(0xFF442B72),
+                                      strokeWidth: 2.0,
+                                      dottedLength: 8.0,
+                                      space: 3.0,
+                                      corner: FDottedLineCorner.all(6.0),
 
-                                  FDottedLine(
-                                    color:Color(0xFF442B72),
-                                    strokeWidth: 2.0,
-                                    dottedLength: 8.0,
-                                    space: 3.0,
-                                    corner: FDottedLineCorner.all(6.0),
-
-                                    /// add widget
-                                    child: Container(
-                                      width: 100,
-                                      height: 100,
-                                      alignment: Alignment.center,
-                                      child: Text("School logo",style: TextStyle(color:Color(0xFF442B72),fontSize:11,fontFamily:'Poppins-Regular'   ),),
+                                      // Child widget
+                                      child: Container(
+                                        width: 83,
+                                        height: 78.5,
+                                        alignment: Alignment.center,
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top:10),
+                                              child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Text(
+                                              "School logo",
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 11,
+                                                fontFamily: 'Poppins-Regular',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
+                                  // GestureDetector(
+                                  //   onTap: (){
+                                  //     _pickImageFromGallery();
+                                  //     // ImagePicker imagePicker=ImagePicker();
+                                  //     // imagePicker.pickImage(source: ImageSource.gallery);
+                                  //   },
+                                  //   child: FDottedLine(
+                                  //     color:Color(0xFF442B72),
+                                  //     strokeWidth: 2.0,
+                                  //     dottedLength: 8.0,
+                                  //     space: 3.0,
+                                  //     corner: FDottedLineCorner.all(6.0),
+                                  //
+                                  //     /// add widget
+                                  //     child: Container(
+                                  //       width: 100,
+                                  //       height: 100,
+                                  //       alignment: Alignment.center,
+                                  //       child: Text("School logo",style: TextStyle(color:Color(0xFF442B72),fontSize:11,fontFamily:'Poppins-Regular'   ),),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // _selectedImage !=null?Image.file(_selectedImage!) : Text(""),
                                   const SizedBox(
-                                    height: 40,
+                                    height: 30,
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
@@ -416,44 +558,82 @@ class _SchoolDataState extends State<SchoolData> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  Container(
-                                    width: constrains.maxWidth / 1.2,
-                                    height: 45,
-                                    child: TextFormField(
-                                      controller: _Address,
-                                      focusNode: _AddressFocus,
-                                      cursorColor: const Color(0xFF442B72),
-                                      onFieldSubmitted: (value) {
-                                        // move to the next field when the user presses the "Done" button
-                                        FocusScope.of(context).requestFocus(_CoordinatorFocus);
-                                      },
-                                      style: TextStyle(color: Color(0xFF442B72)),
-                                      //textDirection: TextDirection.ltr,
-                                      scrollPadding: const EdgeInsets.symmetric(
-                                          vertical: 40),
-                                      decoration:  InputDecoration(
-                                          suffixIcon: Image.asset("assets/imgs/school/icons8_Location.png",width: 23,height: 23,),
-                                          //Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
-                                        alignLabelWithHint: true,
-                                        counterText: "",
-                                        fillColor: const Color(0xFFF1F1F1),
-                                        filled: true,
-                                        contentPadding: const EdgeInsets.fromLTRB(
-                                            8, 30, 10, 5),
-                                      //  hintText:"".tr,
-                                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                        hintStyle: const TextStyle(
-                                          color: Color(0xFFC2C2C2),
-                                          fontSize: 12,
-                                          fontFamily: 'Inter-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.33,
-                                        ),
-                                        enabledBorder: myInputBorder(),
-                                         focusedBorder: myFocusBorder(),
-
-                                      ),
-                                    ),
+                                  // Container(
+                                  //   width: constrains.maxWidth / 1.2,
+                                  //   height: 45,
+                                  //   child: TextFormField(
+                                  //     controller: _Address,
+                                  //     focusNode: _AddressFocus,
+                                  //     cursorColor: const Color(0xFF442B72),
+                                  //     onFieldSubmitted: (value) {
+                                  //       // move to the next field when the user presses the "Done" button
+                                  //       FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                                  //     },
+                                  //     style: TextStyle(color: Color(0xFF442B72)),
+                                  //     //textDirection: TextDirection.ltr,
+                                  //     scrollPadding: const EdgeInsets.symmetric(
+                                  //         vertical: 40),
+                                  //     decoration:  InputDecoration(
+                                  //         suffixIcon: Image.asset("assets/imgs/school/icons8_Location.png",width: 23,height: 23,),
+                                  //         //Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
+                                  //       alignLabelWithHint: true,
+                                  //       counterText: "",
+                                  //       fillColor: const Color(0xFFF1F1F1),
+                                  //       filled: true,
+                                  //       contentPadding: const EdgeInsets.fromLTRB(
+                                  //           8, 30, 10, 5),
+                                  //     //  hintText:"".tr,
+                                  //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  //       hintStyle: const TextStyle(
+                                  //         color: Color(0xFFC2C2C2),
+                                  //         fontSize: 12,
+                                  //         fontFamily: 'Inter-Bold',
+                                  //         fontWeight: FontWeight.w700,
+                                  //         height: 1.33,
+                                  //       ),
+                                  //       enabledBorder: myInputBorder(),
+                                  //        focusedBorder: myFocusBorder(),
+                                  //
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // Form(
+                                  //   key: _formKey,
+                                  //   autovalidateMode: _autovalidateMode,
+                                  //   child: GooglePlacesAutoCompleteTextFormField(
+                                  //     textEditingController: _textController,
+                                  //     googleAPIKey: _yourGoogleAPIKey,
+                                  //     decoration: const InputDecoration(
+                                  //       hintText: 'Enter your address',
+                                  //       labelText: 'Address',
+                                  //       labelStyle: TextStyle(color: Colors.purple),
+                                  //       border: OutlineInputBorder(),
+                                  //     ),
+                                  //     validator: (value) {
+                                  //       if (value!.isEmpty) {
+                                  //         return 'Please enter some text';
+                                  //       }
+                                  //       return null;
+                                  //     },
+                                  //     // proxyURL: _yourProxyURL,
+                                  //     maxLines: 1,
+                                  //     overlayContainer: (child) => Material(
+                                  //       elevation: 1.0,
+                                  //       color: Colors.green,
+                                  //       borderRadius: BorderRadius.circular(12),
+                                  //       child: child,
+                                  //     ),
+                                  //     getPlaceDetailWithLatLng: (prediction) {
+                                  //       print('placeDetails${prediction.lng}');
+                                  //     },
+                                  //     itmClick: (Prediction prediction) =>
+                                  //     _textController.text = prediction.description!,
+                                  //   ),
+                                  // ),
+                                  const SizedBox(height: 24),
+                                  TextButton(
+                                    onPressed: _onSubmit,
+                                    child: const Text('Submit'),
                                   ),
 
 
@@ -634,7 +814,10 @@ class _SchoolDataState extends State<SchoolData> {
                                     child: Center(
                                       child: ElevatedSimpleButton(
                                         txt: "Submit".tr,
-                                        onPress: (){
+                                        onPress: () async {
+
+
+                                          _addDataToFirestore();
                                           Navigator.push(
                                               context ,
                                               MaterialPageRoute(
