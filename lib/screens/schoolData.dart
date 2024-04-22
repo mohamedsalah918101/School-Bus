@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -94,11 +95,13 @@ class _SchoolDataState extends State<SchoolData> {
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
+    //String userId = FirebaseAuth.instance.currentUser!.uid;
+   // String documentId = FirebaseFirestore.instance.collection('schooldata').doc(FirebaseAuth.instance.currentUser!.uid).id;
     Map<String, dynamic> data = {
 
       'nameEnglish': _nameEnglish.text,
       'nameArabic': _nameArabic.text,
-      'address': _Address.text,
+      'address':  _textController.text,
       'coordinatorName':_coordinatorName.text,
       'supportNumber':_supportNumber.text,
       'photo': imageUrl,
@@ -106,9 +109,12 @@ class _SchoolDataState extends State<SchoolData> {
 
 
     // Add the data to the Firestore collection
-    await _firestore.collection('schooldata').add(data).then((docRef) {
-      print('Data added with document ID: ${docRef.id}');
+    await _firestore.collection('schooldata').add(data).then((docRef)
+   // await _firestore.collection('schooldata').doc(userId).update(data).then((docRef)
+    {
 
+      print('Data added with document ID: ${docRef.id}');
+     // print('Data updated with document ID: $userId');
     }).catchError((error) {
       print('Failed to add data: $error');
     });
@@ -631,57 +637,64 @@ class _SchoolDataState extends State<SchoolData> {
                             //   ),
                             // ),
 
-                            Form(
-                              key: _formKey,
-                              autovalidateMode: _autovalidateMode,
-                              child: GooglePlacesAutoCompleteTextFormField(
-                                textEditingController: _textController,
-                                googleAPIKey: _yourGoogleAPIKey,
-                                decoration: InputDecoration(
-                                  labelText: 'Address',
-                                  labelStyle: TextStyle(color: Colors.purple),
-                                  suffixIcon: Image.asset(
-                                    "assets/imgs/school/icons8_Location.png",
-                                    width: 23,
-                                    height: 23,
+                            Container(
+                              height: 45,
+                              width: constrains.maxWidth / 1.2,
+
+                              child: Form(
+                                key: _formKey,
+
+                                autovalidateMode: _autovalidateMode,
+                                child: GooglePlacesAutoCompleteTextFormField(
+
+                                  cursorColor: Color(0xFF442B72),
+                                  textEditingController: _textController,
+                                  googleAPIKey: _yourGoogleAPIKey,
+                                  decoration: InputDecoration(
+                                    labelStyle: TextStyle(color: Colors.purple),
+                                    suffixIcon: Image.asset(
+                                      "assets/imgs/school/icons8_Location.png",
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                    alignLabelWithHint: true,
+                                    counterText: "",
+                                    fillColor: const Color(0xFFF1F1F1),
+                                    filled: true,
+                                    contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
+                                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFFC2C2C2),
+                                      fontSize: 10,
+                                      fontFamily: 'Inter-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.33,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: Colors.black), // Customize border color
+                                    ),
+                                    enabledBorder: myInputBorder(),
+                                    focusedBorder: myFocusBorder(),
                                   ),
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
-                                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Inter-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  border: OutlineInputBorder(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter some text';
+                                    }
+                                    return null;
+                                  },
+                                  maxLines: 1,
+                                  overlayContainer: (child) => Material(
+                                    elevation: 1.0,
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.black), // Customize border color
+                                    child: child,
                                   ),
-                                  enabledBorder: myInputBorder(),
-                                  focusedBorder: myFocusBorder(),
+                                  getPlaceDetailWithLatLng: (prediction) {
+                                    print('placeDetails${prediction.lng}');
+                                  },
+                                  itmClick: (Prediction prediction) => _textController.text = prediction.description!,
                                 ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
-                                maxLines: 1,
-                                overlayContainer: (child) => Material(
-                                  elevation: 1.0,
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: child,
-                                ),
-                                getPlaceDetailWithLatLng: (prediction) {
-                                  print('placeDetails${prediction.lng}');
-                                },
-                                itmClick: (Prediction prediction) => _textController.text = prediction.description!,
                               ),
                             ),
 

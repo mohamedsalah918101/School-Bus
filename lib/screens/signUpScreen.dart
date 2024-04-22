@@ -48,28 +48,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
     return isValid;
   }
-  // Future<void> verifyPhoneNumber(String phoneNumber) async {
-  //   await _auth.verifyPhoneNumber(
-  //     phoneNumber: phoneNumber,
-  //     verificationCompleted: (PhoneAuthCredential credential) async {
-  //       // Auto-retrieve verification code
-  //       await _auth.signInWithCredential(credential);
-  //       Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
-  //     },
-  //     verificationFailed: (FirebaseAuthException e) {
-  //       // Verification failed
-  //     },
-  //     codeSent: (String verificationId, int? resendToken) async {
-  //       // Save the verification ID for future use
-  //       String smsCode = 'xxxxxx'; // Code input by the user
-  //
-  //       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId)));
-  //     },
-  //     codeAutoRetrievalTimeout: (String verificationId) {},
-  //     timeout: Duration(seconds: 60),
-  //   );
-  // }
-  Future<void> verifyPhoneNumber(String phoneNumber) async {
+
+  final _firestore = FirebaseFirestore.instance;
+  void _addDataToFirestore() async {
+    //if (_formKey.currentState!.validate()) {
+    // Define the data to add
+    Map<String, dynamic> data = {
+
+      'name': _name.text,
+      'phonenumber': _phoneNumberController.text,
+
+    };
+    // Add the data to the Firestore collection
+    await _firestore.collection('schooldata').add(data).then((docRef) {
+      print('Data added with document ID: ${docRef.id}');
+
+    }).catchError((error) {
+      print('Failed to add data: $error');
+    });
+    // Clear the text fields
+    _name.clear();
+    _phoneNumberController.clear();
+  }
+    Future<void> verifyPhoneNumber(String phoneNumber) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
@@ -865,9 +866,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           //   }
                                           // },
                                           onPress: () {
-
+                                            _addDataToFirestore();
                                       if (
-                                      //_validatename()&&
+                                      _validatename()&&
                                           _validatePhoneNumber()) { // Step 3
                                         _isLoading = true;
                                         verifyPhoneNumber(enteredPhoneNumber);
