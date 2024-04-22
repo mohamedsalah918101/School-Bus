@@ -99,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
 
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber,name:_name.text,phone:_phoneNumberController.text)) );
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId,name:_name.text,phone:_phoneNumberController.text)) );
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),
@@ -892,64 +892,71 @@ String typeAccount='';
                                           //   }
                                           // },
                                           onPress: () async {
-                                            if (
-                                            //_validatename()&&
-                                            _validatePhoneNumber()) { // Step 3
-                                              setState(() {
-                                                _isLoading = true;
+                                            if(selectedContainer == 0) {
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
 
-                                              });
-                                              // String EnteredPhoneNumber = PhoneNumberController.text;
-                                            bool isNumberExits = await checkIfNumberExists();
-                                            setState(() {
-                                              isPhoneExiting = isNumberExits ;
-                                            });
-                                            if(isNumberExits){
-                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already exist')));
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                      // children.isNotEmpty?
-                                                      LoginScreen(
+            }else
+                                              if (
+                                              //_validatename()&&
+                                              _validatePhoneNumber()) { // Step 3
+                                                setState(() {
+                                                  _isLoading = true;
+                                                });
+                                                // String EnteredPhoneNumber = PhoneNumberController.text;
+                                                bool isNumberExits = await checkIfNumberExists();
+                                                setState(() {
+                                                  isPhoneExiting =
+                                                      isNumberExits;
+                                                });
+                                                if (isNumberExits) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                      content: Text(
+                                                          'this phone already exist')));
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                          // children.isNotEmpty?
+                                                          LoginScreen(
 
-                                                      )
-                                                    //no data
-                                                    // : NoInvitation( selectedImage: selectedImage)
-                                                  ));
-                                            }
-                                            else {
-                                              _isLoading = true;
+                                                          )
+                                                        //no data
+                                                        // : NoInvitation( selectedImage: selectedImage)
+                                                      ));
+                                                }
+                                                else {
+                                                  _isLoading = true;
 
 
-                                              verifyPhoneNumber(enteredPhoneNumber);
+                                                  verifyPhoneNumber(
+                                                      enteredPhoneNumber);
+                                                }
+                                              } else {
+                                                _nameuser = false;
+                                                _phoneNumberEntered = false;
+                                                //message error if user doesn't enter phone number
 
+                                              }
 
-                                            } } else {
-                                              _nameuser=false;
-                                              _phoneNumberEntered = false;
-                                              //message error if user doesn't enter phone number
+                                              // else{
+                                              // if (
+                                              // //_validatename()&&
+                                              // _validatePhoneNumber()) { // Step 3
+                                              //   _isLoading = true;
+                                              //   verifyPhoneNumber(enteredPhoneNumber);
+                                              //   // Navigator.push(
+                                              //   // context,
+                                              //   // MaterialPageRoute(builder: (context) =>  OtpScreen(phoneNumber: enteredPhoneNumber)),
+                                              //   // );
+                                              // } else {
+                                              //   _nameuser=false;
+                                              //   _phoneNumberEntered = false;
+                                              //   //message error if user doesn't enter phone number
+                                              //
+                                              // }}
 
-                                            }
-
-                                            // else{
-                                            // if (
-                                            // //_validatename()&&
-                                            // _validatePhoneNumber()) { // Step 3
-                                            //   _isLoading = true;
-                                            //   verifyPhoneNumber(enteredPhoneNumber);
-                                            //   // Navigator.push(
-                                            //   // context,
-                                            //   // MaterialPageRoute(builder: (context) =>  OtpScreen(phoneNumber: enteredPhoneNumber)),
-                                            //   // );
-                                            // } else {
-                                            //   _nameuser=false;
-                                            //   _phoneNumberEntered = false;
-                                            //   //message error if user doesn't enter phone number
-                                            //
-                                            // }}
-
-                                          },
+                                            } },
                                           // => Navigator.push(
                                           //     context,
                                           //     MaterialPageRoute(
