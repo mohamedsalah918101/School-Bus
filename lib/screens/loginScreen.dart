@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Auto-retrieve verification code
         await _auth.signInWithCredential(credential);
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+     //   Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
       },
       verificationFailed: (FirebaseAuthException e) {
         // Verification failed
