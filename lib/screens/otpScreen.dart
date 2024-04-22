@@ -316,7 +316,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                 Navigator.push(
                                     context ,
                                     MaterialPageRoute(
-                                        builder: (context) =>  HomeScreen(),
+                                        builder: (context) =>  SchoolData(),
                                         maintainState: false));}catch(e){
                                   print('lllll'+e.toString());
                                 }

@@ -433,7 +433,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                           color: Colors.white),),
                                                   ],
                                                 )),
-      
+
                                             decoration: BoxDecoration(
                                               // border:  Border.all(
                                                 // width: _isChecked?3 : 0,
@@ -462,16 +462,17 @@ class _SignupScreenState extends State<SignupScreen> {
                                             });
                                           },
                                         ),
-      
+
                                       ],
                                     ),
-      
+
                                     SizedBox(
                                       height: constrains.maxWidth / 13,
                                     ),
                                     SizedBox(
                                       width: constrains.maxWidth ,
                                       child: Center(
+<<<<<<< HEAD
                                         child: ElevatedSimpleButton(
                                           txt: 'Create Account'.tr,
                                           // onPress: () => Navigator.push(
@@ -492,6 +493,30 @@ class _SignupScreenState extends State<SignupScreen> {
                                           fontSize: 16,
                                           fontFamily: 'Poppins-Regular', onPress: () {  },
                                         ),
+=======
+                                        // child: ElevatedSimpleButton(
+                                        //   txt: 'Create Account'.tr,
+                                        //   onPress: () =>
+                                        //       Navigator.push(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //           builder: (context) =>
+                                        //           // children.isNotEmpty?
+                                        //             OtpScreen(
+                                        //               selectedImage: selectedImage,
+                                        //             )
+                                        //           //no data
+                                        //         // : NoInvitation( selectedImage: selectedImage)
+                                        //       )
+                                        //   ),
+                                        //             // NoInvitation())),
+                                        //   width: constrains.maxWidth ,
+                                        //   hight: 48,
+                                        //   color: const Color(0xFF442B72),
+                                        //   fontSize: 16,
+                                        //   fontFamily: 'Poppins-Regular',
+                                        // ),
+>>>>>>> 075f556c54a2b6bff59c5d34717861a72a7ae1eb
                                       ),
                                     ) ,
                                     SizedBox( height:2),
@@ -539,7 +564,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                     ),
-      
+
                   ],
                 ),
               ),
