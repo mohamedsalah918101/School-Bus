@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/add_children_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
@@ -29,42 +30,42 @@ class AddParents extends StatefulWidget {
   _AddParentsState createState() => _AddParentsState();
 }
 
+
 class _AddParentsState extends State<AddParents> {
   late final int selectedImage;
-  var _fireStore = FirebaseFirestore.instance;
-  // void _addDataToFirestore() async {
-  //   //if (_formKey.currentState!.validate()) {
-  //   // Define the data to add
-  //   Map<String, dynamic> data = {
-  //     'name': NameParent.text,
-  //   };
-  //
-  //   // Add the data to the Firestore collection
-  //   _fireStore.collection('parent').add({
-  //     'name' : NameParent.text.toString(),
-  //     'numberOfChildren' : '2',
-  //     'phone' : '01270247163'
-  //   });}
-  // TextEditingController NameParent = TextEditingController();
-
   final _nameController = TextEditingController();
+  final _gradeController = TextEditingController();
+  final _nameControllerr = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
+  String modifiedText = '';
   final _firestore = FirebaseFirestore.instance;
 
+
+
+  MyFunctions myFunctions = MyFunctions();
+
+  // late String docid ;
+
+
   void _addDataToFirestore() async {
-    //if (_formKey.currentState!.validate()) {
-    // Define the data to add
+    Map<String, dynamic> childData = {
+      'name': _nameControllerr.text,
+      'grade': _gradeController.text,
+    };
     Map<String, dynamic> data = {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
-
+      'childern': childData
     };
 
     // Add the data to the Firestore collection
     await _firestore.collection('parent').add(data).then((docRef) {
+       String docid =docRef.id;
       print('Data added with document ID: ${docRef.id}');
+       myFunctions.createDynamicLink(true, docid!);
+
       // showSnackBarFun(context);
     }).catchError((error) {
       print('Failed to add data: $error');
@@ -77,6 +78,8 @@ class _AddParentsState extends State<AddParents> {
   }
 
 
+
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
   int ChildrenCount = 0;
@@ -87,8 +90,18 @@ class _AddParentsState extends State<AddParents> {
 
   void addChild() {
     setState(() {
-      ChildrenCount++;
-      NumberOfChildren.add(AddChildrenCard());
+      String input = _numberOfChildrenController.text;
+      int count = int.tryParse(input) ?? 0;
+      NumberOfChildren.clear(); // مسح القائمة الحالية للأطفال
+
+      for (int i = 0; i < count; i++) {
+        NumberOfChildren.add(AddChildrenCard(
+        ));
+      }
+
+      setState(() {});
+      // ChildrenCount++;
+      // NumberOfChildren.add(AddChildrenCard());
     });
   }
   //
@@ -98,8 +111,6 @@ class _AddParentsState extends State<AddParents> {
 
   @override
   Widget build(BuildContext context) {
-
-
 
     return Scaffold(
         key: _scaffoldKey,
@@ -228,6 +239,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller:  _gradeController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: const Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -414,6 +426,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller: _phoneNumberController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: const Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -506,6 +519,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller: _numberOfChildrenController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -578,6 +592,7 @@ class _AddParentsState extends State<AddParents> {
                             GestureDetector(
                               onTap: (){
                                 setState(() {
+                                  // modifyText();
                                   addChild();
                                   NumberOfChildrenCard = !NumberOfChildrenCard;
                                 });
@@ -611,7 +626,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.only(right: 25.0 , left: 20):
                         EdgeInsets.only(left: 25.0 , right: 20),
                         child: SizedBox(
-                          height: 300,
+                          height: 800,
                           width: double.infinity,
                           child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
@@ -622,7 +637,6 @@ class _AddParentsState extends State<AddParents> {
                                 Column(
                                   children: [
                                     NumberOfChildren[index],
-
                                   ],
                                 );
                             },
@@ -638,18 +652,20 @@ class _AddParentsState extends State<AddParents> {
                               fontFamily: 'Poppins-Regular',
                               width: 277,
                               hight: 48,
-                              onPress: (){
+                              onPress: () async {
+                                // createDynamicLink(true,docid);
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
                                 print('object');
                                 setState(() {
+    // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+    // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+    // });
+    // if(! _nameController.text.isEmpty && ! _phoneNumberController.text.isEmpty){
+    // _addDataToFirestore();
+    // InvitationSendSnackBar(context, 'Invitation sent successfully');
+    // }
                                 });
-                                // _addDataToFirestore();
-                                // _fireStore.collection('parent').add({
-                                //   'name' : NameParent.text.toString(),
-                                //   'numberOfChildren' : '2',
-                                //   'phone' : '01270247163'
-                                // });
                               },
                               color: Color(0xFF442B72),
                               fontSize: 16),

@@ -893,6 +893,10 @@ String typeAccount='';
                                           //   }
                                           // },
                                           onPress: () async {
+                                            if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
+                                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+
+                                            }else{
                                             if(selectedContainer == 0) {
                                               ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
 
@@ -935,7 +939,7 @@ String typeAccount='';
                                               _phoneNumberEntered = false;
                                               //message error if user doesn't enter phone number
 
-                                            }
+                                            }}
 
                                             // else{
                                             // if (
