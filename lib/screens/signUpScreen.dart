@@ -86,6 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           _isLoading = false;
 
         });
+        print(e.toString()+'testss');
         ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Faild send code.Check phone number and try again')));
 
         // Verification failed
@@ -457,7 +458,7 @@ String typeAccount='';
                                             width: constrains.maxWidth / 1.4,
 
                                             child: Directionality(
-                                              textDirection: _phoneNumberController.text.startsWith('0') ? TextDirection.rtl : TextDirection.ltr,
+                                              textDirection: TextDirection.ltr,
                                               child: Theme(
                                                 data: Theme.of(context).copyWith(
                                                   iconTheme: IconThemeData(
