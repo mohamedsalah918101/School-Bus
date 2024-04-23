@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'controller/local_controller.dart';

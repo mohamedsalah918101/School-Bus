@@ -4,31 +4,31 @@ import 'package:share_plus/share_plus.dart';
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
 
-final String DynamicLink = 'https://fulladriver.page.link/requestdata';
-final String Link = 'https://fulladriver.page.link/requestdata';
+final String DynamicLink = 'https://schoolbusapp.page.link/requestdata';
+final String Link = 'https://schoolbusapp.page.link/requestdata';
 bool _isCreatingLink = false;
 
-Future<void> _createDynamicLink(bool short,requestID) async {
+Future<void> createDynamicLink(bool short,requestID) async {
 
   print('linnk');
   print(
-      "https://www.fullapp.com/request?id=${requestID}");
+      "https://www.schoolbusapp.com/request?id=${requestID}");
 
   DynamicLinkParameters parameters = DynamicLinkParameters(
-    uriPrefix: 'https://fulladriver.page.link',
+    uriPrefix: 'https://schoolbusapp.page.link',
 
     link: Uri.parse(
-        "https://www.fullapp.com/request?id=${requestID}"),
+        "https://www.schoolbusapp.com/request?id=${requestID}"),
     socialMetaTagParameters: SocialMetaTagParameters(
       title: "Share",
       // imageUrl: Uri.parse(
     ),
     androidParameters: const AndroidParameters(
-      packageName: 'com.petra.fulla_user',
+      packageName: 'com.example.school_account',
       minimumVersion: 0,
     ),
     iosParameters: const IOSParameters(
-      bundleId: 'com.petra.fulla_user',
+      bundleId: 'com.example.school_account',
       minimumVersion: '0',
     ),
   );
