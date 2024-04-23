@@ -100,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
 
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(type: selectedContainer,verificationId: verificationId,name:_name.text,phone:_phoneNumberController.text)) );
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(type: selectedContainer,verificationId: verificationId,name:_name.text,phone:_phoneNumberController.text,typeName: typeAccount,)) );
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),

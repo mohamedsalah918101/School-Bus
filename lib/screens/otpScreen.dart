@@ -13,7 +13,7 @@ import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
 import '../supervisor_parent/screens/no_invitation.dart';
 //import '../components/main_bottom_bar.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class OtpScreen extends StatefulWidget {
   // const OtpScreen({super.key});
   //new code
@@ -22,6 +22,7 @@ class OtpScreen extends StatefulWidget {
   String? name;
   String? phone;
   String? typeName;
+
 
   OtpScreen({Key? key, required this.verificationId,this.type,this.name,this.phone,this.typeName}) : super(key: key);
   @override
@@ -35,9 +36,6 @@ class _OtpScreenState extends State<OtpScreen> {
   TextEditingController _pinCodeController=TextEditingController();
   String enteredPhoneNumber = '';
   bool _isLoading = false;
-  // Variables to store the shared preference data
-  //  late String _username;
-  //  late String _phonenumber;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -76,13 +74,14 @@ class _OtpScreenState extends State<OtpScreen> {
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
+    String userId = FirebaseAuth.instance.currentUser!.uid;
     Map<String, dynamic> data = {
       'name': widget.name,
       'phoneNumber': widget.phone,
     };
 
     // Add the data to the Firestore collection
-    await _firestore.collection(widget.typeName!).add(data).then((docRef) {
+    await _firestore.collection(widget.typeName!).add(data).then((docRef) async {
       if(widget.type == 1){
 
         Navigator.push(
@@ -98,6 +97,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 builder: (context) => NoInvitation(selectedImage: widget.type!,),
                 maintainState: false));
       }
+
 
       print('Data added with document ID: ${docRef.id}');
     }).catchError((error) {
@@ -385,6 +385,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
                                       _addDataToFirestore();
+                                      final prefs = await SharedPreferences.getInstance();
+                                      prefs.setString('name', widget.name!);
+                                      prefs.setString('phoneNumber', widget.phone!);
 
                                     }catch(e){
                                       setState(() {

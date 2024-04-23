@@ -16,6 +16,9 @@ import '../controller/local_controller.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:share_plus/share_plus.dart';
+
 
 
 class SendInvitation extends StatefulWidget{
@@ -26,6 +29,9 @@ class SendInvitation extends StatefulWidget{
 
 
 class _SendInvitationState extends State<SendInvitation> {
+  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+
+  String docid='';
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   MyLocalController ControllerLang = Get.find();
   // TextEditingController _namesupervisor=TextEditingController();
@@ -46,7 +52,9 @@ class _SendInvitationState extends State<SendInvitation> {
       };
       // Add the data to the Firestore collection
       await _firestore.collection('supervisor').add(data).then((docRef) {
+        docid=docRef.id;
         print('Data added with document ID: ${docRef.id}');
+
         showSnackBarFun(context);
       }).catchError((error) {
         print('Failed to add data: $error');
@@ -558,6 +566,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                  onPress: ()
                                  //async
                                  {
+                                 //  _createDynamicLink(true,docid);
                                     // Navigator.push(
                                     //     context ,
                                     //     MaterialPageRoute(

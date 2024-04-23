@@ -98,7 +98,8 @@ class _SchoolDataState extends State<SchoolData> {
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
-    //String userId = FirebaseAuth.instance.currentUser!.uid;
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    print("sss"+userId);
    // String documentId = FirebaseFirestore.instance.collection('schooldata').doc(FirebaseAuth.instance.currentUser!.uid).id;
     Map<String, dynamic> data = {
       // 'name': widget.name,
@@ -113,12 +114,13 @@ class _SchoolDataState extends State<SchoolData> {
 
 
     // Add the data to the Firestore collection
-    await _firestore.collection('schooldata').add(data).then((docRef)
-   // await _firestore.collection('schooldata').doc(userId).update(data).then((docRef)
+    //await _firestore.collection('schooldata').add(data).then((docRef)
+   await _firestore.collection('schooldata').doc(userId).set(data, SetOptions(merge: true)).then((_)
+       //.update(data).then((docRef)
     {
 
-      print('Data added with document ID: ${docRef.id}');
-     // print('Data updated with document ID: $userId');
+      //print('Data added with document ID: ${docRef.id}');
+     print('Data updated with document ID: $userId');
     }).catchError((error) {
       print('Failed to add data: $error');
     });
