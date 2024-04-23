@@ -381,6 +381,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       );
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
+                                      _addDataToFirestore();
 
 
                                     }catch(e){
