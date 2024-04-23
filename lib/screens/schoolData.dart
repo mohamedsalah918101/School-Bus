@@ -23,6 +23,9 @@ import 'package:google_places_autocomplete_text_field/model/prediction.dart';
 
 class SchoolData extends StatefulWidget{
   const SchoolData({super.key});
+  // final String name;
+  // final String phone;
+  //const SchoolData({Key? key, required this.name, required this.phone}) : super(key: key);
   @override
   State<SchoolData> createState() => _SchoolDataState();
 }
@@ -98,7 +101,8 @@ class _SchoolDataState extends State<SchoolData> {
     //String userId = FirebaseAuth.instance.currentUser!.uid;
    // String documentId = FirebaseFirestore.instance.collection('schooldata').doc(FirebaseAuth.instance.currentUser!.uid).id;
     Map<String, dynamic> data = {
-
+      // 'name': widget.name,
+      // 'phoneNumber': widget.phone,
       'nameEnglish': _nameEnglish.text,
       'nameArabic': _nameArabic.text,
       'address':  _textController.text,

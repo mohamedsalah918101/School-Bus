@@ -330,6 +330,9 @@ class _OtpScreenState extends State<OtpScreen> {
 
                                   hight: 48,
                                   onPress: () async {
+                                    setState(() {
+                                      _isLoading =true;
+                                    });
                                     //erifyPhoneNumber(enteredPhoneNumber);
                                     //my code
                                     try{
@@ -339,12 +342,17 @@ class _OtpScreenState extends State<OtpScreen> {
                                       );
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
+                                      setState(() {
+                                        _isLoading =false;
+                                      });
                                       if(widget.type == 1){
                                         _addDataToFirestore();
                                         Navigator.push(
                                             context ,
                                             MaterialPageRoute(
-                                                builder: (context) =>  SchoolData(),
+                                                builder: (context) =>  SchoolData(
+                                                    //name: widget.name, phone: widget.phone
+                                                ),
                                                 maintainState: false));
                                       }else
                                       {
@@ -356,6 +364,11 @@ class _OtpScreenState extends State<OtpScreen> {
                                       }
 
                                     }catch(e){
+                                      setState(() {
+                                        _isLoading =false;
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Invalid code.')));
+
                                       print('lllll'+e.toString());
                                     }
 
