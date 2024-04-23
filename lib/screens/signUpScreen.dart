@@ -893,7 +893,7 @@ String typeAccount='';
                                           //     // Handle error, maybe show a Snackbar or similar
                                           //   }
                                           // },
-                                          onPress: () async {createDynamicLink(true,'777');
+                                          onPress: () async {
 
                                             if(selectedContainer == 0) {
                                               ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
