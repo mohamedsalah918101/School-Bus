@@ -36,7 +36,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String phoneNumber = '';
   bool _phoneNumberEntered = true;
   MyLocalController ControllerLang = Get.find();
-  //final _phoneNumberFocusNode = FocusNode();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
@@ -115,7 +114,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           width: 0.5,
         ));
   }
-
   OutlineInputBorder myFocusBorder() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -893,12 +891,18 @@ String typeAccount='';
                                           //   }
                                           // },
                                           onPress: () async {
+
+                                            if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
+                                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+
+                                            }else{
+
                                             if(selectedContainer == 0) {
                                               ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
 
                                             }else{
                                             if (
-                                            //_validatename()&&
+                                            _validatename()&&
                                             _validatePhoneNumber()) { // Step 3
                                               setState(() {
                                                 _isLoading = true;
@@ -935,7 +939,7 @@ String typeAccount='';
                                               _phoneNumberEntered = false;
                                               //message error if user doesn't enter phone number
 
-                                            }
+                                            }}
 
                                             // else{
                                             // if (

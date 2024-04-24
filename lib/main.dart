@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
+import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,7 +28,6 @@ void main()async {
   );
   sharedpref = await SharedPreferences.getInstance();
 
-
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget{
@@ -38,7 +38,9 @@ class MyApp extends StatelessWidget{
       locale: Controller.intialLang,
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home:
+     // AddParents(),
+       SplashScreen(),
     );
   }
 }

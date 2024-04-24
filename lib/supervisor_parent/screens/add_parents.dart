@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/add_children_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
@@ -29,43 +30,63 @@ class AddParents extends StatefulWidget {
   _AddParentsState createState() => _AddParentsState();
 }
 
-class _AddParentsState extends State<AddParents> {
-  late final int selectedImage;
-  var _fireStore = FirebaseFirestore.instance;
-  // void _addDataToFirestore() async {
-  //   //if (_formKey.currentState!.validate()) {
-  //   // Define the data to add
-  //   Map<String, dynamic> data = {
-  //     'name': NameParent.text,
-  //   };
-  //
-  //   // Add the data to the Firestore collection
-  //   _fireStore.collection('parent').add({
-  //     'name' : NameParent.text.toString(),
-  //     'numberOfChildren' : '2',
-  //     'phone' : '01270247163'
-  //   });}
-  // TextEditingController NameParent = TextEditingController();
 
+class _AddParentsState extends State<AddParents> {
+
+  late final int selectedImage;
   final _nameController = TextEditingController();
+  final _gradeController = TextEditingController();
+  final nameChildController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
+  final List<String> DropDownList = ["Father", "Mother", ];
+  String SelectedType = 'Father';
+  bool isFemale = false;
+  bool isMale = false;
+  bool _nameuser = false;
+  String NameErrorText ='';
+  String Phone ='';
+
+
+  void validatename(String value) {
+   if(value.isEmpty)
+    setState(() {
+      NameErrorText = 'entername';
+    });else{
+      setState(() {
+        NameErrorText = '';
+      });
+   }
+  }
+
 
   void _addDataToFirestore() async {
-    //if (_formKey.currentState!.validate()) {
-    // Define the data to add
+    int numberOfChildren = int.parse(_numberOfChildrenController.text );
+
+    List<Map<String, dynamic>> childrenData = List.generate(
+      numberOfChildren ,
+          (index) => {
+        'name': nameChildController.text,
+        'grade': _gradeController.text,
+        // 'index': index + 1,
+      },
+    );
+
+
     Map<String, dynamic> data = {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
-
+      'childern': childrenData
     };
 
     // Add the data to the Firestore collection
     await _firestore.collection('parent').add(data).then((docRef) {
+       String docid =docRef.id;
       print('Data added with document ID: ${docRef.id}');
-      // showSnackBarFun(context);
+      createDynamicLink(true, docid,_phoneNumberController.text,'parent');
+
     }).catchError((error) {
       print('Failed to add data: $error');
     });
@@ -74,32 +95,359 @@ class _AddParentsState extends State<AddParents> {
     _nameController.clear();
     _phoneNumberController.clear();
     _numberOfChildrenController.clear();
+    nameChildController.clear();
   }
+
+
 
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
-  int ChildrenCount = 0;
   bool NumberOfChildrenCard = false;
-
-
 
 
   void addChild() {
     setState(() {
-      ChildrenCount++;
-      NumberOfChildren.add(AddChildrenCard());
+      String input = _numberOfChildrenController.text;
+      int count = int.tryParse(input) ?? 1;
+      NumberOfChildren.clear();
+
+      for (int i = 0; i < count; i++) {
+        NumberOfChildren.add(SizedBox(
+            width: double.infinity,
+            height: 300,
+            child: Column(
+              children: [
+                Container(
+                  // elevation: 8,
+                    decoration: BoxDecoration(
+                      color: Color(0xff771F98).withOpacity(0.03),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: (sharedpref?.getString('lang') == 'ar')?
+                            EdgeInsets.only(right: 12.0):
+                            EdgeInsets.only(left: 12.0),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Child'.tr,
+                                    style: TextStyle(
+                                      color: Color(0xff771F98),
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' 1',
+                                    style: TextStyle(
+                                      color: Color(0xff771F98),
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ) ,
+                          SizedBox(height: 8,),
+                          Padding(
+                            padding: (sharedpref?.getString('lang') == 'ar')?
+                            EdgeInsets.only(right: 18.0):
+                            EdgeInsets.only(left: 18.0),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Name'.tr,
+                                    style: TextStyle(
+                                      color: Color(0xFF442B72),
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.07,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' *',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.07,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ) ,
+                          SizedBox(height: 8,),
+                          Padding(
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 18.0),
+                            child: SizedBox(
+                              width: 277,
+                              height: 38,
+                              child: TextFormField(
+                                controller: nameChildController,
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.33,
+                                ),
+                                cursorColor: const Color(0xFF442B72),
+                                textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                                TextDirection.rtl:
+                                TextDirection.ltr,
+                                // autofocus: true,
+                                textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.text,
+                                textAlign:  (sharedpref?.getString('lang') == 'ar') ?
+                                TextAlign.right :
+                                TextAlign.left ,
+                                scrollPadding:  EdgeInsets.symmetric(
+                                    vertical: 30),
+                                decoration:  InputDecoration(
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding:
+                                  (sharedpref?.getString('lang') == 'ar') ?
+                                  EdgeInsets.fromLTRB(0, 0, 17, 20):
+                                  EdgeInsets.fromLTRB(17, 0, 0, 10),
+                                  hintText:'Mariam Atef'.tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFF9E9E9E),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),
+                                      width: 0.5,
+                                    ),),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  // enabledBorder: myInputBorder(),
+                                  // focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12,),
+                          Padding(
+                            padding: (sharedpref?.getString('lang') == 'ar')?
+                            EdgeInsets.only(right: 18.0):
+                            EdgeInsets.only(left: 18.0),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Grade'.tr,
+                                    style: TextStyle(
+                                      color: Color(0xFF442B72),
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.07,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' *',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.07,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ) ,
+                          SizedBox(height: 8,),
+                          Padding(
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 18.0),
+                            child: SizedBox(
+                              width: 277,
+                              height: 38,
+                              child: TextFormField(
+                                style: TextStyle(color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.33, ),
+                                cursorColor: const Color(0xFF442B72),
+                                textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                                TextDirection.rtl:
+                                TextDirection.ltr,
+                                // autofocus: true,
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly],
+                                textAlign:  (sharedpref?.getString('lang') == 'ar') ?
+                                TextAlign.right :
+                                TextAlign.left ,
+                                scrollPadding:  EdgeInsets.symmetric(
+                                    vertical: 30),
+                                decoration:  InputDecoration(
+                                  alignLabelWithHint: true,
+                                  counterText: "",
+                                  fillColor: const Color(0xFFF1F1F1),
+                                  filled: true,
+                                  contentPadding:
+                                  (sharedpref?.getString('lang') == 'ar') ?
+                                  EdgeInsets.fromLTRB(0, 0, 17, 15):
+                                  EdgeInsets.fromLTRB(17, 0, 0, 10),
+                                  hintText:'4'.tr,
+                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFF9E9E9E),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.33,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),
+                                      width: 0.5,
+                                    ),),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  // enabledBorder: myInputBorder(),
+                                  // focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12,),
+                          Padding(
+                              padding: (sharedpref?.getString('lang') == 'ar')?
+                              EdgeInsets.only(right: 18.0):
+                              EdgeInsets.only(left: 18.0),
+                              child: Text(
+                                'Gender'.tr,
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 15,
+                                  fontFamily: 'Poppins-Bold',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.07,
+                                ),)
+                          ) ,
+                          // SizedBox(height: 12,),
+                          Padding(
+                            padding: (sharedpref?.getString('lang') == 'ar') ?
+                            EdgeInsets.only(right: 15.0):
+                            EdgeInsets.only(left: 15.0),
+                            child: Row(
+                              children: [
+                                Radio(
+                                  value: true,
+                                  groupValue: isFemale,
+                                  onChanged: (bool? value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        isFemale = value;
+                                        isMale = !value;
+                                      });
+                                    }
+                                  },
+                                  fillColor: MaterialStateProperty.resolveWith((states) {
+                                    if (states.contains(MaterialState.selected)) {
+                                      return Color(0xff442B72);
+                                    }
+                                    return Color(0xff442B72);
+                                  }),
+                                  activeColor: Color(0xff442B72), // Set the color of the selected radio button
+                                ),
+                                Text(
+                                  "Female".tr ,
+                                  style: TextStyle(
+                                    fontSize: 15 ,
+                                    fontFamily: 'Poppins-Regular',
+                                    fontWeight: FontWeight.w500 ,
+                                    color: Color(0xff442B72),),
+                                ),
+                                SizedBox(
+                                  width: 50, //115
+                                ),
+                                Radio(
+                                  fillColor: MaterialStateProperty.resolveWith((states) {
+                                    if (states.contains(MaterialState.selected)) {
+                                      return Color(0xff442B72);
+                                    }
+                                    return Color(0xff442B72);
+                                  }),
+                                  value: true,
+                                  groupValue: isMale,
+                                  onChanged: (bool? value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        isFemale = !value;
+                                        isMale = value;
+                                      });
+                                    }
+                                  },
+                                  activeColor: Color(0xff442B72), // Set the color of the selected radio button
+                                ),
+                                Text("Male".tr,
+                                  style: TextStyle(
+                                    fontSize: 15 ,
+                                    fontFamily: 'Poppins-Regular',
+                                    fontWeight: FontWeight.w500 ,
+                                    color: Color(0xff442B72),),),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10,)
+
+
+                        ])),
+              ],
+            )),
+           );
+      }
+      setState(() {});
     });
   }
-  //
-
-
 
 
   @override
   Widget build(BuildContext context) {
-
-
 
     return Scaffold(
         key: _scaffoldKey,
@@ -228,6 +576,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller:  _gradeController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: const Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -284,7 +633,31 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
+
+
+                      // Container(
+                      //   width: 227,
+                      //   height: 30,
+                      //   child: DropdownButton(
+                      //     // icon: Image.asset('assets/images/Vectorbottom (12).png',
+                      //       value: SelectedGoverment,
+                      //       items: DropDownList.map((String llll) {
+                      //         return DropdownMenuItem<String>(
+                      //           value: llll,
+                      //           child: Text(llll),
+                      //         );
+                      //       }).toList(),
+                      //       onChanged: (String? newValue) {
+                      //         if (newValue != null) {
+                      //           setState(() {
+                      //             SelectedGoverment = newValue;
+                      //           });
+                      //         }
+                      //       }),
+                      // ),
+
                       SizedBox(height: 11,),
+
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
                         EdgeInsets.only(right: 42.0):
@@ -345,8 +718,8 @@ class _AddParentsState extends State<AddParents> {
                               contentPadding:
                               (sharedpref?.getString('lang') == 'ar') ?
                               EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 166, 40),
-                              hintText:'Mariam Atef'.tr,
+                              EdgeInsets.fromLTRB(17, 0, 0, 40),
+                              hintText:'Please enter your name'.tr,
                               floatingLabelBehavior:  FloatingLabelBehavior.never,
                               hintStyle: const TextStyle(
                                 color: Color(0xFF9E9E9E),
@@ -371,9 +744,32 @@ class _AddParentsState extends State<AddParents> {
                               // enabledBorder: myInputBorder(),
                               // focusedBorder: myFocusBorder(),
                             ),
+                            onChanged: (value){
+                              Phone = value;
+                              validatename(value);
+                              setState(() {
+
+                              });
+                            },
                           ),
                         ),
                       ),
+                      if(NameErrorText.isNotEmpty)
+                        Text(NameErrorText,
+                        style: TextStyle(
+                          color: Colors.red
+                        ),),
+                      // _nameuser ?
+                      // Align(alignment: AlignmentDirectional.topStart,
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.symmetric(horizontal: 20),
+                      //     child: Text(
+                      //       "Please enter your name".tr,
+                      //       style: TextStyle(color: Colors.red),
+                      //     ),
+                      //
+                      //   ),
+                      // )
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -414,6 +810,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller: _phoneNumberController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: const Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -421,8 +818,9 @@ class _AddParentsState extends State<AddParents> {
                             TextDirection.ltr,
                             autofocus: true,
                             textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
+                              LengthLimitingTextInputFormatter(11),
                               FilteringTextInputFormatter.digitsOnly],
                             textAlign:  (sharedpref?.getString('lang') == 'ar') ?
                             TextAlign.right :
@@ -437,8 +835,8 @@ class _AddParentsState extends State<AddParents> {
                               contentPadding:
                               (sharedpref?.getString('lang') == 'ar') ?
                               EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 166, 40),
-                              hintText:'01247362548'.tr,
+                              EdgeInsets.fromLTRB(17, 0, 0, 40),
+                              hintText:'Please enter your number'.tr,
                               floatingLabelBehavior:  FloatingLabelBehavior.never,
                               hintStyle: const TextStyle(
                                 color: Color(0xFF9E9E9E),
@@ -506,6 +904,7 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
+                            controller: _numberOfChildrenController,
                             style: TextStyle(color: Color(0xFF442B72),),
                             cursorColor: Color(0xFF442B72),
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -529,8 +928,8 @@ class _AddParentsState extends State<AddParents> {
                               contentPadding:
                               (sharedpref?.getString('lang') == 'ar') ?
                               EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 166, 40),
-                              hintText:'2'.tr,
+                              EdgeInsets.fromLTRB(17, 0, 0, 40),
+                              hintText:'Please enter your number children'.tr,
                               floatingLabelBehavior:  FloatingLabelBehavior.never,
                               hintStyle: const TextStyle(
                                 color: Color(0xFF9E9E9E),
@@ -578,6 +977,7 @@ class _AddParentsState extends State<AddParents> {
                             GestureDetector(
                               onTap: (){
                                 setState(() {
+                                  // modifyText();
                                   addChild();
                                   NumberOfChildrenCard = !NumberOfChildrenCard;
                                 });
@@ -611,7 +1011,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.only(right: 25.0 , left: 20):
                         EdgeInsets.only(left: 25.0 , right: 20),
                         child: SizedBox(
-                          height: 300,
+                       height: NumberOfChildren.length*300,
                           width: double.infinity,
                           child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
@@ -622,7 +1022,6 @@ class _AddParentsState extends State<AddParents> {
                                 Column(
                                   children: [
                                     NumberOfChildren[index],
-
                                   ],
                                 );
                             },
@@ -638,19 +1037,24 @@ class _AddParentsState extends State<AddParents> {
                               fontFamily: 'Poppins-Regular',
                               width: 277,
                               hight: 48,
-                              onPress: (){
+                              onPress: () async {
+                                if(_nameController.text.length == 0){
+                                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
+                                }else{
+
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
                                 print('object');
                                 setState(() {
+    // _nameController.text.isEmpty ? _validatename = true : _validateName = false;
+    // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+    // });
+    // if(! _nameController.text.isEmpty && ! _phoneNumberController.text.isEmpty){
+    // _addDataToFirestore();
+    // InvitationSendSnackBar(context, 'Invitation sent successfully');
+    // }
                                 });
-                                // _addDataToFirestore();
-                                // _fireStore.collection('parent').add({
-                                //   'name' : NameParent.text.toString(),
-                                //   'numberOfChildren' : '2',
-                                //   'phone' : '01270247163'
-                                // });
-                              },
+                              }},
                               color: Color(0xFF442B72),
                               fontSize: 16),
                         ),
@@ -663,7 +1067,7 @@ class _AddParentsState extends State<AddParents> {
             ),
           ],
         ),
-        // extendBody: true,
+        extendBody: true,
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation:
         FloatingActionButtonLocation.centerDocked,
