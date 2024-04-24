@@ -39,10 +39,8 @@ class _AddParentsState extends State<AddParents> {
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
-  final List<String> DropDownList = ["Father", "Mother", ];
-  String SelectedType = 'Father';
-  bool isFemale = true;
-  bool isMale = true;
+  // bool isFemale = true;
+  // bool isMale = true;
   bool NumberOfChildrenCard = false;
   bool selectedGenderGroupValue = true;
   bool nameError = true;
@@ -50,6 +48,7 @@ class _AddParentsState extends State<AddParents> {
   bool numberOfChildrenError = true;
   bool nameChildeError = true;
   bool GradeError = true;
+  bool typeOfParentError = true;
   bool showList = false;
   String selectedValue = '';
 
@@ -61,12 +60,12 @@ class _AddParentsState extends State<AddParents> {
           (index) => {
         'name': nameChildControllers[index].text,
         'grade': gradeControllers[index].text,
-        // 'index': index + 1,
       },
     );
 
     // String gender = isFemale ? 'Female' : 'Male';
     Map<String, dynamic> data = {
+      'typeOfParent': selectedValue,
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
@@ -108,7 +107,8 @@ class _AddParentsState extends State<AddParents> {
       gradeControllers.clear();
 
       for (int i = 0; i < count; i++) {
-
+        bool isFemale = false;
+        bool isMale = false;
         nameChildControllers.add(nameChildController);
         gradeControllers.add(gradeController);
         NumberOfChildren.add(SizedBox(
@@ -226,7 +226,7 @@ class _AddParentsState extends State<AddParents> {
                                   (sharedpref?.getString('lang') == 'ar') ?
                                   EdgeInsets.fromLTRB(0, 0, 17, 20):
                                   EdgeInsets.fromLTRB(17, 0, 0, 10),
-                                  hintText:'Mariam Atef'.tr,
+                                  hintText:'Please enter your child name'.tr,
                                   floatingLabelBehavior:  FloatingLabelBehavior.never,
                                   hintStyle: const TextStyle(
                                     color: Color(0xFF9E9E9E),
@@ -330,7 +330,7 @@ class _AddParentsState extends State<AddParents> {
                                   (sharedpref?.getString('lang') == 'ar') ?
                                   EdgeInsets.fromLTRB(0, 0, 17, 15):
                                   EdgeInsets.fromLTRB(17, 0, 0, 10),
-                                  hintText:'4'.tr,
+                                  hintText:'Please enter your child grade'.tr,
                                   floatingLabelBehavior:  FloatingLabelBehavior.never,
                                   hintStyle: const TextStyle(
                                     color: Color(0xFF9E9E9E),
@@ -446,8 +446,6 @@ class _AddParentsState extends State<AddParents> {
                             ),
                           ),
                           SizedBox(height: 10,)
-
-
                         ])),
               ],
             )),
@@ -596,7 +594,6 @@ class _AddParentsState extends State<AddParents> {
                                   width: 0.5,
                                 ),
                               ),
-
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
@@ -617,7 +614,7 @@ class _AddParentsState extends State<AddParents> {
                                             });
                                           },
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             children: <Widget>[
                                               GestureDetector(
                                                 onTap: () {
@@ -627,16 +624,11 @@ class _AddParentsState extends State<AddParents> {
                                                   });
                                                 },
                                                 child: Padding(
-                                                  padding:
-                                                  const EdgeInsets
-                                                      .only(
-                                                      right:
-                                                      160.0),
+                                                  padding: const EdgeInsets.only(right: 0.0),
                                                   child: Text(
-                                                    selectedValue!
-                                                        .isNotEmpty
+                                                    selectedValue!.isNotEmpty
                                                         ? selectedValue
-                                                        : 'Father',
+                                                        : 'Choose your type',
                                                     style: TextStyle(
                                                       color: Color(0xFF9E9E9E),
                                                       fontSize: 12,
@@ -647,11 +639,14 @@ class _AddParentsState extends State<AddParents> {
                                                   ),
                                                 ),
                                               ),
+                                              SizedBox(width:  selectedValue!.isNotEmpty
+                                                  ? 160
+                                                  : 90,),
+
                                               GestureDetector(
                                                 onTap: () {
                                                   setState(() {
-                                                    showList =
-                                                    !showList; // Toggle the visibility of the list
+                                                    showList = !showList; // Toggle the visibility of the list
                                                   });
                                                 },
                                                 child: Container(
@@ -671,16 +666,18 @@ class _AddParentsState extends State<AddParents> {
                                 ],
                               ),
                             ),
-
                             if (showList)
                               Container(
                                 height: 140,
                                 child: Card(
+                                  surfaceTintColor: Colors.transparent,
+                                  color: Colors.white,
                                   child: ListView(
                                     shrinkWrap: true,
                                     children: [
                                       ListTile(
-                                        title: Text('Father',
+                                        title: Text(
+                                          'Father',
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
                                             color: Color(0xFF9E9E9E),
@@ -720,50 +717,6 @@ class _AddParentsState extends State<AddParents> {
                                           },
                                         ),
                                       ),
-                                      Padding(
-                                        padding: EdgeInsets.zero,
-                                        child: ListTile(
-                                          title: Text('الصف الثالث',
-                                              textAlign: TextAlign.end,
-                                              style: TextStyle(
-                                                fontFamily: 'Cairo',
-                                                fontSize: 15.0,
-                                                fontWeight:
-                                                FontWeight.normal,
-                                              )),
-                                          onTap: () {
-                                            setState(() {
-                                              selectedValue =
-                                              'الصف الثالث';
-                                              showList = false;
-
-
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.zero,
-                                        child: ListTile(
-                                          title: Text('الصف الرابع',
-                                              textAlign: TextAlign.end,
-                                              style: TextStyle(
-                                                fontFamily: 'Cairo',
-                                                fontSize: 15.0,
-                                                fontWeight:
-                                                FontWeight.normal,
-                                              )),
-                                          onTap: () {
-                                            setState(() {
-                                              selectedValue =
-                                              'الصف الرابع';
-                                              showList = false;
-
-
-                                            });
-                                          },
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -771,11 +724,18 @@ class _AddParentsState extends State<AddParents> {
                           ],
                         ),
                       ),
-
+                      typeOfParentError?
+                      selectedValue!.isNotEmpty?
+                      Container():
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
+                        child: Text(
+                          "Please enter your type".tr,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ):
+                          Container(),
                       SizedBox(height: 11,),
-
-
-
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
                         EdgeInsets.only(right: 42.0):
@@ -870,13 +830,14 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      nameError? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 48),
-                            child: Text(
-                              "Please enter your name".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ): Container(),
+                      nameError ?  Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
+                        child: Text(
+                          "Please enter your name".tr,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ):Container(),
+
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -1077,7 +1038,7 @@ class _AddParentsState extends State<AddParents> {
                         ),
                       ),
                       numberOfChildrenError? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your number of children".tr,
                           style: TextStyle(color: Colors.red),
@@ -1137,7 +1098,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.only(right: 25.0 , left: 20):
                         EdgeInsets.only(left: 25.0 , right: 20),
                         child: SizedBox(
-                       height: NumberOfChildren.length*310,
+                       height: NumberOfChildren.length*325,
                           width: double.infinity,
                           child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
@@ -1164,7 +1125,12 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               hight: 48,
                               onPress: () async {
-                                if(_nameController.text.length == 0){
+                                if( selectedValue!.isEmpty){
+                                  typeOfParentError = true;
+                                  setState(() {
+
+                                  });
+                                }else if(_nameController.text.length == 0){
                                   nameError = true;
                                   setState(() {
 
@@ -1187,19 +1153,17 @@ class _AddParentsState extends State<AddParents> {
                                 }
                                    else if (nameChildController.text.length == 0) {
                                       nameChildeError = true;
-
                                     }
                                    else if (gradeController.text.length == 0) {
                                       GradeError = true;
-
                                   }else{
                                   nameError = false;
                                   phoneError = false;
                                   numberOfChildrenError = false;
                                   nameChildeError = false;
                                   GradeError = false;
+                                  typeOfParentError = false;
                                   setState(() {
-
                                   });
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();

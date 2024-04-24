@@ -37,8 +37,8 @@ class MyApp extends StatelessWidget{
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
       home:
-      AddParents(),
-      // SplashScreen(),
+      // AddParents(),
+      SplashScreen(),
     );
   }
 }
