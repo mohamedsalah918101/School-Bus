@@ -4,7 +4,7 @@ import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'controller/local_controller.dart';
@@ -37,8 +37,8 @@ class MyApp extends StatelessWidget{
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
       home:
-      // AddParents(),
-      SplashScreen(),
+      AddParents(),
+      // SplashScreen(),
     );
   }
 }

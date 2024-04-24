@@ -9,6 +9,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:school_account/screens/loginScreen.dart';
 
+import '../Functions/functions.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/text_from_field_login_custom.dart';
@@ -36,7 +37,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String phoneNumber = '';
   bool _phoneNumberEntered = true;
   MyLocalController ControllerLang = Get.find();
-  //final _phoneNumberFocusNode = FocusNode();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
@@ -115,7 +115,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           width: 0.5,
         ));
   }
-
   OutlineInputBorder myFocusBorder() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -897,12 +896,13 @@ String typeAccount='';
                                             ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
 
                                             }else{
+
                                             if(selectedContainer == 0) {
                                               ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
 
                                             }else{
                                             if (
-                                            //_validatename()&&
+                                            _validatename()&&
                                             _validatePhoneNumber()) { // Step 3
                                               setState(() {
                                                 _isLoading = true;
