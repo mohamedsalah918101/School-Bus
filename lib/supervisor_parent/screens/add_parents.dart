@@ -32,34 +32,26 @@ class AddParents extends StatefulWidget {
 
 
 class _AddParentsState extends State<AddParents> {
-
+  List<TextEditingController> nameChildControllers = [];
+  List<TextEditingController> gradeControllers = [];
   late final int selectedImage;
   final _nameController = TextEditingController();
-  final _gradeController = TextEditingController();
-  final nameChildController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
   final List<String> DropDownList = ["Father", "Mother", ];
   String SelectedType = 'Father';
-  bool isFemale = false;
-  bool isMale = false;
-  bool _nameuser = false;
-  String NameErrorText ='';
-  String Phone ='';
-
-
-  void validatename(String value) {
-   if(value.isEmpty)
-    setState(() {
-      NameErrorText = 'entername';
-    });else{
-      setState(() {
-        NameErrorText = '';
-      });
-   }
-  }
-
+  bool isFemale = true;
+  bool isMale = true;
+  bool NumberOfChildrenCard = false;
+  bool selectedGenderGroupValue = true;
+  bool nameError = true;
+  bool phoneError = true;
+  bool numberOfChildrenError = true;
+  bool nameChildeError = true;
+  bool GradeError = true;
+  bool showList = false;
+  String selectedValue = '';
 
   void _addDataToFirestore() async {
     int numberOfChildren = int.parse(_numberOfChildrenController.text );
@@ -67,18 +59,19 @@ class _AddParentsState extends State<AddParents> {
     List<Map<String, dynamic>> childrenData = List.generate(
       numberOfChildren ,
           (index) => {
-        'name': nameChildController.text,
-        'grade': _gradeController.text,
+        'name': nameChildControllers[index].text,
+        'grade': gradeControllers[index].text,
         // 'index': index + 1,
       },
     );
 
-
+    // String gender = isFemale ? 'Female' : 'Male';
     Map<String, dynamic> data = {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
-      'childern': childrenData
+      'childern': childrenData,
+      // 'gender': gender
     };
 
     // Add the data to the Firestore collection
@@ -95,31 +88,35 @@ class _AddParentsState extends State<AddParents> {
     _nameController.clear();
     _phoneNumberController.clear();
     _numberOfChildrenController.clear();
-    nameChildController.clear();
+    nameChildControllers.clear();
+    nameChildControllers.clear();
+    gradeControllers.clear();
   }
-
-
-
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
-  bool NumberOfChildrenCard = false;
 
+  final nameChildController = TextEditingController();
+  final gradeController = TextEditingController();
 
   void addChild() {
     setState(() {
       String input = _numberOfChildrenController.text;
-      int count = int.tryParse(input) ?? 1;
+      int count = int.tryParse(input) ?? 0;
       NumberOfChildren.clear();
+      nameChildControllers.clear();
+      gradeControllers.clear();
 
       for (int i = 0; i < count; i++) {
+
+        nameChildControllers.add(nameChildController);
+        gradeControllers.add(gradeController);
         NumberOfChildren.add(SizedBox(
             width: double.infinity,
-            height: 300,
+            height: 310,
             child: Column(
               children: [
                 Container(
-                  // elevation: 8,
                     decoration: BoxDecoration(
                       color: Color(0xff771F98).withOpacity(0.03),
                       borderRadius: BorderRadius.circular(14),
@@ -139,7 +136,7 @@ class _AddParentsState extends State<AddParents> {
                               TextSpan(
                                 children: [
                                   TextSpan(
-                                    text: 'Child'.tr,
+                                    text: 'Child '.tr,
                                     style: TextStyle(
                                       color: Color(0xff771F98),
                                       fontSize: 16,
@@ -148,7 +145,7 @@ class _AddParentsState extends State<AddParents> {
                                     ),
                                   ),
                                   TextSpan(
-                                    text: ' 1',
+                                    text: '${i + 1}' ,
                                     style: TextStyle(
                                       color: Color(0xff771F98),
                                       fontSize: 16,
@@ -200,7 +197,7 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               height: 38,
                               child: TextFormField(
-                                controller: nameChildController,
+                                controller: nameChildControllers[i],
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
                                   fontSize: 12,
@@ -257,6 +254,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
+                          nameChildeError? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              "Please enter your child name".tr,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ): Container(),
                           SizedBox(height: 12,),
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')?
@@ -297,6 +301,7 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               height: 38,
                               child: TextFormField(
+                                controller: gradeControllers[i],
                                 style: TextStyle(color: Color(0xFF442B72),
                                   fontSize: 12,
                                   fontFamily: 'Poppins-Light',
@@ -353,6 +358,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
+                          GradeError? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              "Please enter your child grade".tr,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ): Container(),
                           SizedBox(height: 12,),
                           Padding(
                               padding: (sharedpref?.getString('lang') == 'ar')?
@@ -570,93 +582,199 @@ class _AddParentsState extends State<AddParents> {
                       ) ,
                       SizedBox(height: 13,),
                       Padding(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 44.0),
-                        child: SizedBox(
-                          width: 277,
-                          height: 40,
-                          child: TextFormField(
-                            controller:  _gradeController,
-                            style: TextStyle(color: Color(0xFF442B72),),
-                            cursorColor: const Color(0xFF442B72),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-                            TextAlign.right :
-                            TextAlign.left ,
-                            autofocus: true,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.text,
-                            scrollPadding:  EdgeInsets.symmetric(
-                                vertical: 30),
-                            decoration:  InputDecoration(
-                              // suffixIconConstraints: w,
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Image.asset('assets/images/Vectorbottom (12).png',
-                                  ),
-                              ),
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 166, 40),
-                              hintText:'Father'.tr,
-                              floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.33,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
-                                ),),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
+                        padding:const EdgeInsets.symmetric(horizontal: 42),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 277,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7),
+                                color: Color(0xFFF1F1F1),
+                                border: Border.all(
                                   color: Color(0xFFFFC53E),
                                   width: 0.5,
                                 ),
                               ),
-                              // enabledBorder: myInputBorder(),
-                              // focusedBorder: myFocusBorder(),
+
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        showList = !showList;
+                                      });
+                                    },
+                                    child: Container(
+                                      child: Padding(
+                                        padding:
+                                        const EdgeInsets.only(left: 17.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              showList = !showList;
+                                            });
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    showList =
+                                                    !showList;
+                                                  });
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .only(
+                                                      right:
+                                                      160.0),
+                                                  child: Text(
+                                                    selectedValue!
+                                                        .isNotEmpty
+                                                        ? selectedValue
+                                                        : 'Father',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF9E9E9E),
+                                                      fontSize: 12,
+                                                      fontFamily: 'Poppins-Bold',
+                                                      fontWeight: FontWeight.w700,
+                                                      height: 1.33,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    showList =
+                                                    !showList; // Toggle the visibility of the list
+                                                  });
+                                                },
+                                                child: Container(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(14.0),
+                                                    child: Image.asset('assets/images/Vectorbottom (12).png',
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+
+                            if (showList)
+                              Container(
+                                height: 140,
+                                child: Card(
+                                  child: ListView(
+                                    shrinkWrap: true,
+                                    children: [
+                                      ListTile(
+                                        title: Text('Father',
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            color: Color(0xFF9E9E9E),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Bold',
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.33,
+                                          ),),
+                                        onTap: () {
+                                          setState(() {
+                                            selectedValue =
+                                            'Father';
+                                            showList = false;
+
+                                          });
+                                        },
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.zero,
+                                        child: ListTile(
+                                          title: Text('Mother',
+                                            textAlign: TextAlign.start,
+                                            style:TextStyle(
+                                              color: Color(0xFF9E9E9E),
+                                              fontSize: 12,
+                                              fontFamily: 'Poppins-Bold',
+                                              fontWeight: FontWeight.w700,
+                                              height: 1.33,
+                                            ),),
+                                          onTap: () {
+                                            setState(() {
+                                              selectedValue =
+                                              'Mother';
+                                              showList = false;
+
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.zero,
+                                        child: ListTile(
+                                          title: Text('الصف الثالث',
+                                              textAlign: TextAlign.end,
+                                              style: TextStyle(
+                                                fontFamily: 'Cairo',
+                                                fontSize: 15.0,
+                                                fontWeight:
+                                                FontWeight.normal,
+                                              )),
+                                          onTap: () {
+                                            setState(() {
+                                              selectedValue =
+                                              'الصف الثالث';
+                                              showList = false;
+
+
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.zero,
+                                        child: ListTile(
+                                          title: Text('الصف الرابع',
+                                              textAlign: TextAlign.end,
+                                              style: TextStyle(
+                                                fontFamily: 'Cairo',
+                                                fontSize: 15.0,
+                                                fontWeight:
+                                                FontWeight.normal,
+                                              )),
+                                          onTap: () {
+                                            setState(() {
+                                              selectedValue =
+                                              'الصف الرابع';
+                                              showList = false;
+
+
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
 
-
-                      // Container(
-                      //   width: 227,
-                      //   height: 30,
-                      //   child: DropdownButton(
-                      //     // icon: Image.asset('assets/images/Vectorbottom (12).png',
-                      //       value: SelectedGoverment,
-                      //       items: DropDownList.map((String llll) {
-                      //         return DropdownMenuItem<String>(
-                      //           value: llll,
-                      //           child: Text(llll),
-                      //         );
-                      //       }).toList(),
-                      //       onChanged: (String? newValue) {
-                      //         if (newValue != null) {
-                      //           setState(() {
-                      //             SelectedGoverment = newValue;
-                      //           });
-                      //         }
-                      //       }),
-                      // ),
-
                       SizedBox(height: 11,),
+
+
 
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -703,7 +821,7 @@ class _AddParentsState extends State<AddParents> {
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
                             TextDirection.rtl:
                             TextDirection.ltr,
-                            autofocus: true,
+                            // autofocus: true,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.text,
                             textAlign:  (sharedpref?.getString('lang') == 'ar') ?
@@ -711,7 +829,7 @@ class _AddParentsState extends State<AddParents> {
                             TextAlign.left ,
                             scrollPadding:  EdgeInsets.symmetric(vertical: 30),
                             decoration:  InputDecoration(
-                              alignLabelWithHint: true,
+                              alignLabelWithHint: false,
                               counterText: "",
                               fillColor: const Color(0xFFF1F1F1),
                               filled: true,
@@ -728,12 +846,12 @@ class _AddParentsState extends State<AddParents> {
                                 fontWeight: FontWeight.w700,
                                 height: 1.33,
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
-                                ),),
+                              focusedBorder:
+                              OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFFC53E),                                    width: 0.5,
+                                  )),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(7)),
                                 borderSide: BorderSide(
@@ -741,35 +859,24 @@ class _AddParentsState extends State<AddParents> {
                                   width: 0.5,
                                 ),
                               ),
+
+
                               // enabledBorder: myInputBorder(),
                               // focusedBorder: myFocusBorder(),
-                            ),
-                            onChanged: (value){
-                              Phone = value;
-                              validatename(value);
-                              setState(() {
+                            )
 
-                              });
-                            },
+
+
                           ),
                         ),
                       ),
-                      if(NameErrorText.isNotEmpty)
-                        Text(NameErrorText,
-                        style: TextStyle(
-                          color: Colors.red
-                        ),),
-                      // _nameuser ?
-                      // Align(alignment: AlignmentDirectional.topStart,
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.symmetric(horizontal: 20),
-                      //     child: Text(
-                      //       "Please enter your name".tr,
-                      //       style: TextStyle(color: Colors.red),
-                      //     ),
-                      //
-                      //   ),
-                      // )
+                      nameError? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 48),
+                            child: Text(
+                              "Please enter your name".tr,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ): Container(),
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -802,6 +909,11 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ) ,
+                      SizedBox(
+                        height: 10,
+                      ),
+                      //test
+
                       SizedBox(height: 13,),
                       Padding(
                         padding:
@@ -816,7 +928,7 @@ class _AddParentsState extends State<AddParents> {
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
                             TextDirection.rtl:
                             TextDirection.ltr,
-                            autofocus: true,
+                            // autofocus: true,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
@@ -864,6 +976,13 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
+                      phoneError? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
+                        child: Text(
+                          "Please enter your phone number".tr,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ): Container(),
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -910,7 +1029,7 @@ class _AddParentsState extends State<AddParents> {
                             textDirection: (sharedpref?.getString('lang') == 'ar') ?
                             TextDirection.rtl:
                             TextDirection.ltr,
-                            autofocus: true,
+                            // autofocus: true,
                             textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
@@ -957,6 +1076,13 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
+                      numberOfChildrenError? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "Please enter your number of children".tr,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ): Container(),
                       SizedBox(
                         height: 20,
                       ),
@@ -1011,7 +1137,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.only(right: 25.0 , left: 20):
                         EdgeInsets.only(left: 25.0 , right: 20),
                         child: SizedBox(
-                       height: NumberOfChildren.length*300,
+                       height: NumberOfChildren.length*310,
                           width: double.infinity,
                           child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
@@ -1039,28 +1165,54 @@ class _AddParentsState extends State<AddParents> {
                               hight: 48,
                               onPress: () async {
                                 if(_nameController.text.length == 0){
-                                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
-                                }else{
+                                  nameError = true;
+                                  setState(() {
 
+                                  });
+                                }else if(_phoneNumberController.text.length < 11){
+                                  phoneError = true;
+                                  setState(() {
+
+                                  });
+                                }else if(_numberOfChildrenController.text.length < 1){
+                                  numberOfChildrenError = true;
+                                  setState(() {
+
+                                  });
+                                }else if(nameChildControllers.length < 1){
+                                  nameChildeError = true;
+                                  setState(() {
+
+                                  });
+                                }
+                                   else if (nameChildController.text.length == 0) {
+                                      nameChildeError = true;
+
+                                    }
+                                   else if (gradeController.text.length == 0) {
+                                      GradeError = true;
+
+                                  }else{
+                                  nameError = false;
+                                  phoneError = false;
+                                  numberOfChildrenError = false;
+                                  nameChildeError = false;
+                                  GradeError = false;
+                                  setState(() {
+
+                                  });
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
                                 print('object');
+                                NumberOfChildrenCard = false;
                                 setState(() {
-    // _nameController.text.isEmpty ? _validatename = true : _validateName = false;
-    // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
-    // });
-    // if(! _nameController.text.isEmpty && ! _phoneNumberController.text.isEmpty){
-    // _addDataToFirestore();
-    // InvitationSendSnackBar(context, 'Invitation sent successfully');
-    // }
                                 });
                               }},
                               color: Color(0xFF442B72),
                               fontSize: 16),
                         ),
                       ),
-                      SizedBox(height: 44,),
-
+                      SizedBox(height: 70,),
                     ],
                   )
               ),
