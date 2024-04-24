@@ -9,7 +9,6 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:school_account/screens/loginScreen.dart';
 
-import '../Functions/functions.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/text_from_field_login_custom.dart';
@@ -894,7 +893,6 @@ String typeAccount='';
                                           //   }
                                           // },
                                           onPress: () async {
-
                                             if(selectedContainer == 0) {
                                               ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
 

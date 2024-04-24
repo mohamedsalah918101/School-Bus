@@ -5,7 +5,9 @@
     <application
         android:label="school_account"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true"
+        >
 
         <activity
             android:name=".MainActivity"
@@ -30,7 +32,7 @@
 
                 <!-- Replace "your_domain" with your actual domain -->
                 <data
-                    android:host="fulladriver.page.link"
+                    android:host="schoolbusapp.page.link"
                     android:scheme="https" />
             </intent-filter>
 

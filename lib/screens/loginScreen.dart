@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -36,6 +37,38 @@ class _LoginScreenState extends State<LoginScreen> {
       context,
       MaterialPageRoute(builder: (context) => const SignUpScreen()),
     );
+  }
+  initDynamicLinks() async {
+    await Future.delayed(Duration(seconds: 3));
+    var data = await FirebaseDynamicLinks.instance.getInitialLink();
+    var deepLink = data?.link;
+    final queryParams = deepLink!.queryParameters;
+    if (queryParams.length > 0) {
+      handleLinkData(queryParams);
+
+    }
+    FirebaseDynamicLinks.instance.onLink.listen(
+          (pendingDynamicLinkData) async{
+
+        // Set up the `onLink` event listener next as it may be received here
+        if (pendingDynamicLinkData != null) {
+          final Uri deepLink = pendingDynamicLinkData.link;
+          print('dynamicLink');
+          handleLinkData(pendingDynamicLinkData);
+
+          // Example of using the dynamic link to push the user to a different screen
+        }
+      },
+    );
+
+  }
+  Future<void> handleLinkData(queryParams) async {
+
+    if (queryParams.length > 0) {
+       print('userDataGet${queryParams["id"]!}');
+
+
+    }
   }
   // sendOtp() async {
   //   await FirebaseAuth.instance.verifyPhoneNumber(
@@ -130,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-
+    initDynamicLinks();
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/controller/local.dart';
@@ -25,6 +26,8 @@ void main()async {
     ),
   );
   sharedpref = await SharedPreferences.getInstance();
+
+
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget{
