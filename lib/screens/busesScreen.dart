@@ -15,6 +15,7 @@
 //
 // }
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -50,6 +51,11 @@ class BusScreen extends StatefulWidget{
 
 
 class BusScreenSate extends State<BusScreen> {
+List data=[];
+getData() async {
+QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("busdata").get();
+data.addAll(querySnapshot.docs);
+}
 
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController=TextEditingController();
@@ -73,6 +79,7 @@ class BusScreenSate extends State<BusScreen> {
 // to lock in landscape view
   @override
   void initState() {
+    getData();
     super.initState();
     // responsible
     SystemChrome.setPreferredOrientations([
@@ -897,12 +904,14 @@ class BusScreenSate extends State<BusScreen> {
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
-              backgroundColor: Colors.white,
+              backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+               // Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
               child: Image.asset(
-                'assets/imgs/school/Ellipse 2 (2).png',
+                'assets/imgs/school/busbottombar.png',
+                width: 35,
+                height: 35,
                 fit: BoxFit.fill,
               ),
             ),

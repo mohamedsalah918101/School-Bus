@@ -32,7 +32,11 @@ class SchoolData extends StatefulWidget{
 
 
 class _SchoolDataState extends State<SchoolData> {
-
+  bool _validateNameEnglish = false;
+  bool _validateNameArabic = false;
+  bool _validateAddress = false;
+  bool _validateCoordinatorName = false;
+  bool _validateSupportNumber = false;
   MyLocalController ControllerLang = Get.find();
   TextEditingController _nameEnglish = TextEditingController();
   TextEditingController _nameArabic = TextEditingController();
@@ -429,6 +433,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
+                                  errorText: _validateNameEnglish ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -500,10 +505,15 @@ class _SchoolDataState extends State<SchoolData> {
                                   // move to the next field when the user presses the "Done" button
                                   FocusScope.of(context).requestFocus(_AddressFocus);
                                 },
+                                keyboardType: TextInputType.text,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
+                                ],
                                 //textDirection: TextDirection.ltr,
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
+                                  errorText: _validateNameArabic ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -657,6 +667,7 @@ class _SchoolDataState extends State<SchoolData> {
                                   textEditingController: _textController,
                                   googleAPIKey: _yourGoogleAPIKey,
                                   decoration: InputDecoration(
+                                   // errorText: _validateAddress ? "Please Enter Your Address" : null,
                                     labelStyle: TextStyle(color: Colors.purple),
                                     suffixIcon: Image.asset(
                                       "assets/imgs/school/icons8_Location.png",
@@ -683,12 +694,12 @@ class _SchoolDataState extends State<SchoolData> {
                                     enabledBorder: myInputBorder(),
                                     focusedBorder: myFocusBorder(),
                                   ),
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Please enter some text';
-                                    }
-                                    return null;
-                                  },
+                                  // validator: (value) {
+                                  //   if (value!.isEmpty) {
+                                  //     return 'Please enter some text';
+                                  //   }
+                                  //   return null;
+                                  // },
                                   maxLines: 1,
                                   overlayContainer: (child) => Material(
                                     elevation: 1.0,
@@ -754,6 +765,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
+                                  errorText: _validateCoordinatorName ? "Please Enter Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -840,6 +852,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
+                                  errorText: _validateSupportNumber ? "Please Enter Number" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -882,14 +895,29 @@ class _SchoolDataState extends State<SchoolData> {
                                 child: ElevatedSimpleButton(
                                   txt: "Submit".tr,
                                   onPress: () async {
+                                    setState(() {
+                                      _nameEnglish.text.isEmpty ? _validateNameEnglish = true :  _validateNameEnglish = false;
+                                      _nameArabic.text.isEmpty ? _validateNameArabic = true :  _validateNameArabic = false;
+                                      _Address.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
+                                      _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
+                                      _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
+                                      // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                    });
+                               if(_supportNumber.text.length == 11 && ! _nameEnglish.text.isEmpty &&
+                                   !_nameArabic.text.isEmpty
+                                  // &&!_Address.text.isEmpty
+                                   &&!_coordinatorName.text.isEmpty &&!_supportNumber.text.isEmpty) {
+                                 _addDataToFirestore();
+                                 Navigator.push(
+                                     context ,
+                                     MaterialPageRoute(
+                                         builder: (context) =>  HomeScreen(),
+                                         maintainState: false));
+                                           }else{
+                                 // ScaffoldMessenger.of(context).showSnackBar(
+                                 //     SnackBar(content: Text('Please,enter valid number')));
+                               }
 
-
-                                    _addDataToFirestore();
-                                    Navigator.push(
-                                        context ,
-                                        MaterialPageRoute(
-                                            builder: (context) =>  HomeScreen(),
-                                            maintainState: false));
                                   },
                                   width: constrains.maxWidth /1.2,
                                   hight: 48,

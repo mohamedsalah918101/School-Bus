@@ -385,9 +385,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
                                       _addDataToFirestore();
-                                      final prefs = await SharedPreferences.getInstance();
-                                      prefs.setString('name', widget.name!);
-                                      prefs.setString('phoneNumber', widget.phone!);
+                                      // final prefs = await SharedPreferences.getInstance();
+                                      // prefs.setString('name', widget.name!);
+                                      // prefs.setString('phoneNumber', widget.phone!);
 
                                     }catch(e){
                                       setState(() {

@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -17,7 +19,7 @@ import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
-
+import 'package:firebase_storage/firebase_storage.dart';
 
 
 class AddBus extends StatefulWidget{
@@ -42,6 +44,76 @@ class _AddBusState extends State<AddBus> {
   final _supervisorFocus = FocusNode();
 // add to firestore
   final _firestore = FirebaseFirestore.instance;
+  File ? _selectedImage;
+  File ? _selectedImagebus;
+  String? imageUrl;
+  String? busimage;
+  //function choose photo from gallery
+  Future _pickImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImage=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('name');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+      return imageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+  //fun image bus from gallery
+  Future _pickBusImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImagebus=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('img');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('bus');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      busimage = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $busimage');
+      return busimage;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
@@ -49,7 +121,9 @@ class _AddBusState extends State<AddBus> {
       'namedriver': _driverName.text,
       'phonedriver': _driverNumber.text,
       'busnumber': _busNumber.text,
-      'supervisorname':_supervisor.text
+      'supervisorname':_supervisor.text,
+      'imagedriver':imageUrl,
+      'busphoto':busimage,
     };
     // Add the data to the Firestore collection
     await _firestore.collection('busdata').add(data).then((docRef) {
@@ -205,10 +279,60 @@ class _AddBusState extends State<AddBus> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(left: 12),
-                                    child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
+                                    // child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
                                     // CircleAvatar( radius:30, // Set the radius of the circle
                                     //   backgroundImage: AssetImage('assets/imgs/school/Frame 154.png'),
                                     // ),
+                                    child: Stack(children: [
+                                      GestureDetector(
+                                        onTap:()async {
+                  await _pickImageFromGallery();}  , // Call function when tapped
+                    child: _selectedImage != null
+                        ? Image.file(
+                      _selectedImage!,  // Display the uploaded image
+                      width: 83,  // Set width as per your preference
+                      height: 78.5,  // Set height as per your preference
+                      fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                    )
+                                       : Container(
+                                          width: 65, // Adjust size as needed
+                                          height: 65,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Color(0xffCCCCCC), // Adjust border color
+                                              width: 2, // Adjust border width
+                                            ),
+                                          ),
+                                          child: Align(alignment: Alignment.bottomCenter,
+                                            child: CircleAvatar(radius: 20,
+                                            backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                              ,backgroundColor: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+
+                                          child: Container(
+                                              width: 20, // Adjust size as needed
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Color(0xffCCCCCC), // Adjust border color
+                                                  width: 2, // Adjust border width
+                                                ),
+                                              ),
+                                              child: Image.asset("assets/imgs/school/image-editing 1 1.png",width:11,height: 11,)),
+                                        bottom: -10,
+                                        left: 80,
+
+                                      )
+
+
+                                    ],
+                                    ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal:15,vertical: 0 ),
@@ -424,17 +548,60 @@ class _AddBusState extends State<AddBus> {
                                 height: 15,
                               ),
                               Align(alignment: AlignmentDirectional.center,
-                                child: Container(
-                                  width: 290, // Adjust width as needed
-                                  height: 75, // Adjust height as needed
-                                  decoration: BoxDecoration(
-                                    // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
-                                    image: DecorationImage(
-                                      image: AssetImage('assets/imgs/school/Frame 136.png'), // Provide the path to your image
-                                      fit: BoxFit.fill, // Adjust the fit as needed
+                                child:
+                                GestureDetector(
+                                  onTap:()async {
+                                    await _pickBusImageFromGallery();}  , // Call function when tapped
+                                  child: _selectedImagebus != null
+                                      ? Image.file(
+                                    _selectedImagebus!,  // Display the uploaded image
+                                    width: 275,  // Set width as per your preference
+                                    height: 75,  // Set height as per your preference
+                                    fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                  )
+                                      : FDottedLine(
+                                    color: Color(0xFF442B72),
+                                    strokeWidth: 0.8,
+                                    dottedLength: 10,
+                                    space: 5.0,
+                                    corner: FDottedLineCorner.all(6.0),
+
+                                    // Child widget
+                                    child: Container(
+                                      width: 275,
+                                      height: 75,
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 80),
+                                            child: Image.asset("assets/imgs/school/icons8_image_document_1 1.png",width: 24,height: 24,),
+                                          ),
+                                          SizedBox(width: 10,),
+                                          Text(
+                                            "upload image",
+                                            style: TextStyle(
+                                              color: Color(0xFF442B72),
+                                              fontSize: 14,
+                                              fontFamily: 'Poppins-Regular',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
+                                // Container(
+                                //   width: 290, // Adjust width as needed
+                                //   height: 75, // Adjust height as needed
+                                //   decoration: BoxDecoration(
+                                //     // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
+                                //     image: DecorationImage(
+                                //       image: AssetImage('assets/imgs/school/Frame 136.png'), // Provide the path to your image
+                                //       fit: BoxFit.fill, // Adjust the fit as needed
+                                //     ),
+                                //   ),
+                                // ),
                               ),
                               // Container(
                               //   width: constrains.maxWidth / 1.2,
@@ -690,16 +857,20 @@ class _AddBusState extends State<AddBus> {
                               SizedBox(
                                 width: constrains.maxWidth / 1.3,
                                 child: Center(
-                                  // Otp pageلسه معملتهاش ودا الكود اللى بيودينى عليها
                                   child: ElevatedSimpleButton(
                                     txt: "Add".tr,
                                     onPress: (){
-                                      _addDataToFirestore();
-                                      Navigator.push(
-                                          context ,
-                                          MaterialPageRoute(
-                                              builder: (context) =>  HomeScreen(),
-                                              maintainState: false));
+                                      if (_busNumber.text.length ==11){
+                                        _addDataToFirestore();
+                                        Navigator.push(
+                                            context ,
+                                            MaterialPageRoute(
+                                                builder: (context) =>  HomeScreen(),
+                                                maintainState: false));
+                                      }else{
+                                        SnackBar(content: Text('Please,enter valid number'));
+                                      }
+
                                     },
                                     width: constrains.maxWidth /1.2,
                                     hight: 48,
@@ -740,12 +911,14 @@ class _AddBusState extends State<AddBus> {
             child: SizedBox(
               //height: 100,
               child: FloatingActionButton(
-                backgroundColor: Colors.white,
+                backgroundColor: Color(0xff442B72),
                 onPressed: () async {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+                  //Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
                 },
                 child: Image.asset(
-                  'assets/imgs/school/Ellipse 2 (2).png',
+                  'assets/imgs/school/busbottombar.png',
+                  width: 35,
+                  height: 35,
                   fit: BoxFit.fill,
                 ),
               ),
