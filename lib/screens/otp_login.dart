@@ -6,31 +6,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/components/main_bottom_bar.dart';
+import 'package:school_account/main.dart';
 import 'package:school_account/screens/homeScreen.dart';
 import 'package:school_account/screens/schoolData.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
-import '../main.dart';
+import '../supervisor_parent/screens/final_invitation_parent.dart';
+import '../supervisor_parent/screens/final_invitation_supervisor.dart';
+import '../supervisor_parent/screens/home_parent.dart';
+import '../supervisor_parent/screens/home_supervisor.dart';
 import '../supervisor_parent/screens/no_invitation.dart';
 //import '../components/main_bottom_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-class OtpScreen extends StatefulWidget {
-  // const OtpScreen({super.key});
+
+class OtpScreenLogin  extends StatefulWidget {
+  // const OtpScreenLogin({super.key});
   //new code
   final String verificationId;
-  int? type = 0;
-  String? name;
-  String? phone;
-  String? typeName;
 
-
-  OtpScreen({Key? key, required this.verificationId,this.type,this.name,this.phone,this.typeName}) : super(key: key);
+  OtpScreenLogin({Key? key, required this.verificationId}) : super(key: key);
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  State<OtpScreenLogin> createState() => _OtpScreenLoginState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenLoginState extends State<OtpScreenLogin> {
   Timer? _timer;  // Variable to store the timer
   int _seconds = 60;
   String verificationId = '';
@@ -53,7 +53,6 @@ class _OtpScreenState extends State<OtpScreen> {
       });
     });
   }
-  final _firestore = FirebaseFirestore.instance;
 
   // void _addDataToSupervisorFirestore() async {
   //   //if (_formKey.currentState!.validate()) {
@@ -72,52 +71,6 @@ class _OtpScreenState extends State<OtpScreen> {
   //   });
   // }
 
-  void _addDataToFirestore() async {
-    //if (_formKey.currentState!.validate()) {
-    // Define the data to add
-    String userId = FirebaseAuth.instance.currentUser!.uid;
-    Map<String, dynamic> data = {
-      'name': widget.name,
-      'phoneNumber': widget.phone,
-    'state':0,
-    'invite':1
-    };
-
-    // Add the data to the Firestore collection
-    await _firestore.collection(widget.typeName!).add(data).then((docRef) async {
-      if(widget.type == 1){
-        sharedpref!.setInt('allData',0);
-        await sharedpref!.setString('type', widget.typeName!);
-        await sharedpref!.setString('id', docRef.id);
-        Navigator.push(
-            context ,
-            MaterialPageRoute(
-                builder: (context) =>  SchoolData(),
-                maintainState: false));
-      }else
-      {
-        await sharedpref!.setString('type', widget.typeName!);
-        await sharedpref!.setString('id', docRef.id);
-        sharedpref!.setInt('invitstate',0);
-        sharedpref!.setInt('invit',0);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NoInvitation(selectedImage: widget.type!,),
-                maintainState: false));
-
-      }
-
-
-      print('Data added with document ID: ${docRef.id}');
-    }).catchError((error) {
-      print('Failed to add data: $error');
-      setState(() {
-        _isLoading = false;
-      });
-    });
-
-  }
   @override
   void initState() {
     super.initState();
@@ -394,10 +347,27 @@ class _OtpScreenState extends State<OtpScreen> {
                                       );
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
-                                      _addDataToFirestore();
-                                      // final prefs = await SharedPreferences.getInstance();
-                                      // prefs.setString('name', widget.name!);
-                                      // prefs.setString('phoneNumber', widget.phone!);
+                                      await sharedpref!.setString('type', loginType);
+                                      await sharedpref!.setString('id', id);
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                          builder: (context) =>  sharedpref!.getString('type').toString() == 'schooldata'
+                                              ? sharedpref!.getInt('allData') == 1
+                                              ? HomeScreen()
+                                              : SchoolData()
+                                              : sharedpref!.getString('type').toString() == 'parent'
+                                              ? sharedpref!.getInt('invit') == 1
+                                              ? sharedpref!.getInt('invitstate') == 1
+                                              ? HomeParent()
+                                              : FinalAcceptInvitationParent()
+                                              : NoInvitation(selectedImage: 3)
+                                              : sharedpref!.getInt('invit') == 1
+                                              ? sharedpref!.getInt('invitstate') == 1
+                                              ? HomeForSupervisor()
+                                              : FinalAcceptInvitationSupervisor()
+                                              : NoInvitation(selectedImage: 2)));
+
 
                                     }catch(e){
                                       setState(() {

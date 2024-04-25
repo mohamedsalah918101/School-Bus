@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gif/flutter_gif.dart';
+import 'package:school_account/screens/schoolData.dart';
+import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
+import 'package:school_account/supervisor_parent/screens/no_invitation.dart';
 
+import '../main.dart';
+import '../supervisor_parent/screens/final_invitation_parent.dart';
+import '../supervisor_parent/screens/final_invitation_supervisor.dart';
+import '../supervisor_parent/screens/home_parent.dart';
+import 'homeScreen.dart';
 import 'loginScreen.dart';
 
-class SplashScreen extends StatefulWidget{
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
-
 }
+
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   double? height;
@@ -28,11 +36,32 @@ class _SplashScreenState extends State<SplashScreen>
     controller.addListener(() {
       if (controller.isCompleted) {
         controller.stop();
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => sharedpref!.getString('id').toString() ==
+                            'null' ||
+                        sharedpref!.getString('id').toString() == ''
+                    ?
+                    // AddParents(),
+                    LoginScreen()
+                    : sharedpref!.getString('type').toString() == 'schooldata'
+                        ? sharedpref!.getInt('allData') == 1
+                            ? HomeScreen()
+                            : SchoolData()
+                        : sharedpref!.getString('type').toString() == 'parent'
+                            ? sharedpref!.getInt('invit') == 1
+                                ? sharedpref!.getInt('invitstate') == 1
+                                    ? HomeParent()
+                                    : FinalAcceptInvitationParent()
+                                : NoInvitation(selectedImage: 3)
+                            : sharedpref!.getInt('invit') == 1
+                                ? sharedpref!.getInt('invitstate') == 1
+                                    ? HomeForSupervisor()
+                                    : FinalAcceptInvitationSupervisor()
+                                : NoInvitation(selectedImage: 2)));
       }
     });
-
   }
 
   @override
@@ -87,3 +116,4 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+//invit lw mogod--lw gat invite b3d ---lw ft7t invite --otp

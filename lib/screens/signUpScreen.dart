@@ -138,27 +138,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isPhoneExiting = false;
 String typeAccount='';
 
-  Future<bool> checkIfNumberExists() async {
-    print(_phoneNumberController.text+'hhh');
-    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection(typeAccount);
-    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: _phoneNumberController.text);
-    try {
-      setState(() {
-        _isLoading = false;
-
-      });
-      QuerySnapshot snapshot = await queryOfNumber.get();
-      print(snapshot.docs.toString()+'dataaa');
-      return snapshot.size > 0;
-    } catch (error) {
-      setState(() {
-        _isLoading = false;
-
-      });
-      print('Error: $error');
-      return false;
-    }
-  }
+  // Future<bool> checkIfNumberExists() async {
+  //   print(_phoneNumberController.text+'hhh');
+  //   CollectionReference supervisorCollection = FirebaseFirestore.instance.collection(typeAccount);
+  //   Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: _phoneNumberController.text);
+  //   try {
+  //     setState(() {
+  //       _isLoading = false;
+  //
+  //     });
+  //     QuerySnapshot snapshot = await queryOfNumber.get();
+  //     print(snapshot.docs.toString()+'dataaa');
+  //     return snapshot.size > 0;
+  //   } catch (error) {
+  //     setState(() {
+  //       _isLoading = false;
+  //
+  //     });
+  //     print('Error: $error');
+  //     return false;
+  //   }
+  // }
 
   bool _validatename() {
     //return _name.text.isNotEmpty;
@@ -892,6 +892,7 @@ String typeAccount='';
                                           //   }
                                           // },
                                           onPress: () async {
+
                                             if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
                                             ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
 
@@ -909,7 +910,7 @@ String typeAccount='';
 
                                               });
                                               // String EnteredPhoneNumber = PhoneNumberController.text;
-                                            bool isNumberExits = await checkIfNumberExists();
+                                            bool isNumberExits = await checkIfNumberExists(_phoneNumberController.text);
                                             setState(() {
                                               isPhoneExiting = isNumberExits ;
                                             });
