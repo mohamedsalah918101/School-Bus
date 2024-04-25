@@ -4,24 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
-import 'package:school_account/supervisor_parent/components/students_card_in_home.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/show_all_students.dart';
 import 'package:school_account/supervisor_parent/screens/student_screen.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/bus_component.dart';
-import '../components/main_bottom_bar.dart';
-import '../components/supervisor_card.dart';
-import 'notification_parent.dart';
+
 class HomeForSupervisor extends StatefulWidget {
   HomeForSupervisor({
     Key? key,
@@ -46,11 +38,29 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   //     print('Document does not exist');
   //   }
   // }
+
+
+  // getData(String docid)async{
+  //   DocumentReference documentReference = FirebaseFirestore.instance.collection('parent').doc(docid);
+  //   DocumentSnapshot documentSnapshot = await documentReference.get();
+  //   if (documentSnapshot.exists) {
+  //     Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+  //     // Add the data to the `data` list
+  //     data.add(data);
+  //     setState(() {
+  //
+  //     });
+  //   } else {
+  //     print('Document does not exist on the database');
+  //   }
+  // }
+
+
+
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
     data.addAll(querySnapshot.docs);
     setState(() {
-
     });
   }
 
@@ -58,7 +68,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   void initState() {
     getData();
     super.initState();
-
   }
 
 

@@ -65,7 +65,16 @@ class _AddParentsState extends State<AddParents> {
         'grade': gradeControllers[index].text,
       },
     );
-
+    // Map<String, dynamic> data = {
+    //   'typeOfParent': selectedValue,
+    //   'name': _nameController.text,
+    //   'numberOfChildren': _numberOfChildrenController.text,
+    //   'phoneNumber': _phoneNumberController.text,
+    //   'childern': childrenData,
+    //   'state':0,
+    //   'invite':1
+    //   // 'gender': gender
+    // };
   // String gender = isFemale ? 'Female' : 'Male';
   Map<String, dynamic> data = {
     'typeOfParent': selectedValue,
@@ -74,7 +83,7 @@ class _AddParentsState extends State<AddParents> {
     'phoneNumber': _phoneNumberController.text,
     'childern': childrenData,
     'state': 0,
-    'invite': 1
+    'invite': 0
     // 'gender': gender
   };
  // Add the data to the Firestore collection
@@ -109,6 +118,7 @@ class _AddParentsState extends State<AddParents> {
       ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
 
 
+
     }}
 
 
@@ -118,19 +128,30 @@ class _AddParentsState extends State<AddParents> {
 
   final nameChildController = TextEditingController();
   final gradeController = TextEditingController();
+  List<Map<String, dynamic>> genderSelection = [];
+
 
   void addChild() {
     setState(() {
       String input = _numberOfChildrenController.text;
+      // List<Map<String, bool>> genderSelection = [];
+
       int count = int.tryParse(input) ?? 0;
       NumberOfChildren.clear();
       nameChildControllers.clear();
       gradeControllers.clear();
+      genderSelection.clear();
 
       for (int i = 0; i < count; i++) {
         bool isFemale = false;
         bool isMale = false;
-        nameChildControllers.add(nameChildController);
+        genderSelection.add({'isFemale': isFemale, 'isMale': isMale});
+
+
+        TextEditingController nameController = TextEditingController();
+        TextEditingController gradeController = TextEditingController();
+
+        nameChildControllers.add(nameController);
         gradeControllers.add(gradeController);
         NumberOfChildren.add(SizedBox(
             width: double.infinity,
@@ -218,7 +239,7 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               height: 38,
                               child: TextFormField(
-                                controller: nameChildControllers[i],
+                                controller: nameController,
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
                                   fontSize: 12,
@@ -406,19 +427,19 @@ class _AddParentsState extends State<AddParents> {
                             padding: (sharedpref?.getString('lang') == 'ar') ?
                             EdgeInsets.only(right: 15.0):
                             EdgeInsets.only(left: 15.0),
-                            child: Row(
+                            child:  Row(
                               children: [
-                                Radio(
-                                  value: true,
-                                  groupValue: isFemale,
-                                  onChanged: (bool? value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        isFemale = value;
-                                        isMale = !value;
-                                      });
-                                    }
-                                  },
+                            Row(
+                            children: [
+                            Radio<bool>(
+                              value: true,
+                              groupValue: genderSelection[i]['isFemale'],
+                              onChanged: (value) {
+                                setState(() {
+                                  genderSelection[i]['isFemale'] = value!;
+                                  genderSelection[i]['isMale'] = !value;
+                                });
+                              },
                                   fillColor: MaterialStateProperty.resolveWith((states) {
                                     if (states.contains(MaterialState.selected)) {
                                       return Color(0xff442B72);
@@ -438,7 +459,7 @@ class _AddParentsState extends State<AddParents> {
                                 SizedBox(
                                   width: 50, //115
                                 ),
-                                Radio(
+                                Radio<bool>(
                                   fillColor: MaterialStateProperty.resolveWith((states) {
                                     if (states.contains(MaterialState.selected)) {
                                       return Color(0xff442B72);
@@ -446,16 +467,14 @@ class _AddParentsState extends State<AddParents> {
                                     return Color(0xff442B72);
                                   }),
                                   value: true,
-                                  groupValue: isMale,
-                                  onChanged: (bool? value) {
-                                    if (value != null) {
+                                    groupValue: genderSelection[i]['isMale'],
+                                    onChanged: (value) {
                                       setState(() {
-                                        isFemale = !value;
-                                        isMale = value;
+                                        genderSelection[i]['isMale'] = value!;
+                                        genderSelection[i]['isFemale'] = !value;
                                       });
-                                    }
                                   },
-                                  activeColor: Color(0xff442B72), // Set the color of the selected radio button
+                                  activeColor: Color(0xff442B72),
                                 ),
                                 Text("Male".tr,
                                   style: TextStyle(
@@ -464,12 +483,11 @@ class _AddParentsState extends State<AddParents> {
                                     fontWeight: FontWeight.w500 ,
                                     color: Color(0xff442B72),),),
                               ],
-                            ),
                           ),
                           SizedBox(height: 10,)
                         ])),
               ],
-            )),
+            ))]))
            );
       }
       setState(() {});
