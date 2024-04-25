@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget{
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
       home:
-      HomeForSupervisor(),
+      SplashScreen(),
       // AddParents(),
       // SplashScreen(),
     //   Text('${data[index]['childern']?[1]['name'] }',

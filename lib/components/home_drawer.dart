@@ -1,5 +1,6 @@
 //
 import 'package:flutter/material.dart';
+import 'package:school_account/main.dart';
 import 'package:school_account/screens/busesScreen.dart';
 import 'package:school_account/screens/faqScreen.dart';
 import 'package:school_account/screens/homeScreen.dart';
@@ -314,7 +315,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          onTap: () {
+                          onTap: () async {
+                            await sharedpref!.setString('id', '');
                             Dialoge.logOutDialog(context);
                             // userData.write('userIsLoggedIn', null);
                             // userData.write('language', null);

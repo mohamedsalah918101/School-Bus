@@ -66,36 +66,52 @@ class _AddParentsState extends State<AddParents> {
       },
     );
 
-    // String gender = isFemale ? 'Female' : 'Male';
-    Map<String, dynamic> data = {
-      'typeOfParent': selectedValue,
-      'name': _nameController.text,
-      'numberOfChildren': _numberOfChildrenController.text,
-      'phoneNumber': _phoneNumberController.text,
-      'childern': childrenData,
-      'state':0,
-      'invite':1
-      // 'gender': gender
-    };
+  // String gender = isFemale ? 'Female' : 'Male';
+  Map<String, dynamic> data = {
+    'typeOfParent': selectedValue,
+    'name': _nameController.text,
+    'numberOfChildren': _numberOfChildrenController.text,
+    'phoneNumber': _phoneNumberController.text,
+    'childern': childrenData,
+    'state': 0,
+    'invite': 1
+    // 'gender': gender
+  };
+ // Add the data to the Firestore collection
+    var check =await addParentCheck(_phoneNumberController.text);
+    if(!check) {
+    var res =await checkUpdate(_phoneNumberController.text);
+    if(!res) {
+      await _firestore.collection('parent').add(data).then((docRef) {
+        String docid = docRef.id;
+        print('Data added with document ID: ${docRef.id}');
+        createDynamicLink(true, docid, _phoneNumberController.text, 'parent');
+      }).catchError((error) {
+        print('Failed to add data: $error');
+      });
+      // Clear the text fields
+      _nameController.clear();
+      _phoneNumberController.clear();
+      _numberOfChildrenController.clear();
+      nameChildControllers.clear();
+      nameChildControllers.clear();
+      gradeControllers.clear();
+    }else{
+      await _firestore.collection('parent').doc(docID).update(data);
+      // Clear the text fields
+      _nameController.clear();
+      _phoneNumberController.clear();
+      _numberOfChildrenController.clear();
+      nameChildControllers.clear();
+      nameChildControllers.clear();
+      gradeControllers.clear();
+    }  }else{
+      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
 
-    // Add the data to the Firestore collection
-    await _firestore.collection('parent').add(data).then((docRef) {
-       String docid =docRef.id;
-      print('Data added with document ID: ${docRef.id}');
-      createDynamicLink(true, docid,_phoneNumberController.text,'parent');
 
-    }).catchError((error) {
-      print('Failed to add data: $error');
-    });
+    }}
 
-    // Clear the text fields
-    _nameController.clear();
-    _phoneNumberController.clear();
-    _numberOfChildrenController.clear();
-    nameChildControllers.clear();
-    nameChildControllers.clear();
-    gradeControllers.clear();
-  }
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];

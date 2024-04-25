@@ -134,12 +134,19 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
      //   Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
       },
       verificationFailed: (FirebaseAuthException e) {
+        setState(() {
+          _isLoading = false;
+
+        });
         // Verification failed
       },
       codeSent: (String verificationId, int? resendToken) async {
         // Save the verification ID for future use
         String smsCode = 'xxxxxx'; // Code input by the user
+        setState(() {
+          _isLoading = false;
 
+        });
         Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreenLogin(verificationId: verificationId,)));
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
@@ -502,20 +509,25 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                               txt: 'Login'.tr,
 
                                               onPress: () async{
+    if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
+    ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+
+    }else{
                                                 if (_validatePhoneNumber())  {
                                                   setState(() {
                                                     _isLoading = true;
 
                                                   });
-                                              var res =   await checkIfNumberExists(_phoneNumberController.text);
-                                                  setState(() {
-                                                    _isLoading = false;
+                                              var res =   await checkIfNumberExists('0'+_phoneNumberController.text);
 
-                                                  });
                                               if(res){
                                                 verifyPhoneNumber(enteredPhoneNumber);
 
                                               }else{
+                                                setState(() {
+                                                  _isLoading = false;
+
+                                                });
                                                 ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('This phone not exist.')));
 
                                               }
@@ -536,7 +548,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                                   //     duration: Duration(seconds: 2),
                                                   //   ),
                                                   // );
-                                                }
+                                                }}
                                               },
 
                                               width: constrains.maxWidth /1.4,

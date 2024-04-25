@@ -80,13 +80,13 @@ class _OtpScreenState extends State<OtpScreen> {
       'name': widget.name,
       'phoneNumber': widget.phone,
     'state':0,
-    'invite':1
+    'invite':0
     };
 
     // Add the data to the Firestore collection
     await _firestore.collection(widget.typeName!).add(data).then((docRef) async {
       if(widget.type == 1){
-        sharedpref!.setInt('allData',0);
+        await sharedpref!.setInt('allData',0);
         await sharedpref!.setString('type', widget.typeName!);
         await sharedpref!.setString('id', docRef.id);
         Navigator.push(
@@ -98,8 +98,8 @@ class _OtpScreenState extends State<OtpScreen> {
       {
         await sharedpref!.setString('type', widget.typeName!);
         await sharedpref!.setString('id', docRef.id);
-        sharedpref!.setInt('invitstate',0);
-        sharedpref!.setInt('invit',0);
+        await sharedpref!.setInt('invitstate',0);
+        await sharedpref!.setInt('invit',0);
         Navigator.push(
             context,
             MaterialPageRoute(
