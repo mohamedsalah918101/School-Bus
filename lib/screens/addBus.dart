@@ -48,6 +48,9 @@ class _AddBusState extends State<AddBus> {
   File ? _selectedImagebus;
   String? imageUrl;
   String? busimage;
+  bool _validateDriverName = false;
+  bool _validateDriverNumber = false;
+  bool _validateBusNumber = false;
   //function choose photo from gallery
   Future _pickImageFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -294,11 +297,14 @@ class _AddBusState extends State<AddBus> {
                       height: 78.5,  // Set height as per your preference
                       fit: BoxFit.cover,  // Adjusts how the image fits in the container
                     )
-                                       : Container(
+                                       :
+                    Container(
+
                                           width: 65, // Adjust size as needed
                                           height: 65,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
+
                                             border: Border.all(
                                               color: Color(0xffCCCCCC), // Adjust border color
                                               width: 2, // Adjust border width
@@ -306,6 +312,7 @@ class _AddBusState extends State<AddBus> {
                                           ),
                                           child: Align(alignment: Alignment.bottomCenter,
                                             child: CircleAvatar(radius: 20,
+
                                             backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
                                               ,backgroundColor: Colors.white,
                                             ),
@@ -318,6 +325,7 @@ class _AddBusState extends State<AddBus> {
                                               width: 20, // Adjust size as needed
                                               height: 20,
                                               decoration: BoxDecoration(
+
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
                                                   color: Color(0xffCCCCCC), // Adjust border color
@@ -343,14 +351,25 @@ class _AddBusState extends State<AddBus> {
                                           text: TextSpan(
                                             children: [
                                               TextSpan(text:"Driver photo",style: TextStyle(color: Color(0xff442B72),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold' )),
-                                              TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
+                                              //TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
                                             ]
                                           ),
                                         ),
 
                                     ),
                                   ),
+                                  //error message on null photo
+                                  // if (_selectedImage == null)
+                                  //   Padding(
+                                  //     padding: const EdgeInsets.only(left: 12, top: 4),
+                                  //     child: Text(
+                                  //       "Please select a photo",
+                                  //       style: TextStyle(color: Colors.red),
+                                  //     ),
+                                  //   ),
+
                                 ],
+
                               ),
                               // Padding(
 
@@ -413,6 +432,7 @@ class _AddBusState extends State<AddBus> {
                                   scrollPadding: const EdgeInsets.symmetric(
                                       vertical: 40),
                                   decoration:  InputDecoration(
+                                    errorText: _validateDriverName ? "Please Enter Name" : null,
                                     alignLabelWithHint: true,
                                     counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
@@ -491,13 +511,19 @@ class _AddBusState extends State<AddBus> {
                                   scrollPadding: const EdgeInsets.symmetric(
                                       vertical: 40),
                                   keyboardType: TextInputType.number,
+                                  maxLength: 11,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                    LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                                  ],
                                   decoration:  InputDecoration(
+                                    errorText: _validateDriverNumber ? "Please Enter Phone Number" : null,
                                     // labelText: 'Shady Ayman'.tr,
                                     hintText:'Your Number'.tr ,
                                     hintStyle: const TextStyle(
                                       color: Color(0xFFC2C2C2),
                                       fontSize: 12,
-                                      fontFamily: 'Inter-Bold',
+                                      fontFamily: 'Poppins-Bold',
                                       fontWeight: FontWeight.w700,
                                       height: 1.33,
                                     ),
@@ -506,7 +532,7 @@ class _AddBusState extends State<AddBus> {
                                     fillColor: const Color(0xFFF1F1F1),
                                     filled: true,
                                     contentPadding: const EdgeInsets.fromLTRB(
-                                        8, 5, 10, 5),
+                                        8,20, 10, 5),
                                     floatingLabelBehavior:  FloatingLabelBehavior.never,
                                     enabledBorder: myInputBorder(),
                                     focusedBorder: myFocusBorder(),
@@ -586,10 +612,12 @@ class _AddBusState extends State<AddBus> {
                                               fontFamily: 'Poppins-Regular',
                                             ),
                                           ),
+
                                         ],
                                       ),
                                     ),
                                   ),
+
                                 ),
                                 // Container(
                                 //   width: 290, // Adjust width as needed
@@ -685,6 +713,7 @@ class _AddBusState extends State<AddBus> {
                                   scrollPadding: const EdgeInsets.symmetric(
                                       vertical: 40),
                                   decoration:  InputDecoration(
+                                    errorText: _validateBusNumber ? "Please Enter Bus Number" : null,
                                     alignLabelWithHint: true,
                                     counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
@@ -859,8 +888,18 @@ class _AddBusState extends State<AddBus> {
                                 child: Center(
                                   child: ElevatedSimpleButton(
                                     txt: "Add".tr,
+
                                     onPress: (){
-                                      if (_busNumber.text.length ==11){
+                                      setState(() {
+                                        _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
+                                        _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
+                                        _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
+                                      });
+                                      if (_driverNumber.text.length ==11 && _driverName.text.isEmpty &&
+                                          _driverNumber.text.isEmpty && _busNumber.text.isEmpty
+                                          //_selectedImage != null && _selectedImagebus != null
+                                          ){
+
                                         _addDataToFirestore();
                                         Navigator.push(
                                             context ,
@@ -869,6 +908,7 @@ class _AddBusState extends State<AddBus> {
                                                 maintainState: false));
                                       }else{
                                         SnackBar(content: Text('Please,enter valid number'));
+
                                       }
 
                                     },

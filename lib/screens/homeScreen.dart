@@ -15,6 +15,7 @@
 //
 // }
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -55,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _counter = 0;
   // هنا تقوم بتعريف الحالة
   bool _isButtonDisabled= true;
-
+  final _firestore = FirebaseFirestore.instance;
   void _incrementCounter() {
     setState(() {
       _isButtonDisabled = true;
@@ -169,31 +170,78 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child:
 
-                              ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                leading: GestureDetector(
-                                    onTap: (){
-                                      Navigator.push(
-                                          context ,
-                                          MaterialPageRoute(
-                                              builder: (context) =>  ProfileScreen(),
-                                              maintainState: false));
-                                    },
-                                    child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
-                                //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
-                                title: Text(
-                                  'Salam Language School'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins-Bold',
-                                  ),
-                                ),
-                                subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                                  tileColor: Colors.white,
-                              ),
+                              // ListTile(
+                              //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              //   leading: GestureDetector(
+                              //       onTap: (){
+                              //         Navigator.push(
+                              //             context ,
+                              //             MaterialPageRoute(
+                              //                 builder: (context) =>  ProfileScreen(),
+                              //                 maintainState: false));
+                              //       },
+                              //       child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
+                              //   //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
+                              //   title: Text(
+                              //     'Salam Language School'.tr,
+                              //     style: TextStyle(
+                              //       color: Color(0xFF442B72),
+                              //       fontSize: 15,
+                              //       fontWeight: FontWeight.bold,
+                              //       fontFamily: 'Poppins-Bold',
+                              //     ),
+                              //   ),
+                              //   subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
+                              //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                              //     tileColor: Colors.white,
+                              // ),
+                              FutureBuilder(
+                                future: _firestore.collection('schooldata').doc('62tmDjVPy7ZD1rjM64oT7rDvkqE3').get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      leading: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ProfileScreen(),
+                                              maintainState: false,
+                                            ),
+                                          );
+                                        },
+                                        child: Image.network(data['photo'], width: 61, height: 61,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                          },),
+                                      ),
+                                      title: Text(
+                                        data['nameEnglish'],
+                                        style: TextStyle(
+                                          color: Color(0xFF442B72),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Poppins-Bold',
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        data['address'],
+                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                      ),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                      tileColor: Colors.white,
+                                    );
+                                  }
+
+                                  return CircularProgressIndicator();
+                                },
+                              )
                             ),
                             SizedBox(height: 30,),
 
