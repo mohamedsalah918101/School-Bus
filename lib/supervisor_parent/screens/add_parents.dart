@@ -53,6 +53,9 @@ class _AddParentsState extends State<AddParents> {
   String selectedValue = '';
 
   void _addDataToFirestore() async {
+    setState(() {
+
+    });
     int numberOfChildren = int.parse(_numberOfChildrenController.text );
 
     List<Map<String, dynamic>> childrenData = List.generate(

@@ -7,6 +7,7 @@ import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'elevated_simple_button.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentsCardInHome extends StatefulWidget {
   StudentsCardInHome({super.key, });
@@ -17,6 +18,41 @@ class StudentsCardInHome extends StatefulWidget {
 
 class _StudentsCardInHomeState extends State<StudentsCardInHome> {
 
+  List<TextEditingController> nameChildControllers = [];
+  List<TextEditingController> gradeControllers = [];
+  int index=0;
+
+  List<QueryDocumentSnapshot> data = [];
+
+  getData()async{
+   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+   data.addAll(querySnapshot.docs);
+  }
+
+  @override
+  void initState() {
+      getData() ;
+      super.initState();
+  }
+
+  // Future<List<Map<String, dynamic>>> getDataFromFirestore() async {
+  //   List<Map<String, dynamic>> data = [];
+  //
+  //   QuerySnapshot querySnapshot = await _firestore.collection('parent').get();
+  //
+  //   querySnapshot.docs.forEach((doc) {
+  //     Map<String, dynamic> docData = doc.data() as Map<String, dynamic>;
+  //     String name = docData['name'];
+  //     String grade = docData['grade'];
+  //
+  //     data.add({
+  //       'name': name,
+  //       'grade': grade,
+  //     });
+  //   });
+  //
+  //   return data;
+  // }
 
   @override
   Widget build(BuildContext context) {
