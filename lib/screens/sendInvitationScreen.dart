@@ -388,6 +388,11 @@ class _SendInvitationState extends State<SendInvitation> {
                                 controller: _phoneNumberController,
                                 focusNode: _numberSupervisorFocus,
                                 cursorColor: const Color(0xFF442B72),
+                                maxLength: 11,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                  LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                                ],
                                 onFieldSubmitted: (value) {
                                   // move to the next field when the user presses the "Done" button
                                   FocusScope.of(context).requestFocus(_emailSupervisorFocus);
@@ -577,7 +582,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                     // );
                                    setState(() {
                                      _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                                    // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                     _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                    });
                                    if(! _nameController.text.isEmpty &&
                                        //! _phoneNumberController.text.isEmpty

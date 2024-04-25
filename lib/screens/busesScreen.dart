@@ -65,7 +65,7 @@ data.addAll(querySnapshot.docs);
   int _counter = 0;
   // هنا تقوم بتعريف الحالة
   bool _isButtonDisabled= true;
-
+final _firestore = FirebaseFirestore.instance;
   //هنا بتعريق الدالة التي ستفوم بعمل الزيادة
   void _incrementCounter() {
     setState(() {
@@ -99,6 +99,7 @@ data.addAll(querySnapshot.docs);
     // ScaffoldMessenger.of(context).hideCurrentSnackBar();
     super.dispose();
   }
+
 
 
   @override
@@ -741,122 +742,87 @@ data.addAll(querySnapshot.docs);
                                       //     ]
                                       // ),
                                       //child:
-                                      ListTile(
-                                        leading: Image.asset('assets/imgs/school/buses.png'),
-                                        title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                        subtitle: Text("Driver name : Ahmed Atef",style:
-                                        TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                        trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                      FutureBuilder(
+                                        future: _firestore.collection('busdata').doc('UzrcI6MfSYP1mbGY2Ci3').get(),
+                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                          if (snapshot.hasError) {
+                                            return Text('Something went wrong');
+                                          }
+
+                                          if (snapshot.connectionState == ConnectionState.done) {
+                                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                            return ListTile(
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                              leading: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => ProfileScreen(),
+                                                      maintainState: false,
+                                                    ),
+                                                  );
+                                                },
+                                                child: Image.network(data['busphoto'], width: 61, height: 61,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                                  },),
+                                              ),
+                                              title: Text(
+                                                data['busnumber'],
+                                                style: TextStyle(
+                                                  color: Color(0xFF442B72),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Poppins-Bold',
+                                                ),
+                                              ),
+                                              subtitle: Text("Driver Name : "+
+                                                data['namedriver'],
+                                                style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                              ),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                                trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
+                                              //tileColor: Colors.white,
+
+                                            ),);
+                                          }
+
+                                          return CircularProgressIndicator();
+                                        },
                                       ),
+                                      // ListTile(
+                                      //   leading: Image.asset('assets/imgs/school/buses.png'),
+                                      //   title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                      //   subtitle: Text("Driver name : Ahmed Atef",style:
+                                      //   TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
+                                      //   trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                      // ),
                                       // ),
                                       SizedBox(height: 40,),
 
-                                        ListTile(
-                                          leading: Container(
-                                            width: 60,
-
-                                            //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
-                                              //color: Colors.white,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                          ),
-                                          subtitle: Text("Driver name : Ahmed Atef",style:
-                                          TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                          trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                          ),
-
-                                        ),
-                                      SizedBox(height: 40,),
-
-                                      ListTile(
-                                        leading: Container(
-                                          width: 60,
-
-                                          //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
-                                            //color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                        ),
-                                        subtitle: Text("Driver name : Ahmed Atef",style:
-                                        TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                        trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                        ),
-
-                                      ),
-                                      SizedBox(height: 40,),
-
-
-                                      ListTile(
-                                        leading: Container(
-                                          width: 60,
-
-                                          //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
-                                            //color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                        ),
-                                        subtitle: Text("Driver name : Ahmed Atef",style:
-                                        TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                        trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                        ),
-
-                                      ),
-                                      SizedBox(height: 40,),
-                                      ListTile(
-                                        leading: Container(
-                                          width: 60,
-
-                                          //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
-                                            //color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                        ),
-                                        subtitle: Text("Driver name : Ahmed Atef",style:
-                                        TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-
-                                        trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                        ),
-
-                                      ),
-                                      SizedBox(height: 40,),
-                                      ListTile(
-                                        leading: Container(
-                                          width: 60,
-
-                                          //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
-                                            //color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                        ),
-                                        subtitle: Text("Driver name : Ahmed Atef",style:
-                                        TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-
-                                        trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-
-                                        ),
-
-                                      ),
-                                      SizedBox(height: 40,),
+                                      // ListTile(
+                                      //   leading: Container(
+                                      //     width: 60,
+                                      //
+                                      //     //child: Image.asset('assets/imgs/school/fruits.jpeg'),
+                                      //     decoration: BoxDecoration(
+                                      //       image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
+                                      //       //color: Colors.white,
+                                      //       shape: BoxShape.circle,
+                                      //     ),
+                                      //   ),
+                                      //   title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
+                                      //   ),
+                                      //   subtitle: Text("Driver name : Ahmed Atef",style:
+                                      //   TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
+                                      //
+                                      //   trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
+                                      //
+                                      //   ),
+                                      //
+                                      // ),
+                                     // SizedBox(height: 40,),
 
 
 
