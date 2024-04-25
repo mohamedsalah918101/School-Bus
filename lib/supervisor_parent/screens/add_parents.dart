@@ -114,7 +114,11 @@ class _AddParentsState extends State<AddParents> {
       for (int i = 0; i < count; i++) {
         bool isFemale = false;
         bool isMale = false;
-        nameChildControllers.add(nameChildController);
+
+        TextEditingController nameController = TextEditingController();
+        TextEditingController gradeController = TextEditingController();
+
+        nameChildControllers.add(nameController);
         gradeControllers.add(gradeController);
         NumberOfChildren.add(SizedBox(
             width: double.infinity,
@@ -202,7 +206,7 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               height: 38,
                               child: TextFormField(
-                                controller: nameChildControllers[i],
+                                controller: nameController,
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
                                   fontSize: 12,
