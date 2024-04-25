@@ -49,7 +49,7 @@ class _SendInvitationState extends State<SendInvitation> {
       Map<String, dynamic> data = {
         'name': _nameController.text,
         'email': _emailController.text,
-        'phoneNumber': _phoneNumberController.text,
+        'phoneNumber': '+2'+_phoneNumberController.text,
         'state':0,
         'invite':1
       };

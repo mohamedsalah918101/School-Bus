@@ -83,7 +83,7 @@ class _AddParentsState extends State<AddParents> {
     'phoneNumber': _phoneNumberController.text,
     'childern': childrenData,
     'state': 0,
-    'invite': 0
+    'invite': 1
     // 'gender': gender
   };
  // Add the data to the Firestore collection
@@ -1164,53 +1164,53 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               hight: 48,
                               onPress: () async {
-                                if( selectedValue!.isEmpty){
-                                  typeOfParentError = true;
-                                  setState(() {
-
-                                  });
-                                }else if(_nameController.text.length == 0){
-                                  nameError = true;
-                                  setState(() {
-
-                                  });
-                                }else if(_phoneNumberController.text.length < 11){
-                                  phoneError = true;
-                                  setState(() {
-
-                                  });
-                                }else if(_numberOfChildrenController.text.length < 1){
-                                  numberOfChildrenError = true;
-                                  setState(() {
-
-                                  });
-                                }else if(nameChildControllers.length < 1){
-                                  nameChildeError = true;
-                                  setState(() {
-
-                                  });
-                                }
-                                   else if (nameChildController.text.length == 0) {
-                                      nameChildeError = true;
-                                    }
-                                   else if (gradeController.text.length == 0) {
-                                      GradeError = true;
-                                  }else{
-                                  nameError = false;
-                                  phoneError = false;
-                                  numberOfChildrenError = false;
-                                  nameChildeError = false;
-                                  GradeError = false;
-                                  typeOfParentError = false;
-                                  setState(() {
-                                  });
+                                // if( selectedValue!.isEmpty){
+                                //   typeOfParentError = true;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }else if(_nameController.text.length == 0){
+                                //   nameError = true;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }else if(_phoneNumberController.text.length < 11){
+                                //   phoneError = true;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }else if(_numberOfChildrenController.text.length < 1){
+                                //   numberOfChildrenError = true;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }else if(nameChildControllers.length < 1){
+                                //   nameChildeError = true;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }
+                                //    else if (nameChildController.text.length == 0) {
+                                //       nameChildeError = true;
+                                //     }
+                                //    else if (gradeController.text.length == 0) {
+                                //       GradeError = true;
+                                //   }else{
+                                //   nameError = false;
+                                //   phoneError = false;
+                                //   numberOfChildrenError = false;
+                                //   nameChildeError = false;
+                                //   GradeError = false;
+                                //   typeOfParentError = false;
+                                //   setState(() {
+                                //   });
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
                                 print('object');
                                 NumberOfChildrenCard = false;
                                 setState(() {
                                 });
-                              }},
+                              },
                               color: Color(0xFF442B72),
                               fontSize: 16),
                         ),

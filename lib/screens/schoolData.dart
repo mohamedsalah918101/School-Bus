@@ -115,15 +115,17 @@ class _SchoolDataState extends State<SchoolData> {
       'coordinatorName':_coordinatorName.text,
       'supportNumber':_supportNumber.text,
       'photo': imageUrl,
+      'state':1
     };
 
 
     // Add the data to the Firestore collection
     //await _firestore.collection('schooldata').add(data).then((docRef)
-   await _firestore.collection('schooldata').doc(userId).set(data, SetOptions(merge: true)).then((_)
+   await _firestore.collection('schooldata').doc(sharedpref!.getString('id')).update(data).then((_)
        //.update(data).then((docRef)
     {
       sharedpref!.setInt("allData",1);
+      // await _firestore.collection('schooldata').doc(userId)
       //print('Data added with document ID: ${docRef.id}');
      print('Data updated with document ID: $userId');
     }).catchError((error) {

@@ -34,6 +34,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'homeScreen.dart';
 
 
@@ -196,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               //     tileColor: Colors.white,
                               // ),
                               FutureBuilder(
-                                future: _firestore.collection('schooldata').doc('62tmDjVPy7ZD1rjM64oT7rDvkqE3').get(),
+                                future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
                                 builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                                   if (snapshot.hasError) {
                                     return Text('Something went wrong');
@@ -216,10 +217,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           );
                                         },
-                                        child: Image.network(data['photo'], width: 61, height: 61,
+                                        child:data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
                                           errorBuilder: (context, error, stackTrace) {
-                                            return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
-                                          },),
+                                            return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                          },):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
                                       ),
                                       title: Text(
                                         data['nameEnglish'],

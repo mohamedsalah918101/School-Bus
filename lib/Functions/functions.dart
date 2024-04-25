@@ -64,20 +64,22 @@ String id='';
 int invitestate=0;
 
 Future<bool> checkIfNumberExists(String phoneNumber) async {
-  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
 
-  Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
   try {
+    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
 
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
     QuerySnapshot snapshot = await queryOfNumber.get();
-    print(phoneNumber+'dataaa');
+  //  print(snapshot.docs[0].toString()+'dataaa');
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;
-      if(snapshot.docs[0].get('address') == null)
-        sharedpref!.setInt('allData',0);
+      if(snapshot.docs[0].get('state') == 0)
+       {
+         print(snapshot.docs[0].get('state').toString()+'ghghgh');
+         sharedpref!.setInt('allData',0);}
       else
-      sharedpref!.setInt('allData',1);
+     { sharedpref!.setInt('allData',1);}
 
       return true;
     }else{
