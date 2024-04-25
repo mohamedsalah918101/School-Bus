@@ -8,6 +8,7 @@ import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
+import '../Functions/functions.dart';
 import '../components/bottom_bar_item.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
@@ -16,6 +17,9 @@ import '../controller/local_controller.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:share_plus/share_plus.dart';
+
 
 
 class SendInvitation extends StatefulWidget{
@@ -26,6 +30,9 @@ class SendInvitation extends StatefulWidget{
 
 
 class _SendInvitationState extends State<SendInvitation> {
+  FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+
+  String docid='';
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   MyLocalController ControllerLang = Get.find();
   // TextEditingController _namesupervisor=TextEditingController();
@@ -43,11 +50,15 @@ class _SendInvitationState extends State<SendInvitation> {
         'name': _nameController.text,
         'email': _emailController.text,
         'phoneNumber': _phoneNumberController.text,
+        'state':0,
+        'invite':1
       };
       // Add the data to the Firestore collection
       await _firestore.collection('supervisor').add(data).then((docRef) {
+        docid=docRef.id;
         print('Data added with document ID: ${docRef.id}');
-        showSnackBarFun(context);
+
+        // showSnackBarFun(context);
       }).catchError((error) {
         print('Failed to add data: $error');
       });
@@ -386,7 +397,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                     vertical: 40),
                                 keyboardType: TextInputType.number,
                                 decoration:  InputDecoration(
-                                  errorText: _validatePhone ? "Please Enter Your Phone number": null,
+                                  errorText: _validatePhone ? "Please Enter valid Phone number": null,
                                   // labelText: 'Shady Ayman'.tr,
                                   hintText:'Your Number'.tr ,
                                   hintStyle:  const TextStyle(
@@ -406,12 +417,12 @@ class _SendInvitationState extends State<SendInvitation> {
                                   enabledBorder: myInputBorder(),
                                   focusedBorder: myFocusBorder(),
                                 ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Please enter a phone number";
-                                  }
-                                  return null;
-                                },
+                                // validator: (value) {
+                                //   if (value!.isEmpty) {
+                                //     return "Please enter a phone number";
+                                //   }
+                                //   return null;
+                                // },
                               ),
                             ),
                             // Container(
@@ -566,10 +577,17 @@ class _SendInvitationState extends State<SendInvitation> {
                                     // );
                                    setState(() {
                                      _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                                     _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                    // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                    });
-                                   if(! _nameController.text.isEmpty && ! _phoneNumberController.text.isEmpty){
+                                   if(! _nameController.text.isEmpty &&
+                                       //! _phoneNumberController.text.isEmpty
+                                   _phoneNumberController.text.length==11){
                                      _addDataToFirestore();
+                                     createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+                                     showSnackBarFun(context);
+                                   }
+                                   else{
+                                     SnackBar(content: Text('Please,enter valid number'));
                                    }
                                 //   _addDataToFirestore();
                                   },
@@ -577,8 +595,6 @@ class _SendInvitationState extends State<SendInvitation> {
                                   hight: 48,
                                   color: const Color(0xFF442B72),
                                   fontSize: 16,
-
-
                                 ),
                                 // end of comment
                               ),
@@ -617,12 +633,14 @@ class _SendInvitationState extends State<SendInvitation> {
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
-              backgroundColor: Colors.white,
+              backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+               // Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
               child: Image.asset(
-                'assets/imgs/school/Ellipse 2 (2).png',
+                'assets/imgs/school/busbottombar.png',
+                width: 35,
+                height: 35,
                 fit: BoxFit.fill,
               ),
             ),

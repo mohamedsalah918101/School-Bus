@@ -106,6 +106,8 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                             width: 117,
                             hight: 38,
                             onPress: (){
+                              sharedpref!.setInt('invitstate',1);
+                              sharedpref!.setInt('invit',1);
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => FinalAcceptInvitationParent(
                                   )));
@@ -142,6 +144,8 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                                    fontSize: 16)
                                  ),
                                ), onPressed: () {
+                               sharedpref!.setInt('invitstate',0);
+                               sharedpref!.setInt('invit',0);
                                Dialoge.declinedInvitationDialog(context);
                              },
                               ),

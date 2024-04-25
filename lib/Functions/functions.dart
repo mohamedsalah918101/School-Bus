@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../main.dart';
+
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
 
@@ -56,7 +58,11 @@ Future<void> createDynamicLink(bool short,requestID,String phone,String type) as
     }
   }
 }
+
 String loginType='';
+String id='';
+int invitestate=0;
+
 Future<bool> checkIfNumberExists(String phoneNumber) async {
   CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
 
@@ -67,6 +73,12 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
     print(phoneNumber+'dataaa');
     if(snapshot.size > 0){
       loginType = 'schooldata';
+      id =snapshot.docs[0].id;
+      if(snapshot.docs[0].get('address') == null)
+        sharedpref!.setInt('allData',0);
+      else
+      sharedpref!.setInt('allData',1);
+
       return true;
     }else{
       CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
@@ -75,6 +87,9 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
       print(snapshot.docs.toString()+'dataaa');
       if(snapshot.size > 0){
         loginType = 'parent';
+        id =snapshot.docs[0].id;
+        sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
+        sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
 
         return true;
       }else{
@@ -84,7 +99,9 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
         print(snapshot.docs.toString()+'dataaa');
         if(snapshot.size > 0){
           loginType = 'supervisor';
-
+          id =snapshot.docs[0].id;
+          sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
+          sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
           return true;
         }else{
           return false;

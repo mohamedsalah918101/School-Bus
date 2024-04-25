@@ -11,9 +11,10 @@ import 'package:school_account/screens/homeScreen.dart';
 import 'package:school_account/screens/schoolData.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
+import '../main.dart';
 import '../supervisor_parent/screens/no_invitation.dart';
 //import '../components/main_bottom_bar.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class OtpScreen extends StatefulWidget {
   // const OtpScreen({super.key});
   //new code
@@ -22,6 +23,7 @@ class OtpScreen extends StatefulWidget {
   String? name;
   String? phone;
   String? typeName;
+
 
   OtpScreen({Key? key, required this.verificationId,this.type,this.name,this.phone,this.typeName}) : super(key: key);
   @override
@@ -73,15 +75,20 @@ class _OtpScreenState extends State<OtpScreen> {
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
+    String userId = FirebaseAuth.instance.currentUser!.uid;
     Map<String, dynamic> data = {
       'name': widget.name,
       'phoneNumber': widget.phone,
+    'state':0,
+    'invite':1
     };
 
     // Add the data to the Firestore collection
-    await _firestore.collection(widget.typeName!).add(data).then((docRef) {
+    await _firestore.collection(widget.typeName!).add(data).then((docRef) async {
       if(widget.type == 1){
-
+        sharedpref!.setInt('allData',0);
+        await sharedpref!.setString('type', widget.typeName!);
+        await sharedpref!.setString('id', docRef.id);
         Navigator.push(
             context ,
             MaterialPageRoute(
@@ -89,12 +96,18 @@ class _OtpScreenState extends State<OtpScreen> {
                 maintainState: false));
       }else
       {
+        await sharedpref!.setString('type', widget.typeName!);
+        await sharedpref!.setString('id', docRef.id);
+        sharedpref!.setInt('invitstate',0);
+        sharedpref!.setInt('invit',0);
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => NoInvitation(selectedImage: widget.type!,),
                 maintainState: false));
+
       }
+
 
       print('Data added with document ID: ${docRef.id}');
     }).catchError((error) {
@@ -382,7 +395,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
                                       _addDataToFirestore();
-
+                                      // final prefs = await SharedPreferences.getInstance();
+                                      // prefs.setString('name', widget.name!);
+                                      // prefs.setString('phoneNumber', widget.phone!);
 
                                     }catch(e){
                                       setState(() {

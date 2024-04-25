@@ -48,15 +48,15 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
     await Future.delayed(Duration(seconds: 3));
     var data = await FirebaseDynamicLinks.instance.getInitialLink();
     var deepLink = data?.link;
-    print('userDataGet${deepLink}');
-    if (deepLink != null) {
-      Navigator.pushNamed(context, deepLink.path);
-    }
-    // final queryParams = deepLink!.queryParameters;
-    // if (queryParams.length > 0) {
-    //   handleLinkData(queryParams);
-    //
+    // print('userDataGet${deepLink}');
+    // if (deepLink != null) {
+    //   Navigator.pushNamed(context, deepLink.path);
     // }
+    final queryParams = deepLink!.queryParameters;
+    if (queryParams.length > 0) {
+      handleLinkData(queryParams);
+
+    }
     FirebaseDynamicLinks.instance.onLink.listen(
           (pendingDynamicLinkData) async{
 
@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
 
     if (queryParams.length > 0) {
        print('userDataGet${queryParams["id"]!}');
-
+       _phoneNumberController.text = queryParams["phone"]!;
 
     }
   }

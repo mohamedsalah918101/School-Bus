@@ -5,7 +5,6 @@ import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'controller/local_controller.dart';
@@ -28,6 +27,20 @@ void main()async {
   );
   sharedpref = await SharedPreferences.getInstance();
 
+//   final prefs = await SharedPreferences.getInstance();
+//
+// // Retrieve the stored values
+//   final name = prefs.getString('name');
+//   final phoneNumber = prefs.getString('phoneNumber');
+  // if (name != null && phoneNumber != null) {
+  //   // Use the retrieved values
+  //   print('Name: $name');
+  //   print('Phone Number: $phoneNumber');
+  //
+  // } else {
+  //   // Handle case where values are not found
+  //   print('Name or Phone Number not found in SharedPreferences');
+  // }
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget{

@@ -6,11 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/components/main_bottom_bar.dart';
+import 'package:school_account/main.dart';
 import 'package:school_account/screens/homeScreen.dart';
 import 'package:school_account/screens/schoolData.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
+import '../supervisor_parent/screens/final_invitation_parent.dart';
+import '../supervisor_parent/screens/final_invitation_supervisor.dart';
+import '../supervisor_parent/screens/home_parent.dart';
+import '../supervisor_parent/screens/home_supervisor.dart';
 import '../supervisor_parent/screens/no_invitation.dart';
 //import '../components/main_bottom_bar.dart';
 
@@ -341,7 +347,26 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       );
                                       // Sign the user in with the credential
                                       await _auth.signInWithCredential(credential);
-
+                                      await sharedpref!.setString('type', loginType);
+                                      await sharedpref!.setString('id', id);
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                          builder: (context) =>  sharedpref!.getString('type').toString() == 'schooldata'
+                                              ? sharedpref!.getInt('allData') == 1
+                                              ? HomeScreen()
+                                              : SchoolData()
+                                              : sharedpref!.getString('type').toString() == 'parent'
+                                              ? sharedpref!.getInt('invit') == 1
+                                              ? sharedpref!.getInt('invitstate') == 1
+                                              ? HomeParent()
+                                              : FinalAcceptInvitationParent()
+                                              : NoInvitation(selectedImage: 3)
+                                              : sharedpref!.getInt('invit') == 1
+                                              ? sharedpref!.getInt('invitstate') == 1
+                                              ? HomeForSupervisor()
+                                              : FinalAcceptInvitationSupervisor()
+                                              : NoInvitation(selectedImage: 2)));
 
 
                                     }catch(e){
