@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
@@ -35,6 +36,17 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   bool isStarting = false;
   List<ChildDataItem> children = [];
 
+  getToken() async{
+      String? myToken = await FirebaseMessaging.instance.getToken();
+      print('object');
+      print(myToken);
+}
+
+@override
+  void initState() {
+     getToken();
+     super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +161,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                       borderRadius: BorderRadius.circular(5)
                                     )
                                   ),
-                                  onPressed: (){
-
+                                  onPressed: () async {
                                     isStarting =
                                     // children.isNotEmpty?
                                     true;
@@ -158,6 +169,23 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     // : false;
                                     setState(() {
                                     });
+    // // Send a notification
+    // final message = {
+    // 'notification': {
+    // 'title': 'Trip Started',
+    // 'body': 'Your trip has started',
+    // },
+    // 'token': 'your_device_token_here', // replace with the actual device token
+    // };
+    //
+    // try {
+    // await FirebaseMessaging.instance.send(message);
+    // } catch (e) {
+    // print('Error sending notification: $e');
+    // }
+    // },
+                                    getToken();
+
                                   },
                                   child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,
                                   style: TextStyle(

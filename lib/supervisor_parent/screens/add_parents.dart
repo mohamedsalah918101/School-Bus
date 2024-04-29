@@ -36,6 +36,8 @@ class _AddParentsState extends State<AddParents> {
   List<TextEditingController> gradeControllers = [];
   late final int selectedImage;
   final _nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController gradeController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
@@ -100,7 +102,7 @@ class _AddParentsState extends State<AddParents> {
   List<Widget> NumberOfChildren = [];
 
   final nameChildController = TextEditingController();
-  final gradeController = TextEditingController();
+  // final gradeController = TextEditingController();
   List<Map<String, dynamic>> genderSelection = [];
 
 
@@ -269,13 +271,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          nameChildeError? Padding(
+                          nameChildeError? Container():Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Text(
                               "Please enter your child name".tr,
                               style: TextStyle(color: Colors.red),
                             ),
-                          ): Container(),
+                          ),
                           SizedBox(height: 12,),
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')?
@@ -373,13 +375,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          GradeError? Padding(
+                          GradeError?Container(): Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Text(
                               "Please enter your child grade".tr,
                               style: TextStyle(color: Colors.red),
                             ),
-                          ): Container(),
+                          ),
                           SizedBox(height: 12,),
                           Padding(
                               padding: (sharedpref?.getString('lang') == 'ar')?
@@ -736,17 +738,34 @@ class _AddParentsState extends State<AddParents> {
                           ],
                         ),
                       ),
-                      typeOfParentError?
-                      selectedValue!.isNotEmpty?
-                      Container():
+                      typeOfParentError? Container():
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 48),
-                        child: Text(
-                          "Please enter your type".tr,
-                          style: TextStyle(color: Colors.red),
+                          padding: const EdgeInsets.symmetric(horizontal: 48),
+                          child: Text(
+                            "Please enter your type".tr,
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
-                      ):
-                          Container(),
+                      // selectedValue == null || selectedValue.isEmpty
+                      //     ? Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                      //   child: Text(
+                      //     "Please enter your type".tr,
+                      //     style: TextStyle(color: Colors.red),
+                      //   ),
+                      // )
+                      //     : Container(),
+                      // typeOfParentError?
+                      // selectedValue!.isEmpty?
+                      // Container():
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                      //   child: Text(
+                      //     "Please enter your type".tr,
+                      //     style: TextStyle(color: Colors.red),
+                      //   ),
+                      // ):
+                      //     Container(),
                       SizedBox(height: 11,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -842,13 +861,14 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      nameError ?  Padding(
+                      nameError ? Container(): Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your name".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ):Container(),
+                      ),
+                          // :Container(),
 
                       SizedBox(height: 17,),
                       Padding(
@@ -949,13 +969,15 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      phoneError? Padding(
+
+                      phoneError? Container():Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your phone number".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ): Container(),
+                      ),
+
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -1049,13 +1071,15 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      numberOfChildrenError? Padding(
+                      numberOfChildrenError?
+                          Container():
+                      Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your number of children".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ): Container(),
+                      ),
                       SizedBox(
                         height: 20,
                       ),
@@ -1138,43 +1162,71 @@ class _AddParentsState extends State<AddParents> {
                               hight: 48,
                               onPress: () async {
                                 if( selectedValue!.isEmpty){
+                                  typeOfParentError = false;
+                                  setState(() {
+
+                                  });
+                                }else if( selectedValue!.isNotEmpty){
                                   typeOfParentError = true;
                                   setState(() {
 
                                   });
-                                }else if(_nameController.text.length == 0){
-                                  nameError = true;
+                                }
+
+                                  if(_nameController.text.length == 0){
+                                  nameError = false;
                                   setState(() {
 
                                   });
-                                }else if(_phoneNumberController.text.length < 11){
+                                }else  if(_nameController.text.length > 0){
+                                    nameError = true;
+                                    setState(() {
+
+                                    });
+                                  }
+
+                                if(_phoneNumberController.text.length < 11){
+                                  phoneError = false;
+                                  setState(() {
+
+                                  });
+                                }
+                                else if(_phoneNumberController.text.length > 10){
                                   phoneError = true;
                                   setState(() {
 
                                   });
-                                }else if(_numberOfChildrenController.text.length < 1){
+                                }
+                                 if(_numberOfChildrenController.text.length < 1){
+                                  numberOfChildrenError = false;
+                                  setState(() {
+
+                                  });
+                                } else if(_numberOfChildrenController.text.length > 0){
                                   numberOfChildrenError = true;
                                   setState(() {
 
                                   });
-                                }else if(nameChildControllers.length < 1){
+                                }
+                                if(nameController.text.length == 0){
+                                  nameChildeError = false;
+                                  setState(() {
+
+                                  });
+                                }else  if(nameController.text.length > 0){
                                   nameChildeError = true;
                                   setState(() {
 
                                   });
                                 }
-                                   else if (nameChildController.text.length == 0) {
-                                      nameChildeError = true;
-                                    }
-                                   else if (gradeController.text.length == 0) {
+                                if (gradeController.text.length == 0) {
+                                      GradeError = false;
+                                  }
+                                   else if (gradeController.text.length> 0) {
                                       GradeError = true;
-                                  }else{
-                                  nameError = false;
-                                  phoneError = false;
-                                  numberOfChildrenError = false;
-                                  nameChildeError = false;
-                                  GradeError = false;
-                                  typeOfParentError = false;
+                                  }
+                                   else{
+
                                   setState(() {
                                   });
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -35,6 +36,21 @@ class _ParentsViewState extends State<ParentsView> {
   bool Accepted = false;
   bool Declined = false;
   bool Waiting = false;
+  List<QueryDocumentSnapshot> data = [];
+
+
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -399,7 +415,7 @@ class _ParentsViewState extends State<ParentsView> {
                           padding: const EdgeInsets.symmetric(horizontal: 28.0),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 8,
+                            itemCount: data.length,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               return Column(
@@ -419,13 +435,10 @@ class _ParentsViewState extends State<ParentsView> {
                                         width: 5,
                                       ),
                                       Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'Shady Ayman',
+                                           Text('${data[index]['childern']?[0]['name'] }',
                                             style: TextStyle(
                                               color: Color(0xFF442B72),
                                               fontSize: 17,
@@ -484,7 +497,31 @@ class _ParentsViewState extends State<ParentsView> {
                                                     fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF432B72),)),],)),],
                                         onSelected: (String value) {
                                           if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) => EditAddParents()),);
-                                          } else if (value == 'item2') {Dialoge.DeleteParent(context);}},
+                                          } else if (value == 'item2') {
+                                            // showDialog(
+                                            //   context: context,
+                                            //   builder: (BuildContext context) {
+                                            //     return AlertDialog(
+                                            //       title: Text("Alert Dialog"),
+                                            //       content: Text("Dialog Content"),
+                                            //       actions: [
+                                            //         TextButton(
+                                            //           child: Text("Close"),
+                                            //           onPressed: () async{
+                                            //             await FirebaseFirestore.instance.collection('parent').doc(data[0]['name']).delete();
+                                            //             Navigator.pop(context);
+                                            //             setState(() {
+                                            //             });
+                                            //           },
+                                            //         )
+                                            //       ],
+                                            //     );
+                                            //   },
+                                            // );
+
+                                            Dialoge.DeleteParent(context);
+                                          }
+                                          },
                                         child: Image.asset('assets/images/more.png', width: 20.8, height: 20.8,),),],),
                                   SizedBox(height: 25,)],);},),),
                         SizedBox(height: 44,)
