@@ -1,4 +1,4 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
@@ -36,17 +36,17 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   bool isStarting = false;
   List<ChildDataItem> children = [];
 
-  getToken() async{
-      String? myToken = await FirebaseMessaging.instance.getToken();
-      print('object');
-      print(myToken);
-}
-
-@override
-  void initState() {
-     getToken();
-     super.initState();
-  }
+  // getToken() async{
+//       String? myToken = await FirebaseMessaging.instance.getToken();
+//       print('object');
+//       print(myToken);
+// }
+//
+// @override
+//   void initState() {
+//      getToken();
+//      super.initState();
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +184,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
     // print('Error sending notification: $e');
     // }
     // },
-                                    getToken();
+    //                                 getToken();
 
                                   },
                                   child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,

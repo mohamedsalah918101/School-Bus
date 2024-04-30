@@ -271,13 +271,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          nameChildeError? Container():Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Please enter your child name".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
+                          // nameChildeError? Container():Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                          //   child: Text(
+                          //     "Please enter your child name".tr,
+                          //     style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
                           SizedBox(height: 12,),
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')?
@@ -375,13 +375,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          GradeError?Container(): Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Please enter your child grade".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
+                          // GradeError?Container(): Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                          //   child: Text(
+                          //     "Please enter your child grade".tr,
+                          //     style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
                           SizedBox(height: 12,),
                           Padding(
                               padding: (sharedpref?.getString('lang') == 'ar')?
@@ -1161,81 +1161,92 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               hight: 48,
                               onPress: () async {
-                                if( selectedValue!.isEmpty){
+                                if (selectedValue!.isEmpty) {
                                   typeOfParentError = false;
                                   setState(() {
 
                                   });
-                                }else if( selectedValue!.isNotEmpty){
+                                } else if (selectedValue!.isNotEmpty) {
                                   typeOfParentError = true;
                                   setState(() {
 
                                   });
                                 }
 
-                                  if(_nameController.text.length == 0){
+                                if (_nameController.text.length == 0) {
                                   nameError = false;
                                   setState(() {
 
                                   });
-                                }else  if(_nameController.text.length > 0){
-                                    nameError = true;
-                                    setState(() {
-
-                                    });
-                                  }
-
-                                if(_phoneNumberController.text.length < 11){
-                                  phoneError = false;
+                                } else if (_nameController.text.length > 0) {
+                                  nameError = true;
                                   setState(() {
 
                                   });
                                 }
-                                else if(_phoneNumberController.text.length > 10){
+
+                                if (_phoneNumberController.text.length < 11) {
+                                  phoneError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_phoneNumberController.text.length > 10) {
                                   phoneError = true;
                                   setState(() {
 
                                   });
                                 }
-                                 if(_numberOfChildrenController.text.length < 1){
+
+                                if (_numberOfChildrenController.text.length < 1) {
                                   numberOfChildrenError = false;
                                   setState(() {
 
                                   });
-                                } else if(_numberOfChildrenController.text.length > 0){
+                                } else if (_numberOfChildrenController.text.length > 0) {
                                   numberOfChildrenError = true;
                                   setState(() {
 
                                   });
                                 }
-                                if(nameController.text.length == 0){
-                                  nameChildeError = false;
-                                  setState(() {
-
-                                  });
-                                }else  if(nameController.text.length > 0){
-                                  nameChildeError = true;
-                                  setState(() {
-
-                                  });
-                                }
-                                if (gradeController.text.length == 0) {
-                                      GradeError = false;
-                                  }
-                                   else if (gradeController.text.length> 0) {
-                                      GradeError = true;
-                                  }
-                                   else{
-
-                                  setState(() {
-                                  });
+                                // if(nameController.text.length == 0){
+                                //   nameChildeError = false;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }else  if(nameController.text.length > 0){
+                                //   nameChildeError = true;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }
+                                // if (gradeController.text.length == 0) {
+                                //       GradeError = false;
+                                //       setState(() {
+                                //
+                                //       });
+                                //   }
+                                //    else if (gradeController.text.length> 0) {
+                                //       GradeError = true;
+                                //       setState(() {
+                                //
+                                //       });
+                                //   }
+                                 if (
+                                    // GradeError&&
+                                    // nameChildeError&&
+                                    typeOfParentError &&
+                                    nameError &&
+                                    phoneError &&
+                                    numberOfChildrenError)
+                                    {
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
                                 print('object');
                                 NumberOfChildrenCard = false;
                                 setState(() {
                                 });
-                              }},
+                              }
+                                },
                               color: Color(0xFF442B72),
                               fontSize: 16),
                         ),

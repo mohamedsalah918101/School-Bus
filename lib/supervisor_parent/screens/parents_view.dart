@@ -1,32 +1,20 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter/material.dart';
-import 'package:school_account/supervisor_parent/components/add_children_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
-import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/edit_add_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/child_data_item.dart';
-import '../components/custom_app_bar.dart';
-import '../components/added_child_card.dart';
-
 class ParentsView extends StatefulWidget {
+
   @override
   _ParentsViewState createState() => _ParentsViewState();
 }
@@ -37,18 +25,73 @@ class _ParentsViewState extends State<ParentsView> {
   bool Declined = false;
   bool Waiting = false;
   List<QueryDocumentSnapshot> data = [];
+  bool isAcceptFiltered = false;
+  bool isDeclineFiltered = false;
+
+  void _deleteSupervisorDocument(String documentId) {
+    FirebaseFirestore.instance
+        .collection('parent')
+        .doc(documentId)
+        .delete()
+        .then((_) {
+      setState(() {
+        // Update UI by removing the deleted document from the data list
+        data.removeWhere((document) => document.id == documentId);
+      });
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   showSnackBarFun(context),
+      //   // SnackBar(content: Text('Document deleted successfully')),
+      // );
+    })
+        .catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete document: $error')),
+      );
+    });
+  }
+
+
+
+  getDataForAcceptFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isAcceptFiltered = true;
+    });
+  }
+
+  getDataForDeclinedFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isDeclineFiltered = true;
+    });
+  }
 
 
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
-    data.addAll(querySnapshot.docs);
+    // data.addAll(querySnapshot.docs);
     setState(() {
+      data = querySnapshot.docs;
+
     });
   }
 
   @override
   void initState() {
     getData();
+    // getDataForAcceptFilter();
     super.initState();
   }
 
@@ -66,6 +109,7 @@ class _ParentsViewState extends State<ParentsView> {
                     child: FloatingActionButton(
                       shape: const CircleBorder(),
                       onPressed: () {
+                        print('object');
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -85,6 +129,7 @@ class _ParentsViewState extends State<ParentsView> {
                     child: FloatingActionButton(
                       shape: const CircleBorder(),
                       onPressed: () {
+                        print('object');
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -402,7 +447,19 @@ class _ParentsViewState extends State<ParentsView> {
                                           ),
                                         ),
                                       ],
-                                  onSelected: (String value) {},
+                                  onSelected: (String value) {
+                                    if (value == 'item3') {
+                                      getDataForAcceptFilter();
+                                      setState(() {
+                                        isAcceptFiltered=true;
+                                      });
+                                    }else if (value == 'item4'){
+                                      getDataForDeclinedFilter();
+                                      setState(() {
+                                        isDeclineFiltered=true;
+                                      });
+                                    }
+                                  },
                                   child: Image.asset(
                                     'assets/images/Vector (13)sliders.png',
                                     width: 27.62,
@@ -438,7 +495,7 @@ class _ParentsViewState extends State<ParentsView> {
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                           Text('${data[index]['childern']?[0]['name'] }',
+                                           Text('${data[index]['name'] }',
                                             style: TextStyle(
                                               color: Color(0xFF442B72),
                                               fontSize: 17,
@@ -451,9 +508,7 @@ class _ParentsViewState extends State<ParentsView> {
                                             height: 5,
                                           ),
                                           Padding(
-                                            padding: (sharedpref
-                                                        ?.getString('lang') ==
-                                                    'ar')
+                                            padding: (sharedpref?.getString('lang') == 'ar')
                                                 ? EdgeInsets.only(right: 3.0)
                                                 : EdgeInsets.all(0.0),
                                             child: Text(
@@ -496,31 +551,187 @@ class _ParentsViewState extends State<ParentsView> {
                                                 Text('Delete'.tr, style: TextStyle(fontFamily: 'Poppins-Light',
                                                     fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF432B72),)),],)),],
                                         onSelected: (String value) {
-                                          if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) => EditAddParents()),);
+                                          if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                              EditAddParents(docid: data[index].id,
+                                                oldNumber: data[index].get('phoneNumber'),
+                                                oldName: data[index].get('name'),
+                                                oldNumberOfChildren: data[index].get('numberOfChildren'),
+                                                oldType: data[index].get('typeOfParent'),
+                                                // oldNameController: data[index].childrenData[index]['grade'],
+                                                // oldGradeOfChild: ['l;']
+                                              // oldGradeOfChild: data[index]['childern'].get('grade'),
+                                               )),);
                                           } else if (value == 'item2') {
-                                            // showDialog(
-                                            //   context: context,
-                                            //   builder: (BuildContext context) {
-                                            //     return AlertDialog(
-                                            //       title: Text("Alert Dialog"),
-                                            //       content: Text("Dialog Content"),
-                                            //       actions: [
-                                            //         TextButton(
-                                            //           child: Text("Close"),
-                                            //           onPressed: () async{
-                                            //             await FirebaseFirestore.instance.collection('parent').doc(data[0]['name']).delete();
-                                            //             Navigator.pop(context);
-                                            //             setState(() {
-                                            //             });
-                                            //           },
-                                            //         )
-                                            //       ],
-                                            //     );
-                                            //   },
-                                            // );
+                                              void DeleteParentSnackBar(context, String message, {Duration? duration}) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    dismissDirection: DismissDirection.up,
+                                                    duration: duration ?? const Duration(milliseconds: 1000),
+                                                    backgroundColor: Colors.white,
+                                                    margin: EdgeInsets.only(
+                                                      bottom: MediaQuery.of(context).size.height - 150,
+                                                    ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(10),),
+                                                    behavior: SnackBarBehavior.floating,
+                                                    content: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Image.asset('assets/images/saved.png',
+                                                          width: 30,
+                                                          height: 30,),
+                                                        SizedBox(width: 15,),
+                                                        Text(
+                                                          'Parent deleted successfully'.tr,
+                                                          style: const TextStyle(
+                                                            color: Color(0xFF4CAF50),
+                                                            fontSize: 16,
+                                                            fontFamily: 'Poppins-Bold',
+                                                            fontWeight: FontWeight.w700,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (ctx) => Dialog(
+                                                    backgroundColor: Colors.white,
+                                                    surfaceTintColor: Colors.transparent,
+                                                    // contentPadding: const EdgeInsets.all(20),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(
+                                                        30,
+                                                      ),
+                                                    ),
+                                                    child: SizedBox(
+                                                      width: 304,
+                                                      height: 182,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 8,
+                                                                ),
+                                                                Flexible(
+                                                                  child: Column(
+                                                                    children: [
+                                                                      GestureDetector(
+                                                                        onTap: () => Navigator.pop(context),
+                                                                        child: Image.asset(
+                                                                          'assets/images/Vertical container.png',
+                                                                          width: 27,
+                                                                          height: 27,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height: 25,
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                    'Delete'.tr,
+                                                                    textAlign: TextAlign.center,
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF442B72),
+                                                                      fontSize: 18,
+                                                                      fontFamily: 'Poppins-SemiBold',
+                                                                      fontWeight: FontWeight.w600,
+                                                                      height: 1.23,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Center(
+                                                              child: Text(
+                                                                'Are You Sure you want to \n'
+                                                                    'delete this parent ?'.tr,
+                                                                textAlign: TextAlign.center,
+                                                                style: TextStyle(
+                                                                  color: Color(0xFF442B72),
+                                                                  fontSize: 16,
+                                                                  fontFamily: 'Poppins-Light',
+                                                                  fontWeight: FontWeight.w400,
+                                                                  height: 1.23,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 15,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              children: [
+                                                                SizedBox(
+                                                                  child: ElevatedSimpleButton(
+                                                                    txt: 'Delete'.tr,
+                                                                    width:  107,
+                                                                    hight: 38,
+                                                                    onPress: () async{
+                                                                      setState(() {
+                                                                        _deleteSupervisorDocument(data[index].id);
+                                                                      });
+                                                                      DeleteParentSnackBar(context, 'message');
+                                                                      Navigator.pop(context);
+                                                                    },
+                                                                    color: const Color(0xFF442B72),
+                                                                    fontSize: 16,
+                                                                    fontFamily: 'Poppins-Regular',
+                                                                  ),
+                                                                ),
+                                                                // const Spacer(),
+                                                                SizedBox(width: 15,),
+                                                                SizedBox(
+                                                                  width: 107,
+                                                                  height: 38,
+                                                                  child:ElevatedButton(
+                                                                    style: ElevatedButton.styleFrom(
+                                                                      backgroundColor: Colors.white,
+                                                                      surfaceTintColor: Colors.transparent,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          side: BorderSide(
+                                                                            color: Color(0xFF442B72),
+                                                                          ),
+                                                                          borderRadius: BorderRadius.circular(10)
+                                                                      ),
+                                                                    ),
+                                                                    child: Text(
+                                                                        'Cancel'.tr,
+                                                                        textAlign: TextAlign.center,
+                                                                        style: TextStyle(
+                                                                            color: Color(0xFF442B72),
+                                                                            fontFamily: 'Poppins-Regular',
+                                                                            fontWeight: FontWeight.w500 ,
+                                                                            fontSize: 16)
+                                                                    ), onPressed: () {
+                                                                    Navigator.pop(context);
+                                                                  },
+                                                                  ),
+                                                                ),
 
-                                            Dialoge.DeleteParent(context);
-                                          }
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )),
+                                              );
+                                            }
                                           },
                                         child: Image.asset('assets/images/more.png', width: 20.8, height: 20.8,),),],),
                                   SizedBox(height: 25,)],);},),),
