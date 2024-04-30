@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
+import 'package:school_account/classes/dropdownRadiobutton.dart';
+import 'package:school_account/classes/dropdowncheckboxitem.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
@@ -24,9 +25,16 @@ class _ParentsViewState extends State<ParentsView> {
   bool Accepted = false;
   bool Declined = false;
   bool Waiting = false;
+  String? selectedValueAccept;
+  String? selectedValueDecline;
+  String? selectedValueWaiting;
+  List<DropdownCheckboxItem> selectedItems = [];
   List<QueryDocumentSnapshot> data = [];
   bool isAcceptFiltered = false;
   bool isDeclineFiltered = false;
+  bool isWaitingFiltered = false;
+  bool isFiltered  = false;
+  String? currentFilter;
 
   void _deleteSupervisorDocument(String documentId) {
     FirebaseFirestore.instance
@@ -50,21 +58,6 @@ class _ParentsViewState extends State<ParentsView> {
     });
   }
 
-
-
-  getDataForAcceptFilter()async{
-    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
-    setState(() {
-      data = parentData.docs;
-      isAcceptFiltered = true;
-    });
-  }
-
   getDataForDeclinedFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
     QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
@@ -74,7 +67,33 @@ class _ParentsViewState extends State<ParentsView> {
     // );
     setState(() {
       data = parentData.docs;
-      isDeclineFiltered = true;
+      isFiltered = true;
+    });
+  }
+
+  getDataForWaitingFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForAcceptFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2 ).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isFiltered = true;
     });
   }
 
@@ -239,232 +258,110 @@ class _ParentsViewState extends State<ParentsView> {
                                 ),
                               ),
                               SizedBox(
-                                width: 21,
+                                width: 20
                               ),
                               PopupMenuButton<String>(
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(6)),
-                                  ),
-                                  constraints: BoxConstraints.tightFor(
-                                      width: 216, height: 300),
-                                  color: Colors.white,
-                                  surfaceTintColor: Colors.transparent,
-                                  offset: Offset(0, 30),
-                                  itemBuilder: (BuildContext context) =>
-                                      <PopupMenuEntry<String>>[
-                                        PopupMenuItem<String>(
-                                          value: 'item1',
-                                          child: Text(
-                                            'Filter'.tr,
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 16,
-                                              color: Color(0xFF993D9A),
+                                child: Image(
+                                  image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
+                                  width: 29,
+                                  height: 29,
+                                  color: Color(0xFF442B72), // Optionally, you can set the color of the image
+                                ),
+
+                                itemBuilder: (BuildContext context) {
+                                  return [
+                                    PopupMenuItem<String>(
+                                      value: 'custom',
+                                      child:
+                                      Column(
+                                        children: [
+                                          Container(
+                                            child:  DropdownRadiobutton(
+                                              items: [
+                                                DropdownCheckboxItem(label: 'Accepted'),
+                                                DropdownCheckboxItem(label: 'Rejected'),
+                                                DropdownCheckboxItem(label: 'Waiting'),
+                                              ],
+                                              selectedItems: selectedItems,
+                                              onSelectionChanged: (items) {
+                                                setState(() {
+                                                  selectedItems = items;
+                                                  if (items.first.label == 'Accepted') {
+                                                    selectedValueAccept = 'Accepted';
+                                                    selectedValueDecline = null;
+                                                    selectedValueWaiting = null;
+                                                  } else if (items.first.label == 'Rejected') {
+                                                    selectedValueAccept = null;
+                                                    selectedValueDecline = 'Rejected';
+                                                    selectedValueWaiting = null;
+                                                  } else if (items.first.label == 'Waiting') {
+                                                    selectedValueAccept = null;
+                                                    selectedValueDecline = null;
+                                                    selectedValueWaiting = 'Waiting';
+                                                  }
+                                                });
+                                              },
                                             ),
                                           ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                            value: 'item2',
-                                            child: Container(
-                                              width: 150,
-                                              height: 1,
-                                              color: Color(0xff442B72)
-                                                  .withOpacity(0.37),
-                                            )),
-                                        PopupMenuItem<String>(
-                                          value: 'item3',
-                                          child: Row(
-                                            children: [
-                                              Radio(
-                                                value: true,
-                                                groupValue: Accepted,
-                                                onChanged: (bool? value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      Accepted = value;
-                                                      Declined = false;
-                                                      Waiting = false;
-                                                    });
-                                                  }
-                                                },
-                                                fillColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
-                                                  if (states.contains(
-                                                      MaterialState
-                                                          .selected)) {
-                                                    return Color(0xff442B72);
-                                                  }
-                                                  return Color(0xff442B72);
-                                                }), // Set the color of the selected radio button
-                                              ),
-                                              Text(
-                                                "Accepted".tr,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff442B72),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                          value: 'item4',
-                                          child: Row(
-                                            children: [
-                                              Radio(
-                                                value: true,
-                                                groupValue: Declined,
-                                                onChanged: (bool? value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      Accepted = false;
-                                                      Declined = value;
-                                                      Waiting = false;
-                                                    });
-                                                  }
-                                                },
-                                                fillColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
-                                                  if (states.contains(
-                                                      MaterialState
-                                                          .selected)) {
-                                                    return Color(0xff442B72);
-                                                  }
-                                                  return Color(0xff442B72);
-                                                }), // Set the color of the selected radio button
-                                              ),
-                                              Text(
-                                                "Declined".tr,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff442B72),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                          value: 'item5',
-                                          child: Row(
-                                            children: [
-                                              Radio(
-                                                value: true,
-                                                groupValue: Waiting,
-                                                onChanged: (bool? value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      Accepted = false;
-                                                      Declined = false;
-                                                      Waiting = value;
-                                                    });
-                                                  }
-                                                },
-                                                fillColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
-                                                  if (states.contains(
-                                                      MaterialState
-                                                          .selected)) {
-                                                    return Color(0xff442B72);
-                                                  }
-                                                  return Color(0xff442B72);
-                                                }),
-                                              ),
-                                              Text(
-                                                "Waiting".tr,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff442B72),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                          value: 'item6',
-                                          child: Row(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               SizedBox(
-                                                width: 104,
-                                                height: 38,
+                                                width:100,
                                                 child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                          Color(0xff442B72),
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10))),
-                                                  onPressed: () {},
-                                                  child: Text(
-                                                    'Apply'.tr,
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            'Poppins-Regular',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.white,
-                                                        fontSize: 16),
-                                                  ),
-                                                ),
-                                              ),
 
-                                              SizedBox(
-                                                width: 88,
-                                                height: 38,
-                                                child: Center(
-                                                  child: Text(
-                                                    'Reset'.tr,
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          'Poppins-Regular',
-                                                      fontWeight: FontWeight.w500,
-                                                      fontSize: 16,
-                                                      color: Color(0xFF432B72),
+                                                  onPressed: () {
+                                                    // Handle cancel action
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF442B72)),
+                                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
+                                                      ),
                                                     ),
                                                   ),
+                                                  child: GestureDetector(
+                                                      child: Text('Apply',style: TextStyle(fontSize:18),),
+                                                  onTap: (){
+                                                    if (selectedValueAccept != null) {
+                                                      currentFilter = 'Accepted';
+                                                      getDataForAcceptFilter();
+                                                      Navigator.pop(context);
+                                                      print('2');
+                                                    }else  if (selectedValueDecline != null) {
+                                                      currentFilter = 'Rejected';
+                                                      getDataForDeclinedFilter();
+                                                      Navigator.pop(context);
+                                                      print('0');
+                                                    }else  if (selectedValueWaiting != null) {
+                                                      currentFilter = 'Waiting';
+                                                      getDataForWaitingFilter();
+                                                      Navigator.pop(context);
+                                                      print('1');
+                                                    }
+                                                  },),
                                                 ),
                                               ),
+                                              SizedBox(width: 3,),
+                                              GestureDetector(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(5.0),
+                                                  child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),),
+                                                ), onTap: (){
+                                              Navigator.pop(context);
+                                              },
+                                              )
                                             ],
                                           ),
-                                        ),
-                                      ],
-                                  onSelected: (String value) {
-                                    if (value == 'item3') {
-                                      getDataForAcceptFilter();
-                                      setState(() {
-                                        isAcceptFiltered=true;
-                                      });
-                                    }else if (value == 'item4'){
-                                      getDataForDeclinedFilter();
-                                      setState(() {
-                                        isDeclineFiltered=true;
-                                      });
-                                    }
-                                  },
-                                  child: Image.asset(
-                                    'assets/images/Vector (13)sliders.png',
-                                    width: 27.62,
-                                    height: 21.6,
-                                  )),
+                                        ],
+                                      ),
+                                    ),
+                                  ];
+                                },
+
+                              ),
                             ],
                           ),
                         ),

@@ -28,32 +28,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   List<QueryDocumentSnapshot> data = [];
 
 
-  // Future<void> getData(String id) async {
-  //   DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('parent').doc(id).get();
-  //   if (documentSnapshot.exists) {
-  //     setState(() {
-  //       data.add(documentSnapshot.data());
-  //     });
-  //   } else {
-  //     print('Document does not exist');
-  //   }
-  // }
-
-
-  // getData(String docid)async{
-  //   DocumentReference documentReference = FirebaseFirestore.instance.collection('parent').doc(docid);
-  //   DocumentSnapshot documentSnapshot = await documentReference.get();
-  //   if (documentSnapshot.exists) {
-  //     Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
-  //     // Add the data to the `data` list
-  //     data.add(data);
-  //     setState(() {
-  //
-  //     });
-  //   } else {
-  //     print('Document does not exist on the database');
-  //   }
-  // }
 
 
 
@@ -68,6 +42,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   void initState() {
     getData();
     super.initState();
+    setState(() {
+
+    });
   }
 
   @override
