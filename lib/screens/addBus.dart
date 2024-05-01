@@ -118,6 +118,10 @@ class _AddBusState extends State<AddBus> {
     }
   }
   void _addDataToFirestore() async {
+    if (_driverName.text.isEmpty || _driverNumber.text.isEmpty || _busNumber.text.isEmpty || _selectedImage == null || _selectedImagebus == null) {
+      // Show an error message or do something else if any of the required fields are empty or null
+      return;
+    }
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
     Map<String, dynamic> data = {
@@ -125,8 +129,8 @@ class _AddBusState extends State<AddBus> {
       'phonedriver': _driverNumber.text,
       'busnumber': _busNumber.text,
       'supervisorname':_supervisor.text,
-      'imagedriver':imageUrl,
-      'busphoto':busimage,
+      'imagedriver':imageUrl ??'',
+      'busphoto':busimage ??'',
     };
     // Add the data to the Firestore collection
     await _firestore.collection('busdata').add(data).then((docRef) {
@@ -140,6 +144,10 @@ class _AddBusState extends State<AddBus> {
     _driverNumber.clear();
     _busNumber.clear();
     _supervisor.clear();
+    setState(() {
+      _selectedImage = null;
+      _selectedImagebus = null;
+    });
   }
 // to lock in landscape view
   @override

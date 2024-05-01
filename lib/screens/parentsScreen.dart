@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -41,10 +42,20 @@ class ParentsScreenSate extends State<ParentsScreen> {
   List<DropdownCheckboxItem> selectedItems = [];
 
 // to lock in landscape view
+  List<QueryDocumentSnapshot> data = [];
+
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+
+    });
+  }
   @override
   void initState() {
     super.initState();
     // responsible
+    getData();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -213,80 +224,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                               Column(
                                                 children: [
                                                   Container(
-                                                    // padding: EdgeInsets.all(16),
-                                                    // child: Column(
-                                                    //   crossAxisAlignment: CrossAxisAlignment.start,
-                                                    //   children: [
-                                                    //     Text(
-                                                    //       'Options',
-                                                    //       style: TextStyle(
-                                                    //         fontSize: 16,
-                                                    //         fontWeight: FontWeight.bold,
-                                                    //       ),
-                                                    //     ),
-                                                    //     SizedBox(height: 10),
-                                                    //
-                                                    //     RadioListTile(
-                                                    //       title: Text('Accepted'),
-                                                    //       value: 1,
-                                                    //     groupValue:_selectedOption ,
-                                                    //       onChanged: (value) {
-                                                    //         setState(() {
-                                                    //           print("object"+_selectedOption.toString());
-                                                    //           _selectedOption = value;
-                                                    //         });
-                                                    //       },
-                                                    //     ),
-                                                    //     RadioListTile(
-                                                    //       title: Text('Rejected'),
-                                                    //       value: 2,
-                                                    //       groupValue: _selectedOption,
-                                                    //       onChanged: (value) {
-                                                    //         setState(() {
-                                                    //           print("object"+_selectedOption.toString());
-                                                    //           _selectedOption = value;
-                                                    //         });
-                                                    //
-                                                    //
-                                                    //       },
-                                                    //     ),
-                                                    //     RadioListTile(
-                                                    //       title: Text('Waiting'),
-                                                    //       value: 3,
-                                                    //       groupValue: _selectedOption,
-                                                    //       onChanged: (value) {
-                                                    //         setState(() {
-                                                    //           print("object"+_selectedOption.toString());
-                                                    //           _selectedOption = value;
-                                                    //         });
-                                                    //       },
-                                                    //     ),
-                                                    //     SizedBox(height: 20),
-                                                    //     Row(
-                                                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    //       children: [
-                                                    //         ElevatedButton(
-                                                    //           onPressed: () {
-                                                    //             // Handle cancel action
-                                                    //             Navigator.pop(context);
-                                                    //           },
-                                                    //           child: Text('Cancel'),
-                                                    //         ),
-                                                    //         ElevatedButton(
-                                                    //           onPressed: () {
-                                                    //             setState(() {
-                                                    //               Navigator.pop(context);
-                                                    //             });
-                                                    //             // Handle confirm action
-                                                    //             print('Selected: $_selectedOption');
-                                                    //
-                                                    //           }, //
-                                                    //           child: Text('Confirm'),
-                                                    //         ),
-                                                    //       ],
-                                                    //     ),
-                                                    //   ],
-                                                    // ),
+
                                                     child:  DropdownRadiobutton(
                                                       items: [
                                                         DropdownCheckboxItem(label: 'Accepted'),
@@ -372,86 +310,118 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                 SizedBox(
                                   height: 40,
                                 ),
-
-                                ListTile(
-                                  leading: Image.asset('assets/imgs/school/Ellipse 1.png'),
-                                  title: Text('Shady Ayman'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
-                                  subtitle: Text("Joined yesterday",style: TextStyle(fontSize: 13,color: Color(0xff0E8113),fontFamily: "Poppins"),),
-                                 // trailing:
-
-                                  //trailing:Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-                                 // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),
-                                  //tileColor: Colors.white,
-
-                                ),
-                                //),
                                 SizedBox(
-                                  height: 10,
-                                ),
-                                //Container(
-                                // decoration: BoxDecoration(
-                                //     color: Colors.white, // Your desired background color
-                                //     borderRadius: BorderRadius.circular(5),
-                                //     boxShadow: [
-                                //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                //     ]
-                                // ),
-                                //child:
-                                ListTile(
-                                  leading: Container(
-                                    width: 45,
-                                      height: 45,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(width: 2, color: Color(0xffCCCCCC)),
-                                      ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: Image.asset('assets/imgs/school/Vector (9).png',width: 30,height: 30,),
-                                    )),
-                                  title: Text('Shady Ayman'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                  subtitle: Text("Waiting for response",style: TextStyle(fontSize: 13,color: Color(0xffFFC53E ),fontFamily: "Poppins"),),
-                                  //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-                                  onTap: (){
-                                    Navigator.push(
-                                        context ,
-                                        MaterialPageRoute(
-                                            builder: (context) =>  BusScreen(),
-                                            maintainState: false));
-                                    // _key.currentState!.openDrawer();
-                                  },
-                                ),
-                                // ),
-                                SizedBox(height: 10,),
-                                Container(
+                                  height: 500,
+                                  child: ListView.builder(
+                                    // shrinkWrap: true,
+                                      itemCount: data.length,
+                                      itemBuilder: (context, index) {
+                                        return
+                                          Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                                                  SizedBox(width: 10,),
+                                                  Text(
+                                                    '${data[index]['name'] }',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF442B72),
+                                                      fontSize: 17,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Poppins-Bold',
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              )
 
-                                  //   decoration: BoxDecoration(
-                                  //     color: Colors.white, // Your desired background color
-                                  //     borderRadius: BorderRadius.circular(5),
-                                  //     boxShadow: [
-                                  //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                  //     ]
-                                  // ),
-                                  child:
-                                  ListTile(
-                                    leading: Container(
-                                        width: 45,
-                                        height: 45,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(width: 2, color: Color(0xffCCCCCC)),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(6.0),
-                                          child: Image.asset('assets/imgs/school/Vector (9).png',width: 30,height: 30,),
-                                        )),
-                                    title: Text('Shady Ayman'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                    ),
-                                    subtitle: Text("Not joined yet",style: TextStyle(fontSize: 13,color: Color(0xffAD1519),fontFamily: "Poppins"),),
-                                    //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                            ],
+                                          );
 
-                                  ),
-                                )
+                                      }),
+                                ),
+                                // ListTile(
+                                //   leading: Image.asset('assets/imgs/school/Ellipse 1.png'),
+                                //   title: Text('Shady Ayman'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
+                                //   subtitle: Text("Joined yesterday",style: TextStyle(fontSize: 13,color: Color(0xff0E8113),fontFamily: "Poppins"),),
+                                //  // trailing:
+                                //
+                                //   //trailing:Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                //  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),
+                                //   //tileColor: Colors.white,
+                                //
+                                // ),
+                                // //),
+                                // SizedBox(
+                                //   height: 10,
+                                // ),
+                                // //Container(
+                                // // decoration: BoxDecoration(
+                                // //     color: Colors.white, // Your desired background color
+                                // //     borderRadius: BorderRadius.circular(5),
+                                // //     boxShadow: [
+                                // //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                // //     ]
+                                // // ),
+                                // //child:
+                                // ListTile(
+                                //   leading: Container(
+                                //     width: 45,
+                                //       height: 45,
+                                //       decoration: BoxDecoration(
+                                //         shape: BoxShape.circle,
+                                //         border: Border.all(width: 2, color: Color(0xffCCCCCC)),
+                                //       ),
+                                //     child: Padding(
+                                //       padding: const EdgeInsets.all(6.0),
+                                //       child: Image.asset('assets/imgs/school/Vector (9).png',width: 30,height: 30,),
+                                //     )),
+                                //   title: Text('Shady Ayman'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                //   subtitle: Text("Waiting for response",style: TextStyle(fontSize: 13,color: Color(0xffFFC53E ),fontFamily: "Poppins"),),
+                                //   //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                //   onTap: (){
+                                //     Navigator.push(
+                                //         context ,
+                                //         MaterialPageRoute(
+                                //             builder: (context) =>  BusScreen(),
+                                //             maintainState: false));
+                                //     // _key.currentState!.openDrawer();
+                                //   },
+                                // ),
+                                // // ),
+                                // SizedBox(height: 10,),
+                                // Container(
+                                //
+                                //   //   decoration: BoxDecoration(
+                                //   //     color: Colors.white, // Your desired background color
+                                //   //     borderRadius: BorderRadius.circular(5),
+                                //   //     boxShadow: [
+                                //   //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                //   //     ]
+                                //   // ),
+                                //   child:
+                                //   ListTile(
+                                //     leading: Container(
+                                //         width: 45,
+                                //         height: 45,
+                                //         decoration: BoxDecoration(
+                                //           shape: BoxShape.circle,
+                                //           border: Border.all(width: 2, color: Color(0xffCCCCCC)),
+                                //         ),
+                                //         child: Padding(
+                                //           padding: const EdgeInsets.all(6.0),
+                                //           child: Image.asset('assets/imgs/school/Vector (9).png',width: 30,height: 30,),
+                                //         )),
+                                //     title: Text('Shady Ayman'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
+                                //     ),
+                                //     subtitle: Text("Not joined yet",style: TextStyle(fontSize: 13,color: Color(0xffAD1519),fontFamily: "Poppins"),),
+                                //     //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                //
+                                //   ),
+                                // )
 
 
                               ],

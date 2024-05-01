@@ -52,9 +52,12 @@ class BusScreen extends StatefulWidget{
 
 class BusScreenSate extends State<BusScreen> {
 List data=[];
-getData() async {
-QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("busdata").get();
-data.addAll(querySnapshot.docs);
+getData()async{
+  QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
+  data.addAll(querySnapshot.docs);
+  setState(() {
+
+  });
 }
 
   MyLocalController ControllerLang = Get.find();
@@ -301,23 +304,6 @@ final _firestore = FirebaseFirestore.instance;
                                                               ),
                                                             ),
                                                             SizedBox(width: 3,),
-                                                            // ElevatedButton(
-                                                            //   onPressed: () {
-                                                            //     setState(() {
-                                                            //      // resetRadioButtons();
-                                                            //     });
-                                                            //
-                                                            //   },
-                                                            //   style: ButtonStyle(
-                                                            //     backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                                                            //     // shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                            //     //   RoundedRectangleBorder(
-                                                            //     //     borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
-                                                            //     //   ),
-                                                            //     // ),
-                                                            //   ),//
-                                                            //   child: Text('Reset',style: TextStyle(color: Color(0xFF442B72)),),
-                                                            // ),
                                                             Padding(
                                                               padding: const EdgeInsets.all(5.0),
                                                               child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),),
@@ -742,63 +728,110 @@ final _firestore = FirebaseFirestore.instance;
                                       //     ]
                                       // ),
                                       //child:
-                                      FutureBuilder(
-                                        future: _firestore.collection('busdata').doc('UzrcI6MfSYP1mbGY2Ci3').get(),
-                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                          if (snapshot.hasError) {
-                                            return Text('Something went wrong');
-                                          }
-
-                                          if (snapshot.connectionState == ConnectionState.done) {
-                                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                            return ListTile(
-                                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                              leading: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) => ProfileScreen(),
-                                                      maintainState: false,
-                                                    ),
-                                                  );
-                                                },
-                                                child: Image.network(data['busphoto'], width: 61, height: 61,
-                                                  errorBuilder: (context, error, stackTrace) {
-                                                    return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
-                                                  },),
-                                              ),
-                                              title: Text(
-                                                data['busnumber'],
-                                                style: TextStyle(
-                                                  color: Color(0xFF442B72),
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Poppins-Bold',
-                                                ),
-                                              ),
-                                              subtitle: Text("Driver Name : "+
-                                                data['namedriver'],
-                                                style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
-                                              ),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                                                trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                              //tileColor: Colors.white,
-
-                                            ),);
-                                          }
-
-                                          return CircularProgressIndicator();
-                                        },
-                                      ),
-                                      // ListTile(
-                                      //   leading: Image.asset('assets/imgs/school/buses.png'),
-                                      //   title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                      //   subtitle: Text("Driver name : Ahmed Atef",style:
-                                      //   TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                      //   trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                      //function get data
+                                      // FutureBuilder(
+                                      //   future: _firestore.collection('busdata').doc('UzrcI6MfSYP1mbGY2Ci3').get(),
+                                      //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                      //     if (snapshot.hasError) {
+                                      //       return Text('Something went wrong');
+                                      //     }
+                                      //
+                                      //     if (snapshot.connectionState == ConnectionState.done) {
+                                      //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                      //       return ListTile(
+                                      //         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      //         leading: GestureDetector(
+                                      //           onTap: () {
+                                      //             Navigator.push(
+                                      //               context,
+                                      //               MaterialPageRoute(
+                                      //                 builder: (context) => ProfileScreen(),
+                                      //                 maintainState: false,
+                                      //               ),
+                                      //             );
+                                      //           },
+                                      //           child: Image.network(data['busphoto'], width: 61, height: 61,
+                                      //             errorBuilder: (context, error, stackTrace) {
+                                      //               return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                      //             },),
+                                      //         ),
+                                      //         title: Text(
+                                      //           data['busnumber'],
+                                      //           style: TextStyle(
+                                      //             color: Color(0xFF442B72),
+                                      //             fontSize: 15,
+                                      //             fontWeight: FontWeight.bold,
+                                      //             fontFamily: 'Poppins-Bold',
+                                      //           ),
+                                      //         ),
+                                      //         subtitle: Text("Driver Name : "+
+                                      //           data['namedriver'],
+                                      //           style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                      //         ),
+                                      //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                      //           trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
+                                      //         //tileColor: Colors.white,
+                                      //
+                                      //       ),);
+                                      //     }
+                                      //
+                                      //     return CircularProgressIndicator();
+                                      //   },
                                       // ),
+                                      // show data from firestore بس مش كامله
+                                      // SizedBox(
+                                      //   height: 500,
+                                      //   child: ListView.builder(
+                                      //     // shrinkWrap: true,
+                                      //       itemCount: data.length,
+                                      //       itemBuilder: (context, index) {
+                                      //         return
+                                      //           Column(
+                                      //             children: [
+                                      //               Padding(
+                                      //                 padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      //                 child: Row(
+                                      //                   children: [
+                                      //                     Image.asset('assets/imgs/school/Ellipse 1.png'),
+                                      //                     SizedBox(width: 10,),
+                                      //                     Padding(
+                                      //                       padding: const EdgeInsets.symmetric(horizontal: 5),
+                                      //                       child: Text(
+                                      //                         '${data[index]['busnumber'] }',
+                                      //                         style: TextStyle(
+                                      //                           color: Color(0xFF442B72),
+                                      //                           fontSize: 17,
+                                      //                           fontWeight: FontWeight.bold,
+                                      //                           fontFamily: 'Poppins-Bold',
+                                      //                         ),
+                                      //                       ),
+                                      //                     ),
+                                      //
+                                      //
+                                      //                   ],
+                                      //                 ),
+                                      //               ),
+                                      //               SizedBox(
+                                      //                 height: 20,
+                                      //               )
+                                      //
+                                      //             ],
+                                      //           );
+                                      //
+                                      //       }),
+                                      //   // child: Column(
+                                      //   //   children: [
+                                      //   //     ListTile(
+                                      //   //       leading: Image.asset('assets/imgs/school/buses.png'),
+                                      //   //       title: Text('${data[index]['busnumber'] }',style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                      //   //       subtitle: Text("Driver name : Ahmed Atef",style:
+                                      //   //       TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
+                                      //   //       trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                      //   //     ),
+                                      //   //   ],
+                                      //   // ),
                                       // ),
+
                                       SizedBox(height: 40,),
 
                                       // ListTile(
