@@ -70,7 +70,7 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
 
     Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
     QuerySnapshot snapshot = await queryOfNumber.get();
-  //  print(snapshot.docs[0].toString()+'dataaa');
+    print(phoneNumber.toString()+'dataaa');
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;

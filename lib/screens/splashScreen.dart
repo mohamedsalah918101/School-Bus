@@ -8,6 +8,7 @@ import '../main.dart';
 import '../supervisor_parent/screens/final_invitation_parent.dart';
 import '../supervisor_parent/screens/final_invitation_supervisor.dart';
 import '../supervisor_parent/screens/home_parent.dart';
+import '../supervisor_parent/screens/map_parent.dart';
 import 'homeScreen.dart';
 import 'loginScreen.dart';
 
@@ -52,9 +53,9 @@ class _SplashScreenState extends State<SplashScreen>
                         : sharedpref!.getString('type').toString() == 'parent'
                             ? sharedpref!.getInt('invit') == 1
                                 ? sharedpref!.getInt('invitstate') == 1
-                                    ? HomeParent()
+                                    ? MapParentScreen()
                                     : FinalAcceptInvitationParent()
-                                : NoInvitation(selectedImage: 3)
+                                :MapParentScreen()// NoInvitation(selectedImage: 3)
                             : sharedpref!.getInt('invit') == 1
                                 ? sharedpref!.getInt('invitstate') == 1
                                     ? HomeForSupervisor()
