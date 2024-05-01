@@ -1,31 +1,21 @@
-import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter/material.dart';
-import 'package:school_account/supervisor_parent/components/add_children_card.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
+import 'package:school_account/classes/dropdownRadiobutton.dart';
+import 'package:school_account/classes/dropdowncheckboxitem.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
-import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/edit_add_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/child_data_item.dart';
-import '../components/custom_app_bar.dart';
-import '../components/added_child_card.dart';
-
 class ParentsView extends StatefulWidget {
+
   @override
   _ParentsViewState createState() => _ParentsViewState();
 }
@@ -35,6 +25,94 @@ class _ParentsViewState extends State<ParentsView> {
   bool Accepted = false;
   bool Declined = false;
   bool Waiting = false;
+  String? selectedValueAccept;
+  String? selectedValueDecline;
+  String? selectedValueWaiting;
+  List<DropdownCheckboxItem> selectedItems = [];
+  List<QueryDocumentSnapshot> data = [];
+  bool isAcceptFiltered = false;
+  bool isDeclineFiltered = false;
+  bool isWaitingFiltered = false;
+  bool isFiltered  = false;
+  String? currentFilter;
+
+  void _deleteSupervisorDocument(String documentId) {
+    FirebaseFirestore.instance
+        .collection('parent')
+        .doc(documentId)
+        .delete()
+        .then((_) {
+      setState(() {
+        // Update UI by removing the deleted document from the data list
+        data.removeWhere((document) => document.id == documentId);
+      });
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   showSnackBarFun(context),
+      //   // SnackBar(content: Text('Document deleted successfully')),
+      // );
+    })
+        .catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete document: $error')),
+      );
+    });
+  }
+
+  getDataForDeclinedFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForWaitingFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForAcceptFilter()async{
+    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2 ).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = parentData.docs;
+      isFiltered = true;
+    });
+  }
+
+
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    // data.addAll(querySnapshot.docs);
+    setState(() {
+      data = querySnapshot.docs;
+
+    });
+  }
+
+  @override
+  void initState() {
+    getData();
+    // getDataForAcceptFilter();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +128,7 @@ class _ParentsViewState extends State<ParentsView> {
                     child: FloatingActionButton(
                       shape: const CircleBorder(),
                       onPressed: () {
+                        print('object');
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -69,6 +148,7 @@ class _ParentsViewState extends State<ParentsView> {
                     child: FloatingActionButton(
                       shape: const CircleBorder(),
                       onPressed: () {
+                        print('object');
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -178,220 +258,110 @@ class _ParentsViewState extends State<ParentsView> {
                                 ),
                               ),
                               SizedBox(
-                                width: 21,
+                                width: 20
                               ),
                               PopupMenuButton<String>(
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(6)),
-                                  ),
-                                  constraints: BoxConstraints.tightFor(
-                                      width: 216, height: 300),
-                                  color: Colors.white,
-                                  surfaceTintColor: Colors.transparent,
-                                  offset: Offset(0, 30),
-                                  itemBuilder: (BuildContext context) =>
-                                      <PopupMenuEntry<String>>[
-                                        PopupMenuItem<String>(
-                                          value: 'item1',
-                                          child: Text(
-                                            'Filter'.tr,
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 16,
-                                              color: Color(0xFF993D9A),
+                                child: Image(
+                                  image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
+                                  width: 29,
+                                  height: 29,
+                                  color: Color(0xFF442B72), // Optionally, you can set the color of the image
+                                ),
+
+                                itemBuilder: (BuildContext context) {
+                                  return [
+                                    PopupMenuItem<String>(
+                                      value: 'custom',
+                                      child:
+                                      Column(
+                                        children: [
+                                          Container(
+                                            child:  DropdownRadiobutton(
+                                              items: [
+                                                DropdownCheckboxItem(label: 'Accepted'),
+                                                DropdownCheckboxItem(label: 'Rejected'),
+                                                DropdownCheckboxItem(label: 'Waiting'),
+                                              ],
+                                              selectedItems: selectedItems,
+                                              onSelectionChanged: (items) {
+                                                setState(() {
+                                                  selectedItems = items;
+                                                  if (items.first.label == 'Accepted') {
+                                                    selectedValueAccept = 'Accepted';
+                                                    selectedValueDecline = null;
+                                                    selectedValueWaiting = null;
+                                                  } else if (items.first.label == 'Rejected') {
+                                                    selectedValueAccept = null;
+                                                    selectedValueDecline = 'Rejected';
+                                                    selectedValueWaiting = null;
+                                                  } else if (items.first.label == 'Waiting') {
+                                                    selectedValueAccept = null;
+                                                    selectedValueDecline = null;
+                                                    selectedValueWaiting = 'Waiting';
+                                                  }
+                                                });
+                                              },
                                             ),
                                           ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                            value: 'item2',
-                                            child: Container(
-                                              width: 150,
-                                              height: 1,
-                                              color: Color(0xff442B72)
-                                                  .withOpacity(0.37),
-                                            )),
-                                        PopupMenuItem<String>(
-                                          value: 'item3',
-                                          child: Row(
-                                            children: [
-                                              Radio(
-                                                value: true,
-                                                groupValue: Accepted,
-                                                onChanged: (bool? value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      Accepted = value;
-                                                      Declined = false;
-                                                      Waiting = false;
-                                                    });
-                                                  }
-                                                },
-                                                fillColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
-                                                  if (states.contains(
-                                                      MaterialState
-                                                          .selected)) {
-                                                    return Color(0xff442B72);
-                                                  }
-                                                  return Color(0xff442B72);
-                                                }), // Set the color of the selected radio button
-                                              ),
-                                              Text(
-                                                "Accepted".tr,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff442B72),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                          value: 'item4',
-                                          child: Row(
-                                            children: [
-                                              Radio(
-                                                value: true,
-                                                groupValue: Declined,
-                                                onChanged: (bool? value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      Accepted = false;
-                                                      Declined = value;
-                                                      Waiting = false;
-                                                    });
-                                                  }
-                                                },
-                                                fillColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
-                                                  if (states.contains(
-                                                      MaterialState
-                                                          .selected)) {
-                                                    return Color(0xff442B72);
-                                                  }
-                                                  return Color(0xff442B72);
-                                                }), // Set the color of the selected radio button
-                                              ),
-                                              Text(
-                                                "Declined".tr,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff442B72),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                          value: 'item5',
-                                          child: Row(
-                                            children: [
-                                              Radio(
-                                                value: true,
-                                                groupValue: Waiting,
-                                                onChanged: (bool? value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      Accepted = false;
-                                                      Declined = false;
-                                                      Waiting = value;
-                                                    });
-                                                  }
-                                                },
-                                                fillColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
-                                                  if (states.contains(
-                                                      MaterialState
-                                                          .selected)) {
-                                                    return Color(0xff442B72);
-                                                  }
-                                                  return Color(0xff442B72);
-                                                }),
-                                              ),
-                                              Text(
-                                                "Waiting".tr,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff442B72),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        PopupMenuItem<String>(
-                                          value: 'item6',
-                                          child: Row(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               SizedBox(
-                                                width: 104,
-                                                height: 38,
+                                                width:100,
                                                 child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                          Color(0xff442B72),
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10))),
-                                                  onPressed: () {},
-                                                  child: Text(
-                                                    'Apply'.tr,
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            'Poppins-Regular',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.white,
-                                                        fontSize: 16),
-                                                  ),
-                                                ),
-                                              ),
 
-                                              SizedBox(
-                                                width: 88,
-                                                height: 38,
-                                                child: Center(
-                                                  child: Text(
-                                                    'Reset'.tr,
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          'Poppins-Regular',
-                                                      fontWeight: FontWeight.w500,
-                                                      fontSize: 16,
-                                                      color: Color(0xFF432B72),
+                                                  onPressed: () {
+                                                    // Handle cancel action
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF442B72)),
+                                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
+                                                      ),
                                                     ),
                                                   ),
+                                                  child: GestureDetector(
+                                                      child: Text('Apply',style: TextStyle(fontSize:18),),
+                                                  onTap: (){
+                                                    if (selectedValueAccept != null) {
+                                                      currentFilter = 'Accepted';
+                                                      getDataForAcceptFilter();
+                                                      Navigator.pop(context);
+                                                      print('2');
+                                                    }else  if (selectedValueDecline != null) {
+                                                      currentFilter = 'Rejected';
+                                                      getDataForDeclinedFilter();
+                                                      Navigator.pop(context);
+                                                      print('0');
+                                                    }else  if (selectedValueWaiting != null) {
+                                                      currentFilter = 'Waiting';
+                                                      getDataForWaitingFilter();
+                                                      Navigator.pop(context);
+                                                      print('1');
+                                                    }
+                                                  },),
                                                 ),
                                               ),
+                                              SizedBox(width: 3,),
+                                              GestureDetector(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(5.0),
+                                                  child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),),
+                                                ), onTap: (){
+                                              Navigator.pop(context);
+                                              },
+                                              )
                                             ],
                                           ),
-                                        ),
-                                      ],
-                                  onSelected: (String value) {},
-                                  child: Image.asset(
-                                    'assets/images/Vector (13)sliders.png',
-                                    width: 27.62,
-                                    height: 21.6,
-                                  )),
+                                        ],
+                                      ),
+                                    ),
+                                  ];
+                                },
+
+                              ),
                             ],
                           ),
                         ),
@@ -399,7 +369,7 @@ class _ParentsViewState extends State<ParentsView> {
                           padding: const EdgeInsets.symmetric(horizontal: 28.0),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 8,
+                            itemCount: data.length,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               return Column(
@@ -419,13 +389,10 @@ class _ParentsViewState extends State<ParentsView> {
                                         width: 5,
                                       ),
                                       Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'Shady Ayman',
+                                           Text('${data[index]['name'] }',
                                             style: TextStyle(
                                               color: Color(0xFF442B72),
                                               fontSize: 17,
@@ -438,9 +405,7 @@ class _ParentsViewState extends State<ParentsView> {
                                             height: 5,
                                           ),
                                           Padding(
-                                            padding: (sharedpref
-                                                        ?.getString('lang') ==
-                                                    'ar')
+                                            padding: (sharedpref?.getString('lang') == 'ar')
                                                 ? EdgeInsets.only(right: 3.0)
                                                 : EdgeInsets.all(0.0),
                                             child: Text(
@@ -483,8 +448,188 @@ class _ParentsViewState extends State<ParentsView> {
                                                 Text('Delete'.tr, style: TextStyle(fontFamily: 'Poppins-Light',
                                                     fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF432B72),)),],)),],
                                         onSelected: (String value) {
-                                          if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) => EditAddParents()),);
-                                          } else if (value == 'item2') {Dialoge.DeleteParent(context);}},
+                                          if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                              EditAddParents(docid: data[index].id,
+                                                oldNumber: data[index].get('phoneNumber'),
+                                                oldName: data[index].get('name'),
+                                                oldNumberOfChildren: data[index].get('numberOfChildren'),
+                                                oldType: data[index].get('typeOfParent'),
+                                                // oldNameController: data[index].childrenData[index]['grade'],
+                                                // oldGradeOfChild: ['l;']
+                                              // oldGradeOfChild: data[index]['childern'].get('grade'),
+                                               )),);
+                                          } else if (value == 'item2') {
+                                              void DeleteParentSnackBar(context, String message, {Duration? duration}) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    dismissDirection: DismissDirection.up,
+                                                    duration: duration ?? const Duration(milliseconds: 1000),
+                                                    backgroundColor: Colors.white,
+                                                    margin: EdgeInsets.only(
+                                                      bottom: MediaQuery.of(context).size.height - 150,
+                                                    ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(10),),
+                                                    behavior: SnackBarBehavior.floating,
+                                                    content: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Image.asset('assets/images/saved.png',
+                                                          width: 30,
+                                                          height: 30,),
+                                                        SizedBox(width: 15,),
+                                                        Text(
+                                                          'Parent deleted successfully'.tr,
+                                                          style: const TextStyle(
+                                                            color: Color(0xFF4CAF50),
+                                                            fontSize: 16,
+                                                            fontFamily: 'Poppins-Bold',
+                                                            fontWeight: FontWeight.w700,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (ctx) => Dialog(
+                                                    backgroundColor: Colors.white,
+                                                    surfaceTintColor: Colors.transparent,
+                                                    // contentPadding: const EdgeInsets.all(20),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(
+                                                        30,
+                                                      ),
+                                                    ),
+                                                    child: SizedBox(
+                                                      width: 304,
+                                                      height: 182,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 8,
+                                                                ),
+                                                                Flexible(
+                                                                  child: Column(
+                                                                    children: [
+                                                                      GestureDetector(
+                                                                        onTap: () => Navigator.pop(context),
+                                                                        child: Image.asset(
+                                                                          'assets/images/Vertical container.png',
+                                                                          width: 27,
+                                                                          height: 27,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height: 25,
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                    'Delete'.tr,
+                                                                    textAlign: TextAlign.center,
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF442B72),
+                                                                      fontSize: 18,
+                                                                      fontFamily: 'Poppins-SemiBold',
+                                                                      fontWeight: FontWeight.w600,
+                                                                      height: 1.23,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Center(
+                                                              child: Text(
+                                                                'Are You Sure you want to \n'
+                                                                    'delete this parent ?'.tr,
+                                                                textAlign: TextAlign.center,
+                                                                style: TextStyle(
+                                                                  color: Color(0xFF442B72),
+                                                                  fontSize: 16,
+                                                                  fontFamily: 'Poppins-Light',
+                                                                  fontWeight: FontWeight.w400,
+                                                                  height: 1.23,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 15,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              children: [
+                                                                SizedBox(
+                                                                  child: ElevatedSimpleButton(
+                                                                    txt: 'Delete'.tr,
+                                                                    width:  107,
+                                                                    hight: 38,
+                                                                    onPress: () async{
+                                                                      setState(() {
+                                                                        _deleteSupervisorDocument(data[index].id);
+                                                                      });
+                                                                      DeleteParentSnackBar(context, 'message');
+                                                                      Navigator.pop(context);
+                                                                    },
+                                                                    color: const Color(0xFF442B72),
+                                                                    fontSize: 16,
+                                                                    fontFamily: 'Poppins-Regular',
+                                                                  ),
+                                                                ),
+                                                                // const Spacer(),
+                                                                SizedBox(width: 15,),
+                                                                SizedBox(
+                                                                  width: 107,
+                                                                  height: 38,
+                                                                  child:ElevatedButton(
+                                                                    style: ElevatedButton.styleFrom(
+                                                                      backgroundColor: Colors.white,
+                                                                      surfaceTintColor: Colors.transparent,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          side: BorderSide(
+                                                                            color: Color(0xFF442B72),
+                                                                          ),
+                                                                          borderRadius: BorderRadius.circular(10)
+                                                                      ),
+                                                                    ),
+                                                                    child: Text(
+                                                                        'Cancel'.tr,
+                                                                        textAlign: TextAlign.center,
+                                                                        style: TextStyle(
+                                                                            color: Color(0xFF442B72),
+                                                                            fontFamily: 'Poppins-Regular',
+                                                                            fontWeight: FontWeight.w500 ,
+                                                                            fontSize: 16)
+                                                                    ), onPressed: () {
+                                                                    Navigator.pop(context);
+                                                                  },
+                                                                  ),
+                                                                ),
+
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )),
+                                              );
+                                            }
+                                          },
                                         child: Image.asset('assets/images/more.png', width: 20.8, height: 20.8,),),],),
                                   SizedBox(height: 25,)],);},),),
                         SizedBox(height: 44,)

@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
+import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
+import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -52,13 +54,15 @@ class MyApp extends StatelessWidget{
       locale: Controller.intialLang,
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
-      home:
+
 
       // HomeForSupervisor(),
 
+
+      home:SplashScreen(),
+      // AttendanceSupervisorScreen(),
       // AddParents(),
-      SplashScreen(),
-    //   Text('${data[index]['childern']?[1]['name'] }',
+      // SplashScreen(),
     );
   }
 }

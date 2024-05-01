@@ -36,6 +36,8 @@ class _AddParentsState extends State<AddParents> {
   List<TextEditingController> gradeControllers = [];
   late final int selectedImage;
   final _nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController gradeController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
@@ -127,7 +129,7 @@ class _AddParentsState extends State<AddParents> {
   List<Widget> NumberOfChildren = [];
 
   final nameChildController = TextEditingController();
-  final gradeController = TextEditingController();
+  // final gradeController = TextEditingController();
   List<Map<String, dynamic>> genderSelection = [];
 
 
@@ -296,13 +298,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          nameChildeError? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Please enter your child name".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ): Container(),
+                          // nameChildeError? Container():Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                          //   child: Text(
+                          //     "Please enter your child name".tr,
+                          //     style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
                           SizedBox(height: 12,),
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')?
@@ -400,13 +402,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          GradeError? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Please enter your child grade".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ): Container(),
+                          // GradeError?Container(): Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                          //   child: Text(
+                          //     "Please enter your child grade".tr,
+                          //     style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
                           SizedBox(height: 12,),
                           Padding(
                               padding: (sharedpref?.getString('lang') == 'ar')?
@@ -763,17 +765,34 @@ class _AddParentsState extends State<AddParents> {
                           ],
                         ),
                       ),
-                      typeOfParentError?
-                      selectedValue!.isNotEmpty?
-                      Container():
+                      typeOfParentError? Container():
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 48),
-                        child: Text(
-                          "Please enter your type".tr,
-                          style: TextStyle(color: Colors.red),
+                          padding: const EdgeInsets.symmetric(horizontal: 48),
+                          child: Text(
+                            "Please enter your type".tr,
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
-                      ):
-                          Container(),
+                      // selectedValue == null || selectedValue.isEmpty
+                      //     ? Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                      //   child: Text(
+                      //     "Please enter your type".tr,
+                      //     style: TextStyle(color: Colors.red),
+                      //   ),
+                      // )
+                      //     : Container(),
+                      // typeOfParentError?
+                      // selectedValue!.isEmpty?
+                      // Container():
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                      //   child: Text(
+                      //     "Please enter your type".tr,
+                      //     style: TextStyle(color: Colors.red),
+                      //   ),
+                      // ):
+                      //     Container(),
                       SizedBox(height: 11,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -869,13 +888,14 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      nameError ?  Padding(
+                      nameError ? Container(): Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your name".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ):Container(),
+                      ),
+                          // :Container(),
 
                       SizedBox(height: 17,),
                       Padding(
@@ -976,13 +996,15 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      phoneError? Padding(
+
+                      phoneError? Container():Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your phone number".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ): Container(),
+                      ),
+
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -1076,13 +1098,15 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      numberOfChildrenError? Padding(
+                      numberOfChildrenError?
+                          Container():
+                      Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your number of children".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ): Container(),
+                      ),
                       SizedBox(
                         height: 20,
                       ),
@@ -1164,6 +1188,7 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               hight: 48,
                               onPress: () async {
+<<<<<<< HEAD
                                 // if( selectedValue!.isEmpty){
                                 //   typeOfParentError = true;
                                 //   setState(() {
@@ -1185,11 +1210,67 @@ class _AddParentsState extends State<AddParents> {
                                 //
                                 //   });
                                 // }else if(nameChildControllers.length < 1){
+=======
+                                if (selectedValue!.isEmpty) {
+                                  typeOfParentError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (selectedValue!.isNotEmpty) {
+                                  typeOfParentError = true;
+                                  setState(() {
+
+                                  });
+                                }
+
+                                if (_nameController.text.length == 0) {
+                                  nameError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_nameController.text.length > 0) {
+                                  nameError = true;
+                                  setState(() {
+
+                                  });
+                                }
+
+                                if (_phoneNumberController.text.length < 11) {
+                                  phoneError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_phoneNumberController.text.length > 10) {
+                                  phoneError = true;
+                                  setState(() {
+
+                                  });
+                                }
+
+                                if (_numberOfChildrenController.text.length < 1) {
+                                  numberOfChildrenError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_numberOfChildrenController.text.length > 0) {
+                                  numberOfChildrenError = true;
+                                  setState(() {
+
+                                  });
+                                }
+                                // if(nameController.text.length == 0){
+                                //   nameChildeError = false;
+                                //   setState(() {
+                                //
+                                //   });
+                                // }else  if(nameController.text.length > 0){
+>>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
                                 //   nameChildeError = true;
                                 //   setState(() {
                                 //
                                 //   });
                                 // }
+<<<<<<< HEAD
                                 //    else if (nameChildController.text.length == 0) {
                                 //       nameChildeError = true;
                                 //     }
@@ -1204,13 +1285,40 @@ class _AddParentsState extends State<AddParents> {
                                 //   typeOfParentError = false;
                                 //   setState(() {
                                 //   });
+=======
+                                // if (gradeController.text.length == 0) {
+                                //       GradeError = false;
+                                //       setState(() {
+                                //
+                                //       });
+                                //   }
+                                //    else if (gradeController.text.length> 0) {
+                                //       GradeError = true;
+                                //       setState(() {
+                                //
+                                //       });
+                                //   }
+                                 if (
+                                    // GradeError&&
+                                    // nameChildeError&&
+                                    typeOfParentError &&
+                                    nameError &&
+                                    phoneError &&
+                                    numberOfChildrenError)
+                                    {
+>>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
                                 InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
                                 print('object');
                                 NumberOfChildrenCard = false;
                                 setState(() {
                                 });
+<<<<<<< HEAD
                               },
+=======
+                              }
+                                },
+>>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
                               color: Color(0xFF442B72),
                               fontSize: 16),
                         ),

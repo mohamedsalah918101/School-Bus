@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/main.dart';
@@ -10,6 +11,8 @@ import '../screens/login_screen.dart';
 import 'elevated_simple_button.dart';
 
 class Dialoge {
+
+
 
   static addAbsentCalenderDialog(context) {
     showDialog(
@@ -1113,9 +1116,10 @@ class Dialoge {
                           txt: 'Delete'.tr,
                           width:  107,
                           hight: 38,
-                          onPress: () {
-                            Navigator.pop(context);
+                          onPress: () async{
+                            await FirebaseFirestore.instance.collection('parent').doc('hOwOveK2VrgS4JAWnqtz').delete();
                             DeleteParentSnackBar(context, 'message');
+                            Navigator.pop(context);
                           },
                           color: const Color(0xFF442B72),
                           fontSize: 16,
