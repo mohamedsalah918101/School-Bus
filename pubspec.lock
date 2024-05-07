@@ -334,17 +334,6 @@ packages:
     description:
       name: firebase_storage_web
       sha256: "4153814db8d59138e816d9f016736e4095c45675a2c18f2868d11ffd8cc6a4ca"
-<<<<<<< HEAD
-=======
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.7.3"
-  fixnum:
-    dependency: transitive
-    description:
-      name: fixnum
-      sha256: "25517a4deb0c03aa0f32fd12db525856438902d9c16536311e76cdc57b31d7d1"
->>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
       url: "https://pub.dev"
     source: hosted
     version: "3.7.3"
@@ -556,10 +545,10 @@ packages:
     dependency: transitive
     description:
       name: google_maps_flutter_android
-      sha256: "256b3c974e415bd17555ceff76a5d0badd2cbfd29febfc23070993358f639550"
+      sha256: "0bcadb80eba39afda77dede89a6caafd3b68f2786b90491eceea4a01c3db181c"
       url: "https://pub.dev"
     source: hosted
-    version: "2.7.0"
+    version: "2.8.0"
   google_maps_flutter_ios:
     dependency: transitive
     description:
@@ -581,7 +570,6 @@ packages:
     description:
       name: google_maps_flutter_web
       sha256: "6245721c160d6f531c1ef568cf9bef8d660cd585a982aa75121269030163785a"
-<<<<<<< HEAD
       url: "https://pub.dev"
     source: hosted
     version: "0.5.4+3"
@@ -601,11 +589,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.20-nullsafety.5"
-=======
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.4+3"
->>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
   google_places_autocomplete_text_field:
     dependency: "direct main"
     description:
@@ -626,17 +609,10 @@ packages:
     dependency: transitive
     description:
       name: http
-<<<<<<< HEAD
       sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
       url: "https://pub.dev"
     source: hosted
     version: "0.13.6"
-=======
-      sha256: a2bbf9d017fcced29139daa8ed2bba4ece450ab222871df93ca9eec6f80c34ba
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
->>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
   http_parser:
     dependency: transitive
     description:
@@ -681,17 +657,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_ios
-<<<<<<< HEAD
       sha256: fadafce49e8569257a0cad56d24438a6fa1f0cbd7ee0af9b631f7492818a4ca3
       url: "https://pub.dev"
     source: hosted
     version: "0.8.9+1"
-=======
-      sha256: "917a5cadd67d052554cfb258595e54217de53fac5b52939426e26319a02e6297"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.9+2"
->>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
   image_picker_linux:
     dependency: transitive
     description:
@@ -996,15 +965,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-<<<<<<< HEAD
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      sha256: "79fbafed02cfdbe85ef3fd06c7f4bc2cbcba0177e61b765264853d4253b21744"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.9.0"
   provider:
     dependency: transitive
     description:
@@ -1013,8 +973,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
-=======
->>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
   rxdart:
     dependency: transitive
     description:
@@ -1309,10 +1267,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-<<<<<<< HEAD
   dart: ">=3.2.0 <4.0.0"
   flutter: ">=3.16.0"
-=======
-  dart: ">=3.2.3 <4.0.0"
-  flutter: ">=3.16.6"
->>>>>>> c74222626f23a740baa72ef868ddab0842c592e1
