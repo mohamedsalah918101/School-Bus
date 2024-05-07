@@ -76,7 +76,7 @@ class _LoadingState extends State<Loading> {
                   height: _size3,
                   width: _size3,
                   decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Color(0xff1DA1F2)),
+                  BoxDecoration(shape: BoxShape.circle, color: Color(0xff442B72)),
                 )
               ],
             ),
