@@ -47,7 +47,7 @@ class HomeScreen extends StatefulWidget{
 
 
 class _HomeScreenState extends State<HomeScreen> {
-
+  late Future<List<DocumentSnapshot>> _parentData = Future.value([]);
   MyLocalController ControllerLang = Get.find();
   //final colorC = Color.alphaBlend(Color(0xffBE7FBF), Color(0xffFFFFFF));
   Color color1 = Color(0xFFBE7FBF);
@@ -64,12 +64,29 @@ class _HomeScreenState extends State<HomeScreen> {
       _counter++;
     });
   }
+  List<QueryDocumentSnapshot> data = [];
+
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+
+    });
+  }
+//  late Future<List<DocumentSnapshot>> _parentData;
+//   Future<List<DocumentSnapshot>> _getParentData() async {
+//     QuerySnapshot querySnapshot =
+//     await FirebaseFirestore.instance.collection('parent').get();
+//     return querySnapshot.docs;
+//   }
 
 // to lock in landscape view
   @override
   void initState() {
     super.initState();
     // responsible
+    getData();
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -111,16 +128,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Center(
                         child:Padding(
                           padding: const EdgeInsets.only(left: 60),
-                          child: Text(
-                            "Salam Language School".tr,
-                            style: TextStyle(
-                              color: Color(0xFF993D9A),
-                              fontSize: 16,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                              height: 0.64,
-                            ),
+                          child:
+                          FutureBuilder(
+                            future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Something went wrong');
+                              }
+
+                              if (snapshot.connectionState == ConnectionState.done) {
+                                Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                return Text(
+                                  data['nameEnglish'],
+                                  style: TextStyle(
+                                    color: Color(0xFF993D9A),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins-Bold',
+                                  ),
+                                );
+                              }
+
+                              return CircularProgressIndicator();
+                            },
                           ),
+
+          // Text(
+          //                   "Salam Language School".tr,
+          //                   style: TextStyle(
+          //                     color: Color(0xFF993D9A),
+          //                     fontSize: 16,
+          //                     fontFamily: 'Poppins-Bold',
+          //                     fontWeight: FontWeight.w700,
+          //                     height: 0.64,
+          //                   ),
+          //                 ),
                         ),
                       ),
                     ),
@@ -217,10 +259,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           );
                                         },
-                                        child:data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
+                                        child:
+                                        data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
                                           errorBuilder: (context, error, stackTrace) {
                                             return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
-                                          },):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                          },
+                                        ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
                                       ),
                                       title: Text(
                                         data['nameEnglish'],
@@ -449,84 +493,225 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                             SizedBox(height: 20,),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white, // Your desired background color
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                  ]
-                              ),
-                              child:
-                              ListTile(
-                                leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                                //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                title: Text(
-                                  'Shady Aymen'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins-SemiBold',
-                                  ),
-                                ),
-                                subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
-                              ),
-                            ),
+                            // right code
+                            // SizedBox(
+                            //   height: 500,
+                            //   child: ListView.builder(
+                            //      // shrinkWrap: true,
+                            //       itemCount: data.length,
+                            //       itemBuilder: (context, index) {
+                            //         return
+                            //          Column(
+                            //           children: [
+                            //             Row(
+                            //               children: [
+                            //                 Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                            //            SizedBox(width: 10,),
+                            //             Text(
+                            //             '${data[index]['name'] }',
+                            //             style: TextStyle(
+                            //             color: Color(0xFF442B72),
+                            //             fontSize: 15,
+                            //             fontWeight: FontWeight.bold,
+                            //             fontFamily: 'Poppins-SemiBold',
+                            //             ),
+                            //             )
+                            //               ],
+                            //             ),
+                            //         Text(
+                            //         '${data[index]['phoneNumber'] }',
+                            //         style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),)
+                            //
+                            //         ],
+                            //         );
+                            //
+                            //   }),
+                            // ),
                             SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white, // Your desired background color
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                  ]
+                              height: 500,
+                              child: ListView.builder(
+                                itemCount: data.length,
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: [
+                                      Container(height: 16,),
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white, // Your desired background color
+                                              borderRadius: BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                              ]
+                                          ),
+                                        child:
+                                        Column(
+                                          children: [
+                                            ListTile(
+                                              leading:Container(
+                                                width:40,
+                                                  height:40,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: Color(0xffCCCCCC),
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                    child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                  ))
+
+                                              // Image.asset(
+                                              //   'assets/imgs/school/imgparent.png',
+                                              //   width: 40,
+                                              //   height: 40,
+                                              // ),
+                                              ,title: Text(
+                                                '${data[index]['name']}',
+                                                style: TextStyle(
+                                                  color: Color(0xFF442B72),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Poppins-SemiBold',
+                                                ),
+                                              ),
+                                              subtitle: Text(
+                                                '${data[index]['phoneNumber']}',
+                                                style: TextStyle(
+                                                  color: Color(0xff442B72),
+                                                  fontSize: 14,
+                                                  fontFamily: "Poppins-Regular",
+                                                ),
+                                              ),
+                                              // You can add trailing icons or other widgets here if needed
+                                              // trailing: Icon(Icons.arrow_forward),
+                                              // onTap: () {
+                                              //   // Add onTap functionality if required
+                                              // },
+                                            ),
+
+
+                                          ],
+                                        ),
+
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
-                              child:
-                              ListTile(
-                                leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                                //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                title: Text(
-                                  'Shady Aymen'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins-SemiBold',
-                                  ),
-                                ),
-                                subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
-                              ),
                             ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white, // Your desired background color
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                  ]
-                              ),
-                              child:
-                              ListTile(
-                                leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                                //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                title: Text(
-                                  'Shady Aymen'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins-SemiBold',
-                                  ),
-                                ),
-                                subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
-                              ),
-                            ),
+                            // FutureBuilder<List<DocumentSnapshot>>(
+                            //   future: _parentData,
+                            //   builder: (context, snapshot) {
+                            //     if (snapshot.connectionState == ConnectionState.waiting) {
+                            //       return Center(child: CircularProgressIndicator());
+                            //     }
+                            //
+                            //     if (snapshot.hasError) {
+                            //       return Center(child: Text('Error: ${snapshot.error}'));
+                            //     }
+                            //
+                            //     List<DocumentSnapshot>? parentDocs = snapshot.data;
+                            //     if (parentDocs == null || parentDocs.isEmpty) {
+                            //       return Center(child: Text('No data available'));
+                            //     }
+                            //
+                            //     return ListView.builder(
+                            //       itemCount: parentDocs.length,
+                            //       itemBuilder: (context, index) {
+                            //         Map<String, dynamic> data =
+                            //         parentDocs[index].data() as Map<String, dynamic>;
+                            //         String name = data['name'] ?? '';
+                            //         String phoneNumber = data['phoneNumber'] ?? '';
+                            //
+                            //         return ListTile(
+                            //           title: Text(name),
+                            //           subtitle: Text(phoneNumber),
+                            //           leading: Icon(Icons.person),
+                            //         );
+                            //       },
+                            //     );
+                            //   },
+                            // ),
+                            // Container(
+                            //   decoration: BoxDecoration(
+                            //       color: Colors.white, // Your desired background color
+                            //       borderRadius: BorderRadius.circular(10),
+                            //       boxShadow: [
+                            //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                            //       ]
+                            //   ),
+                            //   child:
+                            //   ListTile(
+                            //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                            //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                            //     title: Text(
+                            //       'Shady Aymen'.tr,
+                            //       style: TextStyle(
+                            //         color: Color(0xFF442B72),
+                            //         fontSize: 15,
+                            //         fontWeight: FontWeight.bold,
+                            //         fontFamily: 'Poppins-SemiBold',
+                            //       ),
+                            //     ),
+                            //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
+                            //   ),
+                            // ),
+                            // SizedBox(
+                            //   height: 20,
+                            // ),
+                            // Container(
+                            //   decoration: BoxDecoration(
+                            //       color: Colors.white, // Your desired background color
+                            //       borderRadius: BorderRadius.circular(10),
+                            //       boxShadow: [
+                            //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                            //       ]
+                            //   ),
+                            //   child:
+                            //   ListTile(
+                            //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                            //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                            //     title: Text(
+                            //       'Shady Aymen'.tr,
+                            //       style: TextStyle(
+                            //         color: Color(0xFF442B72),
+                            //         fontSize: 15,
+                            //         fontWeight: FontWeight.bold,
+                            //         fontFamily: 'Poppins-SemiBold',
+                            //       ),
+                            //     ),
+                            //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
+                            //   ),
+                            // ),
+                            // SizedBox(
+                            //   height: 20,
+                            // ),
+                            // Container(
+                            //   decoration: BoxDecoration(
+                            //       color: Colors.white, // Your desired background color
+                            //       borderRadius: BorderRadius.circular(10),
+                            //       boxShadow: [
+                            //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                            //       ]
+                            //   ),
+                            //   child:
+                            //   ListTile(
+                            //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                            //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                            //     title: Text(
+                            //       'Shady Aymen'.tr,
+                            //       style: TextStyle(
+                            //         color: Color(0xFF442B72),
+                            //         fontSize: 15,
+                            //         fontWeight: FontWeight.bold,
+                            //         fontFamily: 'Poppins-SemiBold',
+                            //       ),
+                            //     ),
+                            //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
+                            //   ),
+                            // ),
                             SizedBox(
                               height:50,
                             ),

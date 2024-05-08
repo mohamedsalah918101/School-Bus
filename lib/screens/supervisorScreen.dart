@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -30,23 +31,134 @@ class SupervisorScreen extends StatefulWidget {
 }
 
 class SupervisorScreenSate extends State<SupervisorScreen> {
+
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController = TextEditingController();
   int? _selectedOption = 1;
   int selectedIconIndex = 0;
   bool isEditingSupervisor = false;
   List<DropdownCheckboxItem> selectedItems = [];
-
+ // List<QueryDocumentSnapshot> data = [];
+  List<QueryDocumentSnapshot> filteredData = [];
+ // late Stream<QuerySnapshot> supervisorsStream;
+  // void filterSearchResults(String query) {
+  //   setState(() {
+  //     // Update the Firestore query based on the search input
+  //     supervisorsStream = FirebaseFirestore.instance
+  //         .collection('supervisor')
+  //         .where('name', isGreaterThanOrEqualTo: query)
+  //         .where('name', isLessThan: query + 'z') // Use a range query for partial matches
+  //         .snapshots();
+  //   });
+  // }
+  void _editSupervisorDocument(String documentId, String name, String phone, String email) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditeSupervisor(
+          docid: documentId,
+          oldName: name,
+          oldPhone: phone,
+          oldEmail: email,
+        ),
+      ),
+    );
+  }
 // to lock in landscape view
+  List<QueryDocumentSnapshot> data = [];
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+
+    });
+  }
+  void _deleteSupervisorDocument(String documentId) {
+    FirebaseFirestore.instance
+        .collection('supervisor')
+        .doc(documentId)
+        .delete()
+        .then((_) {
+      setState(() {
+        // Update UI by removing the deleted document from the data list
+        data.removeWhere((document) => document.id == documentId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+          showSnackBarFun(context),
+       // SnackBar(content: Text('Document deleted successfully')),
+      );
+    });
+    //     .catchError((error) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text('Failed to delete document: $error')),
+    //   );
+    // }
+    // );
+  }
+
   @override
   void initState() {
     super.initState();
+   // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
     // responsible
-
+  getData();
+    // setState(() {
+    //   filteredData = data;
+    // });
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+  //functions of filter
+  bool isAcceptFiltered = false;
+  bool isDeclineFiltered = false;
+  bool isWaitingFiltered = false;
+  bool isFiltered  = false;
+  String? currentFilter;
+  bool Accepted = false;
+  bool Declined = false;
+  bool Waiting = false;
+  String? selectedValueAccept;
+  String? selectedValueDecline;
+  String? selectedValueWaiting;
+  getDataForDeclinedFilter()async{
+    CollectionReference supervisor = FirebaseFirestore.instance.collection('supervisor');
+    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 0).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = supervisorData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForWaitingFilter()async{
+    CollectionReference supervisor = FirebaseFirestore.instance.collection('supervisor');
+    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 1).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = supervisorData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForAcceptFilter()async{
+    CollectionReference supervisor = FirebaseFirestore.instance.collection('supervisor');
+    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 2 ).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = supervisorData.docs;
+      isFiltered = true;
+    });
   }
 
   @override
@@ -105,7 +217,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                       ScaffoldMessenger.of(context)
                                           .hideCurrentSnackBar();
                                       // Navigate back to the previous page
-                                      Navigator.pop(context);
+                                     // Navigator.pop(context);
+                                      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
                                     },
                                     child: const Icon(
                                       Icons.arrow_back_ios_new_rounded,
@@ -163,7 +276,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(top: 5),
-                                child: Column(
+                                child:
+                                Column (
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
@@ -184,7 +298,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                     // Set the desired cursor color here
                                                   ),
                                                 ),
-                                                child: SearchBar(
+                                                child:
+                                                SearchBar(
                                                   leading: Padding(
                                                     padding: const EdgeInsets.only(
                                                         left: 4.0),
@@ -201,6 +316,17 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                     color: Color(0xFF442B72),
                                                   )),
                                                   hintText: "Search Name".tr,
+                                                  onChanged: (query) {
+                                                    // Filter the data based on the search query
+                                                    setState(() {
+                                                      filteredData = data.where((doc) {
+                                                        return doc['name'].toLowerCase().contains(query.toLowerCase());
+                                                      }).toList();
+                                                    });
+                                                  },
+                                                  // onChanged: (value) {
+                                                  //   filterSearchResults(value);
+                                                  // },
                                                   hintStyle: MaterialStateProperty
                                                       .all<TextStyle?>(TextStyle(
                                                           color: Color(0xFFC2C2C2),
@@ -217,6 +343,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                               ),
                                             ),
                                           ),
+
+
                                           SizedBox(
                                             width: 20,
                                           ),
@@ -244,80 +372,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                   child: Column(
                                                     children: [
                                                       Container(
-                                                        // padding: EdgeInsets.all(16),
-                                                        // child: Column(
-                                                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                                                        //   children: [
-                                                        //     Text(
-                                                        //       'Options',
-                                                        //       style: TextStyle(
-                                                        //         fontSize: 16,
-                                                        //         fontWeight: FontWeight.bold,
-                                                        //       ),
-                                                        //     ),
-                                                        //     SizedBox(height: 10),
-                                                        //
-                                                        //     RadioListTile(
-                                                        //       title: Text('Accepted'),
-                                                        //       value: 1,
-                                                        //     groupValue:_selectedOption ,
-                                                        //       onChanged: (value) {
-                                                        //         setState(() {
-                                                        //           print("object"+_selectedOption.toString());
-                                                        //           _selectedOption = value;
-                                                        //         });
-                                                        //       },
-                                                        //     ),
-                                                        //     RadioListTile(
-                                                        //       title: Text('Rejected'),
-                                                        //       value: 2,
-                                                        //       groupValue: _selectedOption,
-                                                        //       onChanged: (value) {
-                                                        //         setState(() {
-                                                        //           print("object"+_selectedOption.toString());
-                                                        //           _selectedOption = value;
-                                                        //         });
-                                                        //
-                                                        //
-                                                        //       },
-                                                        //     ),
-                                                        //     RadioListTile(
-                                                        //       title: Text('Waiting'),
-                                                        //       value: 3,
-                                                        //       groupValue: _selectedOption,
-                                                        //       onChanged: (value) {
-                                                        //         setState(() {
-                                                        //           print("object"+_selectedOption.toString());
-                                                        //           _selectedOption = value;
-                                                        //         });
-                                                        //       },
-                                                        //     ),
-                                                        //     SizedBox(height: 20),
-                                                        //     Row(
-                                                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        //       children: [
-                                                        //         ElevatedButton(
-                                                        //           onPressed: () {
-                                                        //             // Handle cancel action
-                                                        //             Navigator.pop(context);
-                                                        //           },
-                                                        //           child: Text('Cancel'),
-                                                        //         ),
-                                                        //         ElevatedButton(
-                                                        //           onPressed: () {
-                                                        //             setState(() {
-                                                        //               Navigator.pop(context);
-                                                        //             });
-                                                        //             // Handle confirm action
-                                                        //             print('Selected: $_selectedOption');
-                                                        //
-                                                        //           }, //
-                                                        //           child: Text('Confirm'),
-                                                        //         ),
-                                                        //       ],
-                                                        //     ),
-                                                        //   ],
-                                                        // ),
+
                                                         child: DropdownRadiobutton(
                                                           items: [
                                                             DropdownCheckboxItem(
@@ -333,7 +388,21 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               (items) {
                                                             setState(() {
                                                               selectedItems = items;
-                                                            });
+                                                              if (items.first.label == 'Accepted') {
+                                                                selectedValueAccept = 'Accepted';
+                                                                selectedValueDecline = null;
+                                                                selectedValueWaiting = null;
+                                                              } else if (items.first.label == 'Rejected') {
+                                                                selectedValueAccept = null;
+                                                                selectedValueDecline = 'Rejected';
+                                                                selectedValueWaiting = null;
+                                                              } else if (items.first.label == 'Waiting') {
+                                                                selectedValueAccept = null;
+                                                                selectedValueDecline = null;
+                                                                selectedValueWaiting = 'Waiting';
+                                                              }
+                                                            }
+                                                            );
                                                           },
                                                         ),
                                                       ),
@@ -366,47 +435,58 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                              child: Text(
-                                                                'Apply',
-                                                                style: TextStyle(
-                                                                    fontSize: 18),
+                                                              child: GestureDetector(
+                                                                child: Text(
+                                                                  'Apply',
+                                                                  style: TextStyle(
+                                                                      fontSize: 18),
+                                                                ),
+                                                                onTap: (){
+                                                                  if (selectedValueAccept != null) {
+                                                                    currentFilter = 'Accepted';
+                                                                    getDataForAcceptFilter();
+                                                                    Navigator.pop(context);
+                                                                    print('2');
+                                                                  }else  if (selectedValueDecline != null) {
+                                                                    currentFilter = 'Rejected';
+                                                                    getDataForDeclinedFilter();
+                                                                    Navigator.pop(context);
+                                                                    print('0');
+                                                                  }else  if (selectedValueWaiting != null) {
+                                                                    currentFilter = 'Waiting';
+                                                                    getDataForWaitingFilter();
+                                                                    Navigator.pop(context);
+                                                                    print('1');
+                                                                  }
+                                                                },
                                                               ),
                                                             ),
                                                           ),
                                                           SizedBox(
                                                             width: 3,
                                                           ),
-                                                          // ElevatedButton(
-                                                          //   onPressed: () {
-                                                          //     setState(() {
-                                                          //      // resetRadioButtons();
-                                                          //     });
-                                                          //
-                                                          //   },
-                                                          //   style: ButtonStyle(
-                                                          //     backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                                                          //     // shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                          //     //   RoundedRectangleBorder(
-                                                          //     //     borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
-                                                          //     //   ),
-                                                          //     // ),
-                                                          //   ),//
-                                                          //   child: Text('Reset',style: TextStyle(color: Color(0xFF442B72)),),
-                                                          // ),
+
                                                           Padding(
                                                             padding:
                                                                 const EdgeInsets.all(
                                                                     5.0),
-                                                            child: Text(
-                                                              "Reset",
-                                                              style: TextStyle(
-                                                                  color: Color(
-                                                                      0xFF442B72),
-                                                                  fontSize: 20),
+                                                            child: GestureDetector(
+                                                              onTap:(){
+                                                                   getData();
+                                                                  Navigator.pop(context);
+                                                              },
+                                                              child: Text(
+                                                                "Reset",
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        0xFF442B72),
+                                                                    fontSize: 20),
+                                                              ),
                                                             ),
                                                           )
                                                         ],
                                                       ),
+
                                                     ],
                                                   ),
                                                 ),
@@ -426,6 +506,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                           ),
                                         ],
                                       ),
+
                                     ),
                                     SizedBox(
                                       height: 40,
@@ -473,11 +554,12 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                               onTap: () {
                                                 ScaffoldMessenger.of(context)
                                                     .hideCurrentSnackBar();
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            EditeSupervisor()));
+
+                                                // Navigator.pushReplacement(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //         builder: (context) =>
+                                                //             EditeSupervisor()));
                                               },
                                               child: SizedBox(
                                                 height: 20,
@@ -537,15 +619,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                               isEditingSupervisor = true;
                                             });
 
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        EditeSupervisor()));
+                                            // Navigator.pushReplacement(
+                                            //     context,
+                                            //     MaterialPageRoute(
+                                            //         builder: (context) =>
+                                            //             EditeSupervisor())
+                                            // );
                                           } else if (value == 'delete') {
-                                            setState(() {
-                                              showSnackBarFun(context);
-                                            });
+
+
                                           }
                                         },
                                       ),
@@ -736,9 +818,9 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                     ),
                                     //),
                                     SizedBox(
-                                      height: 40,
+                                      height: 30,
                                     ),
-                                    //Container(
+                                    // Container(
                                     // decoration: BoxDecoration(
                                     //     color: Colors.white, // Your desired background color
                                     //     borderRadius: BorderRadius.circular(5),
@@ -746,70 +828,553 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                     //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
                                     //     ]
                                     // ),
-                                    //child:
-                                    ListTile(
-                                      leading:
-                                          Image.asset('assets/imgs/school/Ellipse 1.png'),
-                                      title: Text('Shady Ayman'.tr,
-                                          style: TextStyle(
-                                            color: Color(0xFF442B72),
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Poppins-Bold',
-                                          )),
-                                      subtitle: Text(
-                                        "Waiting for response",
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xffFFC53E),
-                                            fontFamily: "Poppins"),
-                                      ),
-                                      trailing: Icon(
-                                        Icons.more_vert,
-                                        size: 30,
-                                        color: Color(0xFF442B72),
-                                      ),
-                                    ),
+                                    // child:
+                                    // ListTile(
+                                    //   leading:
+                                    //       Image.asset('assets/imgs/school/Ellipse 1.png'),
+                                    //   title: Text('Shady Ayman'.tr,
+                                    //       style: TextStyle(
+                                    //         color: Color(0xFF442B72),
+                                    //         fontSize: 17,
+                                    //         fontWeight: FontWeight.bold,
+                                    //         fontFamily: 'Poppins-Bold',
+                                    //       )),
+                                    //   subtitle: Text(
+                                    //     "Waiting for response",
+                                    //     style: TextStyle(
+                                    //         fontSize: 13,
+                                    //         color: Color(0xffFFC53E),
+                                    //         fontFamily: "Poppins"),
+                                    //   ),
+                                    //   trailing: Icon(
+                                    //     Icons.more_vert,
+                                    //     size: 30,
+                                    //     color: Color(0xFF442B72),
+                                    //   ),
                                     // ),
-                                    SizedBox(
-                                      height: 40,
-                                    ),
-                                    Container(
-                                      //   decoration: BoxDecoration(
-                                      //     color: Colors.white, // Your desired background color
-                                      //     borderRadius: BorderRadius.circular(5),
-                                      //     boxShadow: [
-                                      //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                      //     ]
-                                      // ),
-                                      child: ListTile(
-                                        leading: Container(
-                                          width: 60,
+                                    // ),
 
-                                          //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: AssetImage(
-                                                    "assets/imgs/school/fruits.jpeg"),
-                                                fit: BoxFit.cover),
-                                            //color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        title: Text('Shady Ayman'.tr,
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Poppins-Bold',
-                                            )),
-                                        trailing: Icon(
-                                          Icons.more_vert,
-                                          size: 30,
-                                          color: Color(0xFF442B72),
-                                        ),
+                                    //data from firestore supervisor
+                                    // SizedBox(
+                                    //   height: 500,
+                                    //   child: ListView.builder(
+                                    //     // shrinkWrap: true,
+                                    //       itemCount: data.length,
+                                    //       itemBuilder: (context, index) {
+                                    //         return
+                                    //           Column(
+                                    //             children: [
+                                    //               Padding(
+                                    //                 padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    //                 child: Row(
+                                    //                   children: [
+                                    //                     Image.asset('assets/imgs/school/Ellipse 1.png'),
+                                    //                     SizedBox(width: 10,),
+                                    //                     Padding(
+                                    //                       padding: const EdgeInsets.symmetric(horizontal: 5),
+                                    //                       child: Text(
+                                    //                         '${data[index]['name'] }',
+                                    //                         style: TextStyle(
+                                    //                           color: Color(0xFF442B72),
+                                    //                           fontSize: 17,
+                                    //                           fontWeight: FontWeight.bold,
+                                    //                           fontFamily: 'Poppins-Bold',
+                                    //                         ),
+                                    //                       ),
+                                    //                     ),
+                                    //                  //   SizedBox(width: 90,),
+                                    //                     // Icon(
+                                    //                     //   Icons.more_vert,
+                                    //                     //   size: 30,
+                                    //                     //   color: Color(0xFF442B72),
+                                    //                     // ),
+                                    //                     Spacer(),
+                                    //                     PopupMenuButton<String>(
+                                    //                       enabled: !isEditingSupervisor,
+                                    //
+                                    //                       shape: RoundedRectangleBorder(
+                                    //
+                                    //                         borderRadius: BorderRadius.all(
+                                    //                           Radius.circular(10.0),
+                                    //                         ),
+                                    //                       ),
+                                    //                       icon: Icon(Icons.more_vert,
+                                    //                           size: 30, color: Color(0xFF442B72)),
+                                    //                       itemBuilder: (BuildContext context) =>
+                                    //                       <PopupMenuEntry<String>>[
+                                    //                         PopupMenuItem<String>(
+                                    //                           value: 'edit',
+                                    //                           child: GestureDetector(
+                                    //                             onTap: () {
+                                    //                               ScaffoldMessenger.of(context)
+                                    //                                   .hideCurrentSnackBar();
+                                    //                               setState(() {
+                                    //                                 isEditingSupervisor = true;
+                                    //                                 _editSupervisorDocument(
+                                    //                                   data[index].id,
+                                    //                                   data[index]['name'],
+                                    //                                   data[index]['phoneNumber'],
+                                    //                                   data[index]['email'],
+                                    //                                 );
+                                    //                               });
+                                    //                               // Navigator.pushReplacement(
+                                    //                               //     context,
+                                    //                               //     MaterialPageRoute(
+                                    //                               //         builder: (context) =>
+                                    //                               //             EditeSupervisor())
+                                    //                               // );
+                                    //                             },
+                                    //                             child: SizedBox(
+                                    //                               height: 20,
+                                    //                               child: Row(
+                                    //                                 children: [
+                                    //                                   Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
+                                    //                                   // Transform(
+                                    //                                   //     alignment: Alignment.center,
+                                    //                                   //     transform:
+                                    //                                   //         Matrix4.rotationY(math.pi),
+                                    //                                   //     child:
+                                    //                                   //     Icon(
+                                    //                                   //       Icons.edit_outlined,
+                                    //                                   //       color: Color(0xFF442B72),
+                                    //                                   //       size: 17,
+                                    //                                   //     )
+                                    //                                   // ),
+                                    //                                   SizedBox(width: 10),
+                                    //                                   Text('Edit',
+                                    //                                       style: TextStyle(
+                                    //                                           color: Color(0xFF442B72),
+                                    //                                           fontSize: 17)),
+                                    //                                 ],
+                                    //                               ),
+                                    //                             ),
+                                    //                           ),
+                                    //                         ),
+                                    //                         PopupMenuItem<String>(
+                                    //                           value: 'delete',
+                                    //                           child: SizedBox(
+                                    //                             height: 20,
+                                    //                             child: Row(
+                                    //                               children: [
+                                    //                                 Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
+                                    //                                 // Icon(
+                                    //                                 //   Icons.delete_outline_outlined,
+                                    //                                 //   color: Color(0xFF442B72),
+                                    //                                 //   size: 17,
+                                    //                                 // ),
+                                    //                                 SizedBox(width: 10),
+                                    //                                 Text(
+                                    //                                   'Delete',
+                                    //                                   style: TextStyle(
+                                    //                                       color: Color(0xFF442B72),
+                                    //                                       fontSize: 17),
+                                    //                                 )
+                                    //                               ],
+                                    //                             ),
+                                    //                           ),
+                                    //                         ),
+                                    //                       ],
+                                    //                       onSelected: (String value) {
+                                    //                         // Handle selection here
+                                    //                         if (value == 'edit') {
+                                    //                           // Handle edit action
+                                    //                           setState(() {
+                                    //                             isEditingSupervisor = true;
+                                    //                             _editSupervisorDocument(
+                                    //                               data[index].id,
+                                    //                               data[index]['name'],
+                                    //                               data[index]['phoneNumber'],
+                                    //                               data[index]['email'],
+                                    //                             );
+                                    //                           });
+                                    //
+                                    //                           // Navigator.pushReplacement(
+                                    //                           //     context,
+                                    //                           //     MaterialPageRoute(
+                                    //                           //         builder: (context) =>
+                                    //                           //             EditeSupervisor()));
+                                    //                         } else if (value == 'delete') {
+                                    //                           _deleteSupervisorDocument(data[index].id);
+                                    //                           // setState(() {
+                                    //                           //
+                                    //                           //   //showSnackBarFun(context);
+                                    //                           // });
+                                    //                         }
+                                    //                       },
+                                    //                     ),
+                                    //                   ],
+                                    //                 ),
+                                    //               ),
+                                    //               SizedBox(
+                                    //                 height: 20,
+                                    //               ),
+                                    //
+                                    //
+                                    //             ],
+                                    //           );
+                                    //
+                                    //       }),
+                                    // ),
+                                    //new code
+                                    SizedBox(
+                                      height: 500,
+                                      child: ListView.builder(
+                                        itemCount: data.length,
+                                        itemBuilder: (context, index) {
+
+                                          int state = data[index]['state']; // Assuming 'state' is the field from Firestore
+
+                                          Color statusColor;
+                                          String statusText;
+
+                                          // Determine status color and text based on state
+                                          switch (state) {
+                                            case 0:
+                                              statusColor = Colors.red; // Rejected (State = 0)
+                                              statusText = 'Rejected';
+                                              break;
+                                            case 1:
+                                              statusColor = Colors.yellow; // Waiting (State = 1)
+                                              statusText = 'Waiting';
+                                              break;
+                                            case 2:
+                                              statusColor = Colors.green; // Accepted (State = 2)
+                                              statusText = 'Accepted';
+                                              break;
+                                            default:
+                                              statusColor = Colors.grey; // Default color if state is unknown
+                                              statusText = 'Unknown';
+                                              break;
+                                          }
+
+                                          return ListTile(
+                                             leading:
+                                            // data[index]['busphoto'] != null ? Image.network(data[index]['busphoto']as String, width: 61, height: 61,
+                                            //   errorBuilder: (context, error, stackTrace) {
+                                            //     return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                            //   },
+                                            // ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                            Image.asset('assets/imgs/school/Ellipse 1.png'), // Icon or image
+
+                                            title: Text(
+                                              '${data[index]['name']}',
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Poppins-Bold',
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              statusText,
+                                              style: TextStyle(
+                                                color: statusColor,
+                                                fontSize: 13,
+                                                fontFamily: 'Poppins',
+                                              ),
+                                            ),
+                                            trailing:
+                                            PopupMenuButton<String>(
+                                              enabled: !isEditingSupervisor,
+
+                                              shape: RoundedRectangleBorder(
+
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10.0),
+                                                ),
+                                              ),
+                                              icon: Icon(Icons.more_vert,
+                                                  size: 30, color: Color(0xFF442B72)),
+                                              itemBuilder: (BuildContext context) =>
+                                              <PopupMenuEntry<String>>[
+                                                PopupMenuItem<String>(
+                                                  value: 'edit',
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      ScaffoldMessenger.of(context)
+                                                          .hideCurrentSnackBar();
+                                                      setState(() {
+                                                        isEditingSupervisor = true;
+                                                        _editSupervisorDocument(
+                                                          data[index].id,
+                                                          data[index]['name'],
+                                                          data[index]['phoneNumber'],
+                                                          data[index]['email'],
+                                                        );
+                                                      });
+                                                      // Navigator.pushReplacement(
+                                                      //     context,
+                                                      //     MaterialPageRoute(
+                                                      //         builder: (context) =>
+                                                      //             EditeSupervisor())
+                                                      // );
+                                                    },
+                                                    child: SizedBox(
+                                                      height: 20,
+                                                      child: Row(
+                                                        children: [
+                                                          Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
+                                                          // Transform(
+                                                          //     alignment: Alignment.center,
+                                                          //     transform:
+                                                          //         Matrix4.rotationY(math.pi),
+                                                          //     child:
+                                                          //     Icon(
+                                                          //       Icons.edit_outlined,
+                                                          //       color: Color(0xFF442B72),
+                                                          //       size: 17,
+                                                          //     )
+                                                          // ),
+                                                          SizedBox(width: 10),
+                                                          Text('Edit',
+                                                              style: TextStyle(
+                                                                  color: Color(0xFF442B72),
+                                                                  fontSize: 17)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: SizedBox(
+                                                    height: 20,
+                                                    child: Row(
+                                                      children: [
+                                                        Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
+                                                        // Icon(
+                                                        //   Icons.delete_outline_outlined,
+                                                        //   color: Color(0xFF442B72),
+                                                        //   size: 17,
+                                                        // ),
+                                                        SizedBox(width: 10),
+                                                        Text(
+                                                          'Delete',
+                                                          style: TextStyle(
+                                                              color: Color(0xFF442B72),
+                                                              fontSize: 17),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              onSelected: (String value) {
+                                                // Handle selection here
+                                                if (value == 'edit') {
+                                                  // Handle edit action
+                                                  setState(() {
+                                                    isEditingSupervisor = true;
+                                                    _editSupervisorDocument(
+                                                      data[index].id,
+                                                      data[index]['name'],
+                                                      data[index]['phoneNumber'],
+                                                      data[index]['email'],
+                                                    );
+                                                  });
+
+                                                  // Navigator.pushReplacement(
+                                                  //     context,
+                                                  //     MaterialPageRoute(
+                                                  //         builder: (context) =>
+                                                  //             EditeSupervisor()));
+                                                } else if (value == 'delete') {
+                                                  _deleteSupervisorDocument(data[index].id);
+                                                  // setState(() {
+                                                  //
+                                                  //   //showSnackBarFun(context);
+                                                  // });
+                                                }
+                                              },
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            tileColor: Colors.white,
+                                            onTap: () {
+                                              showModalBottomSheet(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.vertical(
+                                                      top: Radius.circular(30.0)),
+                                                ),
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Container(
+                                                    padding: EdgeInsets.all(20),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(
+                                                            40), // Rounded top left corner
+                                                        topRight: Radius.circular(
+                                                            40), // Rounded top right corner
+                                                      ),
+                                                    ),
+                                                    constraints: BoxConstraints(
+                                                        maxHeight: MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                            0.4), // Decreased height
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.symmetric(horizontal:15.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Text('Supervisor',
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                      Color(0xff442B72),
+                                                                      fontSize: 20,
+                                                                      fontWeight:
+                                                                      FontWeight.bold)),
+                                                              Expanded(
+                                                                child: Align(
+                                                                  alignment:
+                                                                  Alignment.centerRight,
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                      shape: BoxShape.circle,
+                                                                      color: Colors.white,
+                                                                      border: Border.all(
+                                                                        color:
+                                                                        Color(0xFF442B72),
+                                                                        width: 1,
+                                                                      ),
+                                                                    ),
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      },
+                                                                      child: Padding(
+                                                                        padding:
+                                                                        const EdgeInsets
+                                                                            .all(4.0),
+                                                                        child: FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .times,
+                                                                          color: Color(
+                                                                              0xFF442B72),
+                                                                          size: 18,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 20,
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Align(
+                                                                alignment:
+                                                                Alignment.centerLeft,
+                                                                child: CircleAvatar(
+                                                                  radius: 35,
+                                                                  backgroundImage: AssetImage(
+                                                                      'assets/imgs/school/Ellipse 1.png'),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Column(
+                                                                children: [
+                                                                  Text('${data[index]['name']}',
+                                                                      style: TextStyle(
+                                                                          color: Color(
+                                                                              0xff442B72),
+                                                                          fontSize: 15)),
+                                                                  SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Text('${data[index]['phoneNumber']}',
+                                                                      style: TextStyle(
+                                                                          color: Color(
+                                                                              0xff442B72),
+                                                                          fontSize: 15)),
+                                                                ],
+                                                              ),
+                                                              //SizedBox(width: 110,),
+                                                              Padding(
+                                                                padding:
+                                                                const EdgeInsets.only(
+                                                                    left: 55),
+                                                                child: Transform(
+                                                                  alignment:
+                                                                  Alignment.centerRight,
+                                                                  transform:
+                                                                  Matrix4.rotationY(
+                                                                      math.pi),
+                                                                  child: Material(
+                                                                    elevation: 3,
+                                                                    shape: CircleBorder(),
+                                                                    child: Align(
+                                                                      alignment: Alignment
+                                                                          .centerRight,
+                                                                      child: CircleAvatar(
+                                                                        backgroundColor:
+                                                                        Colors.white,
+                                                                        child: FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .phone,
+                                                                          color: Color(
+                                                                              0xFF442B72),
+                                                                          size: 26,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(height: 20),
+                                                          Text('Buses',
+                                                              style: TextStyle(
+                                                                  color: Color(0xff442B72),
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                  FontWeight.bold)),
+                                                          SizedBox(height: 10),
+                                                          Row(
+                                                            children: [
+                                                              Container(
+                                                                width: 10,
+                                                                height: 10,
+                                                                decoration: BoxDecoration(
+                                                                  shape: BoxShape.circle,
+                                                                  color: Color(0xFF442B72),
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: 10),
+                                                              Text(
+                                                                'Bus: 1234  ى ر س',
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Color(0xFF442B72),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
                                       ),
-                                    )
+                                    ),
+
                                   ],
                                 ),
                               )
