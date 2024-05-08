@@ -44,7 +44,7 @@ class _AddBusState extends State<AddBus> {
   final _supervisorFocus = FocusNode();
 // add to firestore
   final _firestore = FirebaseFirestore.instance;
-  File ? _selectedImage;
+  File ? _selectedImagedriver;
   File ? _selectedImagebus;
   String? imageUrl;
   String? busimage;
@@ -56,14 +56,14 @@ class _AddBusState extends State<AddBus> {
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
     if(returnedImage ==null) return;
     setState(() {
-      _selectedImage=File(returnedImage.path);
+      _selectedImagedriver=File(returnedImage.path);
     });
 
     //Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('photo');
     // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
-    Reference referenceImageToUpload =referenceDirImages.child('name');
+    Reference referenceImageToUpload =referenceDirImages.child('driver');
     // Reference referenceDirImages =
     // referenceRoot.child('images');
     //
@@ -118,10 +118,10 @@ class _AddBusState extends State<AddBus> {
     }
   }
   void _addDataToFirestore() async {
-    if (_driverName.text.isEmpty || _driverNumber.text.isEmpty || _busNumber.text.isEmpty || _selectedImage == null || _selectedImagebus == null) {
-      // Show an error message or do something else if any of the required fields are empty or null
-      return;
-    }
+    // if (_driverName.text.isEmpty || _driverNumber.text.isEmpty || _busNumber.text.isEmpty || _selectedImage == null || _selectedImagebus == null) {
+    //   // Show an error message or do something else if any of the required fields are empty or null
+    //   return;
+    // }
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
     Map<String, dynamic> data = {
@@ -144,10 +144,10 @@ class _AddBusState extends State<AddBus> {
     _driverNumber.clear();
     _busNumber.clear();
     _supervisor.clear();
-    setState(() {
-      _selectedImage = null;
-      _selectedImagebus = null;
-    });
+    // setState(() {
+    //   _selectedImage = null;
+    //   _selectedImagebus = null;
+    // });
   }
 // to lock in landscape view
   @override
@@ -298,9 +298,9 @@ class _AddBusState extends State<AddBus> {
                                       GestureDetector(
                                         onTap:()async {
                   await _pickImageFromGallery();}  , // Call function when tapped
-                    child: _selectedImage != null
+                    child: _selectedImagedriver != null
                         ? Image.file(
-                      _selectedImage!,  // Display the uploaded image
+                      _selectedImagedriver!,  // Display the uploaded image
                       width: 83,  // Set width as per your preference
                       height: 78.5,  // Set height as per your preference
                       fit: BoxFit.cover,  // Adjusts how the image fits in the container
@@ -903,8 +903,8 @@ class _AddBusState extends State<AddBus> {
                                         _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
                                         _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
                                       });
-                                      if (_driverNumber.text.length ==11 && _driverName.text.isEmpty &&
-                                          _driverNumber.text.isEmpty && _busNumber.text.isEmpty
+                                      if (_driverNumber.text.length ==11 && !_driverName.text.isEmpty &&
+                                         ! _driverNumber.text.isEmpty && !_busNumber.text.isEmpty
                                           //_selectedImage != null && _selectedImagebus != null
                                           ){
 
@@ -912,7 +912,7 @@ class _AddBusState extends State<AddBus> {
                                         Navigator.push(
                                             context ,
                                             MaterialPageRoute(
-                                                builder: (context) =>  HomeScreen(),
+                                                builder: (context) =>  BusScreen(),
                                                 maintainState: false));
                                       }else{
                                         SnackBar(content: Text('Please,enter valid number'));

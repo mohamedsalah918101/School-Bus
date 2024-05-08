@@ -1,202 +1,224 @@
+///
+/// AVANCED EXAMPLE:
+/// Screen with map and search box on top. When the user selects a place through autocompletion,
+/// the screen is moved to the selected location, a path that demonstrates the route is created, and a "start route"
+/// box slides in to the screen.
+///
+
 import 'dart:async';
-import 'dart:developer';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-import 'dart:ui';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
-import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
-import 'package:school_account/supervisor_parent/screens/map_parent_second.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
-import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
-import 'package:dotted_line/dotted_line.dart';
-import 'package:label_marker/label_marker.dart';
-import '../components/custom_app_bar.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+
+
+import 'package:permission_handler/permission_handler.dart';
 
 class MapParentScreen extends StatefulWidget {
+  MapParentScreen({Key? key, this.address}) : super(key: key);
+  var address;
+
   @override
-  _MapParentScreenState createState() => _MapParentScreenState();
+  State<MapParentScreen> createState() => MapParentScreenState();
 }
 
-class _MapParentScreenState extends State<MapParentScreen> {
-  late final String title;
-  // List<ChildDataItem> children = [];
-  bool tracking = true;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class MapParentScreenState extends State<MapParentScreen>
+    with SingleTickerProviderStateMixin {
+  late PickResult selectedPlace;
+  static LatLng kInitialPosition = LatLng(
+      25.9411945,50.9172208); // London , arbitary value
 
-  Set<Marker> markers = {};
-  GoogleMapController? controller;
-  LatLng startLocation = const LatLng(27.1778429, 31.1859626);
-  BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
+  late GoogleMapController _controller;
 
-  @override
-  void initState() {
-    super.initState();
-    loadCustomIcon();
-  }
-  //
-  BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
-  BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
-
-  Future<void> loadCustomIcon() async {
-    final Uint8List imageData =
-    await getBytesFromAsset("assets/images/bus 1.png", 90);
-    customIcon = BitmapDescriptor.fromBytes(imageData);
-
-    final Uint8List imageData2 = await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
-    anotherCustomIcon = BitmapDescriptor.fromBytes(imageData2);
-
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    _controller = controller;
+    String value = await DefaultAssetBundle.of(context)
+        .loadString('assets/map_style.json');
+    _controller.setMapStyle(value);
     setState(() {});
   }
 
-  Future<Uint8List> getBytesFromAsset(String path, int width) async {
-    final ByteData data = await rootBundle.load(path);
-    final Codec codec = await instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width);
-    final FrameInfo frameInfo = await codec.getNextFrame();
-    final Uint8List resizedImage =
-    (await frameInfo.image.toByteData(format: ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-    return resizedImage;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    setDummyInitialLocation();
+
   }
 
+  setInitialLocation() {
+    //   kInitialPosition = LatLng(widget.address.lat, widget.address.lang);
+    setState(() {});
+  }
+
+  setDummyInitialLocation() {
+    kInitialPosition = LatLng(
+        26.201000,50.606998); // London , arbitary value
+    setState(() {});
+  }
+
+  onTapPickHere(selectedPlace) async {
+    Navigator.pop(context, selectedPlace!.formattedAddress!+"/"+selectedPlace!.geometry.location.lat.toString()+","+selectedPlace!.geometry.location.lng.toString());
+    // print(selectedPlace!.geometry.location.lat.toString()+"--"+selectedPlace!.geometry.location.lng.toString());
+    //
+    // print(selectedPlace!.url!);
+
+
+    // var addressUpdateLocationResponse = await AddressRepository().getAddressUpdateLocationResponse(
+    //     widget.address.id,
+    //     selectedPlace.geometry.location.lat,
+    //     selectedPlace.geometry.location.lng
+    // );
+    //
+    // if (addressUpdateLocationResponse.result == false) {
+    //   ToastComponent.showDialog(addressUpdateLocationResponse.message, context,
+    //       gravity: Toast.center, duration: Toast.lengthLong);
+    //   return;
+    // }
+    //
+    // ToastComponent.showDialog(addressUpdateLocationResponse.message, context,
+    //     gravity: Toast.center, duration: Toast.lengthLong);
+
+  }
+  // void setPermissions() async{
+  //   Map<PermissionGroup, PermissionStatus> permissions =
+  //   await PermissionHandler().requestPermissions([PermissionGroup.location]);
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        SystemNavigator.pop();
-        return false;
+
+    return PlacePicker(
+      hintText: 'Home location',
+      apiKey: OtherConfig.GOOGLE_MAP_API_KEY,
+      initialPosition: kInitialPosition,
+      useCurrentLocation: false,
+      //selectInitialPosition: true,
+      onMapCreated: _onMapCreated,
+      //initialMapType: MapType.terrain,
+
+      //usePlaceDetailSearch: true,
+      onPlacePicked: (result) {
+        selectedPlace = result;
+        Navigator.of(context).pop();
+        setState(() {});
       },
-      child: Scaffold(
-          key: _scaffoldKey,
-          body: SingleChildScrollView(
-            child: Stack(
+      //forceSearchOnZoomChanged: true,
+      //automaticallyImplyAppBarLeading: false,
+      //autocompleteLanguage: "ko",
+      //region: 'au',
+      //selectInitialPosition: true,
+      selectedPlaceWidgetBuilder:
+          (_, selectedPlace, state, isSearchBarFocused) {
+        print("state: $state, isSearchBarFocused: $isSearchBarFocused");
+        print(selectedPlace.toString());
+        print("-------------");
+        /*
+        if(!isSearchBarFocused && state != SearchingState.Searching){
+          ToastComponent.showDialog("Hello", context,
+              gravity: Toast.center, duration: Toast.lengthLong);
+        }*/
+        return isSearchBarFocused
+            ? Container()
+            : FloatingCard(
+          height: 50,
+          bottomPosition: 120.0,
+          // MediaQuery.of(context) will cause rebuild. See MediaQuery document for the information.
+          leftPosition: 0.0,
+          rightPosition: 0.0,
+          width: 500,
+          borderRadius: const BorderRadius.only(
+            topLeft: const Radius.circular(8.0),
+            bottomLeft: const Radius.circular(8.0),
+            topRight: const Radius.circular(8.0),
+            bottomRight: const Radius.circular(8.0),
+          ),
+          child: state == SearchingState.Searching
+              ? Center(
+              child: Text(
+                'map location calculating',
+                style: TextStyle(color:Colors.grey),
+              ))
+              : Padding(
+            padding: const EdgeInsets.only(left: 3,right: 3),
+            child: Row(
               children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: GoogleMap(
-                    scrollGesturesEnabled: true,
-                    gestureRecognizers: Set()
-                      ..add(Factory<EagerGestureRecognizer>(() =>
-                          EagerGestureRecognizer())),
-                    initialCameraPosition: const CameraPosition(
-                      target: LatLng(27.180134, 31.189283),
-                      zoom: 12,
-                    ),
-                    markers: markers,
-                    onMapCreated: ((mapController) {
-                      setState(() {
-                        controller = mapController;
-                      });
-                      setState(() {});
+                Expanded(
+                  flex: 2,
+                  child: Container(
 
-                    }),
-                  )
-
-                ),
-                 Positioned(
-                   bottom: 70,
-                    right: 40,
-                    child:  ElevatedSimpleButton(
-                      txt: 'Set home location'.tr,
-                      width: 278,
-                      hight: 48,
-                      onPress: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>
-                              MapParentToHomeScreen()),);
-                      },
-                      color: const Color(0xFF442B72),
-                      fontSize: 16,
-                      fontFamily: 'Poppins-Light',
-
-                    ),),
-                (sharedpref?.getString('lang') == 'ar')?
-                Positioned(
-                  top: 20,
-                  right: 15,
-                  child:   GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).pop();
-                    },
-                    child:  Image.asset(
-                      'assets/images/Layer 1.png',
-                    width: 22,
-                    height: 22,),
-                  ),):
-                Positioned(
-                  top: 20,
-                  left: 15,
-                  child:   GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).pop();
-                    },
-                    child:  Image.asset(
-                      'assets/images/fi-rr-angle-left.png',
-                      width: 22,
-                      height: 22,),
-                  ),),
-                Positioned(
-                  top: 65,
-                  right: 25,
-                  child:  SizedBox(
-                    width: 312,
-                    height: 42,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(21),
-                          borderSide: BorderSide.none,
-                        ),
-                        hintText: "Search Name".tr,
-                        hintStyle: TextStyle(
-                            color: const Color(0xffC2C2C2),
-                            fontSize: 12,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            ),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left:5 ,top: 12.0, bottom: 10),
-                          child: Image.asset('assets/images/Vector (12)search.png',
-                           ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 2.0, right: 2.0),
+                        child: Text(
+                          selectedPlace!.formattedAddress!,
+                          maxLines: 4,
+                          style:
+                          TextStyle(color:Colors.grey),
                         ),
                       ),
                     ),
-                  ),),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: const Radius.circular(4.0),
+                            bottomLeft: const Radius.circular(4.0),
+                            topRight: const Radius.circular(4.0),
+                            bottomRight: const Radius.circular(4.0),
+                          )),
+                    ),
+
+                    child: Text(
+
+                      'pick here',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      // IMPORTANT: You MUST manage selectedPlace data yourself as using this build will not invoke onPlacePicker as
+                      //            this will override default 'Select here' Button.
+                      /*print("do something with [selectedPlace] data");
+                                  print(selectedPlace.formattedAddress);
+                                  print(selectedPlace.geometry.location.lat);
+                                  print(selectedPlace.geometry.location.lng);*/
+
+                      onTapPickHere(selectedPlace);
+                    },
+                  ),
+                ),
               ],
             ),
           ),
-      ),
+        );
+      },
+      pinBuilder: (context, state) {
+        if (state == PinState.Idle) {
+          return Image.asset(
+            'assets/images/delivery_map_icon.png',
+            height: 60,
+          );
+        } else {
+          return Image.asset(
+            'assets/images/delivery_map_icon.png',
+            height: 80,
+          );
+        }
+      },
     );
   }
-  TextDirection _getTextDirection(String text) {
-    // Determine the text direction based on text content
-    if (text.contains(RegExp(
-        r'[\u0600-\u06FF\u0750-\u077F\u0590-\u05FF\uFE70-\uFEFF\uFB50-\uFDFF\u2000-\u206F\u202A-\u202E\u2070-\u209F\u20A0-\u20CF\u2100-\u214F\u2150-\u218F]'))) {
-      // RTL language detected
-      return TextDirection.rtl;
-    } else {
-      // LTR language detected
-      return TextDirection.ltr;
-    }
-  }
 
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
-  }
+}
+class OtherConfig {
+  static const bool USE_PUSH_NOTIFICATION = true;
+  static const bool USE_GOOGLE_MAP = true;
+  static const String GOOGLE_MAP_API_KEY =
+      "AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA";
 }

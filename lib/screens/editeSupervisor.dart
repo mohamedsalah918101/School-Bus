@@ -63,7 +63,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
   //edite function
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
-  editAddParent() async {
+  editAddSupervisor() async {
     print('editAddParent called');
 
     if (formState.currentState != null) {
@@ -484,7 +484,8 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                   child: ElevatedSimpleButton(
                                     txt: "Save".tr,
                                     onPress: (){
-                                      editAddParent();
+                                      editAddSupervisor();
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
                                       // Navigator.push(
                                       //     context ,
                                       //     MaterialPageRoute(

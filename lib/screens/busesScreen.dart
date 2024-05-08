@@ -44,7 +44,10 @@ import 'dart:math' as math;
 
 
 class BusScreen extends StatefulWidget{
-  const BusScreen({super.key});
+
+  // const EditeSupervisor({super.key});
+
+  //const BusScreen({super.key});
   @override
   State<BusScreen> createState() => BusScreenSate();
 }
@@ -59,6 +62,96 @@ getData()async{
 
   });
 }
+void _editBusDocument(String documentId, String photodriver, String drivername, String driverphone,String photobus,String numberbus ) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditeBus(
+        docid: documentId,
+        oldphotodriver: photodriver,
+          olddrivername:drivername,
+          olddriverphone:driverphone,
+         oldphotobus:photobus,
+          olddnumberbus:numberbus
+      ),
+    ),
+  );
+}
+//fun delete bus
+  void _deletebusDocument(String documentId) {
+    FirebaseFirestore.instance
+        .collection('busdata')
+        .doc(documentId)
+        .delete()
+        .then((_) {
+      setState(() {
+        // Update UI by removing the deleted document from the data list
+        data.removeWhere((document) => document.id == documentId);
+      });
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   showSnackBarFun(context),
+      //   // SnackBar(content: Text('Document deleted successfully')),
+      // );
+    });
+    //     .catchError((error) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text('Failed to delete document: $error')),
+    //   );
+    // }
+    // );
+  }
+  //fun filter
+  String selectedFilter = '';
+  bool isAcceptFiltered = false;
+  bool isDeclineFiltered = false;
+  bool isWaitingFiltered = false;
+  bool isFiltered  = false;
+  String? currentFilter;
+  bool Accepted = false;
+  bool Declined = false;
+  bool Waiting = false;
+  String? selectedValueAccept;
+  String? selectedValueDecline;
+  String? selectedValueWaiting;
+  getDataForBusNumberFilter()async{
+    CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+    QuerySnapshot BusData = await Bus.where('busnumber').get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = BusData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForDriverNameFilter()async{
+    CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+    QuerySnapshot BusData = await Bus.where('namedriver' ).get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = BusData.docs;
+      isFiltered = true;
+    });
+  }
+
+  getDataForSupervisorFilter()async{
+    CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+    QuerySnapshot BusData = await Bus.where('supervisorname').get();
+    // parentData.docs.forEach((element) {
+    //   data.add(element);
+    // }
+    // );
+    setState(() {
+      data = BusData.docs;
+      isFiltered = true;
+    });
+  }
+
 
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController=TextEditingController();
@@ -277,6 +370,20 @@ final _firestore = FirebaseFirestore.instance;
                                                             onSelectionChanged: (items) {
                                                               setState(() {
                                                                 selectedItems = items;
+                                                                selectedItems = items;
+                                                                if (items.first.label == 'Bus Number') {
+                                                                  selectedValueAccept = 'Bus Number';
+                                                                  selectedValueDecline = null;
+                                                                  selectedValueWaiting = null;
+                                                                } else if (items.first.label == 'Driver Name') {
+                                                                  selectedValueAccept = null;
+                                                                  selectedValueDecline = 'Driver Name';
+                                                                  selectedValueWaiting = null;
+                                                                } else if (items.first.label == 'Supervisor') {
+                                                                  selectedValueAccept = null;
+                                                                  selectedValueDecline = null;
+                                                                  selectedValueWaiting = 'Supervisor';
+                                                                }
                                                               });
                                                             },
                                                           ),
@@ -300,13 +407,39 @@ final _firestore = FirebaseFirestore.instance;
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                child: Text('Apply',style: TextStyle(fontSize:18),),
+                                                                child: GestureDetector(
+                                                                  onTap:(){
+                                                                    if (selectedValueAccept != null) {
+                                                                      currentFilter = 'Bus Number';
+                                                                      selectedFilter = 'Bus Number';
+                                                                      getDataForBusNumberFilter();
+                                                                      Navigator.pop(context);
+                                                                      print('2');
+                                                                    }else  if (selectedValueDecline != null) {
+                                                                      currentFilter = 'Driver Name';
+                                                                      selectedFilter = 'Driver Name';
+                                                                      getDataForDriverNameFilter();
+                                                                      Navigator.pop(context);
+                                                                      print('0');
+                                                                    }else  if (selectedValueWaiting != null) {
+                                                                      currentFilter = 'Supervisor';
+                                                                      getDataForSupervisorFilter();
+                                                                      Navigator.pop(context);
+                                                                      print('1');
+                                                                    }
+                                                },
+                                                                    child: Text('Apply',style: TextStyle(fontSize:18),)
+
+                                                                ),
                                                               ),
                                                             ),
                                                             SizedBox(width: 3,),
                                                             Padding(
                                                               padding: const EdgeInsets.all(5.0),
-                                                              child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),),
+                                                              child: GestureDetector(
+                                                                  onTap: (){
+                                                                    Navigator.pop(context);
+                                                                  },child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),)),
                                                             )
                                                           ],
                                                         ),
@@ -434,11 +567,11 @@ final _firestore = FirebaseFirestore.instance;
                                                 onTap: () {
                                                   ScaffoldMessenger.of(context)
                                                       .hideCurrentSnackBar();
-                                                  Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EditeBus()));
+                                                  // Navigator.pushReplacement(
+                                                  //     context,
+                                                  //     MaterialPageRoute(
+                                                  //         builder: (context) =>
+                                                  //             EditeBus()));
                                                 },
                                                 child: SizedBox(
                                                   height: 20,
@@ -498,11 +631,12 @@ final _firestore = FirebaseFirestore.instance;
                                                 isEditingSupervisor = true;
                                               });
 
-                                              Navigator.pushReplacement(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          EditeBus()));
+                                              // Navigator.pushReplacement(
+                                              //     context,
+                                              //     // MaterialPageRoute(
+                                              //     //     builder: (context) =>
+                                              //     //         EditeBus())
+                                              // );
                                             } else if (value == 'delete') {
                                               setState(() {
 
@@ -779,58 +913,182 @@ final _firestore = FirebaseFirestore.instance;
                                       //   },
                                       // ),
                                       // show data from firestore بس مش كامله
-                                      // SizedBox(
-                                      //   height: 500,
-                                      //   child: ListView.builder(
-                                      //     // shrinkWrap: true,
-                                      //       itemCount: data.length,
-                                      //       itemBuilder: (context, index) {
-                                      //         return
-                                      //           Column(
-                                      //             children: [
-                                      //               Padding(
-                                      //                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                                      //                 child: Row(
-                                      //                   children: [
-                                      //                     Image.asset('assets/imgs/school/Ellipse 1.png'),
-                                      //                     SizedBox(width: 10,),
-                                      //                     Padding(
-                                      //                       padding: const EdgeInsets.symmetric(horizontal: 5),
-                                      //                       child: Text(
-                                      //                         '${data[index]['busnumber'] }',
-                                      //                         style: TextStyle(
-                                      //                           color: Color(0xFF442B72),
-                                      //                           fontSize: 17,
-                                      //                           fontWeight: FontWeight.bold,
-                                      //                           fontFamily: 'Poppins-Bold',
-                                      //                         ),
-                                      //                       ),
-                                      //                     ),
-                                      //
-                                      //
-                                      //                   ],
-                                      //                 ),
-                                      //               ),
-                                      //               SizedBox(
-                                      //                 height: 20,
-                                      //               )
-                                      //
-                                      //             ],
-                                      //           );
-                                      //
-                                      //       }),
-                                      //   // child: Column(
-                                      //   //   children: [
-                                      //   //     ListTile(
-                                      //   //       leading: Image.asset('assets/imgs/school/buses.png'),
-                                      //   //       title: Text('${data[index]['busnumber'] }',style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                      //   //       subtitle: Text("Driver name : Ahmed Atef",style:
-                                      //   //       TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                      //   //       trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-                                      //   //     ),
-                                      //   //   ],
-                                      //   // ),
-                                      // ),
+                                      SizedBox(
+                                        height: 500,
+                                        child: ListView.builder(
+                                          // shrinkWrap: true,
+                                            itemCount: data.length,
+                                            itemBuilder: (context, index) {
+                                              return
+                                                Column(
+                                                  children: [
+                                                    ListTile(
+                                                      leading: Image.network(data[index]['imagedriver'], width: 61, height: 61,
+                                                                    errorBuilder: (context, error, stackTrace) {
+                                                                      return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                                                    },),
+                                                      title: Text(
+                                                        selectedFilter == 'Bus Number' ? '${data[index]['busnumber']}' : '${data[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
+
+                                                        //'${data[index]['busnumber'] }',
+                                                        style: TextStyle(
+                                                          color: Color(0xFF442B72),
+                                                          fontSize: 17,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: 'Poppins-Bold',
+                                                        ),
+                                                        ),
+                                                      subtitle: Text(
+                                                        selectedFilter == 'Bus Number' ?'Driver Name : ${data[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
+                                                        //"Driver Name : "+data[index]['namedriver'],
+                                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                                      ),
+                                                        trailing:
+                                                      PopupMenuButton<String>(
+                                                        enabled: !isEditingSupervisor,
+
+                                                        shape: RoundedRectangleBorder(
+
+                                                          borderRadius: BorderRadius.all(
+                                                            Radius.circular(10.0),
+                                                          ),
+                                                        ),
+                                                        icon: Icon(Icons.more_vert,
+                                                            size: 30, color: Color(0xFF442B72)),
+                                                        itemBuilder: (BuildContext context) =>
+                                                        <PopupMenuEntry<String>>[
+                                                          PopupMenuItem<String>(
+                                                            value: 'edit',
+                                                            child: GestureDetector(
+                                                              onTap: () {
+                                                                ScaffoldMessenger.of(context)
+                                                                    .hideCurrentSnackBar();
+                                                                setState(() {
+                                                                  isEditingSupervisor = true;
+                                                                  // _editSupervisorDocument(
+                                                                  //   data[index].id,
+                                                                  //   data[index]['name'],
+                                                                  //   data[index]['phoneNumber'],
+                                                                  //   data[index]['email'],
+                                                                  // );
+                                                                });
+                                                                // Navigator.pushReplacement(
+                                                                //     context,
+                                                                //     MaterialPageRoute(
+                                                                //         builder: (context) =>
+                                                                //             EditeSupervisor())
+                                                                // );
+                                                              },
+                                                              child: SizedBox(
+                                                                height: 20,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
+                                                                    // Transform(
+                                                                    //     alignment: Alignment.center,
+                                                                    //     transform:
+                                                                    //         Matrix4.rotationY(math.pi),
+                                                                    //     child:
+                                                                    //     Icon(
+                                                                    //       Icons.edit_outlined,
+                                                                    //       color: Color(0xFF442B72),
+                                                                    //       size: 17,
+                                                                    //     )
+                                                                    // ),
+                                                                    SizedBox(width: 10),
+                                                                    Text('Edit',
+                                                                        style: TextStyle(
+                                                                            color: Color(0xFF442B72),
+                                                                            fontSize: 17)),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            value: 'delete',
+                                                            child: SizedBox(
+                                                              height: 20,
+                                                              child: Row(
+                                                                children: [
+                                                                  Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
+                                                                  // Icon(
+                                                                  //   Icons.delete_outline_outlined,
+                                                                  //   color: Color(0xFF442B72),
+                                                                  //   size: 17,
+                                                                  // ),
+                                                                  SizedBox(width: 10),
+                                                                  Text(
+                                                                    'Delete',
+                                                                    style: TextStyle(
+                                                                        color: Color(0xFF442B72),
+                                                                        fontSize: 17),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                        onSelected: (String value) {
+                                                          // Handle selection here
+                                                          if (value == 'edit') {
+                                                            // Handle edit action
+                                                            setState(() {
+                                                              isEditingSupervisor = true;
+                                                              _editBusDocument(
+                                                                data[index].id,
+                                                                data[index]['busnumber'],
+                                                                data[index]['busphoto'],
+                                                                data[index]['imagedriver'],
+                                                                data[index]['namedriver'],
+                                                                data[index]['phonedriver'],
+                                                              );
+                                                            });
+
+                                                            // Navigator.pushReplacement(
+                                                            //     context,
+                                                            //     MaterialPageRoute(
+                                                            //         builder: (context) =>
+                                                            //             EditeSupervisor()));
+                                                          } else if (value == 'delete') {
+                                                            _deletebusDocument(data[index].id);
+                                                          //  _deleteSupervisorDocument(data[index].id);
+                                                            // setState(() {
+                                                            //
+                                                            //   //showSnackBarFun(context);
+                                                            // });
+                                                          }
+                                                        },
+                                                      ),
+
+                                                    ),
+
+                                                        // SizedBox(width: 10,),
+                                                        // Padding(
+                                                        //   padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                        //   child:
+                                                        // ),
+
+                                                    SizedBox(
+                                                      height: 20,
+                                                    )
+
+                                                  ],
+                                                );
+
+                                            }),
+                                        // child: Column(
+                                        //   children: [
+                                        //     ListTile(
+                                        //       leading: Image.asset('assets/imgs/school/buses.png'),
+                                        //       title: Text('${data[index]['busnumber'] }',style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                        //       subtitle: Text("Driver name : Ahmed Atef",style:
+                                        //       TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
+                                        //       trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                        //     ),
+                                        //   ],
+                                        // ),
+                                      ),
 
                                       SizedBox(height: 40,),
 

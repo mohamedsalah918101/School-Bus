@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -22,23 +25,121 @@ import 'homeScreen.dart';
 
 
 class EditeBus extends StatefulWidget{
-  const EditeBus({super.key});
+  final String docid;
+  final String oldphotodriver;
+  final String? olddrivername;
+  final String olddriverphone;
+  final String oldphotobus;
+  final String olddnumberbus;
+  const EditeBus({super.key,
+  required this.docid,
+  required this.oldphotodriver,
+  required this.olddrivername,
+  required this.olddriverphone,
+    required this.oldphotobus,
+    required this.olddnumberbus
+  });
+  //const EditeBus({super.key});
   @override
   State<EditeBus> createState() => _EditeBusState();
 }
 
 
 class _EditeBusState extends State<EditeBus> {
+  final TransformationController _imagedrivercontroller = TransformationController();
+  final TransformationController _imagebuscontroller = TransformationController();
+  TextEditingController _namedrivercontroller = TextEditingController();
+  TextEditingController _phonedrivercontroller = TextEditingController();
+  TextEditingController _busnumbercontroller = TextEditingController();
+
+
+
 
   MyLocalController ControllerLang = Get.find();
   String? _selectedSupervisor;
   List<String> _supervisors = ['Supervisor 1', 'Supervisor 2', 'Supervisor 3'];
+  GlobalKey<FormState> formState = GlobalKey<FormState>();
+  CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+  editAddBus() async {
+    print('editAddParent called');
+
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+
+        try {
+          print('updating document...');
+
+          await Bus.doc(widget.docid).update({
+             'busnumber': _busnumbercontroller.text,
+             'busphoto': _imagebuscontroller.reactive,
+            'imagedriver': imageUrldriver,
+            'namedriver':_namedrivercontroller.text,
+            'phonedriver':_phonedrivercontroller.text,
+
+          });
+
+          print('document updated successfully');
+
+          setState(() {
+            // Trigger a rebuild of the widget tree if necessary
+          });
+        } catch (e) {
+          print('Error updating document: $e');
+          // Handle specific error cases here
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
+  File ? _selectedImagedriverEdite;
+  String? imageUrldriver;
+  Future _pickImageDriverFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImagedriverEdite=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('photo');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('driver');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
 
 
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      imageUrldriver = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrldriver');
+      return imageUrldriver;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
 // to lock in landscape view
   @override
   void initState() {
     super.initState();
+    //_imagedrivercontroller.reactive=widget.oldphotodriver!;
+    _namedrivercontroller.text=widget.olddrivername!;
+    _phonedrivercontroller.text=widget.olddriverphone!;
+    _busnumbercontroller.text=widget.olddnumberbus!;
+    imageUrldriver=widget.oldphotodriver!;
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -171,10 +272,44 @@ class _EditeBusState extends State<EditeBus> {
                                 Padding(
                                   padding: const EdgeInsets.only(left: 12),
                                   child:
-                                  CircleAvatar( radius:30, // Set the radius of the circle
-                                    backgroundImage: AssetImage('assets/imgs/school/Ellipse 2 (1).png'),
+                                  GestureDetector(
+                                    onTap: (){
+                                      _pickImageDriverFromGallery();
+                                      print('edit');
+                                    },
+                                    child:  CircleAvatar(
+                                        radius: 30.5,
+                                        backgroundColor: Color(0xff442B72),
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage( '$imageUrldriver'),
+                                          radius: 30.5,)
+                                    ),
                                   ),
+                                  // GestureDetector(
+                                  //   onTap: () {
+                                  //     _pickImageDriverFromGallery();
+                                  //   },
+                                  //   child: CircleAvatar(
+                                  //     radius: 30,
+                                  //     backgroundImage: _selectedImagedriverEdite!= null
+                                  //         ? Image.file(_selectedImagedriverEdite!, width: 83, height: 78.5, fit: BoxFit.cover).image
+                                  //         : AssetImage('assets/imgs/school/Ellipse 2 (1).png'),
+                                  //   ),
+                                  // ),
                                 ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(left: 12),
+                                //   child:
+                                //   GestureDetector(
+                                //     onTap: (){
+                                //       _pickImageDriverFromGallery();
+                                //     },
+                                //
+                                //     child: CircleAvatar( radius:30, // Set the radius of the circle
+                                //       backgroundImage: AssetImage('assets/imgs/school/Ellipse 2 (1).png'),
+                                //     ),
+                                //   ),
+                                // ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
                                   child: Align(
@@ -236,14 +371,14 @@ class _EditeBusState extends State<EditeBus> {
                               height: 38,
                               child: TextField(
                                 style: TextStyle(color: Color(0xFF442B72)),
-                                // controller: _namesupervisor,
+                                 controller: _namedrivercontroller,
                                 cursorColor: const Color(0xFF442B72),
                                 //textDirection: TextDirection.ltr,
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
                                   // labelText: 'Shady Ayman'.tr,
-                                  hintText:'Ahmed Karim'.tr ,
+                                 // hintText:'Ahmed Karim'.tr ,
                                   hintStyle: TextStyle(color: Color(0xff442B72)),
                                   alignLabelWithHint: true,
                                   counterText: "",
@@ -298,7 +433,7 @@ class _EditeBusState extends State<EditeBus> {
                               height: 38,
                               child: TextField(
                                 style: TextStyle(color: Color(0xFF442B72)),
-                                // controller: _namesupervisor,
+                                 controller: _phonedrivercontroller,
                                 cursorColor: const Color(0xFF442B72),
                                 //textDirection: TextDirection.ltr,
                                 scrollPadding: const EdgeInsets.symmetric(
@@ -306,7 +441,7 @@ class _EditeBusState extends State<EditeBus> {
                                 keyboardType: TextInputType.number,
                                 decoration:  InputDecoration(
                                   // labelText: 'Shady Ayman'.tr,
-                                  hintText:'01028765006'.tr ,
+                                //  hintText:'01028765006'.tr ,
                                   hintStyle: TextStyle(color: Color(0xff442B72)),
                                   alignLabelWithHint: true,
                                   counterText: "",
@@ -362,7 +497,13 @@ class _EditeBusState extends State<EditeBus> {
 
                                 Stack(alignment: Alignment.topRight,
                                     children:[
-                                      Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
+                                      InteractiveViewer(
+                                          transformationController: _imagebuscontroller,
+                                          child:
+                                         //  Image.network(widget.oldphotobus),
+                                         Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,)
+                                      ),
+
                                       Align(alignment: AlignmentDirectional.topEnd,
                                         child:
                                         Container(
@@ -382,86 +523,53 @@ class _EditeBusState extends State<EditeBus> {
                                                 Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
                                             )),
                                       )]),
-                                Stack(alignment: Alignment.topRight,
-                                    children:[
-                                      Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
-                                      Align(alignment: AlignmentDirectional.topEnd,
-                                        child:
-                                        Container(
-                                            width:20,
-                                            height: 20,
-                                            decoration:BoxDecoration(
-                                                color: Color(0xFF442B72),
-                                                borderRadius: BorderRadius.circular(20)
-                                            ),
-                                            child:
-                                            GestureDetector(
-                                                onTap:(){
-                                                  deletePhotoDialog(context);
-                                                  //showSnackBarDeleteFun(context);
-                                                },
-                                                child:
-                                                Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
-                                            )),
-                                      )]),
-                                Stack(alignment: Alignment.topRight,
-                                    children:[
-                                      Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
-                                      Align(alignment: AlignmentDirectional.topEnd,
-                                        child:
-                                        Container(
-                                            width:20,
-                                            height: 20,
-                                            decoration:BoxDecoration(
-                                                color: Color(0xFF442B72),
-                                                borderRadius: BorderRadius.circular(20)
-                                            ),
-                                            child:
-                                            GestureDetector(
-                                                onTap:(){
-                                                  deletePhotoDialog(context);
-                                                  //showSnackBarDeleteFun(context);
-                                                },
-                                                child:
-                                                Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
-                                            )),
-                                      )]),
-                                //Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
-                                //Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
+                                // Stack(alignment: Alignment.topRight,
+                                //     children:[
+                                //       Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
+                                //       Align(alignment: AlignmentDirectional.topEnd,
+                                //         child:
+                                //         Container(
+                                //             width:20,
+                                //             height: 20,
+                                //             decoration:BoxDecoration(
+                                //                 color: Color(0xFF442B72),
+                                //                 borderRadius: BorderRadius.circular(20)
+                                //             ),
+                                //             child:
+                                //             GestureDetector(
+                                //                 onTap:(){
+                                //                   deletePhotoDialog(context);
+                                //                   //showSnackBarDeleteFun(context);
+                                //                 },
+                                //                 child:
+                                //                 Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
+                                //             )),
+                                //       )]),
+                                // Stack(alignment: Alignment.topRight,
+                                //     children:[
+                                //       Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
+                                //       Align(alignment: AlignmentDirectional.topEnd,
+                                //         child:
+                                //         Container(
+                                //             width:20,
+                                //             height: 20,
+                                //             decoration:BoxDecoration(
+                                //                 color: Color(0xFF442B72),
+                                //                 borderRadius: BorderRadius.circular(20)
+                                //             ),
+                                //             child:
+                                //             GestureDetector(
+                                //                 onTap:(){
+                                //                   deletePhotoDialog(context);
+                                //                   //showSnackBarDeleteFun(context);
+                                //                 },
+                                //                 child:
+                                //                 Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
+                                //             )),
+                                //       )]),
+
                               ],),
-                            //old
-                            // Container(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   height: 45,
-                            //   child: TextFormField(
-                            //     cursorColor: const Color(0xFF442B72),
-                            //     style: TextStyle(color: Color(0xFF442B72)),
-                            //     //textDirection: TextDirection.ltr,
-                            //     scrollPadding: const EdgeInsets.symmetric(
-                            //         vertical: 40),
-                            //     decoration:  InputDecoration(
-                            //       //suffixIcon: Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
-                            //       alignLabelWithHint: true,
-                            //       counterText: "",
-                            //       fillColor: const Color(0xFFF1F1F1),
-                            //       filled: true,
-                            //       contentPadding: const EdgeInsets.fromLTRB(
-                            //           8, 30, 10, 5),
-                            //       //  hintText:"".tr,
-                            //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                            //       hintStyle: const TextStyle(
-                            //         color: Color(0xFFC2C2C2),
-                            //         fontSize: 12,
-                            //         fontFamily: 'Inter-Bold',
-                            //         fontWeight: FontWeight.w700,
-                            //         height: 1.33,
-                            //       ),
-                            //       enabledBorder: myInputBorder(),
-                            //       focusedBorder: myFocusBorder(),
-                            //
-                            //     ),
-                            //   ),
-                            // ),
+
 
 
                             const SizedBox(
@@ -504,14 +612,20 @@ class _EditeBusState extends State<EditeBus> {
                               height: 38,
                               child: TextField(
                                 style: TextStyle(color: Color(0xFF442B72)),
-                                // controller: _namesupervisor,
+                                controller: _busnumbercontroller,
                                 cursorColor: const Color(0xFF442B72),
+                                keyboardType: TextInputType.number,
+                                maxLength: 11,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                  LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                                ],
                                 //textDirection: TextDirection.ltr,
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
                                   // labelText: 'Shady Ayman'.tr,
-                                  hintText:'ي ر س 1458'.tr ,
+                                  //hintText:'ي ر س 1458'.tr ,
                                   hintStyle: TextStyle(color: Color(0xff442B72)),
                                   alignLabelWithHint: true,
                                   counterText: "",
@@ -663,12 +777,14 @@ class _EditeBusState extends State<EditeBus> {
                                 child: ElevatedSimpleButton(
                                   txt: "Save".tr,
                                   onPress: (){
+                                    editAddBus();
                                     showSnackBarFun(context);
                                     Navigator.push(
                                         context ,
                                         MaterialPageRoute(
-                                            builder: (context) =>  HomeScreen(),
-                                            maintainState: false));
+                                            builder: (context) =>  BusScreen(),
+                                            maintainState: false)
+                                    );
                                   },
                                   width: constrains.maxWidth /1.2,
                                   hight: 48,

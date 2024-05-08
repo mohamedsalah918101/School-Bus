@@ -259,10 +259,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           );
                                         },
-                                        child:data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
+                                        child:
+                                        data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
                                           errorBuilder: (context, error, stackTrace) {
                                             return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
-                                          },):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                          },
+                                        ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
                                       ),
                                       title: Text(
                                         data['nameEnglish'],
@@ -541,15 +543,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
                                               ]
                                           ),
-                                        child: Column(
+                                        child:
+                                        Column(
                                           children: [
                                             ListTile(
-                                              leading: Image.asset(
-                                                'assets/imgs/school/imgparent.png',
-                                                width: 40,
-                                                height: 40,
-                                              ),
-                                              title: Text(
+                                              leading:Container(
+                                                width:40,
+                                                  height:40,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: Color(0xffCCCCCC),
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                    child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                  ))
+
+                                              // Image.asset(
+                                              //   'assets/imgs/school/imgparent.png',
+                                              //   width: 40,
+                                              //   height: 40,
+                                              // ),
+                                              ,title: Text(
                                                 '${data[index]['name']}',
                                                 style: TextStyle(
                                                   color: Color(0xFF442B72),

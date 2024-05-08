@@ -36,6 +36,8 @@ class _AddParentsState extends State<AddParents> {
   List<TextEditingController> gradeControllers = [];
   late final int selectedImage;
   final _nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController gradeController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _numberOfChildrenController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
@@ -75,46 +77,46 @@ class _AddParentsState extends State<AddParents> {
     //   'invite':1
     //   // 'gender': gender
     // };
-  // String gender = isFemale ? 'Female' : 'Male';
-  Map<String, dynamic> data = {
-    'typeOfParent': selectedValue,
-    'name': _nameController.text,
-    'numberOfChildren': _numberOfChildrenController.text,
-    'phoneNumber': _phoneNumberController.text,
-    'childern': childrenData,
-    'state': 0,
-    'invite': 1
-    // 'gender': gender
-  };
- // Add the data to the Firestore collection
+    // String gender = isFemale ? 'Female' : 'Male';
+    Map<String, dynamic> data = {
+      'typeOfParent': selectedValue,
+      'name': _nameController.text,
+      'numberOfChildren': _numberOfChildrenController.text,
+      'phoneNumber': _phoneNumberController.text,
+      'childern': childrenData,
+      'state': 0,
+      'invite': 1
+      // 'gender': gender
+    };
+    // Add the data to the Firestore collection
     var check =await addParentCheck(_phoneNumberController.text);
     if(!check) {
-    var res =await checkUpdate(_phoneNumberController.text);
-    if(!res) {
-      await _firestore.collection('parent').add(data).then((docRef) {
-        String docid = docRef.id;
-        print('Data added with document ID: ${docRef.id}');
-        createDynamicLink(true, docid, _phoneNumberController.text, 'parent');
-      }).catchError((error) {
-        print('Failed to add data: $error');
-      });
-      // Clear the text fields
-      _nameController.clear();
-      _phoneNumberController.clear();
-      _numberOfChildrenController.clear();
-      nameChildControllers.clear();
-      nameChildControllers.clear();
-      gradeControllers.clear();
-    }else{
-      await _firestore.collection('parent').doc(docID).update(data);
-      // Clear the text fields
-      _nameController.clear();
-      _phoneNumberController.clear();
-      _numberOfChildrenController.clear();
-      nameChildControllers.clear();
-      nameChildControllers.clear();
-      gradeControllers.clear();
-    }  }else{
+      var res =await checkUpdate(_phoneNumberController.text);
+      if(!res) {
+        await _firestore.collection('parent').add(data).then((docRef) {
+          String docid = docRef.id;
+          print('Data added with document ID: ${docRef.id}');
+          createDynamicLink(true, docid, _phoneNumberController.text, 'parent');
+        }).catchError((error) {
+          print('Failed to add data: $error');
+        });
+        // Clear the text fields
+        _nameController.clear();
+        _phoneNumberController.clear();
+        _numberOfChildrenController.clear();
+        nameChildControllers.clear();
+        nameChildControllers.clear();
+        gradeControllers.clear();
+      }else{
+        await _firestore.collection('parent').doc(docID).update(data);
+        // Clear the text fields
+        _nameController.clear();
+        _phoneNumberController.clear();
+        _numberOfChildrenController.clear();
+        nameChildControllers.clear();
+        nameChildControllers.clear();
+        gradeControllers.clear();
+      }  }else{
       ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
 
 
@@ -122,12 +124,11 @@ class _AddParentsState extends State<AddParents> {
     }}
 
 
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
 
   final nameChildController = TextEditingController();
-  final gradeController = TextEditingController();
+  // final gradeController = TextEditingController();
   List<Map<String, dynamic>> genderSelection = [];
 
 
@@ -157,13 +158,13 @@ class _AddParentsState extends State<AddParents> {
             width: double.infinity,
             height: 310,
             child: Column(
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xff771F98).withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Column(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xff771F98).withOpacity(0.03),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -296,13 +297,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          nameChildeError? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Please enter your child name".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ): Container(),
+                          // nameChildeError? Container():Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                          //   child: Text(
+                          //     "Please enter your child name".tr,
+                          //     style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
                           SizedBox(height: 12,),
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')?
@@ -400,13 +401,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          GradeError? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Please enter your child grade".tr,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ): Container(),
+                          // GradeError?Container(): Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                          //   child: Text(
+                          //     "Please enter your child grade".tr,
+                          //     style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
                           SizedBox(height: 12,),
                           Padding(
                               padding: (sharedpref?.getString('lang') == 'ar')?
@@ -424,71 +425,71 @@ class _AddParentsState extends State<AddParents> {
                           ) ,
                           // SizedBox(height: 12,),
                           Padding(
-                            padding: (sharedpref?.getString('lang') == 'ar') ?
-                            EdgeInsets.only(right: 15.0):
-                            EdgeInsets.only(left: 15.0),
-                            child:  Row(
-                              children: [
-                            Row(
-                            children: [
-                            Radio<bool>(
-                              value: true,
-                              groupValue: genderSelection[i]['isFemale'],
-                              onChanged: (value) {
-                                setState(() {
-                                  genderSelection[i]['isFemale'] = value!;
-                                  genderSelection[i]['isMale'] = !value;
-                                });
-                              },
-                                  fillColor: MaterialStateProperty.resolveWith((states) {
-                                    if (states.contains(MaterialState.selected)) {
-                                      return Color(0xff442B72);
-                                    }
-                                    return Color(0xff442B72);
-                                  }),
-                                  activeColor: Color(0xff442B72), // Set the color of the selected radio button
-                                ),
-                                Text(
-                                  "Female".tr ,
-                                  style: TextStyle(
-                                    fontSize: 15 ,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w500 ,
-                                    color: Color(0xff442B72),),
-                                ),
-                                SizedBox(
-                                  width: 50, //115
-                                ),
-                                Radio<bool>(
-                                  fillColor: MaterialStateProperty.resolveWith((states) {
-                                    if (states.contains(MaterialState.selected)) {
-                                      return Color(0xff442B72);
-                                    }
-                                    return Color(0xff442B72);
-                                  }),
-                                  value: true,
-                                    groupValue: genderSelection[i]['isMale'],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        genderSelection[i]['isMale'] = value!;
-                                        genderSelection[i]['isFemale'] = !value;
-                                      });
-                                  },
-                                  activeColor: Color(0xff442B72),
-                                ),
-                                Text("Male".tr,
-                                  style: TextStyle(
-                                    fontSize: 15 ,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w500 ,
-                                    color: Color(0xff442B72),),),
-                              ],
-                          ),
-                          SizedBox(height: 10,)
-                        ])),
-              ],
-            ))]))
-           );
+                              padding: (sharedpref?.getString('lang') == 'ar') ?
+                              EdgeInsets.only(right: 15.0):
+                              EdgeInsets.only(left: 15.0),
+                              child:  Row(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Radio<bool>(
+                                          value: true,
+                                          groupValue: genderSelection[i]['isFemale'],
+                                          onChanged: (value) {
+                                            setState(() {
+                                              genderSelection[i]['isFemale'] = value!;
+                                              genderSelection[i]['isMale'] = !value;
+                                            });
+                                          },
+                                          fillColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Color(0xff442B72);
+                                            }
+                                            return Color(0xff442B72);
+                                          }),
+                                          activeColor: Color(0xff442B72), // Set the color of the selected radio button
+                                        ),
+                                        Text(
+                                          "Female".tr ,
+                                          style: TextStyle(
+                                            fontSize: 15 ,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w500 ,
+                                            color: Color(0xff442B72),),
+                                        ),
+                                        SizedBox(
+                                          width: 50, //115
+                                        ),
+                                        Radio<bool>(
+                                          fillColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Color(0xff442B72);
+                                            }
+                                            return Color(0xff442B72);
+                                          }),
+                                          value: true,
+                                          groupValue: genderSelection[i]['isMale'],
+                                          onChanged: (value) {
+                                            setState(() {
+                                              genderSelection[i]['isMale'] = value!;
+                                              genderSelection[i]['isFemale'] = !value;
+                                            });
+                                          },
+                                          activeColor: Color(0xff442B72),
+                                        ),
+                                        Text("Male".tr,
+                                          style: TextStyle(
+                                            fontSize: 15 ,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w500 ,
+                                            color: Color(0xff442B72),),),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10,)
+                                  ])),
+                        ],
+                      ))]))
+        );
       }
       setState(() {});
     });
@@ -763,17 +764,34 @@ class _AddParentsState extends State<AddParents> {
                           ],
                         ),
                       ),
-                      typeOfParentError?
-                      selectedValue!.isNotEmpty?
-                      Container():
+                      typeOfParentError? Container():
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your type".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ):
-                          Container(),
+                      ),
+                      // selectedValue == null || selectedValue.isEmpty
+                      //     ? Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                      //   child: Text(
+                      //     "Please enter your type".tr,
+                      //     style: TextStyle(color: Colors.red),
+                      //   ),
+                      // )
+                      //     : Container(),
+                      // typeOfParentError?
+                      // selectedValue!.isEmpty?
+                      // Container():
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                      //   child: Text(
+                      //     "Please enter your type".tr,
+                      //     style: TextStyle(color: Colors.red),
+                      //   ),
+                      // ):
+                      //     Container(),
                       SizedBox(height: 11,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -814,68 +832,69 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
-                            controller: _nameController,
-                            style: TextStyle(color: Color(0xFF442B72),),
-                            cursorColor: const Color(0xFF442B72),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            // autofocus: true,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.text,
-                            textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-                            TextAlign.right :
-                            TextAlign.left ,
-                            scrollPadding:  EdgeInsets.symmetric(vertical: 30),
-                            decoration:  InputDecoration(
-                              alignLabelWithHint: false,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 0, 40),
-                              hintText:'Please enter your name'.tr,
-                              floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.33,
-                              ),
-                              focusedBorder:
-                              OutlineInputBorder(
+                              controller: _nameController,
+                              style: TextStyle(color: Color(0xFF442B72),),
+                              cursorColor: const Color(0xFF442B72),
+                              textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                              TextDirection.rtl:
+                              TextDirection.ltr,
+                              // autofocus: true,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.text,
+                              textAlign:  (sharedpref?.getString('lang') == 'ar') ?
+                              TextAlign.right :
+                              TextAlign.left ,
+                              scrollPadding:  EdgeInsets.symmetric(vertical: 30),
+                              decoration:  InputDecoration(
+                                alignLabelWithHint: false,
+                                counterText: "",
+                                fillColor: const Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding:
+                                (sharedpref?.getString('lang') == 'ar') ?
+                                EdgeInsets.fromLTRB(166, 0, 17, 40):
+                                EdgeInsets.fromLTRB(17, 0, 0, 40),
+                                hintText:'Please enter your name'.tr,
+                                floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                hintStyle: const TextStyle(
+                                  color: Color(0xFF9E9E9E),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Bold',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.33,
+                                ),
+                                focusedBorder:
+                                OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),                                    width: 0.5,
+                                    )),
+                                enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(7)),
                                   borderSide: BorderSide(
-                                    color: Color(0xFFFFC53E),                                    width: 0.5,
-                                  )),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
+                                    color: Color(0xFFFFC53E),
+                                    width: 0.5,
+                                  ),
                                 ),
-                              ),
 
 
-                              // enabledBorder: myInputBorder(),
-                              // focusedBorder: myFocusBorder(),
-                            )
+                                // enabledBorder: myInputBorder(),
+                                // focusedBorder: myFocusBorder(),
+                              )
 
 
 
                           ),
                         ),
                       ),
-                      nameError ?  Padding(
+                      nameError ? Container(): Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your name".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ):Container(),
+                      ),
+                      // :Container(),
 
                       SizedBox(height: 17,),
                       Padding(
@@ -976,13 +995,15 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      phoneError? Padding(
+
+                      phoneError? Container():Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your phone number".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ): Container(),
+                      ),
+
                       SizedBox(height: 17,),
                       Padding(
                         padding: (sharedpref?.getString('lang') == 'ar')?
@@ -1076,13 +1097,15 @@ class _AddParentsState extends State<AddParents> {
                           ),
                         ),
                       ),
-                      numberOfChildrenError? Padding(
+                      numberOfChildrenError?
+                      Container():
+                      Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           "Please enter your number of children".tr,
                           style: TextStyle(color: Colors.red),
                         ),
-                      ): Container(),
+                      ),
                       SizedBox(
                         height: 20,
                       ),
@@ -1101,35 +1124,35 @@ class _AddParentsState extends State<AddParents> {
                                 fontWeight: FontWeight.w700 ,
                                 color: Color(0xff771F98),),),
                             GestureDetector(
-                              onTap: (){
-                                setState(() {
-                                  // modifyText();
-                                  addChild();
-                                  NumberOfChildrenCard = !NumberOfChildrenCard;
-                                });
+                                onTap: (){
+                                  setState(() {
+                                    // modifyText();
+                                    addChild();
+                                    NumberOfChildrenCard = !NumberOfChildrenCard;
+                                  });
 
-                              },
-                              child: NumberOfChildrenCard?
-                              Image.asset('assets/images/iconamoon_arrow-up-2-thin (1).png',
-                                width: 34,
-                                height: 34,):
-                              Image.asset('assets/images/iconamoon_arrow-up-2-thin.png',
-                                width: 34,
-                                height: 34,)
+                                },
+                                child: NumberOfChildrenCard?
+                                Image.asset('assets/images/iconamoon_arrow-up-2-thin (1).png',
+                                  width: 34,
+                                  height: 34,):
+                                Image.asset('assets/images/iconamoon_arrow-up-2-thin.png',
+                                  width: 34,
+                                  height: 34,)
                             ),
                           ],
                         ),
                       ) ,
                       SizedBox(height: 5,),
                       Padding(
-                        padding: (sharedpref?.getString('lang') == 'ar')?
-                        EdgeInsets.only(right: 21.0):
-                        EdgeInsets.only(left: 25.0),
-                        child: Container(
-                          width: (sharedpref?.getString('lang') == 'ar')?
-                          310 : 318,
-                          height: 1,
-                          color: Color(0xFF442B72),)
+                          padding: (sharedpref?.getString('lang') == 'ar')?
+                          EdgeInsets.only(right: 21.0):
+                          EdgeInsets.only(left: 25.0),
+                          child: Container(
+                            width: (sharedpref?.getString('lang') == 'ar')?
+                            310 : 318,
+                            height: 1,
+                            color: Color(0xFF442B72),)
                       ) ,
                       NumberOfChildrenCard?
                       Padding(
@@ -1137,7 +1160,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.only(right: 25.0 , left: 20):
                         EdgeInsets.only(left: 25.0 , right: 20),
                         child: SizedBox(
-                       height: NumberOfChildren.length*325,
+                          height: NumberOfChildren.length*325,
                           width: double.infinity,
                           child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
@@ -1164,52 +1187,91 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               hight: 48,
                               onPress: () async {
-                                // if( selectedValue!.isEmpty){
-                                //   typeOfParentError = true;
+                                if (selectedValue!.isEmpty) {
+                                  typeOfParentError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (selectedValue!.isNotEmpty) {
+                                  typeOfParentError = true;
+                                  setState(() {
+
+                                  });
+                                }
+
+                                if (_nameController.text.length == 0) {
+                                  nameError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_nameController.text.length > 0) {
+                                  nameError = true;
+                                  setState(() {
+
+                                  });
+                                }
+
+                                if (_phoneNumberController.text.length < 11) {
+                                  phoneError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_phoneNumberController.text.length > 10) {
+                                  phoneError = true;
+                                  setState(() {
+
+                                  });
+                                }
+
+                                if (_numberOfChildrenController.text.length < 1) {
+                                  numberOfChildrenError = false;
+                                  setState(() {
+
+                                  });
+                                } else if (_numberOfChildrenController.text.length > 0) {
+                                  numberOfChildrenError = true;
+                                  setState(() {
+
+                                  });
+                                }
+                                // if(nameController.text.length == 0){
+                                //   nameChildeError = false;
                                 //   setState(() {
                                 //
                                 //   });
-                                // }else if(_nameController.text.length == 0){
-                                //   nameError = true;
-                                //   setState(() {
-                                //
-                                //   });
-                                // }else if(_phoneNumberController.text.length < 11){
-                                //   phoneError = true;
-                                //   setState(() {
-                                //
-                                //   });
-                                // }else if(_numberOfChildrenController.text.length < 1){
-                                //   numberOfChildrenError = true;
-                                //   setState(() {
-                                //
-                                //   });
-                                // }else if(nameChildControllers.length < 1){
+                                // }else  if(nameController.text.length > 0){
                                 //   nameChildeError = true;
                                 //   setState(() {
                                 //
                                 //   });
                                 // }
-                                //    else if (nameChildController.text.length == 0) {
-                                //       nameChildeError = true;
-                                //     }
-                                //    else if (gradeController.text.length == 0) {
+                                // if (gradeController.text.length == 0) {
+                                //       GradeError = false;
+                                //       setState(() {
+                                //
+                                //       });
+                                //   }
+                                //    else if (gradeController.text.length> 0) {
                                 //       GradeError = true;
-                                //   }else{
-                                //   nameError = false;
-                                //   phoneError = false;
-                                //   numberOfChildrenError = false;
-                                //   nameChildeError = false;
-                                //   GradeError = false;
-                                //   typeOfParentError = false;
-                                //   setState(() {
-                                //   });
-                                InvitationSendSnackBar(context, 'Invitation sent successfully');
-                                _addDataToFirestore();
-                                print('object');
-                                NumberOfChildrenCard = false;
-                                setState(() {
-                                });
+                                //       setState(() {
+                                //
+                                //       });
+                                //   }
+                                if (
+                                // GradeError&&
+                                // nameChildeError&&
+                                typeOfParentError &&
+                                    nameError &&
+                                    phoneError &&
+                                    numberOfChildrenError)
+                                {
+                                  InvitationSendSnackBar(context, 'Invitation sent successfully');
+                                  _addDataToFirestore();
+                                  print('object');
+                                  NumberOfChildrenCard = false;
+                                  setState(() {
+                                  });
+                                }
                               },
                               color: Color(0xFF442B72),
                               fontSize: 16),
