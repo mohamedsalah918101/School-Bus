@@ -202,12 +202,13 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: data.length*95,
+                                height: 330,
                                 width: double.infinity,
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: data.length,
+                                  itemCount: 3,
+                                  // data.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     return Column(
                                       children: [

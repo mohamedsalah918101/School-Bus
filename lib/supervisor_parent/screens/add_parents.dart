@@ -4,26 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:school_account/Functions/functions.dart';
-import 'package:school_account/supervisor_parent/components/add_children_card.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
-import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/edit_add_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/child_data_item.dart';
-import '../components/custom_app_bar.dart';
-import '../components/added_child_card.dart';
 
 class AddParents extends StatefulWidget {
   @override
@@ -35,6 +23,7 @@ class _AddParentsState extends State<AddParents> {
   List<TextEditingController> nameChildControllers = [];
   List<TextEditingController> gradeControllers = [];
   late final int selectedImage;
+
   final _nameController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController gradeController = TextEditingController();
@@ -240,6 +229,11 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               height: 38,
                               child: TextFormField(
+                                onChanged: (value){
+                                  setState(() {
+
+                                  });
+                                },
                                 controller: nameController,
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
@@ -291,19 +285,17 @@ class _AddParentsState extends State<AddParents> {
                                       width: 0.5,
                                     ),
                                   ),
-                                  // enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
                                 ),
                               ),
                             ),
                           ),
-                          // nameChildeError? Container():Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
-                          //   child: Text(
-                          //     "Please enter your child name".tr,
-                          //     style: TextStyle(color: Colors.red),
-                          //   ),
-                          // ),
+                          nameChildeError? Container():Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              "Please enter your child name".tr,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
                           SizedBox(height: 12,),
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')?
@@ -344,6 +336,11 @@ class _AddParentsState extends State<AddParents> {
                               width: 277,
                               height: 38,
                               child: TextFormField(
+                                onChanged: (value){
+                                  setState(() {
+
+                                  });
+                                },
                                 controller: gradeControllers[i],
                                 style: TextStyle(color: Color(0xFF442B72),
                                   fontSize: 12,
@@ -401,13 +398,13 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
-                          // GradeError?Container(): Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
-                          //   child: Text(
-                          //     "Please enter your child grade".tr,
-                          //     style: TextStyle(color: Colors.red),
-                          //   ),
-                          // ),
+                          GradeError?Container(): Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              "Please enter your child grade".tr,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
                           SizedBox(height: 12,),
                           Padding(
                               padding: (sharedpref?.getString('lang') == 'ar')?
@@ -1124,12 +1121,24 @@ class _AddParentsState extends State<AddParents> {
                                 fontWeight: FontWeight.w700 ,
                                 color: Color(0xff771F98),),),
                             GestureDetector(
+<<<<<<< HEAD
                                 onTap: (){
                                   setState(() {
                                     // modifyText();
                                     addChild();
                                     NumberOfChildrenCard = !NumberOfChildrenCard;
                                   });
+=======
+                              onTap: (){
+                                setState(() {
+                                  // modifyText();
+                                  addChild();
+                                  NumberOfChildrenCard = !NumberOfChildrenCard;
+                                  setState(() {
+
+                                  });
+                                });
+>>>>>>> 8e013e49459c670b6cce96a8bde33731eeec6418
 
                                 },
                                 child: NumberOfChildrenCard?
@@ -1182,58 +1191,51 @@ class _AddParentsState extends State<AddParents> {
                         padding:  EdgeInsets.symmetric(horizontal: 44.0),
                         child: Center(
                           child: ElevatedSimpleButton(
-                              txt: 'Send invitation'.tr,
-                              fontFamily: 'Poppins-Regular',
-                              width: 277,
-                              hight: 48,
-                              onPress: () async {
-                                if (selectedValue!.isEmpty) {
+                            txt: 'Send invitation'.tr,
+                            fontFamily: 'Poppins-Regular',
+                            width: 277,
+                            hight: 48,
+                            onPress: () async {
+                              setState(() {
+                                // تحقق من الأخطاء هنا
+                                if (selectedValue.isEmpty) {
                                   typeOfParentError = false;
-                                  setState(() {
-
-                                  });
-                                } else if (selectedValue!.isNotEmpty) {
+                                } else {
                                   typeOfParentError = true;
-                                  setState(() {
-
-                                  });
                                 }
 
-                                if (_nameController.text.length == 0) {
+                                if (_nameController.text.isEmpty) {
                                   nameError = false;
-                                  setState(() {
-
-                                  });
-                                } else if (_nameController.text.length > 0) {
+                                } else {
                                   nameError = true;
-                                  setState(() {
-
-                                  });
                                 }
 
                                 if (_phoneNumberController.text.length < 11) {
                                   phoneError = false;
-                                  setState(() {
-
-                                  });
-                                } else if (_phoneNumberController.text.length > 10) {
+                                } else {
                                   phoneError = true;
-                                  setState(() {
-
-                                  });
                                 }
 
-                                if (_numberOfChildrenController.text.length < 1) {
+                                if (_numberOfChildrenController.text.isEmpty) {
                                   numberOfChildrenError = false;
-                                  setState(() {
-
-                                  });
-                                } else if (_numberOfChildrenController.text.length > 0) {
+                                } else {
                                   numberOfChildrenError = true;
-                                  setState(() {
-
-                                  });
                                 }
+
+                                // تحقق من الأخطاء في كل بطاقة طفل
+                                for (int i = 0; i < nameChildControllers.length; i++) {
+                                  if (nameChildControllers[i].text.isEmpty) {
+                                    nameChildeError = false;
+                                  } else {
+                                    nameChildeError = true;
+                                  }
+                                  if (gradeControllers[i].text.isEmpty) {
+                                    GradeError = false;
+                                  } else {
+                                    GradeError = true;
+                                  }
+                                }
+<<<<<<< HEAD
                                 // if(nameController.text.length == 0){
                                 //   nameChildeError = false;
                                 //   setState(() {
@@ -1273,6 +1275,24 @@ class _AddParentsState extends State<AddParents> {
                                   });
                                 }
                               },
+=======
+                              });
+                              if (
+                              // GradeError &&
+                              // nameChildeError &&
+                                  typeOfParentError &&
+                                  nameError &&
+                                  phoneError &&
+                                  numberOfChildrenError
+                              ) {
+                                InvitationSendSnackBar(context, 'Invitation sent successfully');
+                                _addDataToFirestore();
+                                print('object');
+                                NumberOfChildrenCard = false;
+                                setState(() {});
+                              }
+                            },
+>>>>>>> 8e013e49459c670b6cce96a8bde33731eeec6418
                               color: Color(0xFF442B72),
                               fontSize: 16),
                         ),
