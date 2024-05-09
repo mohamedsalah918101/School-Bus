@@ -1121,14 +1121,12 @@ class _AddParentsState extends State<AddParents> {
                                 fontWeight: FontWeight.w700 ,
                                 color: Color(0xff771F98),),),
                             GestureDetector(
-<<<<<<< HEAD
-                                onTap: (){
-                                  setState(() {
-                                    // modifyText();
-                                    addChild();
-                                    NumberOfChildrenCard = !NumberOfChildrenCard;
-                                  });
-=======
+                                // onTap: (){
+                                //   setState(() {
+                                //     // modifyText();
+                                //     addChild();
+                                //     NumberOfChildrenCard = !NumberOfChildrenCard;
+                                //   });
                               onTap: (){
                                 setState(() {
                                   // modifyText();
@@ -1138,7 +1136,6 @@ class _AddParentsState extends State<AddParents> {
 
                                   });
                                 });
->>>>>>> 8e013e49459c670b6cce96a8bde33731eeec6418
 
                                 },
                                 child: NumberOfChildrenCard?
@@ -1195,358 +1192,316 @@ class _AddParentsState extends State<AddParents> {
                             fontFamily: 'Poppins-Regular',
                             width: 277,
                             hight: 48,
-                            onPress: () async {
-                              setState(() {
-                                // تحقق من الأخطاء هنا
-                                if (selectedValue.isEmpty) {
-                                  typeOfParentError = false;
-                                } else {
-                                  typeOfParentError = true;
-                                }
+    onPress: () async {
+    setState(() {
+    // تحقق من الأخطاء هنا
+    if (selectedValue.isEmpty) {
+    typeOfParentError = false;
+    } else {
+    typeOfParentError = true;
+    }
 
-                                if (_nameController.text.isEmpty) {
-                                  nameError = false;
-                                } else {
-                                  nameError = true;
-                                }
+    if (_nameController.text.isEmpty) {
+    nameError = false;
+    } else {
+    nameError = true;
+    }
 
-                                if (_phoneNumberController.text.length < 11) {
-                                  phoneError = false;
-                                } else {
-                                  phoneError = true;
-                                }
+    if (_phoneNumberController.text.length < 11) {
+    phoneError = false;
+    } else {
+    phoneError = true;
+    }
 
-                                if (_numberOfChildrenController.text.isEmpty) {
-                                  numberOfChildrenError = false;
-                                } else {
-                                  numberOfChildrenError = true;
-                                }
+    if (_numberOfChildrenController.text.isEmpty) {
+    numberOfChildrenError = false;
+    } else {
+    numberOfChildrenError = true;
+    }
 
-                                // تحقق من الأخطاء في كل بطاقة طفل
-                                for (int i = 0; i < nameChildControllers.length; i++) {
-                                  if (nameChildControllers[i].text.isEmpty) {
-                                    nameChildeError = false;
-                                  } else {
-                                    nameChildeError = true;
-                                  }
-                                  if (gradeControllers[i].text.isEmpty) {
-                                    GradeError = false;
-                                  } else {
-                                    GradeError = true;
-                                  }
-                                }
-<<<<<<< HEAD
-                                // if(nameController.text.length == 0){
-                                //   nameChildeError = false;
-                                //   setState(() {
-                                //
-                                //   });
-                                // }else  if(nameController.text.length > 0){
-                                //   nameChildeError = true;
-                                //   setState(() {
-                                //
-                                //   });
-                                // }
-                                // if (gradeController.text.length == 0) {
-                                //       GradeError = false;
-                                //       setState(() {
-                                //
-                                //       });
-                                //   }
-                                //    else if (gradeController.text.length> 0) {
-                                //       GradeError = true;
-                                //       setState(() {
-                                //
-                                //       });
-                                //   }
-                                if (
-                                // GradeError&&
-                                // nameChildeError&&
-                                typeOfParentError &&
-                                    nameError &&
-                                    phoneError &&
-                                    numberOfChildrenError)
-                                {
-                                  InvitationSendSnackBar(context, 'Invitation sent successfully');
-                                  _addDataToFirestore();
-                                  print('object');
-                                  NumberOfChildrenCard = false;
-                                  setState(() {
-                                  });
-                                }
-                              },
-=======
-                              });
-                              if (
-                              // GradeError &&
-                              // nameChildeError &&
-                                  typeOfParentError &&
-                                  nameError &&
-                                  phoneError &&
-                                  numberOfChildrenError
-                              ) {
-                                InvitationSendSnackBar(context, 'Invitation sent successfully');
-                                _addDataToFirestore();
-                                print('object');
-                                NumberOfChildrenCard = false;
-                                setState(() {});
-                              }
-                            },
->>>>>>> 8e013e49459c670b6cce96a8bde33731eeec6418
-                              color: Color(0xFF442B72),
-                              fontSize: 16),
-                        ),
-                      ),
-                      SizedBox(height: 70,),
-                    ],
-                  )
+    // تحقق من الأخطاء في كل بطاقة طفل
+    for (int i = 0; i < nameChildControllers.length; i++) {
+    if (nameChildControllers[i].text.isEmpty) {
+    nameChildeError = false;
+    } else {
+    nameChildeError = true;
+    }
+    if (gradeControllers[i].text.isEmpty) {
+    GradeError = false;
+    } else {
+    GradeError = true;
+    }
+    }
+    });
+    if (
+    // GradeError &&
+    // nameChildeError &&
+    typeOfParentError &&
+    nameError &&
+    phoneError &&
+    numberOfChildrenError
+    ) {
+    InvitationSendSnackBar(context, 'Invitation sent successfully');
+    _addDataToFirestore();
+    print('object');
+    NumberOfChildrenCard = false;
+    setState(() {});
+    }
+    },
+    color: Color(0xFF442B72),
+    fontSize: 16),
+    ),
+    ),
+    SizedBox(height: 70,),
+    ],
+    )
+    ),
+    ),
+    ],
+    ),
+    extendBody: true,
+    resizeToAvoidBottomInset: false,
+    floatingActionButtonLocation:
+    FloatingActionButtonLocation.centerDocked,
+    floatingActionButton: FloatingActionButton(
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(100)),
+    backgroundColor: Color(0xff442B72),
+    onPressed: () {
+    Navigator.of(context).push(MaterialPageRoute(
+    builder: (context) => ProfileSupervisorScreen(
+    // onTapMenu: onTapMenu
+    )));
+    },
+    child: Image.asset(
+    'assets/images/174237 1.png',
+    height: 33,
+    width: 33,
+    fit: BoxFit.cover,
+    )
+
+    ),
+    bottomNavigationBar: Directionality(
+    textDirection: Get.locale == Locale('ar')
+    ? TextDirection.rtl
+        : TextDirection.ltr,
+    child: ClipRRect(
+    borderRadius: const BorderRadius.only(
+    topLeft: Radius.circular(25),
+    topRight: Radius.circular(25),
+    ),
+    child: BottomAppBar(
+    padding: EdgeInsets.symmetric(vertical: 3),
+    height: 60,
+    color: const Color(0xFF442B72),
+    clipBehavior: Clip.antiAlias,
+    shape: const AutomaticNotchedShape(
+    RoundedRectangleBorder(
+    borderRadius: BorderRadius.only(
+    topLeft: Radius.circular(38.5),
+    topRight: Radius.circular(38.5))),
+    RoundedRectangleBorder(
+    borderRadius:
+    BorderRadius.all(Radius.circular(50)))),
+    notchMargin: 7,
+    child: SizedBox(
+    height: 10,
+    child: SingleChildScrollView(
+    child: Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    HomeForSupervisor()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top:7 , right: 15):
+    EdgeInsets.only(left: 15),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/Vector (7).png',
+    height: 20,
+    width: 20
+    ),
+    SizedBox(height: 3),
+    Text(
+    "Home".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    AttendanceSupervisorScreen()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top: 9, left: 50):
+    EdgeInsets.only( right: 50, top: 2 ),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/icons8_checklist_1 1.png',
+    height: 19,
+    width: 19
+    ),
+    SizedBox(height: 3),
+    Text(
+    "Attendance".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    NotificationsSupervisor()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
+    EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/Vector (2).png',
+    height: 17,
+    width: 16.2
+    ),
+    Image.asset(
+    'assets/images/Vector (5).png',
+    height: 4,
+    width: 6
+    ),
+    SizedBox(height: 2),
+    Text(
+    "Notifications".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    TrackSupervisor()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
+    EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/Vector (4).png',
+    height: 18.36,
+    width: 23.5
+    ),
+    SizedBox(height: 3),
+    Text(
+    "Buses".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    ],
+    ),
+    )))))
+    );
+    }
+  }
+  void InvitationSendSnackBar(context, String message, {Duration? duration}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        dismissDirection: DismissDirection.up,
+        duration: duration ?? const Duration(milliseconds: 1000),
+        backgroundColor: Colors.white,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 150,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),),
+        behavior: SnackBarBehavior.floating,
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/saved.png',
+              width: 30,
+              height: 30,),
+            SizedBox(width: 15,),
+            Text(
+              'Invitation sent successfully'.tr,
+              style: const TextStyle(
+                color: Color(0xFF4CAF50),
+                fontSize: 16,
+                fontFamily: 'Poppins-Bold',
+                fontWeight: FontWeight.w700,
+                height: 1.23,
               ),
             ),
           ],
         ),
-        extendBody: true,
-        resizeToAvoidBottomInset: false,
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100)),
-            backgroundColor: Color(0xff442B72),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ProfileSupervisorScreen(
-                    // onTapMenu: onTapMenu
-                  )));
-            },
-            child: Image.asset(
-              'assets/images/174237 1.png',
-              height: 33,
-              width: 33,
-              fit: BoxFit.cover,
-            )
-
-        ),
-        bottomNavigationBar: Directionality(
-            textDirection: Get.locale == Locale('ar')
-                ? TextDirection.rtl
-                : TextDirection.ltr,
-            child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-                child: BottomAppBar(
-                    padding: EdgeInsets.symmetric(vertical: 3),
-                    height: 60,
-                    color: const Color(0xFF442B72),
-                    clipBehavior: Clip.antiAlias,
-                    shape: const AutomaticNotchedShape(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(38.5),
-                                topRight: Radius.circular(38.5))),
-                        RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(50)))),
-                    notchMargin: 7,
-                    child: SizedBox(
-                        height: 10,
-                        child: SingleChildScrollView(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              HomeForSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top:7 , right: 15):
-                                  EdgeInsets.only(left: 15),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (7).png',
-                                          height: 20,
-                                          width: 20
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Home".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AttendanceSupervisorScreen()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 9, left: 50):
-                                  EdgeInsets.only( right: 50, top: 2 ),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/icons8_checklist_1 1.png',
-                                          height: 19,
-                                          width: 19
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Attendance".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              NotificationsSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                  EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (2).png',
-                                          height: 17,
-                                          width: 16.2
-                                      ),
-                                      Image.asset(
-                                          'assets/images/Vector (5).png',
-                                          height: 4,
-                                          width: 6
-                                      ),
-                                      SizedBox(height: 2),
-                                      Text(
-                                        "Notifications".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TrackSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
-                                  EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (4).png',
-                                          height: 18.36,
-                                          width: 23.5
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Buses".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )))))
+      ),
     );
   }
-}
-void InvitationSendSnackBar(context, String message, {Duration? duration}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      dismissDirection: DismissDirection.up,
-      duration: duration ?? const Duration(milliseconds: 1000),
-      backgroundColor: Colors.white,
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).size.height - 150,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),),
-      behavior: SnackBarBehavior.floating,
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset('assets/images/saved.png',
-            width: 30,
-            height: 30,),
-          SizedBox(width: 15,),
-          Text(
-            'Invitation sent successfully'.tr,
-            style: const TextStyle(
-              color: Color(0xFF4CAF50),
-              fontSize: 16,
-              fontFamily: 'Poppins-Bold',
-              fontWeight: FontWeight.w700,
-              height: 1.23,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
