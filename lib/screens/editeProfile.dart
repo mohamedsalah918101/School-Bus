@@ -17,6 +17,23 @@ import 'notificationsScreen.dart';
 //import '../components/profile_child_card.dart';
 
 class EditeProfile extends StatefulWidget {
+  final String docid;
+  final String oldNameEnglish;
+  final String? oldNameArabic;
+  final String oldAddress;
+  final String oldSchoolLogo;
+  final String oldCoordinatorName;
+  final String oldSupportNumber;
+  // const EditeSupervisor({super.key});
+  const EditeProfile({super.key,
+    required this.docid,
+    required this.oldNameEnglish,
+    required this.oldNameArabic,
+    required this.oldAddress,
+    required this.oldSchoolLogo,
+    required this.oldCoordinatorName,
+    required this.oldSupportNumber,
+  });
   @override
   _EditeProfileState createState() => _EditeProfileState();
 }

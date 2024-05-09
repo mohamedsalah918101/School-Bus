@@ -54,12 +54,22 @@ class BusScreen extends StatefulWidget{
 
 
 class BusScreenSate extends State<BusScreen> {
-List data=[];
+  List<QueryDocumentSnapshot> filteredData = [];
+  List<QueryDocumentSnapshot<Object?>> filteredQuerySnapshots = [];
+
+  List data=[];
 getData()async{
   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
   data.addAll(querySnapshot.docs);
   setState(() {
+    data = querySnapshot.docs;
+    // Initialize filteredData with a copy of data
+    filteredData = List.from(data);
 
+    // Cast filteredData to List<QueryDocumentSnapshot<Object?>>
+    filteredQuerySnapshots =
+        filteredData.cast<QueryDocumentSnapshot<Object?>>();
+    //filteredData = List.from(data);
   });
 }
 void _editBusDocument(String documentId, String photodriver, String drivername, String driverphone,String photobus,String numberbus ) {
@@ -322,6 +332,34 @@ final _firestore = FirebaseFirestore.instance;
                                                       controller: searchController,
                                                       textStyle:MaterialStateProperty.all<TextStyle?>(TextStyle(color: Color(0xFF442B72),)) ,
                                                       hintText: "Search Name".tr,
+                                                      onChanged: (query) {
+                                                        setState(() {
+                                                          filteredData = data.where((item) {
+                                                            if (selectedFilter == 'Bus Number') {
+                                                              // Filter by bus number
+                                                              String busNumber = item['busnumber'] as String;
+                                                              return busNumber.toLowerCase().contains(query.toLowerCase());
+                                                            } else if (selectedFilter == 'Driver Name') {
+                                                              // Filter by driver name
+                                                              String driverName = item['namedriver'] as String;
+                                                              return driverName.toLowerCase().contains(query.toLowerCase());
+                                                            }
+                                                            return false; // Default case
+                                                          }).toList().cast<QueryDocumentSnapshot<Object?>>();
+                                                        });
+                                                        // setState(() {
+                                                        //   filteredData = data.where((item) {
+                                                        //     if (selectedFilter == 'Bus Number') {
+                                                        //       // Filter by bus number
+                                                        //       return item['busnumber'].toString().toLowerCase().contains(query.toLowerCase());
+                                                        //     } else if (selectedFilter == 'Driver Name') {
+                                                        //       // Filter by driver name
+                                                        //       return item['namedriver'].toString().toLowerCase().contains(query.toLowerCase());
+                                                        //     }
+                                                        //     return false; // Default case
+                                                        //   }).toList();
+                                                        // });
+                                                      },
                                                       hintStyle: MaterialStateProperty.all<TextStyle?>(TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold')) ,
                                                       backgroundColor: MaterialStateProperty.all<Color?>(Color(0xFFF1F1F1)),
                                                       elevation: MaterialStateProperty.all<double?>(0.0),
@@ -448,407 +486,15 @@ final _firestore = FirebaseFirestore.instance;
                                                   ),
                                                 ];
                                               },
-                                              // onSelected: (String value) {
-                                              //   // Handle selection here
-                                              //   print('Selected: $value');
-                                              // },
-                                              // onSelected: ( value) {
-                                              //   setState(() {
-                                              //     _selectedOption = value; // Update selected option
-                                              //   });
-                                              //   // Handle any additional actions based on the selected option
-                                              //   print('Selected: $value');
-                                              // },
                                             ),
 
 
                                           ],
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: 40,
-                                      ),
-
-                                      ListTile(
-                                        leading: Image.asset('assets/imgs/school/Ellipse 1 (2).png'),
-                                        title: Text('Ahmed Latif'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
-                             subtitle: Text("Bus number : 1458 ى ر س",style:
-                                   TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                        trailing:
-                                            //old pop up  bigger in width
-                                        // PopupMenuButton<String>(
-                                        //   enabled: !isEditingSupervisor,
-                                        //   shape: RoundedRectangleBorder(borderRadius:BorderRadius.all(Radius.circular(10))),
-                                        //   //constraints: const BoxConstraints.expand(width: 110, height: 95),
-                                        //   icon: Padding(
-                                        //     padding: const EdgeInsets.only(left: 8),
-                                        //     child: Icon(Icons.more_vert, size: 30, color: Color(0xFF442B72)),
-                                        //   ),
-                                        //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                        //     PopupMenuItem<String>(
-                                        //       value: 'edit',
-                                        //       child: GestureDetector(
-                                        //         onTap: (){
-                                        //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                        //           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> EditeBus()));
-                                        //
-                                        //         },
-                                        //         child: SizedBox(
-                                        //           height: 20,
-                                        //           child: Row(
-                                        //             children: [
-                                        //               Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
-                                        //               // Transform(
-                                        //               //     alignment: Alignment.center,
-                                        //               //     transform: Matrix4.rotationY(math.pi),
-                                        //               //     child: Icon(Icons.edit_outlined, color: Color(0xFF442B72),size: 17,)
-                                        //               // ),
-                                        //               SizedBox(width: 10),
-                                        //               Text('Edit', style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontFamily: "Poppins-Regular")),
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //     PopupMenuItem<String>(
-                                        //       value: 'delete',
-                                        //       child: SizedBox(
-                                        //         height: 20,
-                                        //         child: GestureDetector(
-                                        //           onTap: (){
-                                        //             Dialoge.deleteBusDialog(context);
-                                        //           },
-                                        //           child: Row(
-                                        //             children: [
-                                        //               //Icon(Icons.delete_outline_outlined, color: Color(0xFF442B72),size: 17,),
-                                        //               Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
-                                        //               SizedBox(width: 10),
-                                        //               Text('Delete', style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontFamily: "Poppins-Regular"),)
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //   ],
-                                        //   onSelected: (String value) {
-                                        //     // Handle selection here
-                                        //     if (value == 'edit') {
-                                        //       // Handle edit action
-                                        //       setState(() {
-                                        //         isEditingSupervisor = true;
-                                        //       });
-                                        //
-                                        //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> EditeBus()));
-                                        //
-                                        //     } else if (value == 'delete') {
-                                        //       // Handle delete action
-                                        //     }
-                                        //   },
-                                        // ),
-                                        PopupMenuButton<String>(
-                                          enabled: !isEditingSupervisor,
-
-                                          shape: RoundedRectangleBorder(
-
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(10.0),
-                                            ),
-                                          ),
-                                          icon: Padding(
-                                            padding: const EdgeInsets.only(left: 8),
-                                            child: Icon(Icons.more_vert,
-                                                size: 30, color: Color(0xFF442B72)),
-                                          ),
-                                          itemBuilder: (BuildContext context) =>
-                                          <PopupMenuEntry<String>>[
-                                            PopupMenuItem<String>(
-                                              value: 'edit',
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  ScaffoldMessenger.of(context)
-                                                      .hideCurrentSnackBar();
-                                                  // Navigator.pushReplacement(
-                                                  //     context,
-                                                  //     MaterialPageRoute(
-                                                  //         builder: (context) =>
-                                                  //             EditeBus()));
-                                                },
-                                                child: SizedBox(
-                                                  height: 20,
-                                                  child: Row(
-                                                    children: [
-                                                      Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
-                                                      // Transform(
-                                                      //     alignment: Alignment.center,
-                                                      //     transform:
-                                                      //         Matrix4.rotationY(math.pi),
-                                                      //     child:
-                                                      //     Icon(
-                                                      //       Icons.edit_outlined,
-                                                      //       color: Color(0xFF442B72),
-                                                      //       size: 17,
-                                                      //     )
-                                                      // ),
-                                                      SizedBox(width: 10),
-                                                      Text('Edit',
-                                                          style: TextStyle(
-                                                              color: Color(0xFF442B72),
-                                                              fontSize: 17)),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            PopupMenuItem<String>(
-                                              value: 'delete',
-                                              child: SizedBox(
-                                                height: 20,
-                                                child: Row(
-                                                  children: [
-                                                    Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
-                                                    // Icon(
-                                                    //   Icons.delete_outline_outlined,
-                                                    //   color: Color(0xFF442B72),
-                                                    //   size: 17,
-                                                    // ),
-                                                    SizedBox(width: 10),
-                                                    Text(
-                                                      'Delete',
-                                                      style: TextStyle(
-                                                          color: Color(0xFF442B72),
-                                                          fontSize: 17),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                          onSelected: (String value) {
-                                            // Handle selection here
-                                            if (value == 'edit') {
-                                              // Handle edit action
-                                              setState(() {
-                                                isEditingSupervisor = true;
-                                              });
-
-                                              // Navigator.pushReplacement(
-                                              //     context,
-                                              //     // MaterialPageRoute(
-                                              //     //     builder: (context) =>
-                                              //     //         EditeBus())
-                                              // );
-                                            } else if (value == 'delete') {
-                                              setState(() {
-
-                                              });
-                                            }
-                                          },
-                                        ),
-                                        //trailing:Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-                                        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),
-                                        tileColor: Colors.white,
-                                        onTap: (){
-                                          showModalBottomSheet(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
-                                            ),
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Container(
-                                                padding: EdgeInsets.all(20),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(40), // Rounded top left corner
-                                                    topRight: Radius.circular(40), // Rounded top right corner
-                                                  ),
-                                                ),
-                                                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6), // Decreased height
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Text('Bus', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                          Expanded(
-                                                            child: Align(
-                                                              alignment: Alignment.centerRight,
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                  shape: BoxShape.circle,
-                                                                  color: Colors.white,
-                                                                  border: Border.all(
-                                                                    color: Color(0xFF442B72),
-                                                                    width: 1,
-                                                                  ),
-                                                                ),
-                                                                child: GestureDetector(
-                                                                  onTap: () {
-                                                                    Navigator.of(context).pop();
-                                                                  },
-                                                                  child: Padding(
-                                                                    padding: const EdgeInsets.all(4.0),
-                                                                    child: FaIcon(
-                                                                      FontAwesomeIcons.times,
-                                                                      color: Color(0xFF442B72),
-                                                                      size: 18,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-
-                                                      SizedBox(height: 10,),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              width: 7,
-                                                              height: 7,
-                                                              decoration: BoxDecoration(
-                                                                shape: BoxShape.circle,
-                                                                color: Color(0xFF442B72),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: 10),
-                                                            Text(
-                                                              'Bus: 1234  ى ر س',
-                                                              style: TextStyle(
-                                                                fontSize: 14,
-                                                                color: Color(0xFF442B72),
-                                                                fontFamily: "Poppins-Regular"
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(height:25,),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        children: [
-                                                        Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
-                                                        Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
-                                                        Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
-                                                      ],),
-                                                      SizedBox(height: 25,),
-                                                      Text("Driver", style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                     SizedBox(height: 10,),
-                                                      Row(
-                                                        children: [
-
-                                                          Align(
-                                                            alignment: Alignment.centerLeft,
-                                                            child: CircleAvatar(
-                                                              radius: 35,
-                                                              backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
-
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: 20,),
-                                                          Column(
-                                                            children: [
-                                                              Text('Shady ayman', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
-                                                              SizedBox(height: 10,),
-                                                              Text('01028765006', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
-
-                                                            ],
-                                                          ),
-                                                          //SizedBox(width: 110,),
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(left: 55),
-                                                            child: Transform(
-                                                              alignment: Alignment.centerRight,
-                                                              transform: Matrix4.rotationY(math.pi),
-                                                              child: Material(
-                                                                elevation: 3,
-                                                                shape: CircleBorder(),
-                                                                child: Align(
-                                                                  alignment: Alignment.centerRight,
-                                                                  child: CircleAvatar(
-                                                                    backgroundColor: Colors.white,
-                                                                    child: FaIcon(
-                                                                      FontAwesomeIcons.phone,
-                                                                      color: Color(0xFF442B72),
-                                                                      size: 26,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-
-
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: 30),
-                                                      Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                      SizedBox(height: 10),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              width: 7,
-                                                              height: 7,
-                                                              decoration: BoxDecoration(
-                                                                shape: BoxShape.circle,
-                                                                color: Color(0xFF442B72),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: 10),
-                                                            Text(
-                                                              'Ahmed Atef',
-                                                              style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Color(0xFF442B72),
-                                                                  fontFamily: "Poppins-Regular"
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              width: 7,
-                                                              height: 7,
-                                                              decoration: BoxDecoration(
-                                                                shape: BoxShape.circle,
-                                                                color: Color(0xFF442B72),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: 10),
-                                                            Text(
-                                                              'Kariem atif',
-                                                              style: TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Color(0xFF442B72),
-                                                                  fontFamily: "Poppins-Regular"
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
 
 
 
-                                        },
-                                      ),
                                       //),
                                       SizedBox(
                                         height: 40,
@@ -917,18 +563,18 @@ final _firestore = FirebaseFirestore.instance;
                                         height: 500,
                                         child: ListView.builder(
                                           // shrinkWrap: true,
-                                            itemCount: data.length,
+                                            itemCount: filteredData.length,
                                             itemBuilder: (context, index) {
                                               return
                                                 Column(
                                                   children: [
                                                     ListTile(
-                                                      leading: Image.network(data[index]['imagedriver'], width: 61, height: 61,
+                                                      leading: Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
                                                                     errorBuilder: (context, error, stackTrace) {
                                                                       return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
                                                                     },),
                                                       title: Text(
-                                                        selectedFilter == 'Bus Number' ? '${data[index]['busnumber']}' : '${data[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
+                                                        selectedFilter == 'Bus Number' ? '${filteredData[index]['busnumber']}' : '${filteredData[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
 
                                                         //'${data[index]['busnumber'] }',
                                                         style: TextStyle(
@@ -939,9 +585,9 @@ final _firestore = FirebaseFirestore.instance;
                                                         ),
                                                         ),
                                                       subtitle: Text(
-                                                        selectedFilter == 'Bus Number' ?'Driver Name : ${data[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
+                                                        selectedFilter == 'Bus Number' ?'Driver Name : ${filteredData[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
                                                         //"Driver Name : "+data[index]['namedriver'],
-                                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
                                                       ),
                                                         trailing:
                                                       PopupMenuButton<String>(
@@ -1060,6 +706,215 @@ final _firestore = FirebaseFirestore.instance;
                                                           }
                                                         },
                                                       ),
+                                                      tileColor: Colors.white,
+                                                      onTap: (){
+                                                        showModalBottomSheet(
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
+                                                          ),
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            return Container(
+                                                              padding: EdgeInsets.all(20),
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.white,
+                                                                borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius.circular(40), // Rounded top left corner
+                                                                  topRight: Radius.circular(40), // Rounded top right corner
+                                                                ),
+                                                              ),
+                                                              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6), // Decreased height
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                child: Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Row(
+                                                                      children: [
+                                                                        Text('Bus', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
+                                                                        Expanded(
+                                                                          child: Align(
+                                                                            alignment: Alignment.centerRight,
+                                                                            child: Container(
+                                                                              decoration: BoxDecoration(
+                                                                                shape: BoxShape.circle,
+                                                                                color: Colors.white,
+                                                                                border: Border.all(
+                                                                                  color: Color(0xFF442B72),
+                                                                                  width: 1,
+                                                                                ),
+                                                                              ),
+                                                                              child: GestureDetector(
+                                                                                onTap: () {
+                                                                                  Navigator.of(context).pop();
+                                                                                },
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.all(4.0),
+                                                                                  child: FaIcon(
+                                                                                    FontAwesomeIcons.times,
+                                                                                    color: Color(0xFF442B72),
+                                                                                    size: 18,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+
+                                                                    SizedBox(height: 10,),
+                                                                    Padding(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            width: 7,
+                                                                            height: 7,
+                                                                            decoration: BoxDecoration(
+                                                                              shape: BoxShape.circle,
+                                                                              color: Color(0xFF442B72),
+                                                                            ),
+                                                                          ),
+                                                                          SizedBox(width: 10),
+                                                                          Text(
+                                                                            'Bus: ${data[index]['busnumber']}',
+                                                                            style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                color: Color(0xFF442B72),
+                                                                                fontFamily: "Poppins-Regular"
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(height:25,),
+                                                                    Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: [
+                                                                        SizedBox(
+                                                                            width: 80,
+                                                                            height: 80,
+                                                                            child: Image.network('${data[index]['busphoto']}',
+                                                                              fit: BoxFit.scaleDown,
+                                                                            )
+                                                                        )
+
+                                                                        // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
+                                                                        // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
+                                                                      ],),
+                                                                    SizedBox(height: 25,),
+                                                                    Text("Driver", style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
+                                                                    SizedBox(height: 10,),
+                                                                    Row(
+                                                                      children: [
+
+                                                                        Align(
+                                                                          alignment: Alignment.centerLeft,
+                                                                          child: CircleAvatar(
+                                                                            radius: 35,
+                                                                            backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
+
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(width: 20,),
+                                                                        Column(
+                                                                          children: [
+                                                                            Text('${data[index]['namedriver']}', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
+                                                                            SizedBox(height: 10,),
+                                                                            Text('${data[index]['phonedriver']}', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
+
+                                                                          ],
+                                                                        ),
+                                                                        //SizedBox(width: 110,),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets.only(left: 55),
+                                                                          child: Transform(
+                                                                            alignment: Alignment.centerRight,
+                                                                            transform: Matrix4.rotationY(math.pi),
+                                                                            child: Material(
+                                                                              elevation: 3,
+                                                                              shape: CircleBorder(),
+                                                                              child: Align(
+                                                                                alignment: Alignment.centerRight,
+                                                                                child: CircleAvatar(
+                                                                                  backgroundColor: Colors.white,
+                                                                                  child: FaIcon(
+                                                                                    FontAwesomeIcons.phone,
+                                                                                    color: Color(0xFF442B72),
+                                                                                    size: 26,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+
+
+                                                                      ],
+                                                                    ),
+                                                                    SizedBox(height: 30),
+                                                                    Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
+                                                                    SizedBox(height: 10),
+                                                                    Padding(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            width: 7,
+                                                                            height: 7,
+                                                                            decoration: BoxDecoration(
+                                                                              shape: BoxShape.circle,
+                                                                              color: Color(0xFF442B72),
+                                                                            ),
+                                                                          ),
+                                                                          SizedBox(width: 10),
+                                                                          Text(
+                                                                            'Ahmed Atef',
+                                                                            style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                color: Color(0xFF442B72),
+                                                                                fontFamily: "Poppins-Regular"
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            width: 7,
+                                                                            height: 7,
+                                                                            decoration: BoxDecoration(
+                                                                              shape: BoxShape.circle,
+                                                                              color: Color(0xFF442B72),
+                                                                            ),
+                                                                          ),
+                                                                          SizedBox(width: 10),
+                                                                          Text(
+                                                                            'Kariem atif',
+                                                                            style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                color: Color(0xFF442B72),
+                                                                                fontFamily: "Poppins-Regular"
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        );
+
+
+
+                                                      },
 
                                                     ),
 
