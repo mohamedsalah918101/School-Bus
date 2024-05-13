@@ -61,10 +61,10 @@ class MyApp extends StatelessWidget{
       home:
       // GoogleMapWidget()
       // TrackSupervisor()
-      ParentsView(),
+      // ParentsView(),
       // AttendanceSupervisorScreen(),
       // AddParents(),
-      // SplashScreen(),
+      SplashScreen(),
     );
   }
 }

@@ -1,11 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
-import '../components/main_bottom_bar.dart';
 import '../model/chat_message_model.dart';
 import '../components/reciver_message_item.dart';
 import '../components/sender_message_item.dart';
