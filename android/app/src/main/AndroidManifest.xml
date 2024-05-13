@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
     <uses-permission android:name="android.permission.MANAGE_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
 
     <application
         android:label="school_account"
@@ -13,6 +17,8 @@
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true"
         >
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyALy3swq7u5ipI1w2hYM6VZXvSoSz-MtIU"/>
 
         <activity
             android:name=".MainActivity"

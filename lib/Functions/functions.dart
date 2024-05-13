@@ -114,3 +114,45 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
     return false;
   }
 }
+
+
+String Home='';
+String SearchiId='';
+int invitestateHome=0;
+
+Future<bool> checkIfNumberExistsForSearch(String phoneNumber) async {
+  CollectionReference schoolDataCollection = FirebaseFirestore.instance.collection('schooldata');
+  CollectionReference parentCollection = FirebaseFirestore.instance.collection('parent');
+  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+
+  try {
+    // بحث في جميع المجموعات للتحقق من وجود الرقم
+    QuerySnapshot schoolDataSnapshot = await schoolDataCollection.where('phoneNumber', isEqualTo: phoneNumber).get();
+    QuerySnapshot parentSnapshot = await parentCollection.where('phoneNumber', isEqualTo: phoneNumber).get();
+    QuerySnapshot supervisorSnapshot = await supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber).get();
+
+     if (supervisorSnapshot.size > 0) {
+      loginType = 'supervisor';
+      SearchiId = supervisorSnapshot.docs[0].id;
+      sharedpref!.setInt('invitstate', supervisorSnapshot.docs[0].get('state'));
+      sharedpref!.setInt('invit', supervisorSnapshot.docs[0].get('invite'));
+
+      // قم بالتوجيه إلى صفحة المشرف هنا
+      // Navigator.pushNamed(context, '/supervisor');
+
+      // استخراج بيانات الـ phoneNumber من مستند supervisor
+      String supervisorPhoneNumber = supervisorSnapshot.docs[0].get('phoneNumber');
+      // يمكنك استخدام هذه البيانات كما تحتاج، على سبيل المثال، تخزينها في متغير لاستخدامه لاحقًا
+      print('Supervisor Phone Number: $supervisorPhoneNumber');
+
+      return true;
+    }
+    // إذا كان الرقم غير موجود
+    else {
+      return false;
+    }
+  } catch (error) {
+    print('Error: $error');
+    return false;
+  }
+}

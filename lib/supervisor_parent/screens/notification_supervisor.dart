@@ -1,25 +1,15 @@
-import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/notification_item.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent_takebus.dart';
-import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../model/chat_message_model.dart';
-import '../components/custom_app_bar.dart';
-import '../components/reciver_message_item.dart';
-import '../components/sender_message_item.dart';
 import '../model/notification_message_model.dart';
 
 class NotificationsSupervisor extends StatefulWidget {
@@ -31,6 +21,24 @@ class NotificationsSupervisor extends StatefulWidget {
 class _NotificationsSupervisorState extends State<NotificationsSupervisor> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<ChildDataItem> children = [];
+  getToken() async {
+    try {
+      String? myToken = await FirebaseMessaging.instance.getToken();
+      print('object Attendance');
+      print(myToken);
+    } on PlatformException catch (e) {
+      if (e.code == 'ERROR_GET_TOKEN') {
+        print('Failed to get FCM token with error: ${e.message}');
+      }
+    }
+  }
+
+
+  @override
+  void initState() {
+    getToken();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

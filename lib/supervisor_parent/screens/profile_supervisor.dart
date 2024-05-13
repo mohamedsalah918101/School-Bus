@@ -201,18 +201,12 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                         EdgeInsets.only(left: 105.0 , top: 5 ),
                         child: Stack(
                           children: [
-                            GestureDetector(
-                              onTap: (){
-                                _pickImageFromGallery();
-                                print('object');
-                              },
+                            CircleAvatar(
+                              radius: 52.5,
+                              backgroundColor: Color(0xff442B72),
                               child: CircleAvatar(
-                                radius: 52.5,
-                                backgroundColor: Color(0xff442B72),
-                                child: CircleAvatar(
-                                  backgroundImage: NetworkImage('${data[0]['busphoto'] }'),
-                                  radius: 50.5,
-                                ),
+                                backgroundImage: NetworkImage('${data[0]['busphoto'] }'),
+                                radius: 50.5,
                               ),
                             ),
                             (sharedpref?.getString('lang') == 'ar')?
@@ -270,25 +264,21 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                             ),
                                                           ),
                                                           child: Align(alignment: Alignment.bottomCenter,
-                                                            child: CircleAvatar(radius: 20,
-                                                              backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
-                                                              ,backgroundColor: Colors.white,
+                                                            child: GestureDetector(
+                                                              onTap: (){
+                                                                _pickImageFromGallery();
+                                                                print('object');
+                                                              },
+                                                              child: CircleAvatar(radius: 20,
+                                                                backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                                                ,backgroundColor: Colors.white,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                        // child: Image.asset('assets/images/Vector (13)profile.png',
-                                                        //   width: 55,
-                                                        //   height: 55,),
-                                                        onTap:()async {
-
-                                                          await _pickImageFromGallery();
-
-                                                          print('objectttt');
-                                                          setState(() {
-
-                                                          });}  , // Call function when tapped
+                                                       // Call function when tapped
                                                       ),
-                                                      if ( file != null ) Image.file(file!),
+
                                                       SizedBox(width: 15,),
                                                       Text('Select profile picture'.tr,
                                                         style: TextStyle(
@@ -369,9 +359,15 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                   EdgeInsets.only(left: 20.0, top: 15),
                                                   child: Row(
                                                     children: [
-                                                      Image.asset('assets/images/Vector (13)profile.png',
-                                                      width: 55,
-                                                      height: 55,),
+                                                      GestureDetector(
+                                                        onTap: (){
+                                                          _pickImageFromGallery();
+                                                          print('object');
+                                                        },
+                                                        child: Image.asset('assets/images/Vector (13)profile.png',
+                                                        width: 55,
+                                                        height: 55,),
+                                                      ),
                                                       SizedBox(width: 15,),
                                                       Text('Select profile picture',
                                                         style: TextStyle(
@@ -390,7 +386,9 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                     fontFamily: 'Poppins-Regular',
                                                     width: 278,
                                                     hight: 48,
-                                                    onPress: (){},
+                                                    onPress: (){
+                                                      Navigator.of(context).pop();
+                                                    },
                                                     color: Color(0xff442B72),
                                                     fontSize: 16)
                                               ],
@@ -426,7 +424,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
             padding: const EdgeInsets.only(bottom: 55.0),
             child: GestureDetector(
                 onTap: () {
-                  if (data.isNotEmpty) { // التحقق من أن القائمة ليست فارغة
+                  if (data.isNotEmpty) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) =>
                         EditProfileSupervisorScreen(
                           docid: data[0].id,

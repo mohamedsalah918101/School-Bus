@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
@@ -26,9 +27,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
-
-
-
+  List<QueryDocumentSnapshot> dataSupervisor = [];
 
 
   getData()async{
@@ -37,10 +36,18 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
     setState(() {
     });
   }
+  getDataForSupervisor()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').get();
+    dataSupervisor.addAll(querySnapshot.docs);
+    setState(() {
+    });
+  }
 
   @override
   void initState() {
     getData();
+    getDataForSupervisor();
+    checkIfNumberExistsForSearch('phoneNumber');
     super.initState();
     setState(() {
 
@@ -83,7 +90,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               ),
                             ),
                             TextSpan(
-                              text: 'Ahmed',
+                              text: '${dataSupervisor?[0]['name'] }',
                               style: TextStyle(
                                 color: Color(0xFF993D9A),
                                 fontSize: 16,
@@ -207,7 +214,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: 3,
+                                  itemCount: data.length-3,
                                   // data.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     return Column(

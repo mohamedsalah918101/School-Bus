@@ -70,8 +70,8 @@ class _EditAddParentsState extends State<EditAddParents> {
           List<Map<String, dynamic>> childrenData = List.generate(
             int.parse(_numberOfChildrenController.text),
                 (index) => {
-              'name': nameChildControllers[index].text,
-              'grade': gradeControllers[index].text,
+              // 'name': nameChildControllers[index].text,
+              // 'grade': gradeControllers[index].text,
             },
           );
 
@@ -80,7 +80,7 @@ class _EditAddParentsState extends State<EditAddParents> {
             'typeOfParent': selectedValue,
             'name': _nameController.text,
             'numberOfChildren': _numberOfChildrenController.text,
-            'childern': childrenData, // إضافة بيانات الأطفال هنا
+            'childern': childrenData,
           });
 
           print('document updated successfully');
@@ -108,6 +108,9 @@ class _EditAddParentsState extends State<EditAddParents> {
     // nameController.text = widget.oldNameOfChild!;
     // List<String> grades = widget.oldGradeOfChild!;
     // gradeControllers = grades.map((grade) => TextEditingController(text: grade)).toList();
+    setState(() {
+
+    });
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -1170,13 +1173,65 @@ class _EditAddParentsState extends State<EditAddParents> {
                                 width: 277,
                                 hight: 48,
                                 onPress: () async {
-                                    InvitationSendSnackBar(context, 'Invitation sent successfully');
+                                  setState(() {
+                                    // تحقق من الأخطاء هنا
+                                    if (selectedValue.isEmpty) {
+                                      typeOfParentError = false;
+                                    } else {
+                                      typeOfParentError = true;
+                                    }
+
+                                    if (_nameController.text.isEmpty) {
+                                      nameError = false;
+                                    } else {
+                                      nameError = true;
+                                    }
+
+                                    if (_phoneNumberController.text.length < 11) {
+                                      phoneError = false;
+                                    } else {
+                                      phoneError = true;
+                                    }
+
+                                    if (_numberOfChildrenController.text.isEmpty) {
+                                      numberOfChildrenError = false;
+                                    } else {
+                                      numberOfChildrenError = true;
+                                    }
+
+                                    // تحقق من الأخطاء في كل بطاقة طفل
+                                    for (int i = 0; i < nameChildControllers.length; i++) {
+                                      if (nameChildControllers[i].text.isEmpty) {
+                                        nameChildeError = false;
+                                      } else {
+                                        nameChildeError = true;
+                                      }
+                                      if (gradeControllers[i].text.isEmpty) {
+                                        GradeError = false;
+                                      } else {
+                                        GradeError = true;
+                                      }
+                                    }
+                                  });
+                                  setState(() {
+
+                                  });
+                                  if (
+                                  // GradeError &&
+                                  // nameChildeError &&
+                                  typeOfParentError &&
+                                      nameError &&
+                                      phoneError &&
+                                      numberOfChildrenError
+                                  ) {
                                     editAddParent();
+                                    InvitationSendSnackBar(context, 'Invitation sent successfully');
                                     print('object');
                                     NumberOfChildrenCard = false;
-                                    setState(() {
-                                    });
-                                  },
+                                    Navigator.pop(context , true);
+
+                                  }
+                                },
                                 color: Color(0xFF442B72),
                                 fontSize: 16),
                           ),

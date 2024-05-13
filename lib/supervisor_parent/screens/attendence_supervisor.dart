@@ -1,28 +1,17 @@
-// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/check_in_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
-import 'package:school_account/supervisor_parent/components/parents_card_in_student.dart';
-import 'package:school_account/supervisor_parent/components/student_card_in_student.dart';
-import 'package:school_account/supervisor_parent/components/students_card_in_home.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/bus_component.dart';
-import '../components/main_bottom_bar.dart';
-import '../components/supervisor_card.dart';
-import 'notification_parent.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+
 class AttendanceSupervisorScreen extends StatefulWidget {
   AttendanceSupervisorScreen({
     Key? key,
@@ -36,17 +25,30 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   bool isStarting = false;
   List<ChildDataItem> children = [];
 
-  // getToken() async{
+//   getToken() async{
 //       String? myToken = await FirebaseMessaging.instance.getToken();
-//       print('object');
+//       print('object Attendance');
 //       print(myToken);
 // }
-//
-// @override
-//   void initState() {
-//      getToken();
-//      super.initState();
-//   }
+
+  getToken() async {
+    try {
+      String? myToken = await FirebaseMessaging.instance.getToken();
+      print('object Attendance');
+      print(myToken);
+    } on PlatformException catch (e) {
+      if (e.code == 'ERROR_GET_TOKEN') {
+        print('Failed to get FCM token with error: ${e.message}');
+      }
+    }
+  }
+
+
+@override
+  void initState() {
+     getToken();
+     super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,6 +164,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     )
                                   ),
                                   onPressed: () async {
+                                    // getToken();
                                     isStarting =
                                     // children.isNotEmpty?
                                     true;

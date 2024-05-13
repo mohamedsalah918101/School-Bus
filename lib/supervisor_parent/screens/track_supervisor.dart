@@ -1,33 +1,26 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:label_marker/label_marker.dart';
 
+//AIzaSyALy3swq7u5ipI1w2hYM6VZXvSoSz-MtIU
 
-
-import '../components/custom_app_bar.dart';
 
 class TrackSupervisor extends StatefulWidget {
   @override
@@ -37,20 +30,39 @@ class TrackSupervisor extends StatefulWidget {
 class _TrackSupervisorState extends State<TrackSupervisor> {
   late final String title;
   // List<ChildDataItem> children = [];
+  List<QueryDocumentSnapshot> data = [];
+  List<QueryDocumentSnapshot> dataBus = [];
   bool tracking = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   Set<Marker> markers = {};
   GoogleMapController? controller;
   LatLng startLocation = const LatLng(27.1778429, 31.1859626);
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
 
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    // data.addAll(querySnapshot.docs);
+    setState(() {
+      data = querySnapshot.docs;
+    });
+  }
+
+  getDataForBusInfo()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
+    // data.addAll(querySnapshot.docs);
+    setState(() {
+      dataBus = querySnapshot.docs;
+    });
+  }
+
   @override
   void initState() {
+    getData();
+    getDataForBusInfo();
     super.initState();
     loadCustomIcon();
   }
-  //
+
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
 
   Future<void> loadCustomIcon() async {
@@ -152,20 +164,17 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
               SizedBox(
                 height: 350,
                 child: GoogleMap(
-                  scrollGesturesEnabled: true,
-                  gestureRecognizers: Set()
-                    ..add(Factory<EagerGestureRecognizer>(() =>
-                        EagerGestureRecognizer())),
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(27.180134, 31.189283),
-                    zoom: 12,
-                  ),
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                      target: LatLng(37.42796133580664, -122.085749655962),
+                      zoom: 14.4746,
+                    ),
                   markers: markers,
-                  onMapCreated: ((mapController) {
+                    onMapCreated: ((mapController) {
                     setState(() {
                       controller = mapController;
-                    });
-
+                    }
+                    );
                     markers.add(
                       Marker(
                         // consumeTapEvents: true,
@@ -360,7 +369,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            if (index == 19 ) {
+                            if (index == data.length -1 ) {
                               return Row(
                                 children: [
                                   (sharedpref?.getString('lang') == 'ar')?
@@ -383,7 +392,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Manar Ali'.tr,
+                                        '${data[index]['childern'][0]['name'] }',
                                         style: TextStyle(
                                           color: Color(0xFF442B72),
                                           fontSize: 15,
@@ -476,7 +485,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Manar Ali'.tr,
+                                          '${data[index]['childern'][0]['name'] }',
                                           style: TextStyle(
                                             color: Color(0xFF442B72),
                                             fontSize: 15,
@@ -526,7 +535,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Manar Ali'.tr,
+                                       '${data[index]['childern'][0]['name'] }',
                                         style: TextStyle(
                                           color: Color(0xFF442B72),
                                           fontSize: 15,
@@ -564,7 +573,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 height: 20,
                               );}
                           },
-                          itemCount: 20,
+                          itemCount: data.length,
                         ),
                         (sharedpref?.getString('lang') == 'ar')?
                         Positioned(
@@ -613,7 +622,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 height: 12,
                               ),
                               Text(
-                                " 1458 ى ر س ",
+                               '${dataBus[0]['busnumber'] }',
                                 textDirection: _getTextDirection(" 1458ى ر س "),
                                 style: TextStyle(
                                   color: Color(0xFF919191),
@@ -644,7 +653,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 height: 12,
                               ),
                               Text(
-                                'Ahmed Emad'.tr,
+                                '${dataBus[0]['namedriver'] }',
                                 style: TextStyle(
                                   color: Color(0xFF919191),
                                   fontSize: 18,
@@ -682,8 +691,9 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                               Image.asset('assets/images/photo container (1).png',
                                 width: 144, height: 154.42,),
                               SizedBox(width: 10,),
-                              Image.asset('assets/images/photo container.png',
-                                width: 104, height: 111.53,),
+                              Image.network('${dataBus[3]['busphoto'] }',
+                                width: 104, height: 111.53,
+                              fit: BoxFit.cover,),
                               SizedBox(width: 10,),
                               Image.asset('assets/images/Property 1=3.png',
                                 width: 104, height: 111.53,),

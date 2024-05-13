@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,8 +7,10 @@ import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
+import 'package:school_account/supervisor_parent/screens/googlemap_test.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
+import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -54,7 +58,10 @@ class MyApp extends StatelessWidget{
       locale: Controller.intialLang,
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
-      home:ParentsView(),
+      home:
+      // GoogleMapWidget()
+      // TrackSupervisor()
+      ParentsView(),
       // AttendanceSupervisorScreen(),
       // AddParents(),
       // SplashScreen(),

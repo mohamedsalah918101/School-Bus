@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
@@ -17,6 +18,25 @@ class ProfileCardInSupervisor extends StatefulWidget {
 }
 
 class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
+
+  List<QueryDocumentSnapshot> data = [];
+
+
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+    setState(() {
+
+    });
+  }
 
 
   @override
@@ -55,7 +75,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ahmed Latif',
+                    Text('${data?[0]['name'] }',
                     style: TextStyle(
                       color: Color(0xff442B72),
                       fontSize: 15,
@@ -63,7 +83,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                       fontWeight: FontWeight.w700,
                       // height: 1,
                     ),),
-                    Text('01239847635',
+                    Text('${data?[0]['phoneNumber'] }',
                     style: TextStyle(
                       color: Color(0xff442B72),
                       fontSize: 12,

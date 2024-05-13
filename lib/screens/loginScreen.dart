@@ -512,6 +512,11 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                                     _isLoading = false;
 
                                                   });
+                                                  bool isNumberExists = await checkIfNumberExistsForSearch(_phoneNumberController.text);
+                                                  setState(() {
+                                                    _isLoading = false;
+                                                  });
+
                                               if(res){
                                                 verifyPhoneNumber(enteredPhoneNumber);
 

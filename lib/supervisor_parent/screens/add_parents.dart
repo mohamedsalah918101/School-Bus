@@ -1209,8 +1209,8 @@ class _AddParentsState extends State<AddParents> {
                                   phoneError &&
                                   numberOfChildrenError
                               ) {
-                                InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 _addDataToFirestore();
+                                InvitationSendSnackBar(context, 'Invitation sent successfully');
                                 print('object');
                                 NumberOfChildrenCard = false;
                                 setState(() {});
