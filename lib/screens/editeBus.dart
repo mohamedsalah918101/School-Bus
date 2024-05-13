@@ -74,7 +74,7 @@ class _EditeBusState extends State<EditeBus> {
 
           await Bus.doc(widget.docid).update({
              'busnumber': _busnumbercontroller.text,
-             'busphoto': _imagebuscontroller.reactive,
+             //'busphoto': _imagebuscontroller.reactive,
             'imagedriver': imageUrldriver,
             'namedriver':_namedrivercontroller.text,
             'phonedriver':_phonedrivercontroller.text,
@@ -370,6 +370,7 @@ class _EditeBusState extends State<EditeBus> {
                               width: constrains.maxWidth / 1.3,
                               height: 38,
                               child: TextField(
+
                                 style: TextStyle(color: Color(0xFF442B72)),
                                  controller: _namedrivercontroller,
                                 cursorColor: const Color(0xFF442B72),
@@ -378,7 +379,7 @@ class _EditeBusState extends State<EditeBus> {
                                     vertical: 40),
                                 decoration:  InputDecoration(
                                   // labelText: 'Shady Ayman'.tr,
-                                 // hintText:'Ahmed Karim'.tr ,
+
                                   hintStyle: TextStyle(color: Color(0xff442B72)),
                                   alignLabelWithHint: true,
                                   counterText: "",
