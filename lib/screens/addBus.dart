@@ -84,6 +84,21 @@ class _AddBusState extends State<AddBus> {
       //Some error occurred
     }
   }
+  List<QueryDocumentSnapshot> data = [];
+  List<DropdownCheckboxItem> items=[];
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+        .get();
+
+   // data.addAll(querySnapshot.docs);
+    for(int i=0;i<querySnapshot.docs.length;i++)
+      {
+        items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name')));
+      }
+    setState(() {
+
+    });
+  }
   //fun image bus from gallery
   Future _pickBusImageFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -158,7 +173,7 @@ class _AddBusState extends State<AddBus> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-
+    getData();
   }
   OutlineInputBorder myInputBorder() {
     return const OutlineInputBorder(
@@ -872,13 +887,10 @@ class _AddBusState extends State<AddBus> {
                     // ),
                               Container(
                                 child:DropdownCheckbox(
-                                items: [
-                                  DropdownCheckboxItem(label: 'Ahmed Atef'),
-                                  DropdownCheckboxItem(label: 'Shady Aymen'),
-                                  DropdownCheckboxItem(label: 'Karem Ahmed'),
-                                  DropdownCheckboxItem(label: 'Shady Aymen'),
-                                  DropdownCheckboxItem(label: 'Karem Ahmed'),
-                                ], ),),
+
+                                items:
+                                  items
+                                 ),),
                               // DropdownButtonFormField(value:null,items: [], onChanged: (value){}),
                               // DropdownButton<String>(
                               //   hint: Text('Select an option'),

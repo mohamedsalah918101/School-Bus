@@ -11,7 +11,7 @@ class DropdownCheckbox extends StatefulWidget {
 }
 class _DropdownCheckboxState extends State<DropdownCheckbox> {
   bool isDropdownOpened = false;
-
+  List<DropdownCheckboxItem> selectedItems = [];
   @override
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
@@ -28,16 +28,21 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                 });
               },
               child: Container(
+
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Color(0xFFF1F1F1),
                   border: Border.all(color: Color(0xFFFFC53E),width: 0.5),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                child: Row(
+                child:
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Supervisor',style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
+
+                    Text('Supervisor',
+
+                      style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
                       fontFamily: 'Poppins-Bold',),),
                    Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
                    // Icon(Icons.arrow_drop_down),
@@ -89,7 +94,15 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                           onChanged: (value) {
                             setState(() {
                               item.isChecked = value!;
+                              if (value) {
+                                selectedItems.add(item); // Add to selected items list
+                              } else {
+                                selectedItems.remove(item); // Remove from selected items list
+                              }
                             });
+                            // setState(() {
+                            //   item.isChecked = value!;
+                            // });
                           },
                         ),
                       );

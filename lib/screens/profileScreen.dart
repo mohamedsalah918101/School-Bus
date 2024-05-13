@@ -1,13 +1,14 @@
 import 'dart:async';
 
-//
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/screens/editeProfile.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
-//import '../components/child_data_item.dart';
 import '../components/custom_app_bar.dart';
 import '../components/dialogs.dart';
 import '../components/home_drawer.dart';
@@ -15,8 +16,10 @@ import '../main.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'notificationsScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 import 'dart:math' as math;
-//import '../components/profile_child_card.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -28,19 +31,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _firestore = FirebaseFirestore.instance;
   bool isEditingProfile = false;
   List<QueryDocumentSnapshot> data = [];
+  File ? _selectedImageProfile;
+  String? profileimageUrl;
+  Future _pickProfileImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImageProfile=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('profilephoto');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('profile');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      profileimageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $profileimageUrl');
+      return profileimageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('schooldata').get();
     data.addAll(querySnapshot.docs);
     setState(() {
       data = querySnapshot.docs;
     });
-  }
+   }
+  late User? currentUser;
+  late User? _currentUser;
+
+  late String? _currentId;
   @override
   void initState() {
     super.initState();
+    currentUser = FirebaseAuth.instance.currentUser;
     // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
     // responsible
     getData();
+    //getDocumentData(currentId!);
+    //getUserProfileData();
     // setState(() {
     //   filteredData = data;
     // });
@@ -50,7 +94,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ]);
   }
 
-  void _editProfileDocument(String documentId, String nameenglish, String namearabic, String address,String coordinatorname,String supportnumbner,String schoollogo) {
+  Future<void> _getCurrentIdFromSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    _currentId = prefs.getString('id');
+  }
+   String? currentId;
+  Future<void> getCurrentIdFromSharedPreferences() async {
+    // Call the getCurrentId() function to retrieve the current ID
+    String? id = await getCurrentId();
+
+    // Update the state with the retrieved ID
+    setState(() {
+      currentId = id;
+    });
+  }
+
+  Future<DocumentSnapshot> getDocumentData(String documentId) async {
+    return await FirebaseFirestore.instance.collection('schooldata').doc(documentId).get();
+  }
+  Future<String?> getCurrentId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('currentId'); // Replace 'currentId' with your preference key
+  }
+  // void _editProfileDocumentFromSharedPreferences() async {
+  //   String? currentId = await getCurrentId();
+  //
+  //   if (currentId != null) {
+  //     // Retrieve other data associated with the current ID (e.g., from Firestore)
+  //     // For example, you might have a function to fetch document data based on ID
+  //     DocumentSnapshot snapshot = await getDocumentData(currentId);
+  //
+  //     // Use the retrieved data in the _editProfileDocument function
+  //     _editProfileDocument(
+  //       currentId,
+  //       snapshot['nameEnglish'],
+  //       snapshot['nameArabic'],
+  //       snapshot['address'],
+  //       snapshot['coordinatorName'],
+  //       snapshot['supportNumber'],
+  //       snapshot['photo'],
+  //     );
+  //   } else {
+  //     // Handle case where current ID is not found in shared preferences
+  //     print('Current ID not found in shared preferences');
+  //   }
+  // }
+
+  void _editProfileDocument(String documentId, String nameenglish,
+      String namearabic, String address,String coordinatorname,String supportnumbner,String schoollogo) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -285,11 +376,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: CircleAvatar(
                                     backgroundColor: Colors.white,
                                     radius: 10,
-                                    child: Image.asset(
-                                      'assets/imgs/school/edite.png',
-                                      fit: BoxFit.cover,
-                                      width: 15,
-                                      height: 15,
+                                    child:
+                                    // GestureDetector(
+                                    //   onTap:()async {
+                                    //     await _pickProfileImageFromGallery();}  , // Call function when tapped
+                                    //   child: _selectedImageProfile != null
+                                    //       ? Image.file(
+                                    //     _selectedImageProfile!,  // Display the uploaded image
+                                    //     width: 83,  // Set width as per your preference
+                                    //     height: 78.5,  // Set height as per your preference
+                                    //     fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                    //   )
+                                    //       :
+                                    //   Container(
+                                    //
+                                    //     width: 65, // Adjust size as needed
+                                    //     height: 65,
+                                    //     decoration: BoxDecoration(
+                                    //       shape: BoxShape.circle,
+                                    //
+                                    //       border: Border.all(
+                                    //         color: Color(0xffCCCCCC), // Adjust border color
+                                    //         width: 2, // Adjust border width
+                                    //       ),
+                                    //     ),
+                                    //     child: Align(alignment: Alignment.bottomCenter,
+                                    //       child: CircleAvatar(radius: 20,
+                                    //
+                                    //         backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                    //         ,backgroundColor: Colors.white,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    GestureDetector(
+                                      onTap: (){
+                                        _pickProfileImageFromGallery();
+                                      },
+                                      child: Image.asset(
+                                        'assets/imgs/school/edite.png',
+                                        fit: BoxFit.cover,
+                                        width: 15,
+                                        height: 15,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -354,10 +483,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       top:15,
                       right: 5,
                       child: ElevatedButton(
-                        onPressed: () {
-                        // لسه معملتش ان الداته تتنقل لصفحه الايديت
-                         // Navigator.push(context, MaterialPageRoute(builder: (context)=>_editProfileDocument()));
-                        },
+                         onPressed: () {
+                        //   // String currentUserId = sharedpref!.getString('id');
+                        //   // QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                        //   //     .collection('schooldata')
+                        //   //     .where('id', isEqualTo: currentUserId)
+                        //   //     .get();
+                        //   // if (querySnapshot.docs.isNotEmpty) {
+                        //   //   DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+                        //   //   _editProfileDocument(
+                        //   //     documentSnapshot.id,
+                        //   //     documentSnapshot['nameEnglish'],
+                        //   //     documentSnapshot['nameArabic'],
+                        //   //     documentSnapshot['address'],
+                        //   //     documentSnapshot['coordinatorName'],
+                        //   //     documentSnapshot['supportNumber'],
+                        //   //     documentSnapshot['photo'],
+                        //   //   );
+                        //   // }
+                        // // لسه معملتش ان الداته تتنقل لصفحه الايديت
+
+                             _editProfileDocument(
+                            data[0].id,
+                            data[0]['nameEnglish'],
+                            data[0]['nameArabic'],
+                            data[0]['address'],
+                            data[0]['coordinatorName'],
+                            data[0]['supportNumber'],
+                            data[0]['photo']
+                          );
+
+                         },
+                        // onPressed: () async {
+                        //   DocumentSnapshot? userProfile = await getUserProfileData();
+                        //
+                        //   if (userProfile != null) {
+                        //     _editProfileDocument(
+                        //       userProfile.id,
+                        //       userProfile['nameEnglish'],
+                        //       userProfile['nameArabic'],
+                        //       userProfile['address'],
+                        //       userProfile['coordinatorName'],
+                        //       userProfile['supportNumber'],
+                        //       userProfile['schoolLogo'],
+                        //     );
+                        //     // Handle retrieved user profile data
+                        //     print('User Profile Data: ${userProfile.data()}');
+                        //   } else {
+                        //     // Handle error
+                        //     print('Failed to fetch user profile data');
+                        //   }
+                        // },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(

@@ -29,6 +29,7 @@ import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/sendInvitationScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../classes/dropdownRadiobutton.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -54,6 +55,16 @@ class BusScreen extends StatefulWidget{
 
 
 class BusScreenSate extends State<BusScreen> {
+  //fun to make call
+
+  void _makePhoneCall(String phoneNumber) async {
+    var mobileCall = 'tel:$phoneNumber';
+    if (await canLaunchUrlString(mobileCall)) {
+      await launchUrlString(mobileCall);
+    } else {
+      throw 'Could not launch $mobileCall';
+    }
+  }
   List<QueryDocumentSnapshot> filteredData = [];
   List<QueryDocumentSnapshot<Object?>> filteredQuerySnapshots = [];
 
@@ -72,14 +83,14 @@ getData()async{
     //filteredData = List.from(data);
   });
 }
-void _editBusDocument(String documentId, String photodriver, String drivername, String driverphone,String photobus,String numberbus ) {
+void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ) {
   Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) => EditeBus(
         docid: documentId,
-        oldphotodriver: photodriver,
-          olddrivername:drivername,
+        oldphotodriver: imagedriver,
+          olddrivername:namedriver,
           olddriverphone:driverphone,
          oldphotobus:photobus,
           olddnumberbus:numberbus
@@ -565,14 +576,45 @@ final _firestore = FirebaseFirestore.instance;
                                           // shrinkWrap: true,
                                             itemCount: filteredData.length,
                                             itemBuilder: (context, index) {
+                                              String supervisorPhoneNumber = filteredData[index]['phonedriver'];
+                                              // to change image depended on filter if filter with bus number show image of bus & if filter with driver name image of driver appear
+                                              String imageUrl = selectedFilter == 'Bus Number'
+                                                  ? filteredData[index]['busphoto'] // Use busphoto for Bus Number filter
+                                                  : filteredData[index]['imagedriver'];
+                                              // Determine the fallback image asset based on the selected filter
+                                              String defaultImageAsset = selectedFilter == 'Bus Number'
+                                                  ? 'assets/imgs/school/bus 2.png' // Default image for Bus Number filter
+                                                  : 'assets/imgs/school/default_driver_image.png'; // Default image for Driver Name filter
                                               return
                                                 Column(
                                                   children: [
                                                     ListTile(
-                                                      leading: Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
-                                                                    errorBuilder: (context, error, stackTrace) {
-                                                                      return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
-                                                                    },),
+                                                      leading:imageUrl.isNotEmpty
+                                                          ? Image.network(
+                                                        imageUrl,
+                                                        width: 61,
+                                                        height: 61,
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          // Display a default image if loading fails
+                                                          return Image.asset(
+                                                            defaultImageAsset,
+                                                            width: 61,
+                                                            height: 61,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                          : Image.asset(
+                                                        defaultImageAsset,
+                                                        width: 61,
+                                                        height: 61,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                      // Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
+                                                      //               errorBuilder: (context, error, stackTrace) {
+                                                      //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                                      //               },),
                                                       title: Text(
                                                         selectedFilter == 'Bus Number' ? '${filteredData[index]['busnumber']}' : '${filteredData[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
 
@@ -828,22 +870,41 @@ final _firestore = FirebaseFirestore.instance;
                                                                         ),
                                                                         //SizedBox(width: 110,),
                                                                         Padding(
-                                                                          padding: const EdgeInsets.only(left: 55),
-                                                                          child: Transform(
-                                                                            alignment: Alignment.centerRight,
-                                                                            transform: Matrix4.rotationY(math.pi),
-                                                                            child: Material(
-                                                                              elevation: 3,
-                                                                              shape: CircleBorder(),
-                                                                              child: Align(
-                                                                                alignment: Alignment.centerRight,
+                                                                          padding:
+                                                                          const EdgeInsets.only(
+                                                                              left:80),
+                                                                          child: Material(
+                                                                            elevation: 3,
+                                                                            shape: CircleBorder(),
+                                                                            child: Align(
+                                                                              alignment: Alignment
+                                                                                  .centerRight,
+                                                                              child: GestureDetector(
+                                                                                onTap: ()async{
+                                                                                  _makePhoneCall(supervisorPhoneNumber);
+                                                                                  //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                  //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                },
+                                                                                // onTap: () async {
+                                                                                //   try {
+                                                                                //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                //   } catch (e) {
+                                                                                //     print('Error making phone call: $e');
+                                                                                //     // Handle error gracefully (e.g., show a snackbar or alert)
+                                                                                //   }
+                                                                                // },
                                                                                 child: CircleAvatar(
-                                                                                  backgroundColor: Colors.white,
-                                                                                  child: FaIcon(
-                                                                                    FontAwesomeIcons.phone,
-                                                                                    color: Color(0xFF442B72),
-                                                                                    size: 26,
-                                                                                  ),
+                                                                                  backgroundColor:
+                                                                                  Colors.white,
+                                                                                  child:Transform.scale(
+                                                                                      scaleX: -1,
+                                                                                      child:  FaIcon(
+                                                                                        FontAwesomeIcons
+                                                                                            .phone,
+                                                                                        color: Color(
+                                                                                            0xFF442B72),
+                                                                                        size: 26,
+                                                                                      )),
                                                                                 ),
                                                                               ),
                                                                             ),

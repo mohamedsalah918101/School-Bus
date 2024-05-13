@@ -1,9 +1,12 @@
 import 'dart:async';
 
+
 //
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/components/elevated_simple_button.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -14,6 +17,7 @@ import '../components/dialogs.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'notificationsScreen.dart';
+import 'dart:io';
 //import '../components/profile_child_card.dart';
 
 class EditeProfile extends StatefulWidget {
@@ -66,6 +70,56 @@ class _EditeProfileState extends State<EditeProfile> {
           color:  Color(0xFF442B72),
           width: 0.5,
         ));
+  }
+  File ? _selectedImageEditeProfile;
+  String? editeprofileimageUrl;
+  Future _pickEditeProfileImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImageEditeProfile=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('editeprofilephoto');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('editeprofile');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      editeprofileimageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $editeprofileimageUrl');
+      return editeprofileimageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    _nameEnglish.text = widget.oldNameEnglish!;
+    _nameArabic.text=widget.oldNameArabic!;
+    _Address.text=widget.oldAddress!;
+    _coordinatorName.text=widget.oldCoordinatorName!;
+    _supportNumber.text=widget.oldSupportNumber!;
+    editeprofileimageUrl=widget.oldSchoolLogo!;
+    // responsible
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
   }
 
   @override
@@ -179,11 +233,16 @@ class _EditeProfileState extends State<EditeProfile> {
                               backgroundColor: Colors.white,
                               // Set background color to white
                               radius:10, // Set the radius according to your preference
-                              child: Image.asset(
-                                'assets/imgs/school/edite.png',
-                                fit: BoxFit.cover,
-                                width: 15, // Set width of the image
-                                height: 15, // Set height of the image
+                              child: GestureDetector(
+                                onTap: (){
+                                  _pickEditeProfileImageFromGallery();
+                                },
+                                child: Image.asset(
+                                  'assets/imgs/school/edite.png',
+                                  fit: BoxFit.cover,
+                                  width: 15, // Set width of the image
+                                  height: 15, // Set height of the image
+                                ),
                               ),
                             ),
                           ),
@@ -220,7 +279,7 @@ class _EditeProfileState extends State<EditeProfile> {
 
                   decoration:  InputDecoration(
                     //labelText: 'Shady Ayman'.tr,
-                    hintText:'ElSalam School '.tr ,
+                    //hintText:'ElSalam School '.tr ,
                     hintStyle: TextStyle(color: Color(0xFF442B72)),
                     alignLabelWithHint: true,
                     counterText: "",
@@ -260,7 +319,7 @@ class _EditeProfileState extends State<EditeProfile> {
 
                   decoration:  InputDecoration(
                     //labelText: 'Shady Ayman'.tr,
-                    hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
+                   // hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
                     hintStyle: TextStyle(color: Color(0xFF442B72)),
                     alignLabelWithHint: true,
                     counterText: "",
@@ -297,7 +356,7 @@ class _EditeProfileState extends State<EditeProfile> {
                       vertical: 40),
                   decoration:  InputDecoration(
                     //labelText: 'Shady Ayman'.tr,
-                    hintText:'16 Khaled st, Asyut,Egypt'.tr ,
+                  //  hintText:'16 Khaled st, Asyut,Egypt'.tr ,
                     hintStyle: TextStyle(color: Color(0xFF442B72)),
                     alignLabelWithHint: true,
                     counterText: "",
@@ -347,7 +406,7 @@ class _EditeProfileState extends State<EditeProfile> {
 
                   decoration:  InputDecoration(
                     //labelText: 'Shady Ayman'.tr,
-                    hintText:'Shady Ayman'.tr ,
+                    //hintText:'Shady Ayman'.tr ,
                     hintStyle: TextStyle(color: Color(0xFF442B72)),
                     alignLabelWithHint: true,
                     counterText: "",
@@ -382,7 +441,7 @@ class _EditeProfileState extends State<EditeProfile> {
 
                   decoration:  InputDecoration(
                     //labelText: 'Shady Ayman'.tr,
-                    hintText:'01028765006'.tr ,
+                   // hintText:'01028765006'.tr ,
                     hintStyle: TextStyle(color: Color(0xFF442B72)),
                     alignLabelWithHint: true,
                     counterText: "",

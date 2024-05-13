@@ -12,6 +12,7 @@ import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/sendInvitationScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../classes/dropdownRadiobutton.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -24,6 +25,9 @@ import 'homeScreen.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 //import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
 
 
 class SupervisorScreen extends StatefulWidget {
@@ -56,21 +60,14 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   // }
   //call phone
   void _makePhoneCall(String phoneNumber) async {
-    // if (await canLaunch('tel:$phoneNumber')) {
-    //   await launch('tel:$phoneNumber');
-    //   print("succ");
-    // } else {
-    //   throw 'Could not launch $phoneNumber';
-    // }
-    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
-
-    try {
-      await launchUri;
-      print("Phone call successful");
-    } catch (e) {
-      print("Error launching phone call: $e");
+    var mobileCall = 'tel:$phoneNumber';
+    if (await canLaunchUrlString(mobileCall)) {
+      await launchUrlString(mobileCall);
+    } else {
+      throw 'Could not launch $mobileCall';
     }
   }
+
   void _editSupervisorDocument(String documentId, String name, String phone, String email) {
     Navigator.push(
       context,
@@ -865,35 +862,39 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               Padding(
                                                                 padding:
                                                                 const EdgeInsets.only(
-                                                                    left: 55),
-                                                                child: Transform(
-                                                                  alignment:
-                                                                  Alignment.centerRight,
-                                                                  transform:
-                                                                  Matrix4.rotationY(
-                                                                      math.pi),
-                                                                  child: Material(
-                                                                    elevation: 3,
-                                                                    shape: CircleBorder(),
-                                                                    child: Align(
-                                                                      alignment: Alignment
-                                                                          .centerRight,
-                                                                      child: GestureDetector(
-                                                                        onTap: ()async{
-                                                                          _makePhoneCall(supervisorPhoneNumber);
-                                                                          //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                        },
-                                                                        child: CircleAvatar(
-                                                                          backgroundColor:
-                                                                          Colors.white,
-                                                                          child: FaIcon(
-                                                                            FontAwesomeIcons
-                                                                                .phone,
-                                                                            color: Color(
-                                                                                0xFF442B72),
-                                                                            size: 26,
-                                                                          ),
-                                                                        ),
+                                                                    left: 70),
+                                                                child: Material(
+                                                                  elevation: 3,
+                                                                  shape: CircleBorder(),
+                                                                  child: Align(
+                                                                    alignment: Alignment
+                                                                        .centerRight,
+                                                                    child: GestureDetector(
+                                                                      onTap: ()async{
+                                                                        _makePhoneCall(supervisorPhoneNumber);
+                                                                     //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                        //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                      },
+                                                                      // onTap: () async {
+                                                                      //   try {
+                                                                      //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                      //   } catch (e) {
+                                                                      //     print('Error making phone call: $e');
+                                                                      //     // Handle error gracefully (e.g., show a snackbar or alert)
+                                                                      //   }
+                                                                      // },
+                                                                      child: CircleAvatar(
+                                                                        backgroundColor:
+                                                                        Colors.white,
+                                                                        child:Transform.scale(
+                                                                            scaleX: -1,
+                                                                            child:  FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .phone,
+                                                                          color: Color(
+                                                                              0xFF442B72),
+                                                                          size: 26,
+                                                                        )),
                                                                       ),
                                                                     ),
                                                                   ),
