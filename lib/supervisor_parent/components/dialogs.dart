@@ -6,6 +6,7 @@ import 'package:school_account/supervisor_parent/screens/decline_invitation_pare
 import 'package:school_account/supervisor_parent/screens/sign_up.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../screens/loginScreen.dart';
 import '../../screens/signUpScreen.dart';
 import '../screens/login_screen.dart';
 import 'elevated_simple_button.dart';

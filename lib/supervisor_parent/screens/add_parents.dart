@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
@@ -42,6 +43,7 @@ class _AddParentsState extends State<AddParents> {
   bool typeOfParentError = true;
   bool showList = false;
   String selectedValue = '';
+  bool _phoneNumberEntered = true;
 
   void _addDataToFirestore() async {
     setState(() {
@@ -937,48 +939,38 @@ class _AddParentsState extends State<AddParents> {
                         child: SizedBox(
                           width: 277,
                           height: 40,
-                          child: TextFormField(
+                          child:
+                          IntlPhoneField(
+
+                            cursorColor:Color(0xFF442B72) ,
                             controller: _phoneNumberController,
-                            style: TextStyle(color: Color(0xFF442B72),),
-                            cursorColor: const Color(0xFF442B72),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            // autofocus: true,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              LengthLimitingTextInputFormatter(11),
-                              FilteringTextInputFormatter.digitsOnly],
-                            textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-                            TextAlign.right :
-                            TextAlign.left ,
-                            scrollPadding:  EdgeInsets.symmetric(
-                                vertical: 30),
-                            decoration:  InputDecoration(
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
+                            dropdownIconPosition:IconPosition.trailing,
+                            invalidNumberMessage:" ",
+                            style: TextStyle(color: Color(0xFF442B72),height: 1.5),
+                            dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
+                            decoration: InputDecoration(
+                              fillColor: Color(0xffF1F1F1),
                               filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 0, 40),
-                              hintText:'Please enter your number'.tr,
-                              floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.33,
+                              hintText: 'Phone Number'.tr,
+                              hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
+
+                              border:
+                              OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide:  BorderSide(
+                                  color: !_phoneNumberEntered
+                                      ? Colors.red // Red border if phone number not entered
+                                      : Color(0xFFFFC53E),
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
+
+                              focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(7)),
                                 borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
-                                ),),
+                                    color: Colors.red,
+                                    width: 2
+                                ),
+                              ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(7)),
                                 borderSide: BorderSide(
@@ -986,9 +978,32 @@ class _AddParentsState extends State<AddParents> {
                                   width: 0.5,
                                 ),
                               ),
-                              // enabledBorder: myInputBorder(),
-                              // focusedBorder: myFocusBorder(),
+                              errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                      color: Colors.red,
+                                      width: 2
+                                  )
+                              ),
+                              focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFFFC53E),
+                                ),
+                              ),
+
+
+                              contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+
+
                             ),
+
+                            initialCountryCode: 'EG', // Set initial country code if needed
+                            onChanged: (phone) {
+                              // Update the enteredPhoneNumber variable with the entered phone number
+
+                            },
+
                           ),
                         ),
                       ),

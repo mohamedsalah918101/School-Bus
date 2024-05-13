@@ -10,6 +10,7 @@ import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/login_screen.dart';
 import 'package:school_account/supervisor_parent/screens/otp_screen.dart';
 import '../../controller/local_controller.dart';
+import '../../screens/loginScreen.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/text_form_field_login_custom.dart';
 

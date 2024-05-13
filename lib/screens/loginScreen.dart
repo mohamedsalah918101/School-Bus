@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
           _isLoading = false;
 
         });
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreenLogin(verificationId: verificationId,)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreenLogin(verificationId: verificationId,phoneNumer:phoneNumber)));
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
       timeout: Duration(seconds: 60),
@@ -326,7 +326,8 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                             child:
                                             Directionality(
                                               textDirection:  TextDirection.ltr,
-                                              child: IntlPhoneField(
+                                              child:
+                                              IntlPhoneField(
 
                                                 cursorColor:Color(0xFF442B72) ,
                                                 controller: _phoneNumberController,
@@ -500,7 +501,6 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                       SizedBox(
                                         width: constrains.maxWidth / 1.4,
                                         child: Center(
-                                          // Otp pageلسه معملتهاش ودا الكود اللى بيودينى عليها
                                           child: Container(
                                             decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(30)
@@ -509,6 +509,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                               txt: 'Login'.tr,
 
                                               onPress: () async{
+
     if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
     ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
 

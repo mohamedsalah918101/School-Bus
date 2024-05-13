@@ -37,6 +37,7 @@ class _OtpScreenState extends State<OtpScreen> {
   TextEditingController _pinCodeController=TextEditingController();
   String enteredPhoneNumber = '';
   bool _isLoading = false;
+  bool timeout=false;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -47,6 +48,8 @@ class _OtpScreenState extends State<OtpScreen> {
         if (_seconds > 0) {
           _seconds--;  // Decrement the seconds remaining
         } else {
+          timeout =true;
+
           timer.cancel();  // Cancel the timer when countdown ends
           // You can perform any additional actions here when the timer ends
         }
@@ -324,28 +327,68 @@ class _OtpScreenState extends State<OtpScreen> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(
-                                          //color: Colors.black, // Setting default text color to black
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
+                                    GestureDetector(
+
+                                      child:RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            //color: Colors.black, // Setting default text color to black
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+
+                                          children: [
+                                            TextSpan(
+                                              text: "Didn't receive the OTP".tr,
+                                              style: TextStyle(color: Color(0xff263238)),
+                                            ),
+
+                                            TextSpan(
+                                              text: " Resend OTP?".tr,
+                                              style: TextStyle(color: timeout?Color(0xff442B72): Color(
+                                                  0xff9b9a9d)),
+                                            ),
+
+
+                                          ],
                                         ),
-
-                                        children: [
-                                          TextSpan(
-                                            text: "Didn't receive the OTP".tr,
-                                            style: TextStyle(color: Color(0xff263238)),
-                                          ),
-                                          TextSpan(
-                                            text: " Resend OTP?".tr,
-                                            style: TextStyle(color: Color(0xff442B72)),
-                                          ),
-
-
-                                        ],
                                       ),
-                                    ),
+                                      onTap: () async {
+                                        if(timeout) {
+                                          timeout = false;
+                                          _seconds = 60;
+                                          startTimer();
+                                          setState(() {
+
+                                          });
+                                          await _auth.verifyPhoneNumber(
+                                            phoneNumber: widget.phone,
+                                            verificationCompleted: (
+                                                PhoneAuthCredential credential) async {
+                                              // Auto-retrieve verification code
+                                              //   await _auth.signInWithCredential(credential);
+                                              //   Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+                                            },
+                                            verificationFailed: (
+                                                FirebaseAuthException e) {
+                                              setState(() {
+                                                _isLoading = false;
+                                              });
+                                              // Verification failed
+                                            },
+                                            codeSent: (String verificationId,
+                                                int? resendToken) async {
+                                              // Save the verification ID for future use
+                                              String smsCode = 'xxxxxx'; // Code input by the user
+                                              setState(() {
+                                                _isLoading = false;
+                                              });
+                                            },
+                                            codeAutoRetrievalTimeout: (
+                                                String verificationId) {},
+                                            timeout: Duration(seconds: 60),
+                                          );
+                                        }},),
                                     //Text("1 s".tr,style: TextStyle(fontSize: 12,fontFamily: 'Poppins',fontWeight: FontWeight.bold,color: Color(0xff263238)),)
                                     Text(
                                       '$_seconds s',
@@ -377,45 +420,51 @@ class _OtpScreenState extends State<OtpScreen> {
                                 child: ElevatedSimpleButton(
                                   txt: 'Verify'.tr,
                                   width: constrains.maxWidth / 1.4,
-                                  color: const Color(0xFF442B72),
+                                  color: timeout? Color(
+                                      0xff9b9a9d):Color(0xFF442B72),
 
                                   hight: 48,
                                   onPress: () async {
-                                    setState(() {
-                                      _isLoading =true;
-                                    });
-
-                                    //erifyPhoneNumber(enteredPhoneNumber);
-                                    //my code
-                                    try{
-                                      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                                        verificationId: verificationId,
-                                        smsCode:_pinCodeController.text ,
-                                      );
-                                      // Sign the user in with the credential
-                                      await _auth.signInWithCredential(credential);
-                                      _addDataToFirestore();
-                                      // final prefs = await SharedPreferences.getInstance();
-                                      // prefs.setString('name', widget.name!);
-                                      // prefs.setString('phoneNumber', widget.phone!);
-
-                                    }catch(e){
+                                    if(!timeout) {
                                       setState(() {
-                                        _isLoading =false;
+                                        _isLoading = true;
                                       });
-                                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Invalid code.')));
 
-                                      print('lllll'+e.toString());
-                                    }
+                                      //erifyPhoneNumber(enteredPhoneNumber);
+                                      //my code
+                                      try {
+                                        PhoneAuthCredential credential = PhoneAuthProvider
+                                            .credential(
+                                          verificationId: verificationId,
+                                          smsCode: _pinCodeController.text,
+                                        );
+                                        // Sign the user in with the credential
+                                        await _auth.signInWithCredential(
+                                            credential);
+                                        _addDataToFirestore();
+                                        // final prefs = await SharedPreferences.getInstance();
+                                        // prefs.setString('name', widget.name!);
+                                        // prefs.setString('phoneNumber', widget.phone!);
+
+                                      } catch (e) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                            content: Text('Invalid code.')));
+
+                                        print('lllll' + e.toString());
+                                      }
 
 
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) => MainBottomNavigationBar(
-                                    //           pageNum: 0,
-                                    //         )));
-                                  },
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) => MainBottomNavigationBar(
+                                      //           pageNum: 0,
+                                      //         )));
+                                    } },
                                   fontSize: 16,
 
                                 ),
