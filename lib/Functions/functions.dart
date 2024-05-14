@@ -11,11 +11,9 @@ final String DynamicLink = 'https://schoolbusapp.page.link/requestdata';
 final String Link = 'https://schoolbusapp.page.link/requestdata';
 bool _isCreatingLink = false;
 
-Future<void> createDynamicLink(bool short,requestID,String phone,String type) async {
+Future<String> createDynamicLink(bool short,requestID,String phone,String type) async {
 
-  print('linnk');
-  print(
-      "https://www.schoolbusapp.com/request?id=${requestID}&phone=${phone}&type=${type}");
+  print("https://www.schoolbusapp.com/request?id=${requestID}&phone=${phone}&type=${type}");
 
   DynamicLinkParameters parameters = DynamicLinkParameters(
     uriPrefix: 'https://schoolbusapp.page.link',
@@ -43,17 +41,20 @@ Future<void> createDynamicLink(bool short,requestID,String phone,String type) as
     url = shortLink.shortUrl;
     final result = await Share.shareWithResult(url.toString());
     if (result.status == ShareResultStatus.success) {
+      return "success";
     }else{
-      print('errroee1');
+      return "failed";
+
     }
   } else {
     url = await dynamicLinks.buildLink(parameters);
     final result = await Share.shareWithResult(url.toString());
 
     if (result.status == ShareResultStatus.success) {
+      return "success";
 
     }else{
-      print('errroee1');
+      return "failed";
 
     }
   }

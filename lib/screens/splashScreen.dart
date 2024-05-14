@@ -55,12 +55,12 @@ class _SplashScreenState extends State<SplashScreen>
                                 ? sharedpref!.getInt('invitstate') == 1
                                     ? MapParentScreen()
                                     : FinalAcceptInvitationParent()
-                                :MapParentScreen()// NoInvitation(selectedImage: 3)
+                                : sharedpref!.getInt('skip') == 1 ?  MapParentScreen():NoInvitation(selectedImage: 3)
                             : sharedpref!.getInt('invit') == 1
                                 ? sharedpref!.getInt('invitstate') == 1
                                     ? HomeForSupervisor()
                                     : FinalAcceptInvitationSupervisor()
-                                : NoInvitation(selectedImage: 2)));
+                                :  sharedpref!.getInt('skip') == 1 ? HomeForSupervisor() :NoInvitation(selectedImage: 2)));
       }
     });
   }

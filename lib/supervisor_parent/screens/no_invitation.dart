@@ -102,6 +102,7 @@ class _NoInvitationState extends State<NoInvitation> {
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
                       child: GestureDetector(
                         onTap: (){
+                          sharedpref!.setInt('skip',1);
           if (sharedpref!.getString('type') == 'parent'){
           Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => HomeParent(

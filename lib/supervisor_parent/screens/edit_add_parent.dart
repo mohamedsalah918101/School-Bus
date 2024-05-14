@@ -1170,7 +1170,7 @@ class _EditAddParentsState extends State<EditAddParents> {
                                 width: 277,
                                 hight: 48,
                                 onPress: () async {
-                                    InvitationSendSnackBar(context, 'Invitation sent successfully');
+                                  //  InvitationSendSnackBar(context, 'Invitation sent successfully',Color(0xFF4CAF50));
                                     editAddParent();
                                     print('object');
                                     NumberOfChildrenCard = false;
