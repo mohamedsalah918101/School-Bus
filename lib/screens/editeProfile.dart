@@ -1,9 +1,13 @@
 import 'dart:async';
 
+
 //
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/components/elevated_simple_button.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -14,9 +18,27 @@ import '../components/dialogs.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'notificationsScreen.dart';
+import 'dart:io';
 //import '../components/profile_child_card.dart';
 
 class EditeProfile extends StatefulWidget {
+  final String docid;
+  final String oldNameEnglish;
+  final String? oldNameArabic;
+  final String oldAddress;
+  final String oldSchoolLogo;
+  final String oldCoordinatorName;
+  final String oldSupportNumber;
+  // const EditeSupervisor({super.key});
+  const EditeProfile({super.key,
+    required this.docid,
+    required this.oldNameEnglish,
+    required this.oldNameArabic,
+    required this.oldAddress,
+    required this.oldSchoolLogo,
+    required this.oldCoordinatorName,
+    required this.oldSupportNumber,
+  });
   @override
   _EditeProfileState createState() => _EditeProfileState();
 }
@@ -33,6 +55,82 @@ class _EditeProfileState extends State<EditeProfile> {
   final _CoordinatorFocus = FocusNode();
   final _SupporterFocus = FocusNode();
   Custom custom = Custom();
+
+  File ? _selectedImageprofileEdite;
+  String? imageUrlprofile;
+  Future _pickEditeImageProfileFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImageprofileEdite=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('EditeProfile');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('photoprofileedite');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      imageUrlprofile = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrlprofile');
+      return imageUrlprofile;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+
+
+  GlobalKey<FormState> formState = GlobalKey<FormState>();
+  CollectionReference profile = FirebaseFirestore.instance.collection('schooldata');
+  editProfile() async {
+    print('editprofile called');
+
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+
+        try {
+          print('updating document...');
+
+          await profile.doc(widget.docid).update({
+            'nameEnglish': _nameEnglish.text,
+            'nameArabic': _nameArabic.text,
+            'address':_Address.text,
+            'coordinatorName':_coordinatorName.text,
+            'supportNumber':_supportNumber.text,
+
+          });
+
+          print('document updated successfully');
+
+          setState(() {
+            // Trigger a rebuild of the widget tree if necessary
+          });
+        } catch (e) {
+          print('Error updating document: $e');
+          // Handle specific error cases here
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
   OutlineInputBorder myInputBorder() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -49,6 +147,56 @@ class _EditeProfileState extends State<EditeProfile> {
           color:  Color(0xFF442B72),
           width: 0.5,
         ));
+  }
+  File ? _selectedImageEditeProfile;
+  String? editeprofileimageUrl;
+  Future _pickEditeProfileImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImageEditeProfile=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('editeprofilephoto');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('editeprofile');
+    // Reference referenceDirImages =
+    // referenceRoot.child('images');
+    //
+    // //Create a reference for the image to be stored
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      editeprofileimageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $editeprofileimageUrl');
+      return editeprofileimageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    _nameEnglish.text = widget.oldNameEnglish!;
+    _nameArabic.text=widget.oldNameArabic!;
+    _Address.text=widget.oldAddress!;
+    _coordinatorName.text=widget.oldCoordinatorName!;
+    _supportNumber.text=widget.oldSupportNumber!;
+    editeprofileimageUrl=widget.oldSchoolLogo!;
+    // responsible
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
   }
 
   @override
@@ -124,35 +272,46 @@ class _EditeProfileState extends State<EditeProfile> {
          reverse: true,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                  children: [
+          child: Form(
+            key: formState,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                    children: [
 
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white, // Set background color to white
-                          radius:50, // Set the radius according to your preference
-                          child: Image.asset(
-                            'assets/imgs/school/Ellipse 2 (2).png',
-                            fit: BoxFit.cover,
-                            width: 100, // Set width of the image
-                            height: 100, // Set height of the image
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          //this part od code photo doesnot change when choose other image
+                          child:_selectedImageEditeProfile != null
+                              ? Image.file(
+                            _selectedImageEditeProfile!,  // Display the uploaded image
+                            width: 83,  // Set width as per your preference
+                            height: 78.5,  // Set height as per your preference
+                            fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                          ):
+                          GestureDetector(
+                            onTap: ()async {
+                               await _pickEditeImageProfileFromGallery();
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white, // Set background color to white
+                              radius:50, // Set the radius according to your preference
+                              child: Image.asset(
+                                'assets/imgs/school/Ellipse 2 (2).png',
+                                fit: BoxFit.cover,
+                                width: 100, // Set width of the image
+                                height: 100, // Set height of the image
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 95,left: 55),
-                        child: GestureDetector(
-                          onTap: (){
-                            Dialoge.changePhotoDialog(context);
-                          },
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 95,left: 55),
                           child: Container(
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
@@ -162,232 +321,239 @@ class _EditeProfileState extends State<EditeProfile> {
                               backgroundColor: Colors.white,
                               // Set background color to white
                               radius:10, // Set the radius according to your preference
-                              child: Image.asset(
-                                'assets/imgs/school/edite.png',
-                                fit: BoxFit.cover,
-                                width: 15, // Set width of the image
-                                height: 15, // Set height of the image
+                              child: GestureDetector(
+                                onTap: (){
+                                  changePhotoDialog(context);
+                              //    _pickEditeProfileImageFromGallery();
+                                },
+                                child: Image.asset(
+                                  'assets/imgs/school/edite.png',
+                                  fit: BoxFit.cover,
+                                  width: 15, // Set width of the image
+                                  height: 15, // Set height of the image
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
+                    ]
+                ),
+
+
+                // Center(child: Text("Salam School",style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"),)
+                // ),
+                SizedBox(height: 20,),
+                Text("School information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
+                    color: Color(0xff771F98)),),
+                SizedBox(height: 15,),
+                Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
+                Container(
+                  width: 320,
+                  height: 45,
+                  child: TextFormField(
+                    controller: _nameEnglish,
+                    onFieldSubmitted: (value) {
+                      // move to the next field when the user presses the "Done" button
+                      FocusScope.of(context).requestFocus(_NameArabicFocus);
+                    },
+                    style: TextStyle(color: Color(0xFF442B72)),
+                    //controller: _namesupervisor,
+                    cursorColor: const Color(0xFF442B72),
+                    //textDirection: TextDirection.ltr,
+                    scrollPadding: const EdgeInsets.symmetric(
+                        vertical: 40),
+
+                    decoration:  InputDecoration(
+                      //labelText: 'Shady Ayman'.tr,
+                      //hintText:'ElSalam School '.tr ,
+                      hintStyle: TextStyle(color: Color(0xFF442B72)),
+                      alignLabelWithHint: true,
+                      counterText: "",
+                      fillColor: const Color(0xFFF1F1F1),
+                      filled: true,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                          8, 5, 10, 5),
+                      floatingLabelBehavior:  FloatingLabelBehavior.never,
+                      enabledBorder: myInputBorder(),
+                      focusedBorder: myFocusBorder(),
                     ),
-                  ]
-              ),
 
-
-              // Center(child: Text("Salam School",style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"),)
-              // ),
-              SizedBox(height: 20,),
-              Text("School information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
-                  color: Color(0xff771F98)),),
-              SizedBox(height: 15,),
-              Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-              SizedBox(height: 10,),
-              Container(
-                width: 320,
-                height: 45,
-                child: TextFormField(
-                  controller: _nameEnglish,
-                  onFieldSubmitted: (value) {
-                    // move to the next field when the user presses the "Done" button
-                    FocusScope.of(context).requestFocus(_NameArabicFocus);
-                  },
-                  style: TextStyle(color: Color(0xFF442B72)),
-                  //controller: _namesupervisor,
-                  cursorColor: const Color(0xFF442B72),
-                  //textDirection: TextDirection.ltr,
-                  scrollPadding: const EdgeInsets.symmetric(
-                      vertical: 40),
-
-                  decoration:  InputDecoration(
-                    //labelText: 'Shady Ayman'.tr,
-                    hintText:'ElSalam School '.tr ,
-                    hintStyle: TextStyle(color: Color(0xFF442B72)),
-                    alignLabelWithHint: true,
-                    counterText: "",
-                    fillColor: const Color(0xFFF1F1F1),
-                    filled: true,
-                    contentPadding: const EdgeInsets.fromLTRB(
-                        8, 5, 10, 5),
-                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                    enabledBorder: myInputBorder(),
-                    focusedBorder: myFocusBorder(),
                   ),
-
                 ),
-              ),
 
-              SizedBox(height: 20,),
+                SizedBox(height: 20,),
 
-              Text('School name in Arabic'.tr,style: TextStyle(color: Color(0xFF442B72),
-                fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-              SizedBox(height: 10,),
-              Container(
-                width: 320,
-                height: 45,
-                child: TextFormField(
-                  controller: _nameArabic,
-                  focusNode: _NameArabicFocus,
-                  onFieldSubmitted: (value) {
-                    // move to the next field when the user presses the "Done" button
-                    FocusScope.of(context).requestFocus(_AddressFocus);
-                  },
-                  style: TextStyle(color: Color(0xFF442B72)),
-                  //controller: _namesupervisor,
-                  cursorColor: const Color(0xFF442B72),
-                  //textDirection: TextDirection.ltr,
-                  scrollPadding: const EdgeInsets.symmetric(
-                      vertical: 40),
+                Text('School name in Arabic'.tr,style: TextStyle(color: Color(0xFF442B72),
+                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
+                Container(
+                  width: 320,
+                  height: 45,
+                  child: TextFormField(
+                    controller: _nameArabic,
+                    focusNode: _NameArabicFocus,
+                    onFieldSubmitted: (value) {
+                      // move to the next field when the user presses the "Done" button
+                      FocusScope.of(context).requestFocus(_AddressFocus);
+                    },
+                    style: TextStyle(color: Color(0xFF442B72)),
+                    //controller: _namesupervisor,
+                    cursorColor: const Color(0xFF442B72),
+                    //textDirection: TextDirection.ltr,
+                    scrollPadding: const EdgeInsets.symmetric(
+                        vertical: 40),
 
-                  decoration:  InputDecoration(
-                    //labelText: 'Shady Ayman'.tr,
-                    hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
-                    hintStyle: TextStyle(color: Color(0xFF442B72)),
-                    alignLabelWithHint: true,
-                    counterText: "",
-                    fillColor: const Color(0xFFF1F1F1),
-                    filled: true,
-                    contentPadding: const EdgeInsets.fromLTRB(
-                        8, 5, 10, 5),
-                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                    enabledBorder: myInputBorder(),
-                    focusedBorder: myFocusBorder(),
+                    decoration:  InputDecoration(
+                      //labelText: 'Shady Ayman'.tr,
+                     // hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
+                      hintStyle: TextStyle(color: Color(0xFF442B72)),
+                      alignLabelWithHint: true,
+                      counterText: "",
+                      fillColor: const Color(0xFFF1F1F1),
+                      filled: true,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                          8, 5, 10, 5),
+                      floatingLabelBehavior:  FloatingLabelBehavior.never,
+                      enabledBorder: myInputBorder(),
+                      focusedBorder: myFocusBorder(),
+                    ),
+
                   ),
-
                 ),
-              ),
-              SizedBox(height: 20,),
-              Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),
-                fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-              SizedBox(height: 10,),
-              Container(
-                width: 320,
-                height: 45,
-                child: TextFormField(
-                  controller: _Address,
-                  focusNode: _AddressFocus,
-                  onFieldSubmitted: (value) {
-                    // move to the next field when the user presses the "Done" button
-                    FocusScope.of(context).requestFocus(_CoordinatorFocus);
-                  },
-                  style: TextStyle(color: Color(0xFF442B72)),
-                  //controller: _namesupervisor,
-                  cursorColor: const Color(0xFF442B72),
-                  //textDirection: TextDirection.ltr,
-                  scrollPadding: const EdgeInsets.symmetric(
-                      vertical: 40),
-                  decoration:  InputDecoration(
-                    //labelText: 'Shady Ayman'.tr,
-                    hintText:'16 Khaled st, Asyut,Egypt'.tr ,
-                    hintStyle: TextStyle(color: Color(0xFF442B72)),
-                    alignLabelWithHint: true,
-                    counterText: "",
-                    fillColor: const Color(0xFFF1F1F1),
-                    filled: true,
-                    contentPadding: const EdgeInsets.fromLTRB(
-                        8, 5, 10, 5),
-                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                    enabledBorder: myInputBorder(),
-                    focusedBorder: myFocusBorder(),
-                    suffixIcon:Transform.scale(
-                      scale: 0.7, // Adjust the scale factor as needed
-                      child: Image.asset(
-                        'assets/imgs/school/icons8_Location.png',
-                        width: 10,
-                        height: 10,
+                SizedBox(height: 20,),
+                Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),
+                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
+                Container(
+                  width: 320,
+                  height: 45,
+                  child: TextFormField(
+                    controller: _Address,
+                    focusNode: _AddressFocus,
+                    onFieldSubmitted: (value) {
+                      // move to the next field when the user presses the "Done" button
+                      FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                    },
+                    style: TextStyle(color: Color(0xFF442B72)),
+                    //controller: _namesupervisor,
+                    cursorColor: const Color(0xFF442B72),
+                    //textDirection: TextDirection.ltr,
+                    scrollPadding: const EdgeInsets.symmetric(
+                        vertical: 40),
+                    decoration:  InputDecoration(
+                      //labelText: 'Shady Ayman'.tr,
+                    //  hintText:'16 Khaled st, Asyut,Egypt'.tr ,
+                      hintStyle: TextStyle(color: Color(0xFF442B72)),
+                      alignLabelWithHint: true,
+                      counterText: "",
+                      fillColor: const Color(0xFFF1F1F1),
+                      filled: true,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                          8, 5, 10, 5),
+                      floatingLabelBehavior:  FloatingLabelBehavior.never,
+                      enabledBorder: myInputBorder(),
+                      focusedBorder: myFocusBorder(),
+                      suffixIcon:Transform.scale(
+                        scale: 0.7, // Adjust the scale factor as needed
+                        child: Image.asset(
+                          'assets/imgs/school/icons8_Location.png',
+                          width: 10,
+                          height: 10,
+                        ),
                       ),
+                      //Image.asset('assets/imgs/school/icons8_Location.png',width: 10,height: 10,)
                     ),
-                    //Image.asset('assets/imgs/school/icons8_Location.png',width: 10,height: 10,)
+
                   ),
-
                 ),
-              ),
-              SizedBox(height: 35,),
-              Text("Personal information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
-                  color: Color(0xff771F98)),),
-              SizedBox(height: 25,),
-              Text('Coordinator Name'.tr,style: TextStyle(color: Color(0xFF442B72),
-                fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-              SizedBox(height: 10,),
-              Container(
-                width: 320,
-                height: 45,
-                child: TextFormField(
-                  controller: _coordinatorName,
-                  focusNode: _CoordinatorFocus,
-                  onFieldSubmitted: (value) {
-                    // move to the next field when the user presses the "Done" button
-                    FocusScope.of(context).requestFocus(_SupporterFocus);
-                  },
-                  style: TextStyle(color: Color(0xFF442B72)),
-                  //controller: _namesupervisor,
-                  cursorColor: const Color(0xFF442B72),
-                  //textDirection: TextDirection.ltr,
-                  scrollPadding: const EdgeInsets.symmetric(
-                      vertical: 40),
+                SizedBox(height: 35,),
+                Text("Personal information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
+                    color: Color(0xff771F98)),),
+                SizedBox(height: 25,),
+                Text('Coordinator Name'.tr,style: TextStyle(color: Color(0xFF442B72),
+                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
+                Container(
+                  width: 320,
+                  height: 45,
+                  child: TextFormField(
+                    controller: _coordinatorName,
+                    focusNode: _CoordinatorFocus,
+                    onFieldSubmitted: (value) {
+                      // move to the next field when the user presses the "Done" button
+                      FocusScope.of(context).requestFocus(_SupporterFocus);
+                    },
+                    style: TextStyle(color: Color(0xFF442B72)),
+                    //controller: _namesupervisor,
+                    cursorColor: const Color(0xFF442B72),
+                    //textDirection: TextDirection.ltr,
+                    scrollPadding: const EdgeInsets.symmetric(
+                        vertical: 40),
 
-                  decoration:  InputDecoration(
-                    //labelText: 'Shady Ayman'.tr,
-                    hintText:'Shady Ayman'.tr ,
-                    hintStyle: TextStyle(color: Color(0xFF442B72)),
-                    alignLabelWithHint: true,
-                    counterText: "",
-                    fillColor: const Color(0xFFF1F1F1),
-                    filled: true,
-                    contentPadding: const EdgeInsets.fromLTRB(
-                        8, 5, 10, 5),
-                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                    enabledBorder: myInputBorder(),
-                    focusedBorder: myFocusBorder(),
+                    decoration:  InputDecoration(
+                      //labelText: 'Shady Ayman'.tr,
+                      //hintText:'Shady Ayman'.tr ,
+                      hintStyle: TextStyle(color: Color(0xFF442B72)),
+                      alignLabelWithHint: true,
+                      counterText: "",
+                      fillColor: const Color(0xFFF1F1F1),
+                      filled: true,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                          8, 5, 10, 5),
+                      floatingLabelBehavior:  FloatingLabelBehavior.never,
+                      enabledBorder: myInputBorder(),
+                      focusedBorder: myFocusBorder(),
+                    ),
+
                   ),
-
                 ),
-              ),
-              SizedBox(height: 20,),
-              Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),
-                fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-              SizedBox(height: 10,),
-              Container(
-                width: 320,
-                height: 45,
-                child: TextFormField(
-                  keyboardType: TextInputType.number,
-                  controller: _supportNumber,
-                  focusNode: _SupporterFocus,
-                  style: TextStyle(color: Color(0xFF442B72)),
-                  //controller: _namesupervisor,
-                  cursorColor: const Color(0xFF442B72),
-                  //textDirection: TextDirection.ltr,
-                  scrollPadding: const EdgeInsets.symmetric(
-                      vertical: 40),
+                SizedBox(height: 20,),
+                Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),
+                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
+                Container(
+                  width: 320,
+                  height: 45,
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: _supportNumber,
+                    focusNode: _SupporterFocus,
+                    style: TextStyle(color: Color(0xFF442B72)),
+                    //controller: _namesupervisor,
+                    cursorColor: const Color(0xFF442B72),
+                    //textDirection: TextDirection.ltr,
+                    scrollPadding: const EdgeInsets.symmetric(
+                        vertical: 40),
 
-                  decoration:  InputDecoration(
-                    //labelText: 'Shady Ayman'.tr,
-                    hintText:'01028765006'.tr ,
-                    hintStyle: TextStyle(color: Color(0xFF442B72)),
-                    alignLabelWithHint: true,
-                    counterText: "",
-                    fillColor: const Color(0xFFF1F1F1),
-                    filled: true,
-                    contentPadding: const EdgeInsets.fromLTRB(
-                        8, 5, 10, 5),
-                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                    enabledBorder: myInputBorder(),
-                    focusedBorder: myFocusBorder(),
+                    decoration:  InputDecoration(
+                      //labelText: 'Shady Ayman'.tr,
+                     // hintText:'01028765006'.tr ,
+                      hintStyle: TextStyle(color: Color(0xFF442B72)),
+                      alignLabelWithHint: true,
+                      counterText: "",
+                      fillColor: const Color(0xFFF1F1F1),
+                      filled: true,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                          8, 5, 10, 5),
+                      floatingLabelBehavior:  FloatingLabelBehavior.never,
+                      enabledBorder: myInputBorder(),
+                      focusedBorder: myFocusBorder(),
+                    ),
+
                   ),
-
                 ),
-              ),
-              SizedBox(height: 35,),
-              Center(child: ElevatedSimpleButton(txt: 'Save'.tr, width: 320, hight: 48, onPress: (){
-                showSnackBarFun(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
-              }, color: Color(0xff432B72), fontSize: 16,)),
-            SizedBox(height: 40,),
-              Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom))
-            ],
+                SizedBox(height: 35,),
+                Center(child: ElevatedSimpleButton(txt: 'Save'.tr, width: 320, hight: 48, onPress: (){
+                  editProfile();
+                  showSnackBarFun(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+                }, color: Color(0xff432B72), fontSize: 16,)),
+              SizedBox(height: 40,),
+                Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom))
+              ],
+            ),
           ),
         ),
       ),
@@ -582,5 +748,98 @@ class _EditeProfileState extends State<EditeProfile> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+ changePhotoDialog(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30,),
+          ),
+          child: Container(
+            height: 280,
+            width: 450,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+
+
+                      const Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Change profile picture',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF771F98),
+                            fontSize: 19,
+                            fontFamily: 'Poppins-Medium',
+                            fontWeight: FontWeight.w600,
+                            height: 1.23,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: GestureDetector(
+                          onTap: (){
+                            _pickEditeImageProfileFromGallery();
+                          },
+                          child: CircleAvatar(
+                              backgroundColor:Color(0xffE2E1EE),
+                              child: Image.asset("assets/imgs/school/Vectorphoto.png",width: 21,height: 16,)),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: const Text(
+                          'Select profile picture',
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 15,
+                            fontFamily: 'Poppins-Bold',
+                            fontWeight: FontWeight.w400,
+                            height: 3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: ElevatedSimpleButton(
+                      txt: 'Save',
+                      width: 250,
+                      hight: 45,
+                      onPress: () {
+                        Navigator.pop(context);
+
+                      },
+                      color: const Color(0xFF442B72),
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )),
+    );
   }
 }

@@ -5,12 +5,15 @@ import 'dropdowncheckboxitem.dart';
 
 class DropdownCheckbox extends StatefulWidget {
   final List<DropdownCheckboxItem> items;
-  DropdownCheckbox({required this.items});
+  final TextEditingController controller;
+  DropdownCheckbox({required this.items, required this.controller});
   @override
   _DropdownCheckboxState createState() => _DropdownCheckboxState();
 }
 class _DropdownCheckboxState extends State<DropdownCheckbox> {
   bool isDropdownOpened = false;
+  List<DropdownCheckboxItem> selectedItems = [];
+  TextEditingController _supervisorController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,17 +30,45 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                   isDropdownOpened = !isDropdownOpened;
                 });
               },
-              child: Container(
+              child:
+                // Container(
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       TextField(
+                //         controller: _supervisorController,
+                //         readOnly: true,
+                //         decoration: InputDecoration(
+                //           labelText: 'Supervisor',
+                //           border: OutlineInputBorder(),
+                //         ),
+                //       ),
+                //       Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
+                //     ],
+                //   ),
+                // )
+              Container(
+
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Color(0xFFF1F1F1),
                   border: Border.all(color: Color(0xFFFFC53E),width: 0.5),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                child: Row(
+                child:
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Supervisor',style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
+                  // TextField(
+                  // controller: _supervisorController,
+                  // readOnly: true, // Make the text field read-only
+                  // decoration: InputDecoration(
+                  //   labelText: 'Selected Supervisor',
+                  //   border: OutlineInputBorder(),
+                  // ),),
+                    Text('Supervisor',
+
+                      style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
                       fontFamily: 'Poppins-Bold',),),
                    Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
                    // Icon(Icons.arrow_drop_down),
@@ -89,7 +120,26 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                           onChanged: (value) {
                             setState(() {
                               item.isChecked = value!;
+                              if (value) {
+                                // selectedItems.add(item);
+                                // // Clear previously selected items (assuming single selection)
+                                // selectedItems.removeWhere((element) => element != item);
+                                // // Update text field value with selected item's label
+                                // widget.controller.text = item.label;
+                                selectedItems.add(item); // Add to selected items list
+                                //_supervisorController.text = item.label;
+                              // Add to selected items list
+                              } else {
+                                selectedItems.remove(item);
+                                // Clear text field value when unselecting
+                                widget.controller.text = '';
+                                //selectedItems.remove(item); // Remove from selected items list
+                              // _supervisorController.clear();
+                              }
                             });
+                            // setState(() {
+                            //   item.isChecked = value!;
+                            // });
                           },
                         ),
                       );

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
@@ -42,6 +43,7 @@ class _AddParentsState extends State<AddParents> {
   bool typeOfParentError = true;
   bool showList = false;
   String selectedValue = '';
+  bool _phoneNumberEntered = true;
 
   void _addDataToFirestore() async {
     setState(() {
@@ -63,29 +65,45 @@ class _AddParentsState extends State<AddParents> {
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
       'childern': childrenData,
-      'state':0,
-      'invite':1
+      'state': 0,
+      'invite': 1
       // 'gender': gender
     };
-
     // Add the data to the Firestore collection
-    await _firestore.collection('parent').add(data).then((docRef) {
-       String docid =docRef.id;
-      print('Data added with document ID: ${docRef.id}');
-      createDynamicLink(true, docid,_phoneNumberController.text,'parent');
+    var check =await addParentCheck(_phoneNumberController.text);
+    if(!check) {
+      var res =await checkUpdate(_phoneNumberController.text);
+      if(!res) {
+        await _firestore.collection('parent').add(data).then((docRef) {
+          String docid = docRef.id;
+          print('Data added with document ID: ${docRef.id}');
+          createDynamicLink(true, docid, _phoneNumberController.text, 'parent');
+        }).catchError((error) {
+          print('Failed to add data: $error');
+        });
+        // Clear the text fields
+        _nameController.clear();
+        _phoneNumberController.clear();
+        _numberOfChildrenController.clear();
+        nameChildControllers.clear();
+        nameChildControllers.clear();
+        gradeControllers.clear();
+      }else{
+        await _firestore.collection('parent').doc(docID).update(data);
+        // Clear the text fields
+        _nameController.clear();
+        _phoneNumberController.clear();
+        _numberOfChildrenController.clear();
+        nameChildControllers.clear();
+        nameChildControllers.clear();
+        gradeControllers.clear();
+      }  }else{
+      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
 
-    }).catchError((error) {
-      print('Failed to add data: $error');
-    });
 
-    // Clear the text fields
-    _nameController.clear();
-    _phoneNumberController.clear();
-    _numberOfChildrenController.clear();
-    nameChildControllers.clear();
-    nameChildControllers.clear();
-    gradeControllers.clear();
-  }
+
+    }}
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
@@ -121,13 +139,13 @@ class _AddParentsState extends State<AddParents> {
             width: double.infinity,
             height: 310,
             child: Column(
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xff771F98).withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Column(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xff771F98).withOpacity(0.03),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -396,71 +414,71 @@ class _AddParentsState extends State<AddParents> {
                           ) ,
                           // SizedBox(height: 12,),
                           Padding(
-                            padding: (sharedpref?.getString('lang') == 'ar') ?
-                            EdgeInsets.only(right: 15.0):
-                            EdgeInsets.only(left: 15.0),
-                            child:  Row(
-                              children: [
-                            Row(
-                            children: [
-                            Radio<bool>(
-                              value: true,
-                              groupValue: genderSelection[i]['isFemale'],
-                              onChanged: (value) {
-                                setState(() {
-                                  genderSelection[i]['isFemale'] = value!;
-                                  genderSelection[i]['isMale'] = !value;
-                                });
-                              },
-                                  fillColor: MaterialStateProperty.resolveWith((states) {
-                                    if (states.contains(MaterialState.selected)) {
-                                      return Color(0xff442B72);
-                                    }
-                                    return Color(0xff442B72);
-                                  }),
-                                  activeColor: Color(0xff442B72), // Set the color of the selected radio button
-                                ),
-                                Text(
-                                  "Female".tr ,
-                                  style: TextStyle(
-                                    fontSize: 15 ,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w500 ,
-                                    color: Color(0xff442B72),),
-                                ),
-                                SizedBox(
-                                  width: 50, //115
-                                ),
-                                Radio<bool>(
-                                  fillColor: MaterialStateProperty.resolveWith((states) {
-                                    if (states.contains(MaterialState.selected)) {
-                                      return Color(0xff442B72);
-                                    }
-                                    return Color(0xff442B72);
-                                  }),
-                                  value: true,
-                                    groupValue: genderSelection[i]['isMale'],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        genderSelection[i]['isMale'] = value!;
-                                        genderSelection[i]['isFemale'] = !value;
-                                      });
-                                  },
-                                  activeColor: Color(0xff442B72),
-                                ),
-                                Text("Male".tr,
-                                  style: TextStyle(
-                                    fontSize: 15 ,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w500 ,
-                                    color: Color(0xff442B72),),),
-                              ],
-                          ),
-                          SizedBox(height: 10,)
-                        ])),
-              ],
-            ))]))
-           );
+                              padding: (sharedpref?.getString('lang') == 'ar') ?
+                              EdgeInsets.only(right: 15.0):
+                              EdgeInsets.only(left: 15.0),
+                              child:  Row(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Radio<bool>(
+                                          value: true,
+                                          groupValue: genderSelection[i]['isFemale'],
+                                          onChanged: (value) {
+                                            setState(() {
+                                              genderSelection[i]['isFemale'] = value!;
+                                              genderSelection[i]['isMale'] = !value;
+                                            });
+                                          },
+                                          fillColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Color(0xff442B72);
+                                            }
+                                            return Color(0xff442B72);
+                                          }),
+                                          activeColor: Color(0xff442B72), // Set the color of the selected radio button
+                                        ),
+                                        Text(
+                                          "Female".tr ,
+                                          style: TextStyle(
+                                            fontSize: 15 ,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w500 ,
+                                            color: Color(0xff442B72),),
+                                        ),
+                                        SizedBox(
+                                          width: 50, //115
+                                        ),
+                                        Radio<bool>(
+                                          fillColor: MaterialStateProperty.resolveWith((states) {
+                                            if (states.contains(MaterialState.selected)) {
+                                              return Color(0xff442B72);
+                                            }
+                                            return Color(0xff442B72);
+                                          }),
+                                          value: true,
+                                          groupValue: genderSelection[i]['isMale'],
+                                          onChanged: (value) {
+                                            setState(() {
+                                              genderSelection[i]['isMale'] = value!;
+                                              genderSelection[i]['isFemale'] = !value;
+                                            });
+                                          },
+                                          activeColor: Color(0xff442B72),
+                                        ),
+                                        Text("Male".tr,
+                                          style: TextStyle(
+                                            fontSize: 15 ,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w500 ,
+                                            color: Color(0xff442B72),),),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10,)
+                                  ])),
+                        ],
+                      ))]))
+        );
       }
       setState(() {});
     });
@@ -737,12 +755,12 @@ class _AddParentsState extends State<AddParents> {
                       ),
                       typeOfParentError? Container():
                       Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 48),
-                          child: Text(
-                            "Please enter your type".tr,
-                            style: TextStyle(color: Colors.red),
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
+                        child: Text(
+                          "Please enter your type".tr,
+                          style: TextStyle(color: Colors.red),
                         ),
+                      ),
                       // selectedValue == null || selectedValue.isEmpty
                       //     ? Padding(
                       //   padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -803,55 +821,55 @@ class _AddParentsState extends State<AddParents> {
                           width: 277,
                           height: 40,
                           child: TextFormField(
-                            controller: _nameController,
-                            style: TextStyle(color: Color(0xFF442B72),),
-                            cursorColor: const Color(0xFF442B72),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            // autofocus: true,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.text,
-                            textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-                            TextAlign.right :
-                            TextAlign.left ,
-                            scrollPadding:  EdgeInsets.symmetric(vertical: 30),
-                            decoration:  InputDecoration(
-                              alignLabelWithHint: false,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 0, 40),
-                              hintText:'Please enter your name'.tr,
-                              floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.33,
-                              ),
-                              focusedBorder:
-                              OutlineInputBorder(
+                              controller: _nameController,
+                              style: TextStyle(color: Color(0xFF442B72),),
+                              cursorColor: const Color(0xFF442B72),
+                              textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                              TextDirection.rtl:
+                              TextDirection.ltr,
+                              // autofocus: true,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.text,
+                              textAlign:  (sharedpref?.getString('lang') == 'ar') ?
+                              TextAlign.right :
+                              TextAlign.left ,
+                              scrollPadding:  EdgeInsets.symmetric(vertical: 30),
+                              decoration:  InputDecoration(
+                                alignLabelWithHint: false,
+                                counterText: "",
+                                fillColor: const Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding:
+                                (sharedpref?.getString('lang') == 'ar') ?
+                                EdgeInsets.fromLTRB(166, 0, 17, 40):
+                                EdgeInsets.fromLTRB(17, 0, 0, 40),
+                                hintText:'Please enter your name'.tr,
+                                floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                hintStyle: const TextStyle(
+                                  color: Color(0xFF9E9E9E),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Bold',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.33,
+                                ),
+                                focusedBorder:
+                                OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),                                    width: 0.5,
+                                    )),
+                                enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(7)),
                                   borderSide: BorderSide(
-                                    color: Color(0xFFFFC53E),                                    width: 0.5,
-                                  )),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
+                                    color: Color(0xFFFFC53E),
+                                    width: 0.5,
+                                  ),
                                 ),
-                              ),
 
 
-                              // enabledBorder: myInputBorder(),
-                              // focusedBorder: myFocusBorder(),
-                            )
+                                // enabledBorder: myInputBorder(),
+                                // focusedBorder: myFocusBorder(),
+                              )
 
 
 
@@ -865,7 +883,7 @@ class _AddParentsState extends State<AddParents> {
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
-                          // :Container(),
+                      // :Container(),
 
                       SizedBox(height: 17,),
                       Padding(
@@ -910,49 +928,39 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.symmetric(horizontal: 44.0),
                         child: SizedBox(
                           width: 277,
-                          height: 40,
-                          child: TextFormField(
+                          height: 65,
+                          child:
+                          IntlPhoneField(
+
+                            cursorColor:Color(0xFF442B72) ,
                             controller: _phoneNumberController,
-                            style: TextStyle(color: Color(0xFF442B72),),
-                            cursorColor: const Color(0xFF442B72),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            // autofocus: true,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              LengthLimitingTextInputFormatter(11),
-                              FilteringTextInputFormatter.digitsOnly],
-                            textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-                            TextAlign.right :
-                            TextAlign.left ,
-                            scrollPadding:  EdgeInsets.symmetric(
-                                vertical: 30),
-                            decoration:  InputDecoration(
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
+                            dropdownIconPosition:IconPosition.trailing,
+                            invalidNumberMessage:" ",
+                            style: TextStyle(color: Color(0xFF442B72),height: 1.5),
+                            dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
+                            decoration: InputDecoration(
+                              fillColor: Color(0xffF1F1F1),
                               filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(166, 0, 17, 40):
-                              EdgeInsets.fromLTRB(17, 0, 0, 40),
-                              hintText:'Please enter your number'.tr,
-                              floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.33,
+                              hintText: 'Phone Number'.tr,
+                              hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
+
+                              border:
+                              OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide:  BorderSide(
+                                  color: !_phoneNumberEntered
+                                      ? Colors.red // Red border if phone number not entered
+                                      : Color(0xFFFFC53E),
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
+
+                              focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(7)),
                                 borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
-                                ),),
+                                    color: Colors.red,
+                                    width: 2
+                                ),
+                              ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(7)),
                                 borderSide: BorderSide(
@@ -960,9 +968,32 @@ class _AddParentsState extends State<AddParents> {
                                   width: 0.5,
                                 ),
                               ),
-                              // enabledBorder: myInputBorder(),
-                              // focusedBorder: myFocusBorder(),
+                              errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                      color: Colors.red,
+                                      width: 2
+                                  )
+                              ),
+                              focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFFFC53E),
+                                ),
+                              ),
+
+
+                              contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+
+
                             ),
+
+                            initialCountryCode: 'EG', // Set initial country code if needed
+                            onChanged: (phone) {
+                              // Update the enteredPhoneNumber variable with the entered phone number
+
+                            },
+
                           ),
                         ),
                       ),
@@ -1069,7 +1100,7 @@ class _AddParentsState extends State<AddParents> {
                         ),
                       ),
                       numberOfChildrenError?
-                          Container():
+                      Container():
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
@@ -1095,6 +1126,12 @@ class _AddParentsState extends State<AddParents> {
                                 fontWeight: FontWeight.w700 ,
                                 color: Color(0xff771F98),),),
                             GestureDetector(
+                                // onTap: (){
+                                //   setState(() {
+                                //     // modifyText();
+                                //     addChild();
+                                //     NumberOfChildrenCard = !NumberOfChildrenCard;
+                                //   });
                               onTap: (){
                                 setState(() {
                                   // modifyText();
@@ -1105,28 +1142,28 @@ class _AddParentsState extends State<AddParents> {
                                   });
                                 });
 
-                              },
-                              child: NumberOfChildrenCard?
-                              Image.asset('assets/images/iconamoon_arrow-up-2-thin (1).png',
-                                width: 34,
-                                height: 34,):
-                              Image.asset('assets/images/iconamoon_arrow-up-2-thin.png',
-                                width: 34,
-                                height: 34,)
+                                },
+                                child: NumberOfChildrenCard?
+                                Image.asset('assets/images/iconamoon_arrow-up-2-thin (1).png',
+                                  width: 34,
+                                  height: 34,):
+                                Image.asset('assets/images/iconamoon_arrow-up-2-thin.png',
+                                  width: 34,
+                                  height: 34,)
                             ),
                           ],
                         ),
                       ) ,
                       SizedBox(height: 5,),
                       Padding(
-                        padding: (sharedpref?.getString('lang') == 'ar')?
-                        EdgeInsets.only(right: 21.0):
-                        EdgeInsets.only(left: 25.0),
-                        child: Container(
-                          width: (sharedpref?.getString('lang') == 'ar')?
-                          310 : 318,
-                          height: 1,
-                          color: Color(0xFF442B72),)
+                          padding: (sharedpref?.getString('lang') == 'ar')?
+                          EdgeInsets.only(right: 21.0):
+                          EdgeInsets.only(left: 25.0),
+                          child: Container(
+                            width: (sharedpref?.getString('lang') == 'ar')?
+                            310 : 318,
+                            height: 1,
+                            color: Color(0xFF442B72),)
                       ) ,
                       NumberOfChildrenCard?
                       Padding(
@@ -1134,7 +1171,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.only(right: 25.0 , left: 20):
                         EdgeInsets.only(left: 25.0 , right: 20),
                         child: SizedBox(
-                       height: NumberOfChildren.length*325,
+                          height: NumberOfChildren.length*325,
                           width: double.infinity,
                           child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
@@ -1160,33 +1197,34 @@ class _AddParentsState extends State<AddParents> {
                             fontFamily: 'Poppins-Regular',
                             width: 277,
                             hight: 48,
-                            onPress: () async {
-                              setState(() {
-                                // تحقق من الأخطاء هنا
-                                if (selectedValue.isEmpty) {
-                                  typeOfParentError = false;
-                                } else {
-                                  typeOfParentError = true;
-                                }
+    onPress: () async {
+    setState(() {
+    // تحقق من الأخطاء هنا
+    if (selectedValue.isEmpty) {
+    typeOfParentError = false;
+    } else {
+    typeOfParentError = true;
+    }
 
-                                if (_nameController.text.isEmpty) {
-                                  nameError = false;
-                                } else {
-                                  nameError = true;
-                                }
+    if (_nameController.text.isEmpty) {
+    nameError = false;
+    } else {
+    nameError = true;
+    }
 
-                                if (_phoneNumberController.text.length < 11) {
-                                  phoneError = false;
-                                } else {
-                                  phoneError = true;
-                                }
+    if (_phoneNumberController.text.length < 11) {
+    phoneError = false;
+    } else {
+    phoneError = true;
+    }
 
-                                if (_numberOfChildrenController.text.isEmpty) {
-                                  numberOfChildrenError = false;
-                                } else {
-                                  numberOfChildrenError = true;
-                                }
+    if (_numberOfChildrenController.text.isEmpty) {
+    numberOfChildrenError = false;
+    } else {
+    numberOfChildrenError = true;
+    }
 
+<<<<<<< HEAD
                                 // تحقق من الأخطاء في كل بطاقة طفل
                                 for (int i = 0; i < nameChildControllers.length; i++) {
                                   if (nameChildControllers[i].text.isEmpty) {
@@ -1223,253 +1261,291 @@ class _AddParentsState extends State<AddParents> {
                       SizedBox(height: 70,),
                     ],
                   )
+=======
+    // تحقق من الأخطاء في كل بطاقة طفل
+    for (int i = 0; i < nameChildControllers.length; i++) {
+    if (nameChildControllers[i].text.isEmpty) {
+    nameChildeError = false;
+    } else {
+    nameChildeError = true;
+    }
+    if (gradeControllers[i].text.isEmpty) {
+    GradeError = false;
+    } else {
+    GradeError = true;
+    }
+    }
+    });
+    if (
+    // GradeError &&
+    // nameChildeError &&
+    typeOfParentError &&
+    nameError &&
+    phoneError &&
+    numberOfChildrenError
+    ) {
+    InvitationSendSnackBar(context, 'Invitation sent successfully');
+    _addDataToFirestore();
+    print('object');
+    NumberOfChildrenCard = false;
+    setState(() {});
+    }
+    },
+    color: Color(0xFF442B72),
+    fontSize: 16),
+    ),
+    ),
+    SizedBox(height: 70,),
+    ],
+    )
+    ),
+    ),
+    ],
+    ),
+    extendBody: true,
+    resizeToAvoidBottomInset: false,
+    floatingActionButtonLocation:
+    FloatingActionButtonLocation.centerDocked,
+    floatingActionButton: FloatingActionButton(
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(100)),
+    backgroundColor: Color(0xff442B72),
+    onPressed: () {
+    Navigator.of(context).push(MaterialPageRoute(
+    builder: (context) => ProfileSupervisorScreen(
+    // onTapMenu: onTapMenu
+    )));
+    },
+    child: Image.asset(
+    'assets/images/174237 1.png',
+    height: 33,
+    width: 33,
+    fit: BoxFit.cover,
+    )
+
+    ),
+    bottomNavigationBar: Directionality(
+    textDirection: Get.locale == Locale('ar')
+    ? TextDirection.rtl
+        : TextDirection.ltr,
+    child: ClipRRect(
+    borderRadius: const BorderRadius.only(
+    topLeft: Radius.circular(25),
+    topRight: Radius.circular(25),
+    ),
+    child: BottomAppBar(
+    padding: EdgeInsets.symmetric(vertical: 3),
+    height: 60,
+    color: const Color(0xFF442B72),
+    clipBehavior: Clip.antiAlias,
+    shape: const AutomaticNotchedShape(
+    RoundedRectangleBorder(
+    borderRadius: BorderRadius.only(
+    topLeft: Radius.circular(38.5),
+    topRight: Radius.circular(38.5))),
+    RoundedRectangleBorder(
+    borderRadius:
+    BorderRadius.all(Radius.circular(50)))),
+    notchMargin: 7,
+    child: SizedBox(
+    height: 10,
+    child: SingleChildScrollView(
+    child: Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    HomeForSupervisor()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top:7 , right: 15):
+    EdgeInsets.only(left: 15),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/Vector (7).png',
+    height: 20,
+    width: 20
+    ),
+    SizedBox(height: 3),
+    Text(
+    "Home".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    AttendanceSupervisorScreen()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top: 9, left: 50):
+    EdgeInsets.only( right: 50, top: 2 ),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/icons8_checklist_1 1.png',
+    height: 19,
+    width: 19
+    ),
+    SizedBox(height: 3),
+    Text(
+    "Attendance".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    NotificationsSupervisor()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
+    EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/Vector (2).png',
+    height: 17,
+    width: 16.2
+    ),
+    Image.asset(
+    'assets/images/Vector (5).png',
+    height: 4,
+    width: 6
+    ),
+    SizedBox(height: 2),
+    Text(
+    "Notifications".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    GestureDetector(
+    onTap: () {
+    setState(() {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) =>
+    TrackSupervisor()),
+    );
+    });
+    },
+    child: Padding(
+    padding:
+    (sharedpref?.getString('lang') == 'ar')?
+    EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
+    EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
+    child: Column(
+    children: [
+    Image.asset(
+    'assets/images/Vector (4).png',
+    height: 18.36,
+    width: 23.5
+    ),
+    SizedBox(height: 3),
+    Text(
+    "Buses".tr,
+    style: TextStyle(
+    fontFamily: 'Poppins-Regular',
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    fontSize: 8,
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    ],
+    ),
+    )))))
+    );
+    }
+  }
+  void InvitationSendSnackBar(context, String message, {Duration? duration}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        dismissDirection: DismissDirection.up,
+        duration: duration ?? const Duration(milliseconds: 1000),
+        backgroundColor: Colors.white,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 150,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),),
+        behavior: SnackBarBehavior.floating,
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/saved.png',
+              width: 30,
+              height: 30,),
+            SizedBox(width: 15,),
+            Text(
+              'Invitation sent successfully'.tr,
+              style: const TextStyle(
+                color: Color(0xFF4CAF50),
+                fontSize: 16,
+                fontFamily: 'Poppins-Bold',
+                fontWeight: FontWeight.w700,
+                height: 1.23,
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
               ),
             ),
           ],
         ),
-        extendBody: true,
-        resizeToAvoidBottomInset: false,
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100)),
-            backgroundColor: Color(0xff442B72),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ProfileSupervisorScreen(
-                    // onTapMenu: onTapMenu
-                  )));
-            },
-            child: Image.asset(
-              'assets/images/174237 1.png',
-              height: 33,
-              width: 33,
-              fit: BoxFit.cover,
-            )
-
-        ),
-        bottomNavigationBar: Directionality(
-            textDirection: Get.locale == Locale('ar')
-                ? TextDirection.rtl
-                : TextDirection.ltr,
-            child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-                child: BottomAppBar(
-                    padding: EdgeInsets.symmetric(vertical: 3),
-                    height: 60,
-                    color: const Color(0xFF442B72),
-                    clipBehavior: Clip.antiAlias,
-                    shape: const AutomaticNotchedShape(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(38.5),
-                                topRight: Radius.circular(38.5))),
-                        RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(50)))),
-                    notchMargin: 7,
-                    child: SizedBox(
-                        height: 10,
-                        child: SingleChildScrollView(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              HomeForSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top:7 , right: 15):
-                                  EdgeInsets.only(left: 15),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (7).png',
-                                          height: 20,
-                                          width: 20
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Home".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AttendanceSupervisorScreen()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 9, left: 50):
-                                  EdgeInsets.only( right: 50, top: 2 ),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/icons8_checklist_1 1.png',
-                                          height: 19,
-                                          width: 19
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Attendance".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              NotificationsSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                  EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (2).png',
-                                          height: 17,
-                                          width: 16.2
-                                      ),
-                                      Image.asset(
-                                          'assets/images/Vector (5).png',
-                                          height: 4,
-                                          width: 6
-                                      ),
-                                      SizedBox(height: 2),
-                                      Text(
-                                        "Notifications".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TrackSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
-                                  EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (4).png',
-                                          height: 18.36,
-                                          width: 23.5
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Buses".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )))))
+      ),
     );
   }
-}
-void InvitationSendSnackBar(context, String message, {Duration? duration}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      dismissDirection: DismissDirection.up,
-      duration: duration ?? const Duration(milliseconds: 1000),
-      backgroundColor: Colors.white,
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).size.height - 150,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),),
-      behavior: SnackBarBehavior.floating,
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset('assets/images/saved.png',
-            width: 30,
-            height: 30,),
-          SizedBox(width: 15,),
-          Text(
-            'Invitation sent successfully'.tr,
-            style: const TextStyle(
-              color: Color(0xFF4CAF50),
-              fontSize: 16,
-              fontFamily: 'Poppins-Bold',
-              fontWeight: FontWeight.w700,
-              height: 1.23,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}

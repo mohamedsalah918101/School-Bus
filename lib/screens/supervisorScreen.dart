@@ -11,7 +11,12 @@ import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/sendInvitationScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
+<<<<<<< HEAD
 // import 'package:url_launcher/url_launcher.dart';
+=======
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
 import '../classes/dropdownRadiobutton.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -25,6 +30,12 @@ import 'dart:math' as math;
 import 'package:flutter/services.dart';
 //import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
+<<<<<<< HEAD
+=======
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
+
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
 
 class SupervisorScreen extends StatefulWidget {
   const SupervisorScreen({super.key});
@@ -41,9 +52,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   int selectedIconIndex = 0;
   bool isEditingSupervisor = false;
   List<DropdownCheckboxItem> selectedItems = [];
+<<<<<<< HEAD
   // List<QueryDocumentSnapshot> data = [];
   List<QueryDocumentSnapshot> filteredData = [];
   // late Stream<QuerySnapshot> supervisorsStream;
+=======
+ // List<QueryDocumentSnapshot> data = [];
+  List<QueryDocumentSnapshot> filteredData = [];
+ // late Stream<QuerySnapshot> supervisorsStream;
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
   // void filterSearchResults(String query) {
   //   setState(() {
   //     // Update the Firestore query based on the search input
@@ -56,6 +73,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   // }
   //call phone
   void _makePhoneCall(String phoneNumber) async {
+<<<<<<< HEAD
     // if (await canLaunch('tel:$phoneNumber')) {
     //   await launch('tel:$phoneNumber');
     //   print("succ");
@@ -84,6 +102,29 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   //     ),
   //   );
   // }
+=======
+    var mobileCall = 'tel:$phoneNumber';
+    if (await canLaunchUrlString(mobileCall)) {
+      await launchUrlString(mobileCall);
+    } else {
+      throw 'Could not launch $mobileCall';
+    }
+  }
+
+  void _editSupervisorDocument(String documentId, String name, String phone, String email) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditeSupervisor(
+          docid: documentId,
+          oldName: name,
+          oldPhone: phone,
+          oldEmail: email,
+        ),
+      ),
+    );
+  }
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
 // to lock in landscape view
   List<QueryDocumentSnapshot> data = [];
   getData()async{
@@ -106,8 +147,13 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
       });
       ScaffoldMessenger.of(context).showSnackBar(
+<<<<<<< HEAD
         showSnackBarFun(context),
         // SnackBar(content: Text('Document deleted successfully')),
+=======
+          showSnackBarFun(context),
+       // SnackBar(content: Text('Document deleted successfully')),
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
       );
     });
     //     .catchError((error) {
@@ -123,9 +169,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   @override
   void initState() {
     super.initState();
+<<<<<<< HEAD
     // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
     // responsible
     getData();
+=======
+   // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
+    // responsible
+  getData();
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
     // setState(() {
     //   filteredData = data;
     // });
@@ -211,6 +263,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
           resizeToAvoidBottomInset: false,
           endDrawer: HomeDrawer(),
 
+<<<<<<< HEAD
           backgroundColor: const Color(0xFFFFFFFF),
           body: LayoutBuilder(builder: (context, constrains) {
             return Stack(children: [
@@ -244,6 +297,71 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                         // Navigator.pop(context);
                                         Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
                                       },
+=======
+        backgroundColor: const Color(0xFFFFFFFF),
+        body: LayoutBuilder(builder: (context, constrains) {
+          return Stack(children: [
+            Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                     //physics: BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: InkWell(
+                            onTap: () {},
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child: InkWell(
+                                    // onTap: ()=>exit(0),
+                                    onTap: () {
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
+                                      // Navigate back to the previous page
+                                     // Navigator.pop(context);
+                                      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
+                                    },
+                                    child: const Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      size: 23,
+                                      color: Color(0xff442B72),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      "Supervisors".tr,
+                                      style: TextStyle(
+                                        color: Color(0xFF993D9A),
+                                        fontSize: 25,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w700,
+                                        height: 0.64,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 12.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Scaffold.of(context).openEndDrawer();
+                                    },
+                                    child: Align(
+                                      alignment: AlignmentDirectional.topEnd,
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                                       child: const Icon(
                                         Icons.arrow_back_ios_new_rounded,
                                         size: 23,
@@ -291,6 +409,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                             height: 20,
                           ),
 
+<<<<<<< HEAD
                           SizedBox(
                             height: 20,
                           ),
@@ -438,6 +557,154 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               );
                                                             },
                                                           ),
+=======
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child:
+                                Column (
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.symmetric(horizontal: 1),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              //width: constrains.maxWidth / 1.0,
+                                              height: 50,
+                                              child: Theme(
+                                                data: ThemeData(
+                                                  textSelectionTheme:
+                                                      TextSelectionThemeData(
+                                                    cursorColor: Color(0xFF442B72),
+                                                    // Set the desired cursor color here
+                                                  ),
+                                                ),
+                                                child:
+                                                SearchBar(
+                                                  leading: Padding(
+                                                    padding: const EdgeInsets.only(
+                                                        left: 4.0),
+                                                    child: Image.asset(
+                                                      "assets/imgs/school/icons8_search 1.png",
+                                                      width: 22,
+                                                      height: 22,
+                                                    ),
+                                                  ),
+                                                  //Icon(Icons.search,color: Color(0xFFC2C2C2),),
+                                                  controller: searchController,
+                                                  textStyle: MaterialStateProperty
+                                                      .all<TextStyle?>(TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                  )),
+                                                  hintText: "Search Name".tr,
+                                                  onChanged: (query) {
+                                                    // Filter the data based on the search query
+                                                    setState(() {
+                                                      if (query.isEmpty) {
+                                                        filteredData = List.from(data); // Show all data if query is empty
+                                                      } else {
+                                                        filteredData = data.where((doc) {
+                                                          // Debugging: Print the name and query to see what's being compared
+                                                          print('Document Name: ${doc['name']}');
+                                                          print('Search Query: $query');
+
+                                                          // Perform case-insensitive search based on 'name' field
+                                                          return doc['name'].toLowerCase().contains(query.toLowerCase());
+                                                        }).toList();
+                                                      }
+                                                    });
+                                                  },
+                                                  // onChanged: (value) {
+                                                  //   filterSearchResults(value);
+                                                  // },
+                                                  hintStyle: MaterialStateProperty
+                                                      .all<TextStyle?>(TextStyle(
+                                                          color: Color(0xFFC2C2C2),
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily:
+                                                              'Poppins-Bold')),
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                          Color?>(Color(0xFFF1F1F1)),
+                                                  elevation: MaterialStateProperty
+                                                      .all<double?>(0.0),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+
+                                          SizedBox(
+                                            width: 20,
+                                          ),
+                                          // Image(image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
+                                          // width: 27.62,
+                                          // height: 21.6,),
+                                          PopupMenuButton<String>(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  "assets/imgs/school/icons8_slider 2.png"),
+                                              width: 29,
+                                              height: 29,
+                                              color: Color(
+                                                  0xFF442B72), // Optionally, you can set the color of the image
+                                            ),
+                                            // icon: FaIcon(
+                                            //   FontAwesomeIcons.sliders,
+                                            //   size: 20, // Adjust the size as needed
+                                            //   color: Color(0xFF442B72), // Set the color of the icon
+                                            // ),
+                                            itemBuilder: (BuildContext context) {
+                                              return [
+                                                PopupMenuItem<String>(
+                                                  value: 'custom',
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+
+                                                        child: DropdownRadiobutton(
+                                                          items: [
+                                                            DropdownCheckboxItem(
+                                                                label: 'Accepted'),
+                                                            DropdownCheckboxItem(
+                                                                label: 'Rejected'),
+                                                            DropdownCheckboxItem(
+                                                                label: 'Waiting'),
+                                                          ],
+                                                          selectedItems:
+                                                              selectedItems,
+                                                          onSelectionChanged:
+                                                              (items) {
+                                                            setState(() {
+                                                              selectedItems = items;
+                                                              if (items.first.label == 'Accepted') {
+                                                                selectedValueAccept = 'Accepted';
+                                                                selectedValueDecline = null;
+                                                                selectedValueWaiting = null;
+                                                              } else if (items.first.label == 'Rejected') {
+                                                                selectedValueAccept = null;
+                                                                selectedValueDecline = 'Rejected';
+                                                                selectedValueWaiting = null;
+                                                              } else if (items.first.label == 'Waiting') {
+                                                                selectedValueAccept = null;
+                                                                selectedValueDecline = null;
+                                                                selectedValueWaiting = 'Waiting';
+                                                              }
+                                                            }
+                                                            );
+                                                          },
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                                                         ),
                                                         Row(
                                                           mainAxisAlignment:
@@ -494,6 +761,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                   },
                                                                 ),
                                                               ),
+<<<<<<< HEAD
                                                             ),
                                                             SizedBox(
                                                               width: 3,
@@ -946,6 +1214,489 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                 )
                               ],
                             ),
+=======
+                                                              child: GestureDetector(
+                                                                child: Text(
+                                                                  'Apply',
+                                                                  style: TextStyle(
+                                                                      fontSize: 18),
+                                                                ),
+                                                                onTap: (){
+                                                                  if (selectedValueAccept != null) {
+                                                                    currentFilter = 'Accepted';
+                                                                    getDataForAcceptFilter();
+                                                                    Navigator.pop(context);
+                                                                    print('2');
+                                                                  }else  if (selectedValueDecline != null) {
+                                                                    currentFilter = 'Rejected';
+                                                                    getDataForDeclinedFilter();
+                                                                    Navigator.pop(context);
+                                                                    print('0');
+                                                                  }else  if (selectedValueWaiting != null) {
+                                                                    currentFilter = 'Waiting';
+                                                                    getDataForWaitingFilter();
+                                                                    Navigator.pop(context);
+                                                                    print('1');
+                                                                  }
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            width: 3,
+                                                          ),
+
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets.all(
+                                                                    5.0),
+                                                            child: GestureDetector(
+                                                              onTap:(){
+                                                                   getData();
+                                                                  Navigator.pop(context);
+                                                              },
+                                                              child: Text(
+                                                                "Reset",
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        0xFF442B72),
+                                                                    fontSize: 20),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+
+                                                    ],
+                                                  ),
+                                                ),
+                                              ];
+                                            },
+                                            // onSelected: (String value) {
+                                            //   // Handle selection here
+                                            //   print('Selected: $value');
+                                            // },
+                                            // onSelected: ( value) {
+                                            //   setState(() {
+                                            //     _selectedOption = value; // Update selected option
+                                            //   });
+                                            //   // Handle any additional actions based on the selected option
+                                            //   print('Selected: $value');
+                                            // },
+                                          ),
+                                        ],
+                                      ),
+
+                                    ),
+
+
+
+                                    //),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    //new code
+                                    SizedBox(
+                                      height: 500,
+                                      child: ListView.builder(
+                                        //itemCount: data.length,
+                                        itemCount: filteredData.length,
+                                        itemBuilder: (context, index) {
+                                          String supervisorPhoneNumber = filteredData[index]['phoneNumber'];
+                                          int state =data[index]['state']; // Assuming 'state' is the field from Firestore
+
+                                          Color statusColor;
+                                          String statusText;
+
+                                          // Determine status color and text based on state
+                                          switch (state) {
+                                            case 0:
+                                              statusColor = Colors.red; // Rejected (State = 0)
+                                              statusText = 'Rejected';
+                                              break;
+                                            case 1:
+                                              statusColor = Colors.yellow; // Waiting (State = 1)
+                                              statusText = 'Waiting';
+                                              break;
+                                            case 2:
+                                              statusColor = Colors.green; // Accepted (State = 2)
+                                              statusText = 'Accepted';
+                                              break;
+                                            default:
+                                              statusColor = Colors.grey; // Default color if state is unknown
+                                              statusText = 'Unknown';
+                                              break;
+                                          }
+
+                                          return ListTile(
+                                              leading:
+//                                              Map<String, dynamic> documentData = filteredData[index].data() as Map<String, dynamic>;
+//
+// // Check if the 'busphoto' field exists and is not null
+//                                           if (documentData.containsKey('busphoto') && documentData['busphoto'] != null) {
+//                                             // Display Image.network with the URL from 'busphoto' field
+//                                             return Image.network(
+//                                               documentData['busphoto'] as String,
+//                                               width: 61,
+//                                               height: 61,
+//                                               errorBuilder: (context, error, stackTrace) {
+//                                                 // Display a default image if loading fails
+//                                                 return Image.asset(
+//                                                   'assets/images/school (2) 1.png',
+//                                                   width: 61,
+//                                                   height: 61,
+//                                                 );
+//                                               },
+//                                             );
+//                                           } else {
+//                                             // Display a default image if 'busphoto' field is absent or null
+//                                             return Image.asset(
+//                                               'assets/images/school (2) 1.png',
+//                                               width: 61,
+//                                               height: 61,
+//                                             );
+//                                           }
+                                            filteredData[index]['busphoto'] != null ? Image.network(filteredData[index]['busphoto']as String, width: 61, height: 61,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                              },
+                                            ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                            //Image.asset('assets/imgs/school/Ellipse 1.png'), // Icon or image
+
+                                            title: Text(
+                                              '${filteredData[index]['name']}',
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Poppins-Bold',
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              statusText,
+                                              style: TextStyle(
+                                                color: statusColor,
+                                                fontSize: 13,
+                                                fontFamily: 'Poppins',
+                                              ),
+                                            ),
+                                            trailing:
+                                            PopupMenuButton<String>(
+                                              enabled: !isEditingSupervisor,
+
+                                              shape: RoundedRectangleBorder(
+
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10.0),
+                                                ),
+                                              ),
+                                              icon: Icon(Icons.more_vert,
+                                                  size: 30, color: Color(0xFF442B72)),
+                                              itemBuilder: (BuildContext context) =>
+                                              <PopupMenuEntry<String>>[
+                                                PopupMenuItem<String>(
+                                                  value: 'edit',
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      ScaffoldMessenger.of(context)
+                                                          .hideCurrentSnackBar();
+                                                      setState(() {
+                                                        isEditingSupervisor = true;
+                                                        _editSupervisorDocument(
+                                                          data[index].id,
+                                                          data[index]['name'],
+                                                          data[index]['phoneNumber'],
+                                                          data[index]['email'],
+                                                        );
+                                                      });
+                                                      // Navigator.pushReplacement(
+                                                      //     context,
+                                                      //     MaterialPageRoute(
+                                                      //         builder: (context) =>
+                                                      //             EditeSupervisor())
+                                                      // );
+                                                    },
+                                                    child: SizedBox(
+                                                      height: 20,
+                                                      child: Row(
+                                                        children: [
+                                                          Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
+                                                          // Transform(
+                                                          //     alignment: Alignment.center,
+                                                          //     transform:
+                                                          //         Matrix4.rotationY(math.pi),
+                                                          //     child:
+                                                          //     Icon(
+                                                          //       Icons.edit_outlined,
+                                                          //       color: Color(0xFF442B72),
+                                                          //       size: 17,
+                                                          //     )
+                                                          // ),
+                                                          SizedBox(width: 10),
+                                                          Text('Edit',
+                                                              style: TextStyle(
+                                                                  color: Color(0xFF442B72),
+                                                                  fontSize: 17)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: SizedBox(
+                                                    height: 20,
+                                                    child: Row(
+                                                      children: [
+                                                        Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
+                                                        // Icon(
+                                                        //   Icons.delete_outline_outlined,
+                                                        //   color: Color(0xFF442B72),
+                                                        //   size: 17,
+                                                        // ),
+                                                        SizedBox(width: 10),
+                                                        Text(
+                                                          'Delete',
+                                                          style: TextStyle(
+                                                              color: Color(0xFF442B72),
+                                                              fontSize: 17),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              onSelected: (String value) {
+                                                // Handle selection here
+                                                if (value == 'edit') {
+                                                  // Handle edit action
+                                                  setState(() {
+                                                    isEditingSupervisor = true;
+                                                    _editSupervisorDocument(
+                                                      data[index].id,
+                                                      data[index]['name'],
+                                                      data[index]['phoneNumber'],
+                                                      data[index]['email'],
+                                                    );
+                                                  });
+
+                                                  // Navigator.pushReplacement(
+                                                  //     context,
+                                                  //     MaterialPageRoute(
+                                                  //         builder: (context) =>
+                                                  //             EditeSupervisor()));
+                                                } else if (value == 'delete') {
+                                                  _deleteSupervisorDocument(data[index].id);
+                                                  // setState(() {
+                                                  //
+                                                  //   //showSnackBarFun(context);
+                                                  // });
+                                                }
+                                              },
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            tileColor: Colors.white,
+                                            onTap: () {
+                                              showModalBottomSheet(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.vertical(
+                                                      top: Radius.circular(30.0)),
+                                                ),
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Container(
+                                                    padding: EdgeInsets.all(20),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(
+                                                            40), // Rounded top left corner
+                                                        topRight: Radius.circular(
+                                                            40), // Rounded top right corner
+                                                      ),
+                                                    ),
+                                                    constraints: BoxConstraints(
+                                                        maxHeight: MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                            0.4), // Decreased height
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.symmetric(horizontal:15.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Text('Supervisor',
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                      Color(0xff442B72),
+                                                                      fontSize: 20,
+                                                                      fontWeight:
+                                                                      FontWeight.bold)),
+                                                              Expanded(
+                                                                child: Align(
+                                                                  alignment:
+                                                                  Alignment.centerRight,
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                      shape: BoxShape.circle,
+                                                                      color: Colors.white,
+                                                                      border: Border.all(
+                                                                        color:
+                                                                        Color(0xFF442B72),
+                                                                        width: 1,
+                                                                      ),
+                                                                    ),
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      },
+                                                                      child: Padding(
+                                                                        padding:
+                                                                        const EdgeInsets
+                                                                            .all(4.0),
+                                                                        child: FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .times,
+                                                                          color: Color(
+                                                                              0xFF442B72),
+                                                                          size: 18,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 20,
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Align(
+                                                                alignment:
+                                                                Alignment.centerLeft,
+                                                                child: CircleAvatar(
+                                                                  radius: 35,
+                                                                  backgroundImage: AssetImage(
+                                                                      'assets/imgs/school/Ellipse 1.png'),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Column(
+                                                                children: [
+                                                                  Text('${filteredData[index]['name']}',
+                                                                      style: TextStyle(
+                                                                          color: Color(
+                                                                              0xff442B72),
+                                                                          fontSize: 15)),
+                                                                  SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Text('${filteredData[index]['phoneNumber']}',
+                                                                      style: TextStyle(
+                                                                          color: Color(
+                                                                              0xff442B72),
+                                                                          fontSize: 15)),
+                                                                ],
+                                                              ),
+                                                              //SizedBox(width: 110,),
+                                                              Padding(
+                                                                padding:
+                                                                const EdgeInsets.only(
+                                                                    left: 70),
+                                                                child: Material(
+                                                                  elevation: 3,
+                                                                  shape: CircleBorder(),
+                                                                  child: Align(
+                                                                    alignment: Alignment
+                                                                        .centerRight,
+                                                                    child: GestureDetector(
+                                                                      onTap: ()async{
+                                                                        _makePhoneCall(supervisorPhoneNumber);
+                                                                     //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                        //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                      },
+                                                                      // onTap: () async {
+                                                                      //   try {
+                                                                      //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                      //   } catch (e) {
+                                                                      //     print('Error making phone call: $e');
+                                                                      //     // Handle error gracefully (e.g., show a snackbar or alert)
+                                                                      //   }
+                                                                      // },
+                                                                      child: CircleAvatar(
+                                                                        backgroundColor:
+                                                                        Colors.white,
+                                                                        child:Transform.scale(
+                                                                            scaleX: -1,
+                                                                            child:  FaIcon(
+                                                                          FontAwesomeIcons
+                                                                              .phone,
+                                                                          color: Color(
+                                                                              0xFF442B72),
+                                                                          size: 26,
+                                                                        )),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(height: 20),
+                                                          Text('Buses',
+                                                              style: TextStyle(
+                                                                  color: Color(0xff442B72),
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                  FontWeight.bold)),
+                                                          SizedBox(height: 10),
+                                                          Row(
+                                                            children: [
+                                                              Container(
+                                                                width: 10,
+                                                                height: 10,
+                                                                decoration: BoxDecoration(
+                                                                  shape: BoxShape.circle,
+                                                                  color: Color(0xFF442B72),
+                                                                ),
+                                                              ),
+                                                              SizedBox(width: 10),
+                                                              Text(
+                                                                'Bus: 1234  ى ر س',
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Color(0xFF442B72),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                              )
+                            ],
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                           ),
                           //Floating button add old
                           // Align(
@@ -1224,6 +1975,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+<<<<<<< HEAD
 // void resetRadioButtons() {
 //   setState(() {
 //     // Unselect all items
@@ -1235,3 +1987,108 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 //   });
 // }
 }
+=======
+  // void resetRadioButtons() {
+  //   setState(() {
+  //     // Unselect all items
+  //     for (var item in widget.items) {
+  //       item.isChecked = false;
+  //     }
+  //     // Clear selected items list
+  //     widget.selectedItems.clear();
+  //   });
+  // }
+  deletePhotoDialog(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              30,
+            ),
+          ),
+          child: SizedBox(
+            height: 180,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Align(alignment: AlignmentDirectional.topCenter,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Are you sure you want to',
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 20,
+                                fontFamily: 'Poppins-Regular',
+                                //fontWeight: FontWeight.w400,
+                                height: 1.23,
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'delete this supervisor?',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins-Regular',
+                                  // fontWeight: FontWeight.w400,
+                                  height: 1.23,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    children: [
+                      ElevatedSimpleButton(
+                        txt: 'Delete',
+                        width: 120,
+                        hight: 38,
+                        onPress: () => {
+
+                        }
+
+                        // Navigator.of(context).pushAndRemoveUntil(
+                        // MaterialPageRoute(
+                        //     builder: (context) => const SignUpScreen()),
+                        //     (Route<dynamic> route) => false)
+                        ,
+                        color: const Color(0xFF442B72),
+                        fontSize: 16,
+                      ),
+                      const Spacer(),
+                      ElevatedSimpleButton(
+                        txt: 'Cancel',
+                        width: 120,
+                        hight: 38,
+                        onPress: () {
+                          Navigator.pop(context);
+                        },
+                        color: const Color(0xffffffff),
+                        fontSize: 16,
+                        txtColor: Color(0xFF442B72),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )),
+    );
+  }
+}
+
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99

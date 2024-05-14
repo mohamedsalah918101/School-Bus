@@ -15,6 +15,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -114,15 +115,17 @@ class _SchoolDataState extends State<SchoolData> {
       'coordinatorName':_coordinatorName.text,
       'supportNumber':_supportNumber.text,
       'photo': imageUrl,
+      'state':1
     };
 
 
     // Add the data to the Firestore collection
     //await _firestore.collection('schooldata').add(data).then((docRef)
-   await _firestore.collection('schooldata').doc(userId).set(data, SetOptions(merge: true)).then((_)
+   await _firestore.collection('schooldata').doc(sharedpref!.getString('id')).update(data).then((_)
        //.update(data).then((docRef)
     {
-
+      sharedpref!.setInt("allData",1);
+      // await _firestore.collection('schooldata').doc(userId)
       //print('Data added with document ID: ${docRef.id}');
      print('Data updated with document ID: $userId');
     }).catchError((error) {
@@ -667,7 +670,7 @@ class _SchoolDataState extends State<SchoolData> {
                                   textEditingController: _textController,
                                   googleAPIKey: _yourGoogleAPIKey,
                                   decoration: InputDecoration(
-                                   // errorText: _validateAddress ? "Please Enter Your Address" : null,
+                                    errorText: _validateAddress ? "Please Enter Your Address" : null,
                                     labelStyle: TextStyle(color: Colors.purple),
                                     suffixIcon: Image.asset(
                                       "assets/imgs/school/icons8_Location.png",
@@ -678,14 +681,14 @@ class _SchoolDataState extends State<SchoolData> {
                                     counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
                                     filled: true,
-                                    contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
+                                    contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
                                     floatingLabelBehavior: FloatingLabelBehavior.never,
                                     hintStyle: const TextStyle(
                                       color: Color(0xFFC2C2C2),
                                       fontSize: 10,
                                       fontFamily: 'Inter-Bold',
                                       fontWeight: FontWeight.w700,
-                                      height: 1.33,
+                                      height: 1.5,
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -693,7 +696,9 @@ class _SchoolDataState extends State<SchoolData> {
                                     ),
                                     enabledBorder: myInputBorder(),
                                     focusedBorder: myFocusBorder(),
+
                                   ),
+
                                   // validator: (value) {
                                   //   if (value!.isEmpty) {
                                   //     return 'Please enter some text';
@@ -844,6 +849,11 @@ class _SchoolDataState extends State<SchoolData> {
                                 cursorColor: const Color(0xFF442B72),
                                 style: TextStyle(color: Color(0xFF442B72)),
                                 textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                maxLength: 11,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                  LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                                ],
                                 onFieldSubmitted: (value) {
                                   // move to the next field when the user presses the "Done" button
                                   // FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
@@ -898,17 +908,18 @@ class _SchoolDataState extends State<SchoolData> {
                                     setState(() {
                                       _nameEnglish.text.isEmpty ? _validateNameEnglish = true :  _validateNameEnglish = false;
                                       _nameArabic.text.isEmpty ? _validateNameArabic = true :  _validateNameArabic = false;
-                                      _Address.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
+                                      _textController.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
                                       _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
                                       _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
                                       // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                     });
                                if(_supportNumber.text.length == 11 && ! _nameEnglish.text.isEmpty &&
                                    !_nameArabic.text.isEmpty
-                                  // &&!_Address.text.isEmpty
+                                   && !_textController.text.isEmpty
                                    &&!_coordinatorName.text.isEmpty &&!_supportNumber.text.isEmpty) {
                                  _addDataToFirestore();
                                  Navigator.push(
+
                                      context ,
                                      MaterialPageRoute(
                                          builder: (context) =>  HomeScreen(),

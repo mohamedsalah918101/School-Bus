@@ -64,27 +64,29 @@ String id='';
 int invitestate=0;
 
 Future<bool> checkIfNumberExists(String phoneNumber) async {
-  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
 
-  Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
   try {
+    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
 
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
     QuerySnapshot snapshot = await queryOfNumber.get();
-    print(phoneNumber+'dataaa');
+    print(snapshot.docs.toString()+'dataaaschooldata');
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;
-      if(snapshot.docs[0].get('address') == null)
-        sharedpref!.setInt('allData',0);
+      if(snapshot.docs[0].get('state') == 0)
+       {
+         print(snapshot.docs[0].get('state').toString()+'ghghgh');
+         sharedpref!.setInt('allData',0);}
       else
-      sharedpref!.setInt('allData',1);
+     { sharedpref!.setInt('allData',1);}
 
       return true;
     }else{
       CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
       Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
       QuerySnapshot snapshot = await queryOfNumber.get();
-      print(snapshot.docs.toString()+'dataaa');
+      print(snapshot.docs.toString()+'dataaaparent');
       if(snapshot.size > 0){
         loginType = 'parent';
         id =snapshot.docs[0].id;
@@ -96,12 +98,14 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
         CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
         Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
         QuerySnapshot snapshot = await queryOfNumber.get();
-        print(snapshot.docs.toString()+'dataaa');
+        print(snapshot.docs.toString()+'dataaasupervisor');
         if(snapshot.size > 0){
           loginType = 'supervisor';
           id =snapshot.docs[0].id;
           sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
           sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
+          print('invitstate');
+          print(snapshot.docs[0].get('invite').toString());
           return true;
         }else{
           return false;
@@ -115,6 +119,7 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
   }
 }
 
+<<<<<<< HEAD
 
 String Home='';
 String SearchiId='';
@@ -152,6 +157,114 @@ Future<bool> checkIfNumberExistsForSearch(String phoneNumber) async {
       return false;
     }
   } catch (error) {
+=======
+Future<bool> addSupervisorCheck(String phoneNumber) async {
+  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
+
+  Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+  try {
+
+    QuerySnapshot snapshot = await queryOfNumber.get();
+    print(phoneNumber+'dataaa');
+    if(snapshot.size > 0){
+
+      return true;
+    }else{
+      CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
+      Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+      QuerySnapshot snapshot = await queryOfNumber.get();
+      print(snapshot.docs.toString()+'dataaa');
+      if(snapshot.size > 0){
+        return true;
+      }else{
+        return false;
+      }
+
+    }
+  } catch (error) {
+
+    print('Error: $error');
+    return false;
+  }
+}
+
+Future<bool> addParentCheck(String phoneNumber) async {
+  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
+
+  Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+  try {
+
+    QuerySnapshot snapshot = await queryOfNumber.get();
+    print(phoneNumber+'dataaa');
+    if(snapshot.size > 0){
+
+      return true;
+    }else{
+        CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+        Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+        QuerySnapshot snapshot = await queryOfNumber.get();
+        print(snapshot.docs.toString()+'dataaa');
+        if(snapshot.size > 0){
+          return true;
+        }else{
+          return false;
+        }
+
+    }
+  } catch (error) {
+
+    print('Error: $error');
+    return false;
+  }
+}
+String docID='';
+Future<bool> checkUpdate(String phoneNumber) async {
+
+  try {
+
+
+      CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
+      Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+      QuerySnapshot snapshot = await queryOfNumber.get();
+      print(snapshot.docs.toString()+'dataaa');
+      if(snapshot.size > 0){
+        loginType = 'parent';
+        docID =snapshot.docs[0].id;
+        return true;
+
+
+    }else {
+        return false;
+
+      }
+  } catch (error) {
+
+    print('Error: $error');
+    return false;
+  }
+}
+Future<bool> checkUpdateSupervisor(String phoneNumber) async {
+
+  try {
+
+
+    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+    QuerySnapshot snapshot = await queryOfNumber.get();
+    print(snapshot.docs.toString()+'dataaa');
+    if(snapshot.size > 0){
+      loginType = 'supervisor';
+      docID =snapshot.docs[0].id;
+      return true;
+
+
+    }else {
+      return false;
+
+    }
+  } catch (error) {
+
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
     print('Error: $error');
     return false;
   }

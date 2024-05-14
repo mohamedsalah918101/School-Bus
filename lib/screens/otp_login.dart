@@ -20,34 +20,40 @@ import '../supervisor_parent/screens/home_supervisor.dart';
 import '../supervisor_parent/screens/no_invitation.dart';
 //import '../components/main_bottom_bar.dart';
 
-class OtpScreenLogin  extends StatefulWidget {
+class OtpScreenLogin extends StatefulWidget {
   // const OtpScreenLogin({super.key});
   //new code
   final String verificationId;
+  final String phoneNumer;
 
-  OtpScreenLogin({Key? key, required this.verificationId}) : super(key: key);
+  OtpScreenLogin(
+      {Key? key, required this.verificationId, required this.phoneNumer})
+      : super(key: key);
+
   @override
   State<OtpScreenLogin> createState() => _OtpScreenLoginState();
 }
 
 class _OtpScreenLoginState extends State<OtpScreenLogin> {
-  Timer? _timer;  // Variable to store the timer
+  Timer? _timer; // Variable to store the timer
   int _seconds = 60;
   String verificationId = '';
-  TextEditingController _pinCodeController=TextEditingController();
+  TextEditingController _pinCodeController = TextEditingController();
   String enteredPhoneNumber = '';
   bool _isLoading = false;
-
+  bool timeout = false;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   // Function to start the timer
   void startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       setState(() {
         if (_seconds > 0) {
-          _seconds--;  // Decrement the seconds remaining
+          _seconds--; // Decrement the seconds remaining
         } else {
-          timer.cancel();  // Cancel the timer when countdown ends
+          timeout = true;
+          timer.cancel(); // Cancel the timer when countdown ends
           // You can perform any additional actions here when the timer ends
         }
       });
@@ -77,6 +83,7 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
     verificationId = widget.verificationId;
     startTimer();
   }
+
   @override
   void dispose() {
     // Cancel the timer when the widget is disposed
@@ -129,7 +136,8 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                   Container(
                     decoration: const BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage("assets/imgs/school/Group 237669.png"),
+                        image:
+                            AssetImage("assets/imgs/school/Group 237669.png"),
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -173,7 +181,6 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                               //Expanded(child: Container())
                             ],
                           ),
-
                         ),
                         // Center(
                         //   child: Text(
@@ -236,8 +243,8 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                   horizontal: 30.0,
                                 ),
                                 child:
-                                //start
-                                PinCodeTextField(
+                                    //start
+                                    PinCodeTextField(
                                   controller: _pinCodeController,
                                   textStyle: const TextStyle(
                                     fontSize: 24,
@@ -263,46 +270,93 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       activeColor: const Color(0xff8198A5),
                                       selectedFillColor: Colors.white),
                                   cursorColor: const Color(0xff001D4A),
-                                  animationDuration: const Duration(milliseconds: 300),
+                                  animationDuration:
+                                      const Duration(milliseconds: 300),
                                   keyboardType: TextInputType.number,
                                 ),
 
                                 //end
                               ),
-
                             ),
-                            Align(alignment: AlignmentDirectional.topStart,
+                            Align(
+                              alignment: AlignmentDirectional.topStart,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:30),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(
-                                          //color: Colors.black, // Setting default text color to black
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
+                                    GestureDetector(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            //color: Colors.black, // Setting default text color to black
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                              text: "Didn't receive the OTP".tr,
+                                              style: TextStyle(
+                                                  color: Color(0xff263238)),
+                                            ),
+                                            TextSpan(
+                                              text: " Resend OTP?".tr,
+                                              style: TextStyle(
+                                                  color: timeout
+                                                      ? Color(0xff442B72)
+                                                      : Color(0xff9b9a9d)),
+                                            ),
+                                          ],
                                         ),
-
-                                        children: [
-                                          TextSpan(
-                                            text: "Didn't receive the OTP".tr,
-                                            style: TextStyle(color: Color(0xff263238)),
-                                          ),
-                                          TextSpan(
-                                            text: " Resend OTP?".tr,
-                                            style: TextStyle(color: Color(0xff442B72)),
-                                          ),
-
-
-                                        ],
                                       ),
+                                      onTap: () async {
+                                        if (timeout) {
+                                          timeout = false;
+                                          _seconds = 60;
+                                          startTimer();
+                                          setState(() {});
+                                          await _auth.verifyPhoneNumber(
+                                            phoneNumber: widget.phoneNumer,
+                                            verificationCompleted:
+                                                (PhoneAuthCredential
+                                                    credential) async {
+                                              // Auto-retrieve verification code
+                                              //   await _auth.signInWithCredential(credential);
+                                              //   Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
+                                            },
+                                            verificationFailed:
+                                                (FirebaseAuthException e) {
+                                              setState(() {
+                                                _isLoading = false;
+                                              });
+                                              // Verification failed
+                                            },
+                                            codeSent: (String verificationId,
+                                                int? resendToken) async {
+                                              // Save the verification ID for future use
+                                              String smsCode =
+                                                  'xxxxxx'; // Code input by the user
+                                              setState(() {
+                                                _isLoading = false;
+                                              });
+                                            },
+                                            codeAutoRetrievalTimeout:
+                                                (String verificationId) {},
+                                            timeout: Duration(seconds: 60),
+                                          );
+                                        }
+                                      },
                                     ),
                                     //Text("1 s".tr,style: TextStyle(fontSize: 12,fontFamily: 'Poppins',fontWeight: FontWeight.bold,color: Color(0xff263238)),)
                                     Text(
                                       '$_seconds s',
-                                      style: TextStyle(fontSize: 12,fontFamily: 'Poppins',fontWeight: FontWeight.bold,color: Color(0xff263238)),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xff263238)),
                                     ),
                                     // SizedBox(width: 55,),
                                     // Text("1 s".tr,style: TextStyle(fontSize: 12,fontFamily: 'Poppins',fontWeight: FontWeight.bold),
@@ -316,8 +370,6 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                               // ),
                               // ),
                             ),
-
-
                           ],
                         ),
                         Flexible(child: Container()),
@@ -326,68 +378,92 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                             width: constrains.maxWidth / 1.4,
                             child: Center(
                               child: ClipRect(
-
                                 child: ElevatedSimpleButton(
                                   txt: 'Verify'.tr,
                                   width: constrains.maxWidth / 1.4,
-                                  color: const Color(0xFF442B72),
-
+                                  color: timeout
+                                      ? Color(0xff9b9a9d)
+                                      : Color(0xFF442B72),
                                   hight: 48,
                                   onPress: () async {
-                                    setState(() {
-                                      _isLoading =true;
-                                    });
-
-                                    //erifyPhoneNumber(enteredPhoneNumber);
-                                    //my code
-                                    try{
-                                      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                                        verificationId: verificationId,
-                                        smsCode:_pinCodeController.text ,
-                                      );
-                                      // Sign the user in with the credential
-                                      await _auth.signInWithCredential(credential);
-                                      await sharedpref!.setString('type', loginType);
-                                      await sharedpref!.setString('id', id);
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                          builder: (context) =>  sharedpref!.getString('type').toString() == 'schooldata'
-                                              ? sharedpref!.getInt('allData') == 1
-                                              ? HomeScreen()
-                                              : SchoolData()
-                                              : sharedpref!.getString('type').toString() == 'parent'
-                                              ? sharedpref!.getInt('invit') == 1
-                                              ? sharedpref!.getInt('invitstate') == 1
-                                              ? HomeParent()
-                                              : FinalAcceptInvitationParent()
-                                              : NoInvitation(selectedImage: 3)
-                                              : sharedpref!.getInt('invit') == 1
-                                              ? sharedpref!.getInt('invitstate') == 1
-                                              ? HomeForSupervisor()
-                                              : FinalAcceptInvitationSupervisor()
-                                              : NoInvitation(selectedImage: 2)));
-
-
-                                    }catch(e){
+                                    if (!timeout) {
                                       setState(() {
-                                        _isLoading =false;
+                                        _isLoading = true;
                                       });
-                                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Invalid code.')));
 
-                                      print('lllll'+e.toString());
+                                      //erifyPhoneNumber(enteredPhoneNumber);
+                                      //my code
+                                      try {
+                                        PhoneAuthCredential credential =
+                                            PhoneAuthProvider.credential(
+                                          verificationId: verificationId,
+                                          smsCode: _pinCodeController.text,
+                                        );
+                                        // Sign the user in with the credential
+                                        await _auth
+                                            .signInWithCredential(credential);
+                                        await sharedpref!
+                                            .setString('type', loginType);
+                                        await sharedpref!.setString('id', id);
+                                        Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => sharedpref!
+                                                            .getString('type')
+                                                            .toString() ==
+                                                        'schooldata'
+                                                    ? sharedpref!.getInt(
+                                                                'allData') ==
+                                                            1
+                                                        ? HomeScreen()
+                                                        : SchoolData()
+                                                    : sharedpref!
+                                                                .getString(
+                                                                    'type')
+                                                                .toString() ==
+                                                            'parent'
+                                                        ? sharedpref!.getInt(
+                                                                    'invit') ==
+                                                                1
+                                                            ? sharedpref!.getInt(
+                                                                        'invitstate') ==
+                                                                    1
+                                                                ? HomeParent()
+                                                                : FinalAcceptInvitationParent()
+                                                            : NoInvitation(
+                                                                selectedImage:
+                                                                    3)
+                                                        : sharedpref!.getInt(
+                                                                    'invit') ==
+                                                                1
+                                                            ? sharedpref!.getInt(
+                                                                        'invitstate') ==
+                                                                    1
+                                                                ? HomeForSupervisor()
+                                                                : FinalAcceptInvitationSupervisor()
+                                                            : NoInvitation(
+                                                                selectedImage:
+                                                                    2)));
+                                      } catch (e) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content:
+                                                    Text('Invalid code.')));
+
+                                      }
+
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) => MainBottomNavigationBar(
+                                      //           pageNum: 0,
+                                      //         )));
                                     }
-
-
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) => MainBottomNavigationBar(
-                                    //           pageNum: 0,
-                                    //         )));
                                   },
                                   fontSize: 16,
-
                                 ),
                               ),
                             ),

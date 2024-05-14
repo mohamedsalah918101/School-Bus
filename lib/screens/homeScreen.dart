@@ -153,6 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
 
+<<<<<<< HEAD
                           // Text(
                           //                   "Salam Language School".tr,
                           //                   style: TextStyle(
@@ -163,6 +164,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           //                     height: 0.64,
                           //                   ),
                           //                 ),
+=======
+          // Text(
+          //                   "Salam Language School".tr,
+          //                   style: TextStyle(
+          //                     color: Color(0xFF993D9A),
+          //                     fontSize: 16,
+          //                     fontFamily: 'Poppins-Bold',
+          //                     fontWeight: FontWeight.w700,
+          //                     height: 0.64,
+          //                   ),
+          //                 ),
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                         ),
                       ),
                     ),
@@ -204,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Container(
 
+<<<<<<< HEAD
                                 decoration: BoxDecoration(
                                     color: Colors.white, // Your desired background color
                                     borderRadius: BorderRadius.circular(5),
@@ -287,6 +301,91 @@ class _HomeScreenState extends State<HomeScreen> {
                                     return CircularProgressIndicator();
                                   },
                                 )
+=======
+                              decoration: BoxDecoration(
+                                  color: Colors.white, // Your desired background color
+                                  borderRadius: BorderRadius.circular(5),
+                                  boxShadow: [
+                                    BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
+                                  ]
+                              ),
+                              child:
+
+                              // ListTile(
+                              //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              //   leading: GestureDetector(
+                              //       onTap: (){
+                              //         Navigator.push(
+                              //             context ,
+                              //             MaterialPageRoute(
+                              //                 builder: (context) =>  ProfileScreen(),
+                              //                 maintainState: false));
+                              //       },
+                              //       child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
+                              //   //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
+                              //   title: Text(
+                              //     'Salam Language School'.tr,
+                              //     style: TextStyle(
+                              //       color: Color(0xFF442B72),
+                              //       fontSize: 15,
+                              //       fontWeight: FontWeight.bold,
+                              //       fontFamily: 'Poppins-Bold',
+                              //     ),
+                              //   ),
+                              //   subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
+                              //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                              //     tileColor: Colors.white,
+                              // ),
+                              FutureBuilder(
+                                future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      leading: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ProfileScreen(),
+                                              maintainState: false,
+                                            ),
+                                          );
+                                        },
+                                        child:
+                                        data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                          },
+                                        ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                      ),
+                                      title: Text(
+                                        data['nameEnglish'],
+                                        style: TextStyle(
+                                          color: Color(0xFF442B72),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Poppins-Bold',
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        data['address'],
+                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                      ),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                      tileColor: Colors.white,
+                                    );
+                                  }
+
+                                  return CircularProgressIndicator();
+                                },
+                              )
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                             ),
                             SizedBox(height: 30,),
 
@@ -536,6 +635,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Container(height: 16,),
                                       Container(
+<<<<<<< HEAD
                                         decoration: BoxDecoration(
                                             color: Colors.white, // Your desired background color
                                             borderRadius: BorderRadius.circular(10),
@@ -543,12 +643,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                               BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
                                             ]
                                         ),
+=======
+                                          decoration: BoxDecoration(
+                                              color: Colors.white, // Your desired background color
+                                              borderRadius: BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                              ]
+                                          ),
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                                         child:
                                         Column(
                                           children: [
                                             ListTile(
                                               leading:Container(
+<<<<<<< HEAD
                                                   width:40,
+=======
+                                                width:40,
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                                                   height:40,
                                                   decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
@@ -568,6 +681,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               //   height: 40,
                                               // ),
                                               ,title: Text(
+<<<<<<< HEAD
                                               '${data[index]['name']}',
                                               style: TextStyle(
                                                 color: Color(0xFF442B72),
@@ -576,6 +690,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 fontFamily: 'Poppins-SemiBold',
                                               ),
                                             ),
+=======
+                                                '${data[index]['name']}',
+                                                style: TextStyle(
+                                                  color: Color(0xFF442B72),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Poppins-SemiBold',
+                                                ),
+                                              ),
+>>>>>>> 52f92eeb2bdbfa50896954a980efae222cca2e99
                                               subtitle: Text(
                                                 '${data[index]['phoneNumber']}',
                                                 style: TextStyle(

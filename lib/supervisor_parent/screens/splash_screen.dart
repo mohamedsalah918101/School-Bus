@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gif/flutter_gif.dart';
+import '../../screens/loginScreen.dart';
 import 'login_screen.dart';
 
 

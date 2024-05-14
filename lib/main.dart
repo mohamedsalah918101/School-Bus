@@ -67,6 +67,12 @@ class MyApp extends StatelessWidget{
       // TrackSupervisor()
       // ParentsView(),
       AttendanceSupervisorScreen(),
+
+
+      // HomeForSupervisor(),
+
+
+      // AttendanceSupervisorScreen(),
       // AddParents(),
       // SplashScreen(),
     );
