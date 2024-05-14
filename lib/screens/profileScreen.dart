@@ -380,7 +380,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     // GestureDetector(
                                     //   onTap:()async {
                                     //     await _pickProfileImageFromGallery();}  , // Call function when tapped
-                                    //   child: _selectedImageProfile != null
+                                    //   child:
+                                    //   _selectedImageProfile != null
                                     //       ? Image.file(
                                     //     _selectedImageProfile!,  // Display the uploaded image
                                     //     width: 83,  // Set width as per your preference

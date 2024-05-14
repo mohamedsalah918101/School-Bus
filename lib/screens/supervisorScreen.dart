@@ -1235,5 +1235,96 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   //     widget.selectedItems.clear();
   //   });
   // }
+  deletePhotoDialog(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              30,
+            ),
+          ),
+          child: SizedBox(
+            height: 180,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Align(alignment: AlignmentDirectional.topCenter,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Are you sure you want to',
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 20,
+                                fontFamily: 'Poppins-Regular',
+                                //fontWeight: FontWeight.w400,
+                                height: 1.23,
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'delete this supervisor?',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins-Regular',
+                                  // fontWeight: FontWeight.w400,
+                                  height: 1.23,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    children: [
+                      ElevatedSimpleButton(
+                        txt: 'Delete',
+                        width: 120,
+                        hight: 38,
+                        onPress: () => {
+
+                        }
+
+                        // Navigator.of(context).pushAndRemoveUntil(
+                        // MaterialPageRoute(
+                        //     builder: (context) => const SignUpScreen()),
+                        //     (Route<dynamic> route) => false)
+                        ,
+                        color: const Color(0xFF442B72),
+                        fontSize: 16,
+                      ),
+                      const Spacer(),
+                      ElevatedSimpleButton(
+                        txt: 'Cancel',
+                        width: 120,
+                        hight: 38,
+                        onPress: () {
+                          Navigator.pop(context);
+                        },
+                        color: const Color(0xffffffff),
+                        fontSize: 16,
+                        txtColor: Color(0xFF442B72),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )),
+    );
+  }
 }
 

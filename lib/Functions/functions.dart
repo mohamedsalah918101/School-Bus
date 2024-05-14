@@ -91,8 +91,6 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
         loginType = 'parent';
         id =snapshot.docs[0].id;
         sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
-
-
         sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
 
         return true;
