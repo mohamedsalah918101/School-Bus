@@ -70,7 +70,7 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
 
     Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
     QuerySnapshot snapshot = await queryOfNumber.get();
-    print(phoneNumber.toString()+'dataaa');
+    print(snapshot.docs.toString()+'dataaaschooldata');
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;
@@ -86,11 +86,13 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
       CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
       Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
       QuerySnapshot snapshot = await queryOfNumber.get();
-      print(snapshot.docs.toString()+'dataaa');
+      print(snapshot.docs.toString()+'dataaaparent');
       if(snapshot.size > 0){
         loginType = 'parent';
         id =snapshot.docs[0].id;
         sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
+
+
         sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
 
         return true;
@@ -98,12 +100,14 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
         CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
         Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
         QuerySnapshot snapshot = await queryOfNumber.get();
-        print(snapshot.docs.toString()+'dataaa');
+        print(snapshot.docs.toString()+'dataaasupervisor');
         if(snapshot.size > 0){
           loginType = 'supervisor';
           id =snapshot.docs[0].id;
           sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
           sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
+          print('invitstate');
+          print(snapshot.docs[0].get('invite').toString());
           return true;
         }else{
           return false;

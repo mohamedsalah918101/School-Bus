@@ -50,14 +50,16 @@ class _SendInvitationState extends State<SendInvitation> {
       Map<String, dynamic> data = {
         'name': _nameController.text,
         'email': _emailController.text,
-        'phoneNumber': '+2'+_phoneNumberController.text,
+        'phoneNumber': _phoneNumberController.text,
         'state':0,
         'invite':1
       };
+      print('phonenum');
+      print( _phoneNumberController.text);
       // Add the data to the Firestore collection
-      var check =await addParentCheck(_phoneNumberController.text);
+      var check =await addSupervisorCheck(_phoneNumberController.text);
       if(!check) {
-        var res =await checkUpdate(_phoneNumberController.text);
+        var res =await checkUpdateSupervisor(_phoneNumberController.text);
         if(!res) {
       await _firestore.collection('supervisor').add(data).then((docRef) {
         docid=docRef.id;
@@ -79,7 +81,8 @@ class _SendInvitationState extends State<SendInvitation> {
           _emailController.clear();
         }
 
-      }
+      }      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+
   }
  // }
   bool _validateName = false;
@@ -627,7 +630,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                    });
                                    if(! _nameController.text.isEmpty &&
                                        //! _phoneNumberController.text.isEmpty
-                                   _phoneNumberController.text.length==11){
+                                   _phoneNumberController.text.length == 10){
                                      _addDataToFirestore();
                                      createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
                                      showSnackBarFun(context);

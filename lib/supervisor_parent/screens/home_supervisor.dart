@@ -49,6 +49,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
   @override
   Widget build(BuildContext context) {
+    print('invite'+sharedpref!.getInt('invit').toString());
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -116,6 +117,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
+
                     children: [
                       SizedBox(height: 20),
                       Padding(
@@ -128,202 +130,232 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                         width: 276,
                         color: Color(0xff442B72).withOpacity(0.11),
                       ),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.0),
-                        child: ParentsCard(),
-                      ),
-                      SizedBox(height: 25),
-                      Container(
-                        height: 2,
-                        width: 276,
-                        color: Color(0xff442B72).withOpacity(0.11),
-                      ),
-                      SizedBox(height: 15),
-                      Padding(
-                        padding: (sharedpref?.getString('lang') == 'ar')
-                            ? EdgeInsets.symmetric(horizontal: 30.0)
-                            : EdgeInsets.symmetric(horizontal: 25.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Children'.tr,
-                              style: TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 16,
-                                fontFamily: 'Poppins-SemiBold',
-                                fontWeight: FontWeight.w600,
-                              ),
+
+                      sharedpref!.getInt('invit') == 0 ?
+                      Column(
+                        children: [
+                          SizedBox(height: 20),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 25.0),
+                            child: ParentsCard(),
+                          ),
+                          SizedBox(height: 25),
+                          Container(
+                            height: 2,
+                            width: 276,
+                            color: Color(0xff442B72).withOpacity(0.11),
+                          ),
+                          SizedBox(height: 15),
+                          Padding(
+                            padding: (sharedpref?.getString('lang') == 'ar')
+                                ? EdgeInsets.symmetric(horizontal: 30.0)
+                                : EdgeInsets.symmetric(horizontal: 25.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Children'.tr,
+                                  style: TextStyle(
+                                    color: Color(0xFF442B72),
+                                    fontSize: 16,
+                                    fontFamily: 'Poppins-SemiBold',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: (sharedpref?.getString('lang') == 'ar') ? 190 : 168,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => ShowAllStudents()),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Show all'.tr,
+                                        style: TextStyle(
+                                          color: Color(0xFF442B72),
+                                          fontSize: 15,
+                                          fontFamily: 'Poppins-Light',
+                                          fontWeight: FontWeight.w400,
+                                          height: 0.85,
+                                        ),
+                                      ),
+                                      Container(
+                                        height: 1,
+                                        width: (sharedpref?.getString('lang') == 'ar') ? 55 : 62,
+                                        color: Color(0xff442B72),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(
-                              width: (sharedpref?.getString('lang') == 'ar') ? 190 : 168,
-                            ),
-                            GestureDetector(
+                          ),
+                          SizedBox(height: 10),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 25.0),
+                            child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => ShowAllStudents()),
+                                  MaterialPageRoute(builder: (context) => StudentScreen()),
                                 );
                               },
                               child: Column(
                                 children: [
-                                  Text(
-                                    'Show all'.tr,
-                                    style: TextStyle(
-                                      color: Color(0xFF442B72),
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Light',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0.85,
+                                  SizedBox(
+                                    height: 330,
+                                    width: double.infinity,
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: 3,
+                                      // data.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return Column(
+                                          children: [
+                                            SizedBox(
+                                              width: double.infinity,
+                                              height:  92,
+                                              child: Card(
+                                                elevation: 8,
+                                                color: Colors.white,
+                                                surfaceTintColor: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                ),
+                                                child: Padding(
+                                                  padding: (sharedpref?.getString('lang') == 'ar')?
+                                                  EdgeInsets.only(top: 15.0 , right: 12,):
+                                                  EdgeInsets.only(top: 15.0 , left: 12,),
+                                                  child:  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(top: 8.0),
+                                                        child: Image.asset('assets/images/Ellipse 1.png',
+                                                          width: 36,
+                                                          height: 36,),
+                                                      ),
+                                                      SizedBox(width: 12,),
+                                                      Column(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text('${data[index]['childern']?[0]['name'] }',
+                                                          // Text('${data[index]['childern']?[0-3]['name'] }',
+                                                            style: TextStyle(
+                                                              color: Color(0xff442B72),
+                                                              fontSize: 15,
+                                                              fontFamily: 'Poppins-SemiBold',
+                                                              fontWeight: FontWeight.w600,
+                                                              // height: 1,
+                                                            ),),
+                                                          Text.rich(
+                                                            TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: 'Grade: '.tr,
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF919191),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: '${data[index]['childern']?[0]['grade'] }',
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF442B72),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Text.rich(
+                                                            TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: 'Address: '.tr,
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF919191),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    height: 1.33,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: '16 Khaled st,Asyut,Egypt',
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF442B72),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    height: 1.33,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),),
+
+                                              ),
+                                            ),
+                                            SizedBox(height: 10,)
+                                          ],
+                                        );
+                                      },
                                     ),
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    width: (sharedpref?.getString('lang') == 'ar') ? 55 : 62,
-                                    color: Color(0xff442B72),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => StudentScreen()),
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 330,
-                                width: double.infinity,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: 3,
-                                  // data.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return Column(
-                                      children: [
-                                        SizedBox(
-                                          width: double.infinity,
-                                          height:  92,
-                                          child: Card(
-                                            elevation: 8,
-                                            color: Colors.white,
-                                            surfaceTintColor: Colors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(8.0),
-                                            ),
-                                            child: Padding(
-                                              padding: (sharedpref?.getString('lang') == 'ar')?
-                                              EdgeInsets.only(top: 15.0 , right: 12,):
-                                              EdgeInsets.only(top: 15.0 , left: 12,),
-                                              child:  Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 8.0),
-                                                    child: Image.asset('assets/images/Ellipse 1.png',
-                                                      width: 36,
-                                                      height: 36,),
-                                                  ),
-                                                  SizedBox(width: 12,),
-                                                  Column(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text('${data[index]['childern']?[0]['name'] }',
-                                                      // Text('${data[index]['childern']?[0-3]['name'] }',
-                                                        style: TextStyle(
-                                                          color: Color(0xff442B72),
-                                                          fontSize: 15,
-                                                          fontFamily: 'Poppins-SemiBold',
-                                                          fontWeight: FontWeight.w600,
-                                                          // height: 1,
-                                                        ),),
-                                                      Text.rich(
-                                                        TextSpan(
-                                                          children: [
-                                                            TextSpan(
-                                                              text: 'Grade: '.tr,
-                                                              style: TextStyle(
-                                                                color: Color(0xFF919191),
-                                                                fontSize: 12,
-                                                                fontFamily: 'Poppins-Light',
-                                                                fontWeight: FontWeight.w400,
-                                                                // height: 1.33,
-                                                              ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: '${data[index]['childern']?[0]['grade'] }',
-                                                              style: TextStyle(
-                                                                color: Color(0xFF442B72),
-                                                                fontSize: 12,
-                                                                fontFamily: 'Poppins-Light',
-                                                                fontWeight: FontWeight.w400,
-                                                                // height: 1.33,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Text.rich(
-                                                        TextSpan(
-                                                          children: [
-                                                            TextSpan(
-                                                              text: 'Address: '.tr,
-                                                              style: TextStyle(
-                                                                color: Color(0xFF919191),
-                                                                fontSize: 12,
-                                                                fontFamily: 'Poppins-Light',
-                                                                fontWeight: FontWeight.w400,
-                                                                height: 1.33,
-                                                              ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: '16 Khaled st,Asyut,Egypt',
-                                                              style: TextStyle(
-                                                                color: Color(0xFF442B72),
-                                                                fontSize: 12,
-                                                                fontFamily: 'Poppins-Light',
-                                                                fontWeight: FontWeight.w400,
-                                                                height: 1.33,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),),
-
-                                          ),
-                                        ),
-                                        SizedBox(height: 10,)
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
+                          SizedBox(height: 44),
+                        ],
+                      ): Column(
+                        children: [
+                          SizedBox(height: 45,),
+                          Image.asset('assets/images/Group 237684.png',
+                          ),
+                          Text('No Data Found'.tr,
+                            style: TextStyle(
+                              color: Color(0xff442B72),
+                              fontFamily: 'Poppins-Regular',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 19,
+                            ),
+                          ),
+                          Text('You haven’t added any \n '
+                              'data yet'.tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xffBE7FBF),
+                              fontFamily: 'Poppins-Light',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),)
+                        ],
                       ),
-                      SizedBox(height: 44),
                     ],
                   ),
                 ),
-              ),
+              )
+
             ],
           ),
           // extendBody: true,

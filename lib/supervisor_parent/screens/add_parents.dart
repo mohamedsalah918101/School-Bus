@@ -58,17 +58,7 @@ class _AddParentsState extends State<AddParents> {
         'grade': gradeControllers[index].text,
       },
     );
-    // Map<String, dynamic> data = {
-    //   'typeOfParent': selectedValue,
-    //   'name': _nameController.text,
-    //   'numberOfChildren': _numberOfChildrenController.text,
-    //   'phoneNumber': _phoneNumberController.text,
-    //   'childern': childrenData,
-    //   'state':0,
-    //   'invite':1
-    //   // 'gender': gender
-    // };
-    // String gender = isFemale ? 'Female' : 'Male';
+
     Map<String, dynamic> data = {
       'typeOfParent': selectedValue,
       'name': _nameController.text,
@@ -938,7 +928,7 @@ class _AddParentsState extends State<AddParents> {
                         EdgeInsets.symmetric(horizontal: 44.0),
                         child: SizedBox(
                           width: 277,
-                          height: 40,
+                          height: 65,
                           child:
                           IntlPhoneField(
 
