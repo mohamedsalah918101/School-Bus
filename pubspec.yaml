@@ -61,6 +61,7 @@ dependencies:
   share_plus: ^7.0.2
   url_launcher: ^6.1.14
   flutter_phone_direct_caller: ^2.1.1
+  fluttercontactpicker: ^4.7.0
 #  firebase_messaging: ^14.7.20
 
 dev_dependencies:

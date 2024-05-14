@@ -19,7 +19,7 @@ import 'homeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share_plus/share_plus.dart';
-
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 
 
 class SendInvitation extends StatefulWidget{
@@ -30,6 +30,11 @@ class SendInvitation extends StatefulWidget{
 
 
 class _SendInvitationState extends State<SendInvitation> {
+  String kPickerNumber='';
+  String kPickerName='';
+  PhoneContact? _phoneContact;
+
+
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
   String docid='';
@@ -173,8 +178,41 @@ class _SendInvitationState extends State<SendInvitation> {
                         child: InkWell(onTap: (){},
                           child: Row(
                             children: [
-                             Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
-                               color: Color(0xff442B72),),
+                             GestureDetector(
+                               onTap: () async{
+                                 bool permission = await FlutterContactPicker.requestPermission();
+                                 if(permission){
+                                   if(await FlutterContactPicker.hasPermission()){
+                                     _phoneContact=await FlutterContactPicker.pickPhoneContact();
+                                     if(_phoneContact!=null){
+                                       if(_phoneContact!.fullName!.isNotEmpty){
+                                         setState(() {
+                                           kPickerName=_phoneContact!.fullName.toString();
+                                          _nameController.text=kPickerName;
+                                         });
+                                       }
+                                       if (_phoneContact!.phoneNumber != null &&
+                                           _phoneContact!.phoneNumber!.number != null &&
+                                           _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+                                         setState(() {
+                                           kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                           _phoneNumberController.text = kPickerNumber;
+                                         });
+                                       }
+                                       // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+                                       //   setState(() {
+                                       //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+                                       //     _phoneNumberController.text=kPickerNumber;
+                                       //   });
+                                       // }
+                                     }
+
+                                   }
+                                 }
+                               },
+                               child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+                                 color: Color(0xff442B72),),
+                             ),
                               SizedBox(width: 10,),
                                InkWell(onTap: (){
                                  Scaffold.of(context).openEndDrawer();
@@ -251,7 +289,9 @@ class _SendInvitationState extends State<SendInvitation> {
                             Container(
                               width: constrains.maxWidth / 1.2,
                               height: 44,
-                              child: TextFormField(
+                              child:
+                              TextFormField(
+
                                 controller: _nameController,
                                 focusNode: _nameSupervisorFocus,
                                 cursorColor: const Color(0xFF442B72),

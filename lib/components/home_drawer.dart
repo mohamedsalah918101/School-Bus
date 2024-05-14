@@ -1,4 +1,5 @@
 //
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/screens/busesScreen.dart';
@@ -22,6 +23,15 @@ class HomeDrawer extends StatefulWidget {
 }
 
 class _MainDrawerState extends State<HomeDrawer> {
+  final _firestore = FirebaseFirestore.instance;
+  List<QueryDocumentSnapshot> data = [];
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -351,29 +361,75 @@ class _MainDrawerState extends State<HomeDrawer> {
                               //   height: 62,
                               //   width: 62,
                               // ),
-                            CircleAvatar(
-                              backgroundColor: Colors.white, // Set background color to white
-                              radius: 31, // Set the radius according to your preference
-                              child: Image.asset(
-                                'assets/imgs/school/Ellipse 2 (2).png',
-                                fit: BoxFit.cover,
-                                width: 62, // Set width of the image
-                                height: 62, // Set height of the image
-                              ),
+                            FutureBuilder(
+                              future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Something went wrong');
+                                }
+
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                  return data['photo'] != null ? CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 31,
+                                    child: Image.network(data['photo'], width: 61, height: 61,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                      },
+                                    ),
+                                  ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61);
+                                }
+
+                                return CircularProgressIndicator();
+                              },
                             ),
+                            // CircleAvatar(
+                            //   backgroundColor: Colors.white, // Set background color to white
+                            //   radius: 31, // Set the radius according to your preference
+                            //   child: Image.asset(
+                            //     'assets/imgs/school/Ellipse 2 (2).png',
+                            //     fit: BoxFit.cover,
+                            //     width: 62, // Set width of the image
+                            //     height: 62, // Set height of the image
+                            //   ),
+                            // ),
 
                             SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              'Salam School',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18.74,
-                                fontFamily: 'Poppins-Regular',
-                                fontWeight: FontWeight.w600,
-                              ),
+                            FutureBuilder(
+                              future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Something went wrong');
+                                }
+
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                  return Text(
+                                    data['nameEnglish'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize:16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Poppins-Bold',
+                                    ),
+                                  );
+                                }
+
+                                return CircularProgressIndicator();
+                              },
                             ),
+                            // Text(
+                            //   'Salam School',
+                            //   style: TextStyle(
+                            //     color: Colors.white,
+                            //     fontSize: 18.74,
+                            //     fontFamily: 'Poppins-Regular',
+                            //     fontWeight: FontWeight.w600,
+                            //   ),
+                            // ),
                             SizedBox(
                               height: 9,
                             ),

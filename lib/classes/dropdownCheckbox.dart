@@ -5,13 +5,16 @@ import 'dropdowncheckboxitem.dart';
 
 class DropdownCheckbox extends StatefulWidget {
   final List<DropdownCheckboxItem> items;
-  DropdownCheckbox({required this.items});
+  final TextEditingController controller;
+  DropdownCheckbox({required this.items, required this.controller});
   @override
   _DropdownCheckboxState createState() => _DropdownCheckboxState();
 }
 class _DropdownCheckboxState extends State<DropdownCheckbox> {
   bool isDropdownOpened = false;
   List<DropdownCheckboxItem> selectedItems = [];
+  TextEditingController _supervisorController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
@@ -27,7 +30,24 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                   isDropdownOpened = !isDropdownOpened;
                 });
               },
-              child: Container(
+              child:
+                // Container(
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       TextField(
+                //         controller: _supervisorController,
+                //         readOnly: true,
+                //         decoration: InputDecoration(
+                //           labelText: 'Supervisor',
+                //           border: OutlineInputBorder(),
+                //         ),
+                //       ),
+                //       Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
+                //     ],
+                //   ),
+                // )
+              Container(
 
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -39,7 +59,13 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
+                  // TextField(
+                  // controller: _supervisorController,
+                  // readOnly: true, // Make the text field read-only
+                  // decoration: InputDecoration(
+                  //   labelText: 'Selected Supervisor',
+                  //   border: OutlineInputBorder(),
+                  // ),),
                     Text('Supervisor',
 
                       style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
@@ -95,9 +121,20 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                             setState(() {
                               item.isChecked = value!;
                               if (value) {
+                                // selectedItems.add(item);
+                                // // Clear previously selected items (assuming single selection)
+                                // selectedItems.removeWhere((element) => element != item);
+                                // // Update text field value with selected item's label
+                                // widget.controller.text = item.label;
                                 selectedItems.add(item); // Add to selected items list
+                                //_supervisorController.text = item.label;
+                              // Add to selected items list
                               } else {
-                                selectedItems.remove(item); // Remove from selected items list
+                                selectedItems.remove(item);
+                                // Clear text field value when unselecting
+                                widget.controller.text = '';
+                                //selectedItems.remove(item); // Remove from selected items list
+                              // _supervisorController.clear();
                               }
                             });
                             // setState(() {

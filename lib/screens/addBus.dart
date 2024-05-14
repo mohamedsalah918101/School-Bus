@@ -51,6 +51,7 @@ class _AddBusState extends State<AddBus> {
   bool _validateDriverName = false;
   bool _validateDriverNumber = false;
   bool _validateBusNumber = false;
+  TextEditingController _supervisorController = TextEditingController();
   //function choose photo from gallery
   Future _pickImageFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -887,7 +888,7 @@ class _AddBusState extends State<AddBus> {
                     // ),
                               Container(
                                 child:DropdownCheckbox(
-
+                                    controller: _supervisorController,
                                 items:
                                   items
                                  ),),

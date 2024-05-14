@@ -178,7 +178,7 @@ void _editBusDocument(String documentId, String imagedriver, String namedriver, 
   final TextEditingController searchController=TextEditingController();
   int? _selectedOption=1 ;
   int selectedIconIndex = 0;
-  bool isEditingSupervisor = false;
+  bool isEditingBus = false;
   int _counter = 0;
   // هنا تقوم بتعريف الحالة
   bool _isButtonDisabled= true;
@@ -633,7 +633,7 @@ final _firestore = FirebaseFirestore.instance;
                                                       ),
                                                         trailing:
                                                       PopupMenuButton<String>(
-                                                        enabled: !isEditingSupervisor,
+                                                        enabled: !isEditingBus,
 
                                                         shape: RoundedRectangleBorder(
 
@@ -652,7 +652,15 @@ final _firestore = FirebaseFirestore.instance;
                                                                 ScaffoldMessenger.of(context)
                                                                     .hideCurrentSnackBar();
                                                                 setState(() {
-                                                                  isEditingSupervisor = true;
+                                                                  isEditingBus = true;
+                                                                  _editBusDocument(
+                                                                    data[index].id,
+                                                                    data[index]['busnumber'],
+                                                                    data[index]['busphoto'],
+                                                                    data[index]['imagedriver'],
+                                                                    data[index]['namedriver'],
+                                                                    data[index]['phonedriver'],
+                                                                  );
                                                                   // _editSupervisorDocument(
                                                                   //   data[index].id,
                                                                   //   data[index]['name'],
@@ -722,7 +730,7 @@ final _firestore = FirebaseFirestore.instance;
                                                           if (value == 'edit') {
                                                             // Handle edit action
                                                             setState(() {
-                                                              isEditingSupervisor = true;
+                                                              isEditingBus = true;
                                                               _editBusDocument(
                                                                 data[index].id,
                                                                 data[index]['busnumber'],
@@ -739,8 +747,11 @@ final _firestore = FirebaseFirestore.instance;
                                                             //         builder: (context) =>
                                                             //             EditeSupervisor()));
                                                           } else if (value == 'delete') {
-                                                            _deletebusDocument(data[index].id);
-                                                          //  _deleteSupervisorDocument(data[index].id);
+                                                            deletePhotoDialog(context);
+                                                            //وقفت delete function علشان لما بسمح بيعمل error
+
+                                                           // _deletebusDocument(data[index].id);
+
                                                             // setState(() {
                                                             //
                                                             //   //showSnackBarFun(context);
@@ -1260,6 +1271,97 @@ final _firestore = FirebaseFirestore.instance;
           ),
         ),
       ),
+    );
+  }
+  deletePhotoDialog(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              30,
+            ),
+          ),
+          child: SizedBox(
+            height: 180,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Align(alignment: AlignmentDirectional.topCenter,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Are you sure you want to',
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 20,
+                                fontFamily: 'Poppins-Regular',
+                                //fontWeight: FontWeight.w400,
+                                height: 1.23,
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'delete this bus?',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins-Regular',
+                                  // fontWeight: FontWeight.w400,
+                                  height: 1.23,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    children: [
+                      ElevatedSimpleButton(
+                        txt: 'Delete',
+                        width: 120,
+                        hight: 38,
+                        onPress: () => {
+                      //_deletebusDocument(documentId)
+                        }
+
+                        // Navigator.of(context).pushAndRemoveUntil(
+                        // MaterialPageRoute(
+                        //     builder: (context) => const SignUpScreen()),
+                        //     (Route<dynamic> route) => false)
+                        ,
+                        color: const Color(0xFF442B72),
+                        fontSize: 16,
+                      ),
+                      const Spacer(),
+                      ElevatedSimpleButton(
+                        txt: 'Cancel',
+                        width: 120,
+                        hight: 38,
+                        onPress: () {
+                          Navigator.pop(context);
+                        },
+                        color: const Color(0xffffffff),
+                        fontSize: 16,
+                        txtColor: Color(0xFF442B72),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )),
     );
   }
 
