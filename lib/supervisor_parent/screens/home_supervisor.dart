@@ -28,6 +28,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
   List<QueryDocumentSnapshot> dataSupervisor = [];
+  final _firestore = FirebaseFirestore.instance;
+
 
 
   getData()async{
@@ -67,6 +69,48 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
           body: Column(
             children: [
               SizedBox(height: 35),
+              // Expanded(
+              //   child: Center(
+              //     child:Padding(
+              //       padding: const EdgeInsets.only(left: 60),
+              //       child:
+              //       FutureBuilder(
+              //         future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+              //         builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              //           if (snapshot.hasError) {
+              //             return Text('Something went wrong');
+              //           }
+              //
+              //           if (snapshot.connectionState == ConnectionState.done) {
+              //             Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+              //             return Text(
+              //               data['nameEnglish'] ?? '',
+              //               style: TextStyle(
+              //                 color: Color(0xFF993D9A),
+              //                 fontSize: 16,
+              //                 fontWeight: FontWeight.bold,
+              //                 fontFamily: 'Poppins-Bold',
+              //               ),
+              //             );
+              //           }
+              //
+              //           return CircularProgressIndicator();
+              //         },
+              //       ),
+              //
+              //       // Text(
+              //       //                   "Salam Language School".tr,
+              //       //                   style: TextStyle(
+              //       //                     color: Color(0xFF993D9A),
+              //       //                     fontSize: 16,
+              //       //                     fontFamily: 'Poppins-Bold',
+              //       //                     fontWeight: FontWeight.w700,
+              //       //                     height: 0.64,
+              //       //                   ),
+              //       //                 ),
+              //     ),
+              //   ),
+              // ),
               Container(
                 // Fixed row
                 height: 60,

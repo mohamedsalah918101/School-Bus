@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/controller/local.dart';
 import 'package:school_account/screens/splashScreen.dart';
+import 'package:school_account/supervisor_parent/model/user_item.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
+import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
 import 'package:school_account/supervisor_parent/screens/googlemap_test.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
@@ -59,12 +61,14 @@ class MyApp extends StatelessWidget{
       translations: MyLocal(),
       debugShowCheckedModeBanner: false,
       home:
+      // Chat()
+        // ChatScreen(),
       // GoogleMapWidget()
       // TrackSupervisor()
       // ParentsView(),
-      // AttendanceSupervisorScreen(),
+      AttendanceSupervisorScreen(),
       // AddParents(),
-      SplashScreen(),
+      // SplashScreen(),
     );
   }
 }

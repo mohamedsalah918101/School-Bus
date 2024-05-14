@@ -68,53 +68,53 @@ class _ChatScreenState extends State<ChatScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Image.asset(
-                    'assets/images/Call.png',
-                    height: 24,
-                    width: 24,
-                  ),
+                  'assets/images/Call.png',
+                  height: 24,
+                  width: 24,
+                ),
               ),
             ],
             title: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/images/Ellipse 1.png',
-                    height: 50,
-                    width: 50,
-                  ),
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/Ellipse 1.png',
+                  height: 50,
+                  width: 50,
+                ),
 
-                  const SizedBox(
-                    width: 20,
+                const SizedBox(
+                  width: 20,
+                ),
+                SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Aya Essam'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF181818),
+                          fontSize: 14.70,
+                          fontFamily: 'Poppins-SemiBold',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Online'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF771F98),
+                          fontSize: 12.86,
+                          fontFamily: 'Poppins-Light',
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
-                   SingleChildScrollView(
-                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Aya Essam'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF181818),
-                            fontSize: 14.70,
-                            fontFamily: 'Poppins-SemiBold',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          'Online'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF771F98),
-                            fontSize: 12.86,
-                            fontFamily: 'Poppins-Light',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                                 ),
-                   )
-                ],
-              ),
+                )
+              ],
+            ),
             backgroundColor:  Color(0xffF8F8F8),
             surfaceTintColor: Colors.transparent,
           ),
@@ -128,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Padding(
               padding:
-                  const EdgeInsets.only(left: 24.0,bottom: 5, right:24 , top: 5),
+              const EdgeInsets.only(left: 24.0,bottom: 5, right:24 , top: 5),
               child: ListView.separated(
                 itemCount: messages.length,
                 shrinkWrap: true,
@@ -137,13 +137,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemBuilder: (context, index) {
                   return messages[index].messageType == "receiver"
                       ? ReciverMessageItem(
-                          messageContent: messages[index].messageContent,
-                          time: '18.29',
-                        )
+                    messageContent: messages[index].messageContent,
+                    time: '18.29',
+                  )
                       : SenderMessageItem(
-                          messageContent: messages[index].messageContent,
-                          time: '18.29',
-                        );
+                    messageContent: messages[index].messageContent,
+                    time: '18.29',
+                  );
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return SizedBox(
@@ -242,7 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
           width: 0.5,
         ));
   }
-  // void openKeyboard () {
-  //   FocusScope.of(context).requestFocus(inputNode);
-  // }
+// void openKeyboard () {
+//   FocusScope.of(context).requestFocus(inputNode);
+// }
 } // below is custom color class

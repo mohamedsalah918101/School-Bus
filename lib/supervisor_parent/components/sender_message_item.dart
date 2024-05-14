@@ -55,7 +55,7 @@ class SenderMessageItem extends StatelessWidget {
                   time,
                   style: const TextStyle(
                     color: Color(0xFF8C8C8C),
-                    fontSize: 9,
+                    fontSize: 8,
                     fontFamily: 'Poppins-Regular',
                     fontWeight: FontWeight.w400,
                   ),

@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_card.dart';
 import 'package:school_account/main.dart';
+import 'package:school_account/supervisor_parent/model/user_item.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
@@ -18,8 +20,17 @@ class CheckInCard extends StatefulWidget {
 
 class _CheckInCardState extends State<CheckInCard> {
  bool Checkin = false;
+ List<QueryDocumentSnapshot> dataSupervisorAttendance = [];
 
-  @override
+ getDataForSupervisor()async{
+   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').get();
+   dataSupervisorAttendance.addAll(querySnapshot.docs);
+   setState(() {
+   });
+ }
+
+
+ @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -153,7 +164,7 @@ class _CheckInCardState extends State<CheckInCard> {
                         onTap: () {
                           Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) =>
-                                  ChatScreen()));
+                                  Chat()));
                         },
                       ),
                     ],
