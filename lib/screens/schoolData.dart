@@ -130,7 +130,8 @@ class _SchoolDataState extends State<SchoolData> {
      print('Data updated with document ID: $userId');
     }).catchError((error) {
       print('Failed to add data: $error');
-    });
+    }
+    );
     // Clear the text fields
     _nameEnglish.clear();
     _nameArabic.clear();

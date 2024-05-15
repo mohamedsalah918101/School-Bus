@@ -225,7 +225,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
             color: const Color(0xFF442B72),
             clipBehavior: Clip.antiAlias,
-            shape: const CircularNotchedRectangle(),
+            shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(38.5),
+                    topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
+            //CircularNotchedRectangle(),
             //shape of notch
             notchMargin: 7,
             child: SizedBox(

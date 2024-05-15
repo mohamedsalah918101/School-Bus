@@ -218,7 +218,7 @@ class _EditeBusState extends State<EditeBus> {
     return SafeArea(
       child: Scaffold(
         key: _scaffoldeditebus,
-        //resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         endDrawer: HomeDrawer(),
         backgroundColor: const Color(0xFFFFFFFF),
         body: LayoutBuilder(builder: (context, constrains) {
@@ -860,6 +860,7 @@ class _EditeBusState extends State<EditeBus> {
           );
         }
         ),
+        //extendBody: true,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
         floatingActionButton:
@@ -869,6 +870,8 @@ class _EditeBusState extends State<EditeBus> {
             //height: 100,
             child: FloatingActionButton(
               backgroundColor:Color(0xff442B72),
+              // shape: RoundedRectangleBorder(
+              //     borderRadius: BorderRadius.circular(100)),
               onPressed: () async {
                //Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
@@ -896,7 +899,13 @@ class _EditeBusState extends State<EditeBus> {
 
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

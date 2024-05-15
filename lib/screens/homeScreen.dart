@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<QueryDocumentSnapshot> data = [];
 
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:2) .get();
     data.addAll(querySnapshot.docs);
     setState(() {
 
@@ -818,7 +818,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

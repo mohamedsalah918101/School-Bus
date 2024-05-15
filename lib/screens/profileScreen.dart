@@ -65,9 +65,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       //Some error occurred
     }
   }
+  String userID='';
+  int userIDInt=0;
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('schooldata').get();
+   // userID = FirebaseAuth.instance.currentUser!.uid;
+   //  int userIDInt = int.parse(userID);
+   //  print("sss"+userID);
     data.addAll(querySnapshot.docs);
+    // await _firestore.collection('schooldata').doc(sharedpref!.getString('id')).update(data).then((_)
+    // //.update(data).then((docRef)
+    // {
+    //   sharedpref!.setInt("allData",1);
+    //   // await _firestore.collection('schooldata').doc(userId)
+    //   //print('Data added with document ID: ${docRef.id}');
+    //   print('Data updated with document ID: $userId');
+    // }).catchError((error) {
+    //   print('Failed to add data: $error');
+    // }
+    // );
     setState(() {
       data = querySnapshot.docs;
     });
@@ -504,15 +520,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         //   // }
                         // // لسه معملتش ان الداته تتنقل لصفحه الايديت
 
-                             _editProfileDocument(
-                            data[0].id,
-                            data[0]['nameEnglish'],
-                            data[0]['nameArabic'],
-                            data[0]['address'],
-                            data[0]['coordinatorName'],
-                            data[0]['supportNumber'],
-                            data[0]['photo']
-                          );
+//                            getCurrentIdFromSharedPreferences();
+// // Find the index of the document with the current ID in the data list
+//                            final int index = data.indexWhere((doc) => doc.id == currentId);
+//                            print("shahd");
+//                     print(index);
+// // Use the found index to access the document's data
+//                            if (index != -1) {
+//                              _editProfileDocument(
+//                                  data[index].id,
+//                                  data[index]['nameEnglish'],
+//                                  data[index]['nameArabic'],
+//                                  data[index]['address'],
+//                                  data[index]['coordinatorName'],
+//                                  data[index]['supportNumber'],
+//                                  data[index]['photo']
+//                              );
+//                            } else {
+//                              // Handle the case where the document with the current ID is not found in the data list
+//                            }
+                           _editProfileDocument(
+                                 data[0].id,
+                                 data[0]['nameEnglish'],
+                                 data[0]['nameArabic'],
+                                 data[0]['address'],
+                                 data[0]['coordinatorName'],
+                                 data[0]['supportNumber'],
+                                 data[0]['photo']
+                             );
 
                          },
                         // onPressed: () async {
@@ -912,7 +947,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             color: const Color(0xFF442B72),
             clipBehavior: Clip.antiAlias,
-            shape: const CircularNotchedRectangle(),
+            shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(38.5),
+                    topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
+            //CircularNotchedRectangle(),
             //shape of notch
             notchMargin: 7,
             child: SizedBox(

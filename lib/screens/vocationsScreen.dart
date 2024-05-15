@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -22,6 +23,36 @@ class VacationsScreen extends StatefulWidget {
 }
 
 class _VacationsScreenState extends State<VacationsScreen> {
+
+  //function to add holiday in firestore
+  String docid='';
+  final _firestore = FirebaseFirestore.instance;
+  // void _addDataToFirestore() async {
+  //   //if (_formKey.currentState!.validate()) {
+  //   // Define the data to add
+  //   Map<String, dynamic> data = {
+  //     'nameholiday': _nameController.text,
+  //     'fromdate': _emailController.text,
+  //     'todate': _phoneNumberController.text,
+  //
+  //   };
+  //   // Add the data to the Firestore collection
+  //   await _firestore.collection('holiday').add(data).then((docRef) {
+  //     docid=docRef.id;
+  //     print('Data added with document ID: ${docRef.id}');
+  //
+  //     // showSnackBarFun(context);
+  //   }).catchError((error) {
+  //     print('Failed to add data: $error');
+  //   });
+  //   // Clear the text fields
+  //   // _nameController.clear();
+  //   // _phoneNumberController.clear();
+  //   // _emailController.clear();
+  // }
+
+
+
   bool tracking = true;
   bool AddAbsentDay = false;
   bool addAbsentDay = false;
@@ -1253,7 +1284,14 @@ class _VacationsScreenState extends State<VacationsScreen> {
           child: BottomAppBar(
             color: const Color(0xFF442B72),
             clipBehavior: Clip.antiAlias,
-            shape: const CircularNotchedRectangle(),
+            shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(38.5),
+                    topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
+            //CircularNotchedRectangle(),
             //shape of notch
             notchMargin: 7,
             child: SizedBox(

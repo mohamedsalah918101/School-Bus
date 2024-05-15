@@ -7,6 +7,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
+import 'package:google_places_autocomplete_text_field/model/prediction.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_account/components/elevated_simple_button.dart';
 import 'package:school_account/components/home_drawer.dart';
@@ -93,6 +95,10 @@ class _EditeProfileState extends State<EditeProfile> {
 
 
   GlobalKey<FormState> formState = GlobalKey<FormState>();
+  final _yourGoogleAPIKey = 'AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA';
+  final _textController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
   CollectionReference profile = FirebaseFirestore.instance.collection('schooldata');
   editProfile() async {
     print('editprofile called');
@@ -426,46 +432,117 @@ class _EditeProfileState extends State<EditeProfile> {
                 Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),
                   fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
                 SizedBox(height: 10,),
+                // Container(
+                //   width: 320,
+                //   height: 45,
+                //   child: TextFormField(
+                //     controller: _Address,
+                //     focusNode: _AddressFocus,
+                //     onFieldSubmitted: (value) {
+                //       // move to the next field when the user presses the "Done" button
+                //       FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                //     },
+                //     style: TextStyle(color: Color(0xFF442B72)),
+                //     //controller: _namesupervisor,
+                //     cursorColor: const Color(0xFF442B72),
+                //     //textDirection: TextDirection.ltr,
+                //     scrollPadding: const EdgeInsets.symmetric(
+                //         vertical: 40),
+                //     decoration:  InputDecoration(
+                //       //labelText: 'Shady Ayman'.tr,
+                //     //  hintText:'16 Khaled st, Asyut,Egypt'.tr ,
+                //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                //       alignLabelWithHint: true,
+                //       counterText: "",
+                //       fillColor: const Color(0xFFF1F1F1),
+                //       filled: true,
+                //       contentPadding: const EdgeInsets.fromLTRB(
+                //           8, 5, 10, 5),
+                //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                //       enabledBorder: myInputBorder(),
+                //       focusedBorder: myFocusBorder(),
+                //       suffixIcon:Transform.scale(
+                //         scale: 0.7, // Adjust the scale factor as needed
+                //         child: Image.asset(
+                //           'assets/imgs/school/icons8_Location.png',
+                //           width: 10,
+                //           height: 10,
+                //         ),
+                //       ),
+                //       //Image.asset('assets/imgs/school/icons8_Location.png',width: 10,height: 10,)
+                //     ),
+                //
+                //   ),
+                // ),
                 Container(
-                  width: 320,
-                  height: 45,
-                  child: TextFormField(
-                    controller: _Address,
-                    focusNode: _AddressFocus,
-                    onFieldSubmitted: (value) {
-                      // move to the next field when the user presses the "Done" button
-                      FocusScope.of(context).requestFocus(_CoordinatorFocus);
-                    },
-                    style: TextStyle(color: Color(0xFF442B72)),
-                    //controller: _namesupervisor,
-                    cursorColor: const Color(0xFF442B72),
-                    //textDirection: TextDirection.ltr,
-                    scrollPadding: const EdgeInsets.symmetric(
-                        vertical: 40),
-                    decoration:  InputDecoration(
-                      //labelText: 'Shady Ayman'.tr,
-                    //  hintText:'16 Khaled st, Asyut,Egypt'.tr ,
-                      hintStyle: TextStyle(color: Color(0xFF442B72)),
-                      alignLabelWithHint: true,
-                      counterText: "",
-                      fillColor: const Color(0xFFF1F1F1),
-                      filled: true,
-                      contentPadding: const EdgeInsets.fromLTRB(
-                          8, 5, 10, 5),
-                      floatingLabelBehavior:  FloatingLabelBehavior.never,
-                      enabledBorder: myInputBorder(),
-                      focusedBorder: myFocusBorder(),
-                      suffixIcon:Transform.scale(
-                        scale: 0.7, // Adjust the scale factor as needed
-                        child: Image.asset(
-                          'assets/imgs/school/icons8_Location.png',
-                          width: 10,
-                          height: 10,
-                        ),
-                      ),
-                      //Image.asset('assets/imgs/school/icons8_Location.png',width: 10,height: 10,)
-                    ),
+                    width: 320,
+                    height: 45,
 
+                  child: Form(
+
+                    key: _formKey,
+                    autovalidateMode: _autovalidateMode,
+                    child: GooglePlacesAutoCompleteTextFormField(
+
+                      cursorColor: Color(0xFF442B72),
+                      textEditingController: _Address,
+                      googleAPIKey: _yourGoogleAPIKey,
+                      decoration: InputDecoration(
+                      //  errorText: _validateAddress ? "Please Enter Your Address" : null,
+                        labelStyle: TextStyle(color: Colors.purple),
+                        suffixIcon: Image.asset(
+                          "assets/imgs/school/icons8_Location.png",
+                          width: 20,
+                          height: 20,
+                        ),
+                        alignLabelWithHint: true,
+                        counterText: "",
+                        fillColor: const Color(0xFFF1F1F1),
+                        filled: true,
+                        contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        hintStyle: const TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 10,
+                          fontFamily: 'Inter-Bold',
+                          fontWeight: FontWeight.w700,
+                          height: 1.5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.black), // Customize border color
+                        ),
+                        enabledBorder: myInputBorder(),
+                        focusedBorder: myFocusBorder(),
+
+
+                      ),
+                      style: TextStyle(
+                        color: Color(0xFF442B72), // Set text color to purple
+                        fontSize: 14,
+                        fontFamily: 'Poppins-Regular', // Customize font family
+                        //fontWeight: FontWeight.normal, // Customize font weight
+                        // Add more text style properties as needed
+                      ),
+                      // validator: (value) {
+                      //   if (value!.isEmpty) {
+                      //     return 'Please enter some text';
+                      //   }
+                      //   return null;
+                      // },
+                      maxLines: 1,
+
+                      overlayContainer: (child) => Material(
+                        elevation: 1.0,
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        child: child,
+                      ),
+                      getPlaceDetailWithLatLng: (prediction) {
+                        print('placeDetails${prediction.lng}');
+                      },
+                      itmClick: (Prediction prediction) => _Address.text = prediction.description!,
+                    ),
                   ),
                 ),
                 SizedBox(height: 35,),
@@ -593,7 +670,14 @@ class _EditeProfileState extends State<EditeProfile> {
 
             color: const Color(0xFF442B72),
             clipBehavior: Clip.antiAlias,
-            shape: const CircularNotchedRectangle(),
+            shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(38.5),
+                    topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
+            //CircularNotchedRectangle(),
             //shape of notch
             notchMargin: 7,
             child: SizedBox(
