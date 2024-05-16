@@ -9,7 +9,6 @@ import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'controller/local_controller.dart';
 
 SharedPreferences? sharedpref;
@@ -56,13 +55,14 @@ class MyApp extends StatelessWidget{
       debugShowCheckedModeBanner: false,
 
 
-      // HomeForSupervisor(),
+     home:
+     // HomeForSupervisor(),
 
 
-      home:SplashScreen(),
+      // home:SplashScreen(),
       // AttendanceSupervisorScreen(),
       // AddParents(),
-      // SplashScreen(),
+      SplashScreen(),
     );
   }
 }

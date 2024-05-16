@@ -16,6 +16,7 @@ import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 class ParentsView extends StatefulWidget {
 
+
   @override
   _ParentsViewState createState() => _ParentsViewState();
 }
@@ -29,6 +30,9 @@ class _ParentsViewState extends State<ParentsView> {
   String? selectedValueDecline;
   String? selectedValueWaiting;
   List<DropdownCheckboxItem> selectedItems = [];
+  // List<Map<String, dynamic>> data2 = [];
+
+  int get dataLength => data.length;
   List<QueryDocumentSnapshot> data = [];
   bool isAcceptFiltered = false;
   bool isDeclineFiltered = false;
@@ -96,7 +100,6 @@ class _ParentsViewState extends State<ParentsView> {
       isFiltered = true;
     });
   }
-
 
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
@@ -367,7 +370,8 @@ class _ParentsViewState extends State<ParentsView> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                          child: ListView.builder(
+                          child:
+                          ListView.builder(
                             shrinkWrap: true,
                             itemCount: data.length,
                             physics: NeverScrollableScrollPhysics(),
@@ -631,7 +635,8 @@ class _ParentsViewState extends State<ParentsView> {
                                             }
                                           },
                                         child: Image.asset('assets/images/more.png', width: 20.8, height: 20.8,),),],),
-                                  SizedBox(height: 25,)],);},),),
+                                  SizedBox(height: 25,)],);},),
+                        ),
                         SizedBox(height: 44,)
                       ],
                     ),
