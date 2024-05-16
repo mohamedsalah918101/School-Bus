@@ -38,6 +38,15 @@ class _SchoolDataState extends State<SchoolData> {
   bool _validateAddress = false;
   bool _validateCoordinatorName = false;
   bool _validateSupportNumber = false;
+
+  bool logoerror =true;
+  bool namearabicerror=true;
+  bool nameenglisherror=true;
+  bool addresserror=true;
+  bool coordinateerror=true;
+  bool supporterror=true;
+
+
   MyLocalController ControllerLang = Get.find();
   TextEditingController _nameEnglish = TextEditingController();
   TextEditingController _nameArabic = TextEditingController();
@@ -390,16 +399,26 @@ class _SchoolDataState extends State<SchoolData> {
                                         ],
                                       ),
                                     ),
+
                                   ),
                                   SizedBox(height: 5,),
-                                  Text(
-                                    _selectedImage == null ? "Please Enter School logo" : "",
-                                    style: TextStyle(
-                                      color: Color(0xFFAD1519),
-                                      fontSize: 11,
-                                      fontFamily: 'Poppins-Regular',
+                                  logoerror?Container(): Padding(
+                                    padding: const EdgeInsets.only(left: 32),
+                                    child: Align( alignment: AlignmentDirectional.centerStart,
+                                      child: Text(
+                                        "Please enter school logo".tr,
+                                        style: TextStyle(color: Colors.red),
+                                      ),
                                     ),
                                   ),
+                                  // Text(
+                                  //   _selectedImage == null ? "Please Enter School logo" : "",
+                                  //   style: TextStyle(
+                                  //     color: Color(0xFFAD1519),
+                                  //     fontSize: 11,
+                                  //     fontFamily: 'Poppins-Regular',
+                                  //   ),
+                                  // ),
                                 ],
                               ),
 
@@ -493,7 +512,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
-                                  errorText: _validateNameEnglish ? "Please Enter Your Name" : null,
+                                  //errorText: _validateNameEnglish ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -513,6 +532,15 @@ class _SchoolDataState extends State<SchoolData> {
                                   // focusedBorder: myFocusBorder(),
                                   // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
                                   focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                            nameenglisherror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter your Name".tr,
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
                             ),
@@ -573,7 +601,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
-                                  errorText: _validateNameArabic ? "Please Enter Your Name" : null,
+                                  //errorText: _validateNameArabic ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -593,6 +621,15 @@ class _SchoolDataState extends State<SchoolData> {
                                   // focusedBorder: myFocusBorder(),
                                   // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
                                   focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                            namearabicerror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter your Name".tr,
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
                             ),
@@ -727,7 +764,7 @@ class _SchoolDataState extends State<SchoolData> {
                                   textEditingController: _textController,
                                   googleAPIKey: _yourGoogleAPIKey,
                                   decoration: InputDecoration(
-                                    errorText: _validateAddress ? "Please Enter Your Address" : null,
+                                    //errorText: _validateAddress ? "Please Enter Your Address" : null,
                                     labelStyle: TextStyle(color: Colors.purple),
                                     suffixIcon: Image.asset(
                                       "assets/imgs/school/icons8_Location.png",
@@ -773,6 +810,15 @@ class _SchoolDataState extends State<SchoolData> {
                                     print('placeDetails${prediction.lng}');
                                   },
                                   itmClick: (Prediction prediction) => _textController.text = prediction.description!,
+                                ),
+                              ),
+                            ),
+                            addresserror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter address".tr,
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
                             ),
@@ -827,7 +873,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
-                                  errorText: _validateCoordinatorName ? "Please Enter Name" : null,
+                                  //errorText: _validateCoordinatorName ? "Please Enter Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -849,6 +895,15 @@ class _SchoolDataState extends State<SchoolData> {
                                   focusedBorder: myFocusBorder(),
                                 ),
 
+                              ),
+                            ),
+                            coordinateerror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter your name".tr,
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ),
                             ),
                             // TextFormFieldCustom(
@@ -919,7 +974,7 @@ class _SchoolDataState extends State<SchoolData> {
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
-                                  errorText: _validateSupportNumber ? "Please Enter Number" : null,
+                                 // errorText: _validateSupportNumber ? "Please Enter Number" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -946,6 +1001,15 @@ class _SchoolDataState extends State<SchoolData> {
                                 // },
                               ),
                             ),
+                            supporterror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter your number".tr,
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ),
                             // TextFormFieldCustom(
                             //   width: constrains.maxWidth / 1.2,
                             //   hintTxt: "Number".tr,
@@ -963,18 +1027,51 @@ class _SchoolDataState extends State<SchoolData> {
                                   txt: "Submit".tr,
                                   onPress: () async {
                                     setState(() {
-                                      _nameEnglish.text.isEmpty ? _validateNameEnglish = true :  _validateNameEnglish = false;
-                                      _nameArabic.text.isEmpty ? _validateNameArabic = true :  _validateNameArabic = false;
-                                      _textController.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
-                                      _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
-                                      _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
+                                      if (_nameEnglish.text.isEmpty) {
+                                        nameenglisherror = false;
+                                      } else {
+                                        nameenglisherror = true;
+                                      }
+                                      if (_nameArabic.text.isEmpty) {
+                                        namearabicerror = false;
+                                      } else {
+                                        namearabicerror = true;
+                                      }
+                                      if (_textController.text.isEmpty) {
+                                        addresserror = false;
+                                      } else {
+                                        addresserror = true;
+                                      }
+                                      if (_coordinatorName.text.isEmpty) {
+                                        coordinateerror = false;
+                                      } else {
+                                        coordinateerror = true;
+                                      }
+                                      if (_supportNumber.text.isEmpty) {
+                                        supporterror = false;
+                                      } else {
+                                        supporterror = true;
+                                      }
+                                      if (_selectedImage == null) {
+                                        logoerror = false;
+                                      } else {
+                                        logoerror = true;
+                                      }
+
+                                      // _nameEnglish.text.isEmpty ? _validateNameEnglish = true :  _validateNameEnglish = false;
+                                      // _nameArabic.text.isEmpty ? _validateNameArabic = true :  _validateNameArabic = false;
+                                      // _textController.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
+                                      // _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
+                                      // _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
 
                                       // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                     });
-                               if(_supportNumber.text.length == 11 && ! _nameEnglish.text.isEmpty &&
-                                   !_nameArabic.text.isEmpty
-                                   && !_textController.text.isEmpty
-                                   &&!_coordinatorName.text.isEmpty &&!_supportNumber.text.isEmpty&& _selectedImage!= null) {
+                               if(_supportNumber.text.length == 11 && nameenglisherror &&
+                                   namearabicerror
+                                   && addresserror
+                                   &&coordinateerror &&supporterror&& logoerror
+                                   //_selectedImage!= null
+                               ) {
                                  _addDataToFirestore();
                                  Navigator.push(
 

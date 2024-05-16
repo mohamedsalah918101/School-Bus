@@ -41,6 +41,12 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
   TextEditingController _name = TextEditingController();
   TextEditingController _phonenumber = TextEditingController();
   TextEditingController _email = TextEditingController();
+
+  bool nameerror=true;
+  bool phoneerror=true;
+
+
+
   MyLocalController ControllerLang = Get.find();
   //TextEditingController _namesupervisor=TextEditingController();
   OutlineInputBorder myInputBorder() {
@@ -322,6 +328,15 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
 
                                 ),
                               ),
+                              nameerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your Name".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
 
                               const SizedBox(
                                 height: 40,
@@ -415,6 +430,15 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
 
                                 ),
                               ),
+                              phoneerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your phone number".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
                               // TextFormFieldCustom(
                               //   width: constrains.maxWidth / 1.2,
                               //   hintTxt: 'Your Name'.tr,
@@ -488,8 +512,34 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                   child: ElevatedSimpleButton(
                                     txt: "Save".tr,
                                     onPress: (){
-                                      editAddSupervisor();
-                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+                                      setState(() {
+                                        if (_name.text.isEmpty) {
+                                          nameerror = false;
+                                        } else {
+                                          nameerror = true;
+                                        }
+                                        if (_phonenumber.text.isEmpty) {
+                                          phoneerror = false;
+                                        } else {
+                                          phoneerror = true;
+                                        }
+                                        // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                                        // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                      });
+                                      if(nameerror
+                                          // ! _nameController.text.isEmpty
+                                          &&
+                                          //! _phoneNumberController.text.isEmpty
+                                          _phonenumber.text.length == 11&& phoneerror){
+                                        editAddSupervisor();
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+
+                                      }
+                                      else{
+                                        SnackBar(content: Text('Please,enter valid number'));
+                                      }
+
+
                                       // Navigator.push(
                                       //     context ,
                                       //     MaterialPageRoute(

@@ -64,10 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
       _counter++;
     });
   }
+  List<Widget> Parent = [];
   List<QueryDocumentSnapshot> data = [];
 
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:2) .get();
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:0) .get();
     data.addAll(querySnapshot.docs);
     setState(() {
 
@@ -153,16 +154,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
 
-          // Text(
-          //                   "Salam Language School".tr,
-          //                   style: TextStyle(
-          //                     color: Color(0xFF993D9A),
-          //                     fontSize: 16,
-          //                     fontFamily: 'Poppins-Bold',
-          //                     fontWeight: FontWeight.w700,
-          //                     height: 0.64,
-          //                   ),
-          //                 ),
+            // Text(
+            //                   "Salam Language School".tr,
+            //                   style: TextStyle(
+            //                     color: Color(0xFF993D9A),
+            //                     fontSize: 16,
+            //                     fontFamily: 'Poppins-Bold',
+            //                     fontWeight: FontWeight.w700,
+            //                     height: 0.64,
+            //                   ),
+            //                 ),
                         ),
                       ),
                     ),
@@ -529,7 +530,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             // ),
                             SizedBox(
                               height: 500,
+                              // height: Parent.length*325,
+                              // width: double.infinity,
                               child: ListView.builder(
+                               // physics: NeverScrollableScrollPhysics(),
                                 itemCount: data.length,
                                 itemBuilder: (context, index) {
                                   return Column(

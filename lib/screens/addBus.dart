@@ -52,6 +52,11 @@ class _AddBusState extends State<AddBus> {
   bool _validateDriverName = false;
   bool _validateDriverNumber = false;
   bool _validateBusNumber = false;
+  bool namedrivererror=true;
+  bool drivernumbererror=true;
+  bool busnumbererror=true;
+  bool supervisorerror=true;
+  bool driverphotoerror= true;
 
   //function choose photo from gallery
   Future _pickImageFromGallery() async{
@@ -89,7 +94,7 @@ class _AddBusState extends State<AddBus> {
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 0) // Example condition
         .get();
 
    // data.addAll(querySnapshot.docs);
@@ -303,17 +308,19 @@ class _AddBusState extends State<AddBus> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
 
-                              Row(
+                              Column(
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 12),
-                                    // child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
-                                    // CircleAvatar( radius:30, // Set the radius of the circle
-                                    //   backgroundImage: AssetImage('assets/imgs/school/Frame 154.png'),
-                                    // ),
-                                    child: Stack(children: [
-                                      GestureDetector(
-                                        onTap:()async {
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 12),
+                                        // child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
+                                        // CircleAvatar( radius:30, // Set the radius of the circle
+                                        //   backgroundImage: AssetImage('assets/imgs/school/Frame 154.png'),
+                                        // ),
+                                        child: Stack(children: [
+                                          GestureDetector(
+                                            onTap:()async {
                   await _pickImageFromGallery();}  , // Call function when tapped
                     child: _selectedImagedriver != null
                         ? Image.file(
@@ -322,79 +329,89 @@ class _AddBusState extends State<AddBus> {
                       height: 78.5,  // Set height as per your preference
                       fit: BoxFit.cover,  // Adjusts how the image fits in the container
                     )
-                                       :
+                                           :
                     Container(
 
-                                          width: 65, // Adjust size as needed
-                                          height: 65,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-
-                                            border: Border.all(
-                                              color: Color(0xffCCCCCC), // Adjust border color
-                                              width: 2, // Adjust border width
-                                            ),
-                                          ),
-                                          child: Align(alignment: Alignment.bottomCenter,
-                                            child: CircleAvatar(radius: 20,
-
-                                            backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
-                                              ,backgroundColor: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-
-                                          child: Container(
-                                              width: 20, // Adjust size as needed
-                                              height: 20,
+                                              width: 65, // Adjust size as needed
+                                              height: 65,
                                               decoration: BoxDecoration(
-
                                                 shape: BoxShape.circle,
+
                                                 border: Border.all(
                                                   color: Color(0xffCCCCCC), // Adjust border color
                                                   width: 2, // Adjust border width
                                                 ),
                                               ),
-                                              child: Image.asset("assets/imgs/school/image-editing 1 1.png",width:11,height: 11,)),
-                                        bottom: -10,
-                                        left: 80,
+                                              child: Align(alignment: Alignment.bottomCenter,
+                                                child: CircleAvatar(radius: 20,
 
-                                      )
+                                                backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                                  ,backgroundColor: Colors.white,
+                                                ),
+                                              ),
+                                            ),
 
+                                          ),
+                                          Positioned(
+
+                                              child: Container(
+                                                  width: 20, // Adjust size as needed
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: Color(0xffCCCCCC), // Adjust border color
+                                                      width: 2, // Adjust border width
+                                                    ),
+                                                  ),
+                                                  child: Image.asset("assets/imgs/school/image-editing 1 1.png",width:11,height: 11,)),
+                                            bottom: -10,
+                                            left: 80,
+
+                                          )
+                                        ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal:15,vertical: 0 ),
+                                        child: Align(
+                                          alignment: AlignmentDirectional.topStart,
+                                          child:
+                                            RichText(
+                                              text: TextSpan(
+                                                children: [
+                                                  TextSpan(text:"Driver photo",style: TextStyle(color: Color(0xff442B72),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold' )),
+                                                  TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
+                                                ]
+                                              ),
+                                            ),
+
+                                        ),
+                                      ),
+                                      //error message on null photo
+                                      // if (_selectedImage == null)
+                                      //   Padding(
+                                      //     padding: const EdgeInsets.only(left: 12, top: 4),
+                                      //     child: Text(
+                                      //       "Please select a photo",
+                                      //       style: TextStyle(color: Colors.red),
+                                      //     ),
+                                      //   ),
 
                                     ],
+
+                                  ),
+                                  driverphotoerror?Container(): Padding(
+                                    padding: const EdgeInsets.only(left: 32),
+                                    child: Align( alignment: AlignmentDirectional.topStart,
+                                      child: Text(
+                                        "Please enter driver photo".tr,
+                                        style: TextStyle(color: Colors.red),
+                                      ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:15,vertical: 0 ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topStart,
-                                      child:
-                                        RichText(
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(text:"Driver photo",style: TextStyle(color: Color(0xff442B72),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold' )),
-                                              //TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
-                                            ]
-                                          ),
-                                        ),
-
-                                    ),
-                                  ),
-                                  //error message on null photo
-                                  // if (_selectedImage == null)
-                                  //   Padding(
-                                  //     padding: const EdgeInsets.only(left: 12, top: 4),
-                                  //     child: Text(
-                                  //       "Please select a photo",
-                                  //       style: TextStyle(color: Colors.red),
-                                  //     ),
-                                  //   ),
-
                                 ],
-
                               ),
                               // Padding(
 
@@ -457,7 +474,7 @@ class _AddBusState extends State<AddBus> {
                                   scrollPadding: const EdgeInsets.symmetric(
                                       vertical: 40),
                                   decoration:  InputDecoration(
-                                    errorText: _validateDriverName ? "Please Enter Name" : null,
+                                   // errorText: _validateDriverName ? "Please Enter Name" : null,
                                     alignLabelWithHint: true,
                                     counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
@@ -482,6 +499,15 @@ class _AddBusState extends State<AddBus> {
                                   //   // move to the next field when the user presses the "Done" button
                                   //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
                                   // },
+                                ),
+                              ),
+                              namedrivererror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your name".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ),
                               ),
                               // TextFormFieldCustom(
@@ -542,7 +568,7 @@ class _AddBusState extends State<AddBus> {
                                     LengthLimitingTextInputFormatter(11), // Limit the length programmatically
                                   ],
                                   decoration:  InputDecoration(
-                                    errorText: _validateDriverNumber ? "Please Enter Phone Number" : null,
+                                    //errorText: _validateDriverNumber ? "Please Enter Phone Number" : null,
                                     // labelText: 'Shady Ayman'.tr,
                                     hintText:'Your Number'.tr ,
                                     hintStyle: const TextStyle(
@@ -563,6 +589,15 @@ class _AddBusState extends State<AddBus> {
                                     focusedBorder: myFocusBorder(),
                                   ),
 
+                                ),
+                              ),
+                              drivernumbererror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter phone number".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ),
                               ),
                               // TextFormFieldCustom(
@@ -738,7 +773,7 @@ class _AddBusState extends State<AddBus> {
                                   scrollPadding: const EdgeInsets.symmetric(
                                       vertical: 40),
                                   decoration:  InputDecoration(
-                                    errorText: _validateBusNumber ? "Please Enter Bus Number" : null,
+                                    //errorText: _validateBusNumber ? "Please Enter Bus Number" : null,
                                     alignLabelWithHint: true,
                                     counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
@@ -763,6 +798,15 @@ class _AddBusState extends State<AddBus> {
                                   //   // move to the next field when the user presses the "Done" button
                                   //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
                                   // },
+                                ),
+                              ),
+                              busnumbererror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter bus number".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ),
                               ),
                               // TextFormFieldCustom(
@@ -893,6 +937,15 @@ class _AddBusState extends State<AddBus> {
                                 items:
                                   items
                                  ),),
+                              supervisorerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please choose supervisor".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
                               // DropdownButtonFormField(value:null,items: [], onChanged: (value){}),
                               // DropdownButton<String>(
                               //   hint: Text('Select an option'),
@@ -913,12 +966,39 @@ class _AddBusState extends State<AddBus> {
 
                                     onPress: (){
                                       setState(() {
-                                        _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
-                                        _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
-                                        _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
+                                        // _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
+                                        // _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
+                                        // _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
+
+                                        if (_driverName.text.isEmpty) {
+                                          namedrivererror = false;
+                                        } else {
+                                          namedrivererror = true;
+                                        }
+                                        if (_driverNumber.text.isEmpty) {
+                                          drivernumbererror = false;
+                                        } else {
+                                          drivernumbererror = true;
+                                        }
+                                        if (_busNumber.text.isEmpty) {
+                                          busnumbererror = false;
+                                        } else {
+                                          busnumbererror = true;
+                                        }
+                                        if (_supervisorController.text.isEmpty) {
+                                          supervisorerror = false;
+                                        } else {
+                                          supervisorerror = true;
+                                        }
+                                        if (_selectedImagedriver == null) {
+                                          driverphotoerror = false;
+                                        } else {
+                                          driverphotoerror = true;
+                                        }
                                       });
-                                      if (_driverNumber.text.length ==11 && !_driverName.text.isEmpty &&
-                                         ! _driverNumber.text.isEmpty && !_busNumber.text.isEmpty
+                                      if (_driverNumber.text.length ==11 && namedrivererror && drivernumbererror
+                                        // ! _driverNumber.text.isEmpty
+                                          && busnumbererror && supervisorerror && _selectedImagedriver != null && driverphotoerror
                                           //_selectedImage != null && _selectedImagebus != null
                                           ){
 
