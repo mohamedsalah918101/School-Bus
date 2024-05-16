@@ -617,9 +617,38 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                             filteredData[index]['busphoto'] != null ?
                                             Image.network(filteredData[index]['busphoto']as String, width: 61, height: 61,
                                               errorBuilder: (context, error, stackTrace) {
-                                                return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                                return Container(
+                                                    width:50,
+                                                    height:40,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: Color(0xffCCCCCC),
+                                                        width: 2.0,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                      child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                    ));
+                                                  //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
                                               },
-                                            ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                            ):
+                                            //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                            Container(
+                                                width:50,
+                                                height:40,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Color(0xffCCCCCC),
+                                                    width: 2.0,
+                                                  ),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                  child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                )),
                                             //Image.asset('assets/imgs/school/Ellipse 1.png'), // Icon or image
 
                                             title: Text(

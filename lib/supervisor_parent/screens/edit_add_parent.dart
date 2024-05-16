@@ -67,19 +67,24 @@ class _EditAddParentsState extends State<EditAddParents> {
         print('form is valid');
         try {
           print('updating document...');
+          List<Map<String, dynamic>> childrenData = List.generate(
+            int.parse(_numberOfChildrenController.text),
+                (index) => {
+              'name': nameChildControllers[index].text,
+              'grade': gradeControllers[index].text,
+            },
+          );
+
           await Parent.doc(widget.docid).update({
             'phoneNumber': _phoneNumberController.text,
             'typeOfParent': selectedValue,
             'name': _nameController.text,
             'numberOfChildren': _numberOfChildrenController.text,
-
-
+            'childern': childrenData, // إضافة بيانات الأطفال هنا
           });
-          print('document updated successfully');
 
-          // تحديث حالة الواجهة
+          print('document updated successfully');
           setState(() {
-            // قم بتحديث العناصر المطلوبة في واجهة المستخدم
           });
         } catch (e) {
           print('Error updating document: $e');
@@ -91,6 +96,7 @@ class _EditAddParentsState extends State<EditAddParents> {
       print('formState.currentState is null');
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -1164,7 +1170,7 @@ class _EditAddParentsState extends State<EditAddParents> {
                                 width: 277,
                                 hight: 48,
                                 onPress: () async {
-                                    InvitationSendSnackBar(context, 'Invitation sent successfully');
+                                  //  InvitationSendSnackBar(context, 'Invitation sent successfully',Color(0xFF4CAF50));
                                     editAddParent();
                                     print('object');
                                     NumberOfChildrenCard = false;

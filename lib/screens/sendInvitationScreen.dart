@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -54,11 +55,18 @@ class _SendInvitationState extends State<SendInvitation> {
       Map<String, dynamic> data = {
         'name': _nameController.text,
         'email': _emailController.text,
-        'phoneNumber': '+2'+_phoneNumberController.text,
+        'phoneNumber': _phoneNumberController.text,
         'state':0,
-        'invite':1
+        'invite':1,
+        'busphoto':'',
       };
+      print('phonenum');
+      print( _phoneNumberController.text);
       // Add the data to the Firestore collection
+      var check =await addSupervisorCheck(_phoneNumberController.text);
+      if(!check) {
+        var res =await checkUpdateSupervisor(_phoneNumberController.text);
+        if(!res) {
       await _firestore.collection('supervisor').add(data).then((docRef) {
         docid=docRef.id;
         print('Data added with document ID: ${docRef.id}');
@@ -71,7 +79,17 @@ class _SendInvitationState extends State<SendInvitation> {
       _nameController.clear();
       _phoneNumberController.clear();
       _emailController.clear();
-    }
+    }else{
+          await _firestore.collection('supervisor').doc(docID).update(data);
+          // Clear the text fields
+          _nameController.clear();
+          _phoneNumberController.clear();
+          _emailController.clear();
+        }
+
+      }      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+
+  }
  // }
   bool _validateName = false;
   bool _validatePhone = false;
@@ -95,8 +113,15 @@ class _SendInvitationState extends State<SendInvitation> {
           width: 0.5,
         ));
   }
-
-
+  bool _phoneNumberEntered = true;
+bool _nameEntered =true;
+  bool _validatePhoneNumber() {
+    bool isValid = _phoneNumberController.text.isNotEmpty;
+    setState(() {
+      _phoneNumberEntered = isValid;
+    });
+    return isValid;
+  }
 // to lock in landscape view
   @override
   void initState() {
@@ -288,7 +313,7 @@ class _SendInvitationState extends State<SendInvitation> {
                             SizedBox(height: 10,),
                             Container(
                               width: constrains.maxWidth / 1.2,
-                              height: 44,
+                              //height: 44,
                               child:
                               TextFormField(
 
@@ -319,7 +344,15 @@ class _SendInvitationState extends State<SendInvitation> {
                                     fontSize: 12,
                                     fontFamily: 'Poppins-Bold',
                                     fontWeight: FontWeight.w700,
-                                    height: 1.33,
+                                   // height: 1.33,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide:  BorderSide(
+                                      color: !_nameEntered
+                                          ? Colors.red // Red border if phone number not entered
+                                          : Color(0xFFFFC53E),
+                                    ),
                                   ),
                                   enabledBorder: myInputBorder(),
                                   // focusedBorder: myFocusBorder(),
@@ -422,52 +455,73 @@ class _SendInvitationState extends State<SendInvitation> {
                             SizedBox(height: 10,),
                             Container(
                               width: constrains.maxWidth / 1.2,
-                              height: 44,
-                              child: TextFormField(
-                                style: TextStyle(color: Color(0xFF442B72)),
+                              height: 65,
+                              child:
+                              IntlPhoneField(
+
+                                cursorColor:Color(0xFF442B72) ,
                                 controller: _phoneNumberController,
-                                focusNode: _numberSupervisorFocus,
-                                cursorColor: const Color(0xFF442B72),
-                                maxLength: 11,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
-                                  LengthLimitingTextInputFormatter(11), // Limit the length programmatically
-                                ],
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                  FocusScope.of(context).requestFocus(_emailSupervisorFocus);
-                                },
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                keyboardType: TextInputType.number,
-                                decoration:  InputDecoration(
-                                  errorText: _validatePhone ? "Please Enter valid Phone number": null,
-                                  // labelText: 'Shady Ayman'.tr,
-                                  hintText:'Your Number'.tr ,
-                                  hintStyle:  const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
+                                dropdownIconPosition:IconPosition.trailing,
+                                invalidNumberMessage:" ",
+                                style: TextStyle(color: Color(0xFF442B72),height: 1.5),
+                                dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
+                                decoration: InputDecoration(
+                                  errorText: _validatePhone ? "Please Enter Your Phone" : null,
+                                  fillColor: Color(0xffF1F1F1),
                                   filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  enabledBorder: myInputBorder(),
-                                  focusedBorder: myFocusBorder(),
+                                  hintText: 'Phone Number'.tr,
+                                  hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
+
+                                  border:
+                                  OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide:  BorderSide(
+                                      color: !_phoneNumberEntered
+                                          ? Colors.red // Red border if phone number not entered
+                                          : Color(0xFFFFC53E),
+                                    ),
+                                  ),
+
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Colors.red,
+                                        width: 2
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      borderSide: BorderSide(
+                                          color: Colors.red,
+                                          width: 2
+                                      )
+                                  ),
+                                  focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFFC53E),
+                                    ),
+                                  ),
+
+
+                                  contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+
+
                                 ),
-                                // validator: (value) {
-                                //   if (value!.isEmpty) {
-                                //     return "Please enter a phone number";
-                                //   }
-                                //   return null;
-                                // },
+
+                                initialCountryCode: 'EG', // Set initial country code if needed
+                                onChanged: (phone) {
+                                  // Update the enteredPhoneNumber variable with the entered phone number
+
+                                },
+
                               ),
                             ),
                             // Container(
@@ -626,7 +680,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                    });
                                    if(! _nameController.text.isEmpty &&
                                        //! _phoneNumberController.text.isEmpty
-                                   _phoneNumberController.text.length==11){
+                                   _phoneNumberController.text.length == 10){
                                      _addDataToFirestore();
                                      createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
                                      showSnackBarFun(context);

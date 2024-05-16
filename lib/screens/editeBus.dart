@@ -26,11 +26,11 @@ import 'homeScreen.dart';
 
 class EditeBus extends StatefulWidget{
   final String docid;
-  final String oldphotodriver;
+  final String? oldphotodriver;
   final String? olddrivername;
-  final String olddriverphone;
-  final String oldphotobus;
-  final String olddnumberbus;
+  final String? olddriverphone;
+  final String? oldphotobus;
+  final String? olddnumberbus;
   const EditeBus({super.key,
   required this.docid,
   required this.oldphotodriver,
@@ -52,6 +52,7 @@ class _EditeBusState extends State<EditeBus> {
   TextEditingController _namedrivercontroller = TextEditingController();
   TextEditingController _phonedrivercontroller = TextEditingController();
   TextEditingController _busnumbercontroller = TextEditingController();
+  TextEditingController _supervisorController = TextEditingController();
 
 
 
@@ -168,6 +169,23 @@ class _EditeBusState extends State<EditeBus> {
       //Some error occurred
     }
   }
+
+  List<DropdownCheckboxItem> items=[];
+  List<QueryDocumentSnapshot> data = [];
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 0) // Example condition
+        .get();
+
+    // data.addAll(querySnapshot.docs);
+    for(int i=0;i<querySnapshot.docs.length;i++)
+    {
+      items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name')));
+    }
+    setState(() {
+
+    });
+  }
+
 // to lock in landscape view
   @override
   void initState() {
@@ -176,8 +194,8 @@ class _EditeBusState extends State<EditeBus> {
     _namedrivercontroller.text=widget.olddrivername!;
     _phonedrivercontroller.text=widget.olddriverphone!;
     _busnumbercontroller.text=widget.olddnumberbus!;
-    imageUrldriver=widget.oldphotodriver!;
-    imageUrldbus=widget.oldphotobus!;
+    //imageUrldriver=widget.oldphotodriver!;
+    //imageUrldbus=widget.oldphotobus!;
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -799,14 +817,20 @@ class _EditeBusState extends State<EditeBus> {
                               //
                               //   ),
                               // ),
-                              Container(child:DropdownCheckboxEditeBus(
-                                  items: [
-                                    DropdownCheckboxItem(label: 'Ahmed Atef'),
-                                    DropdownCheckboxItem(label: 'Shady Aymen'),
-                                    DropdownCheckboxItem(label: 'Karem Ahmed'),
-                                    DropdownCheckboxItem(label: 'Shady Aymen'),
-                                    DropdownCheckboxItem(label: 'Karem Ahmed'),
-                                  ], ),),
+                              Container(
+                                child:DropdownCheckbox(
+                                    controller: _supervisorController,
+                                    items:
+                                    items
+                                ),),
+                              // Container(child:DropdownCheckboxEditeBus(
+                              //     items: [
+                              //       DropdownCheckboxItem(label: 'Ahmed Atef'),
+                              //       DropdownCheckboxItem(label: 'Shady Aymen'),
+                              //       DropdownCheckboxItem(label: 'Karem Ahmed'),
+                              //       DropdownCheckboxItem(label: 'Shady Aymen'),
+                              //       DropdownCheckboxItem(label: 'Karem Ahmed'),
+                              //     ], ),),
 
                               SizedBox(
                                 height: 20,

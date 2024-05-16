@@ -17,6 +17,7 @@ import 'package:school_account/screens/supervisorScreen.dart';
 //import '../components/child_data_item.dart';
 import '../components/custom_app_bar.dart';
 import '../components/dialogs.dart';
+import '../main.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'notificationsScreen.dart';
@@ -24,28 +25,29 @@ import 'dart:io';
 //import '../components/profile_child_card.dart';
 
 class EditeProfile extends StatefulWidget {
-  final String docid;
-  final String oldNameEnglish;
-  final String? oldNameArabic;
-  final String oldAddress;
-  final String oldSchoolLogo;
-  final String oldCoordinatorName;
-  final String oldSupportNumber;
-  // const EditeSupervisor({super.key});
-  const EditeProfile({super.key,
-    required this.docid,
-    required this.oldNameEnglish,
-    required this.oldNameArabic,
-    required this.oldAddress,
-    required this.oldSchoolLogo,
-    required this.oldCoordinatorName,
-    required this.oldSupportNumber,
-  });
+  // final String docid;
+  // final String oldNameEnglish;
+  // final String? oldNameArabic;
+  // final String oldAddress;
+  // final String oldSchoolLogo;
+  // final String oldCoordinatorName;
+  // final String oldSupportNumber;
+   const EditeProfile({super.key});
+  // const EditeProfile({super.key,
+  //   required this.docid,
+  //   required this.oldNameEnglish,
+  //   required this.oldNameArabic,
+  //   required this.oldAddress,
+  //   required this.oldSchoolLogo,
+  //   required this.oldCoordinatorName,
+  //   required this.oldSupportNumber,
+  // });
   @override
   _EditeProfileState createState() => _EditeProfileState();
 }
 
 class _EditeProfileState extends State<EditeProfile> {
+  final _firestore = FirebaseFirestore.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _nameEnglish = TextEditingController();
   TextEditingController _nameArabic = TextEditingController();
@@ -100,6 +102,8 @@ class _EditeProfileState extends State<EditeProfile> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
   CollectionReference profile = FirebaseFirestore.instance.collection('schooldata');
+
+
   editProfile() async {
     print('editprofile called');
 
@@ -111,8 +115,8 @@ class _EditeProfileState extends State<EditeProfile> {
 
         try {
           print('updating document...');
-
-          await profile.doc(widget.docid).update({
+//profile.doc(widget.docid)
+          await FirebaseFirestore.instance.collection('schooldata').doc(sharedpref!.getString('id')).update({
             'nameEnglish': _nameEnglish.text,
             'nameArabic': _nameArabic.text,
             'address':_Address.text,
@@ -188,15 +192,18 @@ class _EditeProfileState extends State<EditeProfile> {
       //Some error occurred
     }
   }
+  late Future<DocumentSnapshot<Map<String, dynamic>>> _future;
   @override
   void initState() {
     super.initState();
-    _nameEnglish.text = widget.oldNameEnglish!;
-    _nameArabic.text=widget.oldNameArabic!;
-    _Address.text=widget.oldAddress!;
-    _coordinatorName.text=widget.oldCoordinatorName!;
-    _supportNumber.text=widget.oldSupportNumber!;
-    editeprofileimageUrl=widget.oldSchoolLogo!;
+    // _nameEnglish.text = widget.oldNameEnglish!;
+    // _nameArabic.text=widget.oldNameArabic!;
+    // _Address.text=widget.oldAddress!;
+    // _coordinatorName.text=widget.oldCoordinatorName!;
+    // _supportNumber.text=widget.oldSupportNumber!;
+    // editeprofileimageUrl=widget.oldSchoolLogo!;
+
+    _future = FirebaseFirestore.instance.collection('schooldata').doc(sharedpref!.getString('id')).get();
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -355,92 +362,67 @@ class _EditeProfileState extends State<EditeProfile> {
                 SizedBox(height: 15,),
                 Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
                 SizedBox(height: 10,),
-                Container(
-                  width: 320,
-                  height: 45,
-                  child: TextFormField(
-                    controller: _nameEnglish,
-                    onFieldSubmitted: (value) {
-                      // move to the next field when the user presses the "Done" button
-                      FocusScope.of(context).requestFocus(_NameArabicFocus);
-                    },
-                    style: TextStyle(color: Color(0xFF442B72)),
-                    //controller: _namesupervisor,
-                    cursorColor: const Color(0xFF442B72),
-                    //textDirection: TextDirection.ltr,
-                    scrollPadding: const EdgeInsets.symmetric(
-                        vertical: 40),
+    Container(
+    width: 320,
+    height: 45,
+    child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+    future: _future,
+    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+    return Center(
+    child: CircularProgressIndicator(),
+    );
+    }
 
-                    decoration:  InputDecoration(
-                      //labelText: 'Shady Ayman'.tr,
-                      //hintText:'ElSalam School '.tr ,
-                      hintStyle: TextStyle(color: Color(0xFF442B72)),
-                      alignLabelWithHint: true,
-                      counterText: "",
-                      fillColor: const Color(0xFFF1F1F1),
-                      filled: true,
-                      contentPadding: const EdgeInsets.fromLTRB(
-                          8, 5, 10, 5),
-                      floatingLabelBehavior:  FloatingLabelBehavior.never,
-                      enabledBorder: myInputBorder(),
-                      focusedBorder: myFocusBorder(),
-                    ),
+    if (snapshot.hasError) {
+    return Text('Something went wrong');
+    }
 
-                  ),
-                ),
+    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+    return Text('No data available');
+    }
 
-                SizedBox(height: 20,),
+    Map<String, dynamic>? data = snapshot.data!.data();
+    String nameEnglish = data?['nameEnglish'] ?? '';
 
-                Text('School name in Arabic'.tr,style: TextStyle(color: Color(0xFF442B72),
-                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                SizedBox(height: 10,),
-                Container(
-                  width: 320,
-                  height: 45,
-                  child: TextFormField(
-                    controller: _nameArabic,
-                    focusNode: _NameArabicFocus,
-                    onFieldSubmitted: (value) {
-                      // move to the next field when the user presses the "Done" button
-                      FocusScope.of(context).requestFocus(_AddressFocus);
-                    },
-                    style: TextStyle(color: Color(0xFF442B72)),
-                    //controller: _namesupervisor,
-                    cursorColor: const Color(0xFF442B72),
-                    //textDirection: TextDirection.ltr,
-                    scrollPadding: const EdgeInsets.symmetric(
-                        vertical: 40),
+    // Update the text field with the retrieved data
+    _nameEnglish.text = nameEnglish;
 
-                    decoration:  InputDecoration(
-                      //labelText: 'Shady Ayman'.tr,
-                     // hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
-                      hintStyle: TextStyle(color: Color(0xFF442B72)),
-                      alignLabelWithHint: true,
-                      counterText: "",
-                      fillColor: const Color(0xFFF1F1F1),
-                      filled: true,
-                      contentPadding: const EdgeInsets.fromLTRB(
-                          8, 5, 10, 5),
-                      floatingLabelBehavior:  FloatingLabelBehavior.never,
-                      enabledBorder: myInputBorder(),
-                      focusedBorder: myFocusBorder(),
-                    ),
+    return TextFormField(
+    controller:  _nameEnglish,
+    style: TextStyle(
+    color: Color(0xFF442B72),
+      fontSize: 14,
+      //fontWeight: FontWeight.bold,
+      fontFamily: 'Poppins-Regular',
+    ),
+    cursorColor: const Color(0xFF442B72),
+    decoration: InputDecoration(
+    hintStyle: TextStyle(color: Color(0xFF442B72)),
+    alignLabelWithHint: true,
+    counterText: "",
+    fillColor: const Color(0xFFF1F1F1),
+    filled: true,
+    contentPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
+    floatingLabelBehavior: FloatingLabelBehavior.never,
+    enabledBorder: myInputBorder(),
+    focusedBorder: myFocusBorder(),
+    ),
+    );
+    },
+    ),
+    ),
 
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),
-                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                SizedBox(height: 10,),
+
+
                 // Container(
                 //   width: 320,
                 //   height: 45,
                 //   child: TextFormField(
-                //     controller: _Address,
-                //     focusNode: _AddressFocus,
+                //     controller: _nameEnglish,
                 //     onFieldSubmitted: (value) {
                 //       // move to the next field when the user presses the "Done" button
-                //       FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                //       FocusScope.of(context).requestFocus(_NameArabicFocus);
                 //     },
                 //     style: TextStyle(color: Color(0xFF442B72)),
                 //     //controller: _namesupervisor,
@@ -448,9 +430,10 @@ class _EditeProfileState extends State<EditeProfile> {
                 //     //textDirection: TextDirection.ltr,
                 //     scrollPadding: const EdgeInsets.symmetric(
                 //         vertical: 40),
+                //
                 //     decoration:  InputDecoration(
                 //       //labelText: 'Shady Ayman'.tr,
-                //     //  hintText:'16 Khaled st, Asyut,Egypt'.tr ,
+                //       //hintText:'ElSalam School '.tr ,
                 //       hintStyle: TextStyle(color: Color(0xFF442B72)),
                 //       alignLabelWithHint: true,
                 //       counterText: "",
@@ -461,90 +444,257 @@ class _EditeProfileState extends State<EditeProfile> {
                 //       floatingLabelBehavior:  FloatingLabelBehavior.never,
                 //       enabledBorder: myInputBorder(),
                 //       focusedBorder: myFocusBorder(),
-                //       suffixIcon:Transform.scale(
-                //         scale: 0.7, // Adjust the scale factor as needed
-                //         child: Image.asset(
-                //           'assets/imgs/school/icons8_Location.png',
-                //           width: 10,
-                //           height: 10,
-                //         ),
-                //       ),
-                //       //Image.asset('assets/imgs/school/icons8_Location.png',width: 10,height: 10,)
                 //     ),
                 //
                 //   ),
                 // ),
+
+                SizedBox(height: 20,),
+
+                Text('School name in Arabic'.tr,style: TextStyle(color: Color(0xFF442B72),
+                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
                 Container(
-                    width: 320,
-                    height: 45,
+                  width: 320,
+                  height: 45,
+                  child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    future: _future,
+                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
-                  child: Form(
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
 
-                    key: _formKey,
-                    autovalidateMode: _autovalidateMode,
-                    child: GooglePlacesAutoCompleteTextFormField(
+                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                        return Text('No data available');
+                      }
 
-                      cursorColor: Color(0xFF442B72),
-                      textEditingController: _Address,
-                      googleAPIKey: _yourGoogleAPIKey,
-                      decoration: InputDecoration(
-                      //  errorText: _validateAddress ? "Please Enter Your Address" : null,
-                        labelStyle: TextStyle(color: Colors.purple),
-                        suffixIcon: Image.asset(
-                          "assets/imgs/school/icons8_Location.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                        alignLabelWithHint: true,
-                        counterText: "",
-                        fillColor: const Color(0xFFF1F1F1),
-                        filled: true,
-                        contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        hintStyle: const TextStyle(
+                      Map<String, dynamic>? data = snapshot.data!.data();
+                      String nameEnglish = data?['nameArabic'] ?? '';
+
+                      // Update the text field with the retrieved data
+                      _nameArabic.text = nameEnglish;
+
+                      return TextFormField(
+                        controller:  _nameArabic,
+                        style: TextStyle(
                           color: Color(0xFF442B72),
-                          fontSize: 10,
-                          fontFamily: 'Inter-Bold',
-                          fontWeight: FontWeight.w700,
-                          height: 1.5,
+                          fontSize: 14,
+                          //fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Regular',
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.black), // Customize border color
+                        cursorColor: const Color(0xFF442B72),
+                        decoration: InputDecoration(
+                          hintStyle: TextStyle(color: Color(0xFF442B72)),
+                          alignLabelWithHint: true,
+                          counterText: "",
+                          fillColor: const Color(0xFFF1F1F1),
+                          filled: true,
+                          contentPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          enabledBorder: myInputBorder(),
+                          focusedBorder: myFocusBorder(),
                         ),
-                        enabledBorder: myInputBorder(),
-                        focusedBorder: myFocusBorder(),
-
-
-                      ),
-                      style: TextStyle(
-                        color: Color(0xFF442B72), // Set text color to purple
-                        fontSize: 14,
-                        fontFamily: 'Poppins-Regular', // Customize font family
-                        //fontWeight: FontWeight.normal, // Customize font weight
-                        // Add more text style properties as needed
-                      ),
-                      // validator: (value) {
-                      //   if (value!.isEmpty) {
-                      //     return 'Please enter some text';
-                      //   }
-                      //   return null;
-                      // },
-                      maxLines: 1,
-
-                      overlayContainer: (child) => Material(
-                        elevation: 1.0,
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        child: child,
-                      ),
-                      getPlaceDetailWithLatLng: (prediction) {
-                        print('placeDetails${prediction.lng}');
-                      },
-                      itmClick: (Prediction prediction) => _Address.text = prediction.description!,
-                    ),
+                      );
+                    },
                   ),
                 ),
+                // Container(
+                //   width: 320,
+                //   height: 45,
+                //   child: TextFormField(
+                //     controller: _nameArabic,
+                //     focusNode: _NameArabicFocus,
+                //     onFieldSubmitted: (value) {
+                //       // move to the next field when the user presses the "Done" button
+                //       FocusScope.of(context).requestFocus(_AddressFocus);
+                //     },
+                //     style: TextStyle(color: Color(0xFF442B72)),
+                //     //controller: _namesupervisor,
+                //     cursorColor: const Color(0xFF442B72),
+                //     //textDirection: TextDirection.ltr,
+                //     scrollPadding: const EdgeInsets.symmetric(
+                //         vertical: 40),
+                //
+                //     decoration:  InputDecoration(
+                //       //labelText: 'Shady Ayman'.tr,
+                //      // hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
+                //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                //       alignLabelWithHint: true,
+                //       counterText: "",
+                //       fillColor: const Color(0xFFF1F1F1),
+                //       filled: true,
+                //       contentPadding: const EdgeInsets.fromLTRB(
+                //           8, 5, 10, 5),
+                //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                //       enabledBorder: myInputBorder(),
+                //       focusedBorder: myFocusBorder(),
+                //     ),
+                //
+                //   ),
+                // ),
+                SizedBox(height: 20,),
+                Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),
+                  fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                SizedBox(height: 10,),
+
+    Container(
+    width: 320,
+    height: 45,
+    child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+    future: _future,
+    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+    return Center(
+    child: CircularProgressIndicator(),
+    );
+    }
+
+    if (snapshot.hasError) {
+    return Text('Something went wrong');
+    }
+
+    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+    return Text('No data available');
+    }
+
+    Map<String, dynamic>? data = snapshot.data!.data();
+    String nameEnglish = data?['address'] ?? '';
+
+    // Update the text field with the retrieved data
+    _Address.text = nameEnglish;
+
+    return Form(
+    key: _formKey,
+    autovalidateMode: _autovalidateMode,
+    child: GooglePlacesAutoCompleteTextFormField(
+    cursorColor: Color(0xFF442B72),
+    textEditingController: _Address,
+    googleAPIKey: _yourGoogleAPIKey,
+    decoration: InputDecoration(
+    labelStyle: TextStyle(color: Colors.purple),
+    suffixIcon: Image.asset(
+    "assets/imgs/school/icons8_Location.png",
+    width: 20,
+    height: 20,
+    ),
+    alignLabelWithHint: true,
+    counterText: "",
+    fillColor: Color(0xFFF1F1F1),
+    filled: true,
+    contentPadding: EdgeInsets.fromLTRB(8, 10, 10, 5),
+    floatingLabelBehavior: FloatingLabelBehavior.never,
+    hintStyle: TextStyle(
+    color: Color(0xFF442B72),
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    fontWeight: FontWeight.w700,
+    height: 1.5,
+    ),
+    border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide(color: Colors.black), // Customize border color
+    ),
+    enabledBorder: myInputBorder(),
+    focusedBorder: myFocusBorder(),
+    ),
+    style: TextStyle(
+    color: Color(0xFF442B72), // Set text color to purple
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular', // Customize font family
+    ),
+    maxLines: 1,
+    overlayContainer: (child) => Material(
+    elevation: 1.0,
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(12),
+    child: child,
+    ),
+    getPlaceDetailWithLatLng: (prediction) {
+    print('placeDetails${prediction.lng}');
+    },
+    itmClick: (Prediction prediction) => _Address.text = prediction.description!,
+    ),
+    );
+    },
+    ),
+    ),
+                // Container(
+                //     width: 320,
+                //     height: 45,
+                //
+                //   child: Form(
+                //
+                //     key: _formKey,
+                //     autovalidateMode: _autovalidateMode,
+                //     child: GooglePlacesAutoCompleteTextFormField(
+                //
+                //       cursorColor: Color(0xFF442B72),
+                //       textEditingController: _Address,
+                //       googleAPIKey: _yourGoogleAPIKey,
+                //       decoration: InputDecoration(
+                //       //  errorText: _validateAddress ? "Please Enter Your Address" : null,
+                //         labelStyle: TextStyle(color: Colors.purple),
+                //         suffixIcon: Image.asset(
+                //           "assets/imgs/school/icons8_Location.png",
+                //           width: 20,
+                //           height: 20,
+                //         ),
+                //         alignLabelWithHint: true,
+                //         counterText: "",
+                //         fillColor: const Color(0xFFF1F1F1),
+                //         filled: true,
+                //         contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
+                //         floatingLabelBehavior: FloatingLabelBehavior.never,
+                //         hintStyle: const TextStyle(
+                //           color: Color(0xFF442B72),
+                //           fontSize: 10,
+                //           fontFamily: 'Inter-Bold',
+                //           fontWeight: FontWeight.w700,
+                //           height: 1.5,
+                //         ),
+                //         border: OutlineInputBorder(
+                //           borderRadius: BorderRadius.circular(12),
+                //           borderSide: BorderSide(color: Colors.black), // Customize border color
+                //         ),
+                //         enabledBorder: myInputBorder(),
+                //         focusedBorder: myFocusBorder(),
+                //
+                //
+                //       ),
+                //       style: TextStyle(
+                //         color: Color(0xFF442B72), // Set text color to purple
+                //         fontSize: 14,
+                //         fontFamily: 'Poppins-Regular', // Customize font family
+                //         //fontWeight: FontWeight.normal, // Customize font weight
+                //         // Add more text style properties as needed
+                //       ),
+                //       // validator: (value) {
+                //       //   if (value!.isEmpty) {
+                //       //     return 'Please enter some text';
+                //       //   }
+                //       //   return null;
+                //       // },
+                //       maxLines: 1,
+                //
+                //       overlayContainer: (child) => Material(
+                //         elevation: 1.0,
+                //         color: Colors.white,
+                //         borderRadius: BorderRadius.circular(12),
+                //         child: child,
+                //       ),
+                //       getPlaceDetailWithLatLng: (prediction) {
+                //         print('placeDetails${prediction.lng}');
+                //       },
+                //       itmClick: (Prediction prediction) => _Address.text = prediction.description!,
+                //     ),
+                //   ),
+                // ),
                 SizedBox(height: 35,),
                 Text("Personal information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
                     color: Color(0xff771F98)),),
@@ -555,37 +705,87 @@ class _EditeProfileState extends State<EditeProfile> {
                 Container(
                   width: 320,
                   height: 45,
-                  child: TextFormField(
-                    controller: _coordinatorName,
-                    focusNode: _CoordinatorFocus,
-                    onFieldSubmitted: (value) {
-                      // move to the next field when the user presses the "Done" button
-                      FocusScope.of(context).requestFocus(_SupporterFocus);
+                  child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    future: _future,
+                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
+
+                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                        return Text('No data available');
+                      }
+
+                      Map<String, dynamic>? data = snapshot.data!.data();
+                      String nameEnglish = data?['coordinatorName'] ?? '';
+
+                      // Update the text field with the retrieved data
+                      _coordinatorName.text = nameEnglish;
+
+                      return TextFormField(
+                        controller:  _coordinatorName,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 14,
+                          //fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Regular',
+                        ),
+                        cursorColor: const Color(0xFF442B72),
+                        decoration: InputDecoration(
+                          hintStyle: TextStyle(color: Color(0xFF442B72)),
+                          alignLabelWithHint: true,
+                          counterText: "",
+                          fillColor: const Color(0xFFF1F1F1),
+                          filled: true,
+                          contentPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          enabledBorder: myInputBorder(),
+                          focusedBorder: myFocusBorder(),
+                        ),
+                      );
                     },
-                    style: TextStyle(color: Color(0xFF442B72)),
-                    //controller: _namesupervisor,
-                    cursorColor: const Color(0xFF442B72),
-                    //textDirection: TextDirection.ltr,
-                    scrollPadding: const EdgeInsets.symmetric(
-                        vertical: 40),
-
-                    decoration:  InputDecoration(
-                      //labelText: 'Shady Ayman'.tr,
-                      //hintText:'Shady Ayman'.tr ,
-                      hintStyle: TextStyle(color: Color(0xFF442B72)),
-                      alignLabelWithHint: true,
-                      counterText: "",
-                      fillColor: const Color(0xFFF1F1F1),
-                      filled: true,
-                      contentPadding: const EdgeInsets.fromLTRB(
-                          8, 5, 10, 5),
-                      floatingLabelBehavior:  FloatingLabelBehavior.never,
-                      enabledBorder: myInputBorder(),
-                      focusedBorder: myFocusBorder(),
-                    ),
-
                   ),
                 ),
+                // Container(
+                //   width: 320,
+                //   height: 45,
+                //   child: TextFormField(
+                //     controller: _coordinatorName,
+                //     focusNode: _CoordinatorFocus,
+                //     onFieldSubmitted: (value) {
+                //       // move to the next field when the user presses the "Done" button
+                //       FocusScope.of(context).requestFocus(_SupporterFocus);
+                //     },
+                //     style: TextStyle(color: Color(0xFF442B72)),
+                //     //controller: _namesupervisor,
+                //     cursorColor: const Color(0xFF442B72),
+                //     //textDirection: TextDirection.ltr,
+                //     scrollPadding: const EdgeInsets.symmetric(
+                //         vertical: 40),
+                //
+                //     decoration:  InputDecoration(
+                //       //labelText: 'Shady Ayman'.tr,
+                //       //hintText:'Shady Ayman'.tr ,
+                //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                //       alignLabelWithHint: true,
+                //       counterText: "",
+                //       fillColor: const Color(0xFFF1F1F1),
+                //       filled: true,
+                //       contentPadding: const EdgeInsets.fromLTRB(
+                //           8, 5, 10, 5),
+                //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                //       enabledBorder: myInputBorder(),
+                //       focusedBorder: myFocusBorder(),
+                //     ),
+                //
+                //   ),
+                // ),
                 SizedBox(height: 20,),
                 Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),
                   fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
@@ -593,34 +793,84 @@ class _EditeProfileState extends State<EditeProfile> {
                 Container(
                   width: 320,
                   height: 45,
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    controller: _supportNumber,
-                    focusNode: _SupporterFocus,
-                    style: TextStyle(color: Color(0xFF442B72)),
-                    //controller: _namesupervisor,
-                    cursorColor: const Color(0xFF442B72),
-                    //textDirection: TextDirection.ltr,
-                    scrollPadding: const EdgeInsets.symmetric(
-                        vertical: 40),
+                  child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    future: _future,
+                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
-                    decoration:  InputDecoration(
-                      //labelText: 'Shady Ayman'.tr,
-                     // hintText:'01028765006'.tr ,
-                      hintStyle: TextStyle(color: Color(0xFF442B72)),
-                      alignLabelWithHint: true,
-                      counterText: "",
-                      fillColor: const Color(0xFFF1F1F1),
-                      filled: true,
-                      contentPadding: const EdgeInsets.fromLTRB(
-                          8, 5, 10, 5),
-                      floatingLabelBehavior:  FloatingLabelBehavior.never,
-                      enabledBorder: myInputBorder(),
-                      focusedBorder: myFocusBorder(),
-                    ),
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
 
+                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                        return Text('No data available');
+                      }
+
+                      Map<String, dynamic>? data = snapshot.data!.data();
+                      String nameEnglish = data?['supportNumber'] ?? '';
+
+                      // Update the text field with the retrieved data
+                      _supportNumber.text = nameEnglish;
+
+                      return TextFormField(
+                        controller:  _supportNumber,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 14,
+                          //fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Regular',
+                        ),
+                        cursorColor: const Color(0xFF442B72),
+                        decoration: InputDecoration(
+                          hintStyle: TextStyle(color: Color(0xFF442B72)),
+                          alignLabelWithHint: true,
+                          counterText: "",
+                          fillColor: const Color(0xFFF1F1F1),
+                          filled: true,
+                          contentPadding: const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          enabledBorder: myInputBorder(),
+                          focusedBorder: myFocusBorder(),
+                        ),
+                      );
+                    },
                   ),
                 ),
+                // Container(
+                //   width: 320,
+                //   height: 45,
+                //   child: TextFormField(
+                //     keyboardType: TextInputType.number,
+                //     controller: _supportNumber,
+                //     focusNode: _SupporterFocus,
+                //     style: TextStyle(color: Color(0xFF442B72)),
+                //     //controller: _namesupervisor,
+                //     cursorColor: const Color(0xFF442B72),
+                //     //textDirection: TextDirection.ltr,
+                //     scrollPadding: const EdgeInsets.symmetric(
+                //         vertical: 40),
+                //
+                //     decoration:  InputDecoration(
+                //       //labelText: 'Shady Ayman'.tr,
+                //      // hintText:'01028765006'.tr ,
+                //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                //       alignLabelWithHint: true,
+                //       counterText: "",
+                //       fillColor: const Color(0xFFF1F1F1),
+                //       filled: true,
+                //       contentPadding: const EdgeInsets.fromLTRB(
+                //           8, 5, 10, 5),
+                //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                //       enabledBorder: myInputBorder(),
+                //       focusedBorder: myFocusBorder(),
+                //     ),
+                //
+                //   ),
+                // ),
                 SizedBox(height: 35,),
                 Center(child: ElevatedSimpleButton(txt: 'Save'.tr, width: 320, hight: 48, onPress: (){
                   editProfile();

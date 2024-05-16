@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      padding: const EdgeInsets.only(right: 15.0),
                       child: InkWell(onTap: (){
                         Scaffold.of(context).openEndDrawer();
                       },
@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 50,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Stack(
                     children: [
 
@@ -291,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 30,),
 
                             Container(
-                              width:290,
+                              width:320,
                               decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
@@ -454,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 30,),
 
                             Container(
-                              width:290,
+                              width:320,
                               decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(

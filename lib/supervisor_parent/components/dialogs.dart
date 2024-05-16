@@ -6,6 +6,7 @@ import 'package:school_account/supervisor_parent/screens/decline_invitation_pare
 import 'package:school_account/supervisor_parent/screens/sign_up.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../screens/loginScreen.dart';
 import '../../screens/signUpScreen.dart';
 import '../screens/login_screen.dart';
 import 'elevated_simple_button.dart';
@@ -765,13 +766,18 @@ class Dialoge {
                   Row(
                     children: [
                       ElevatedSimpleButton(
-                        txt: 'Log out'.tr,
+                        txt: 'Logout'.tr,
                         width: 110,
                         hight: 38,
-                        onPress: () => Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()),
-                                (Route<dynamic> route) => false),
+                        onPress: () async {
+                          await sharedpref!.setInt('invit', 0);
+
+                          await sharedpref!.setString('id', '');
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                                  (Route<dynamic> route) => false);
+                        } ,
                         color: const Color(0xFF442B72),
                         fontSize: 16,
                         fontFamily: 'Poppins-Regular',

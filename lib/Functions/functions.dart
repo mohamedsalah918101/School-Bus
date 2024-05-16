@@ -11,11 +11,9 @@ final String DynamicLink = 'https://schoolbusapp.page.link/requestdata';
 final String Link = 'https://schoolbusapp.page.link/requestdata';
 bool _isCreatingLink = false;
 
-Future<void> createDynamicLink(bool short,requestID,String phone,String type) async {
+Future<String> createDynamicLink(bool short,requestID,String phone,String type) async {
 
-  print('linnk');
-  print(
-      "https://www.schoolbusapp.com/request?id=${requestID}&phone=${phone}&type=${type}");
+  print("https://www.schoolbusapp.com/request?id=${requestID}&phone=${phone}&type=${type}");
 
   DynamicLinkParameters parameters = DynamicLinkParameters(
     uriPrefix: 'https://schoolbusapp.page.link',
@@ -43,17 +41,20 @@ Future<void> createDynamicLink(bool short,requestID,String phone,String type) as
     url = shortLink.shortUrl;
     final result = await Share.shareWithResult(url.toString());
     if (result.status == ShareResultStatus.success) {
+      return "success";
     }else{
-      print('errroee1');
+      return "failed";
+
     }
   } else {
     url = await dynamicLinks.buildLink(parameters);
     final result = await Share.shareWithResult(url.toString());
 
     if (result.status == ShareResultStatus.success) {
+      return "success";
 
     }else{
-      print('errroee1');
+      return "failed";
 
     }
   }
@@ -70,7 +71,7 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
 
     Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
     QuerySnapshot snapshot = await queryOfNumber.get();
-    print(phoneNumber.toString()+'dataaa');
+    print(snapshot.docs.toString()+'dataaaschooldata');
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;
@@ -86,7 +87,7 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
       CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
       Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
       QuerySnapshot snapshot = await queryOfNumber.get();
-      print(snapshot.docs.toString()+'dataaa');
+      print(snapshot.docs.toString()+'dataaaparent');
       if(snapshot.size > 0){
         loginType = 'parent';
         id =snapshot.docs[0].id;
@@ -98,12 +99,14 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
         CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
         Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
         QuerySnapshot snapshot = await queryOfNumber.get();
-        print(snapshot.docs.toString()+'dataaa');
+        print(snapshot.docs.toString()+'dataaasupervisor');
         if(snapshot.size > 0){
           loginType = 'supervisor';
           id =snapshot.docs[0].id;
           sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
           sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
+          print('invitstate');
+          print(snapshot.docs[0].get('invite').toString());
           return true;
         }else{
           return false;
@@ -117,6 +120,35 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
   }
 }
 
+Future<bool> addSupervisorCheck(String phoneNumber) async {
+  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
+
+  Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+  try {
+
+    QuerySnapshot snapshot = await queryOfNumber.get();
+    print(phoneNumber+'dataaa');
+    if(snapshot.size > 0){
+
+      return true;
+    }else{
+      CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
+      Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+      QuerySnapshot snapshot = await queryOfNumber.get();
+      print(snapshot.docs.toString()+'dataaa');
+      if(snapshot.size > 0){
+        return true;
+      }else{
+        return false;
+      }
+
+    }
+  } catch (error) {
+
+    print('Error: $error');
+    return false;
+  }
+}
 
 Future<bool> addParentCheck(String phoneNumber) async {
   CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
@@ -167,6 +199,31 @@ Future<bool> checkUpdate(String phoneNumber) async {
         return false;
 
       }
+  } catch (error) {
+
+    print('Error: $error');
+    return false;
+  }
+}
+Future<bool> checkUpdateSupervisor(String phoneNumber) async {
+
+  try {
+
+
+    CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+    Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+    QuerySnapshot snapshot = await queryOfNumber.get();
+    print(snapshot.docs.toString()+'dataaa');
+    if(snapshot.size > 0){
+      loginType = 'supervisor';
+      docID =snapshot.docs[0].id;
+      return true;
+
+
+    }else {
+      return false;
+
+    }
   } catch (error) {
 
     print('Error: $error');

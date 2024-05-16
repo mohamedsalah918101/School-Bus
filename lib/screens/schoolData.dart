@@ -325,37 +325,84 @@ class _SchoolDataState extends State<SchoolData> {
                                 height: 78.5,  // Set height as per your preference
                                 fit: BoxFit.cover,  // Adjusts how the image fits in the container
                               )
-                                  : FDottedLine(
-                                color: Color(0xFF442B72),
-                                strokeWidth: 2.0,
-                                dottedLength: 8.0,
-                                space: 3.0,
-                                corner: FDottedLineCorner.all(6.0),
+                              //     : FDottedLine(
+                              //   color: Color(0xFF442B72),
+                              //   strokeWidth: 2.0,
+                              //   dottedLength: 8.0,
+                              //   space: 3.0,
+                              //   corner: FDottedLineCorner.all(6.0),
+                              //
+                              //   // Child widget
+                              //   child: Container(
+                              //     width: 83,
+                              //     height: 78.5,
+                              //     alignment: Alignment.center,
+                              //     child: Column(
+                              //       children: [
+                              //         Padding(
+                              //           padding: const EdgeInsets.only(top:10),
+                              //           child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
+                              //         ),
+                              //         SizedBox(height: 10,),
+                              //         Text(
+                              //           "School logo",
+                              //           style: TextStyle(
+                              //             color: Color(0xFF442B72),
+                              //             fontSize: 11,
+                              //             fontFamily: 'Poppins-Regular',
+                              //           ),
+                              //         ),
+                              //
+                              //
+                              //       ],
+                              //     ),
+                              //   ),
+                              // ),
+                                  : Column(
+                                children: [
+                                  FDottedLine(
+                                    color: Color(0xFF442B72),
+                                    strokeWidth: 2.0,
+                                    dottedLength: 8.0,
+                                    space: 3.0,
+                                    corner: FDottedLineCorner.all(6.0),
 
-                                // Child widget
-                                child: Container(
-                                  width: 83,
-                                  height: 78.5,
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top:10),
-                                        child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
+                                    // Child widget
+                                    child: Container(
+                                      width: 83,
+                                      height: 78.5,
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(top:10),
+                                            child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
+                                          ),
+                                          SizedBox(height: 10,),
+                                          Text(
+                                            "School logo",
+                                            style: TextStyle(
+                                              color: Color(0xFF442B72),
+                                              fontSize: 11,
+                                              fontFamily: 'Poppins-Regular',
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(height: 10,),
-                                      Text(
-                                        "School logo",
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 11,
-                                          fontFamily: 'Poppins-Regular',
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(height: 5,),
+                                  Text(
+                                    _selectedImage == null ? "Please Enter School logo" : "",
+                                    style: TextStyle(
+                                      color: Color(0xFFAD1519),
+                                      fontSize: 11,
+                                      fontFamily: 'Poppins-Regular',
+                                    ),
+                                  ),
+                                ],
                               ),
+
                             ),
                             // GestureDetector(
                             //   onTap: (){
@@ -427,12 +474,21 @@ class _SchoolDataState extends State<SchoolData> {
                               child: TextFormField(
                                 controller: _nameEnglish,
                                 cursorColor: const Color(0xFF442B72),
-                                style: TextStyle(color: Color(0xFF442B72)),
+
+                                style: TextStyle(color: Color(0xFF442B72)
+                                ),
+
                                 textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
                                 onFieldSubmitted: (value) {
                                   // move to the next field when the user presses the "Done" button
                                   FocusScope.of(context).requestFocus(_NameArabicFocus);
                                 },
+                                keyboardType: TextInputType.text,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]+')), // Allow only English characters and spaces
+                                ],
+
+
                                 //textDirection: TextDirection.ltr,
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
@@ -912,12 +968,13 @@ class _SchoolDataState extends State<SchoolData> {
                                       _textController.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
                                       _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
                                       _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
+
                                       // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                     });
                                if(_supportNumber.text.length == 11 && ! _nameEnglish.text.isEmpty &&
                                    !_nameArabic.text.isEmpty
                                    && !_textController.text.isEmpty
-                                   &&!_coordinatorName.text.isEmpty &&!_supportNumber.text.isEmpty) {
+                                   &&!_coordinatorName.text.isEmpty &&!_supportNumber.text.isEmpty&& _selectedImage!= null) {
                                  _addDataToFirestore();
                                  Navigator.push(
 

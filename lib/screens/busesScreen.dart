@@ -584,7 +584,7 @@ final _firestore = FirebaseFirestore.instance;
                                               // Determine the fallback image asset based on the selected filter
                                               String defaultImageAsset = selectedFilter == 'Bus Number'
                                                   ? 'assets/imgs/school/bus 2.png' // Default image for Bus Number filter
-                                                  : 'assets/imgs/school/default_driver_image.png'; // Default image for Driver Name filter
+                                                  : 'assets/imgs/school/empty_supervisor.png'; // Default image for Driver Name filter
                                               return
                                                 Column(
                                                   children: [

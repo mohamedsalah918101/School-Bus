@@ -156,23 +156,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //   }
   // }
 
-  void _editProfileDocument(String documentId, String nameenglish,
-      String namearabic, String address,String coordinatorname,String supportnumbner,String schoollogo) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditeProfile(
-          docid: documentId,
-          oldNameEnglish: nameenglish,
-          oldNameArabic: namearabic,
-          oldAddress: address,
-            oldSchoolLogo:schoollogo,
-            oldCoordinatorName:coordinatorname,
-            oldSupportNumber:supportnumbner,
-        ),
-      ),
-    );
-  }
+  // void _editProfileDocument(String documentId, String nameenglish,
+  //     String namearabic, String address,String coordinatorname,String supportnumbner,String schoollogo) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => EditeProfile(
+  //         docid: documentId,
+  //         oldNameEnglish: nameenglish,
+  //         oldNameArabic: namearabic,
+  //         oldAddress: address,
+  //           oldSchoolLogo:schoollogo,
+  //           oldCoordinatorName:coordinatorname,
+  //           oldSupportNumber:supportnumbner,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -501,6 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       right: 5,
                       child: ElevatedButton(
                          onPressed: () {
+                           Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
                         //   // String currentUserId = sharedpref!.getString('id');
                         //   // QuerySnapshot querySnapshot = await FirebaseFirestore.instance
                         //   //     .collection('schooldata')
@@ -539,15 +540,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                            } else {
 //                              // Handle the case where the document with the current ID is not found in the data list
 //                            }
-                           _editProfileDocument(
-                                 data[0].id,
-                                 data[0]['nameEnglish'],
-                                 data[0]['nameArabic'],
-                                 data[0]['address'],
-                                 data[0]['coordinatorName'],
-                                 data[0]['supportNumber'],
-                                 data[0]['photo']
-                             );
+//                            _editProfileDocument(
+//                                  data[0].id,
+//                                  data[0]['nameEnglish'],
+//                                  data[0]['nameArabic'],
+//                                  data[0]['address'],
+//                                  data[0]['coordinatorName'],
+//                                  data[0]['supportNumber'],
+//                                  data[0]['photo']
+//                              );
 
                          },
                         // onPressed: () async {

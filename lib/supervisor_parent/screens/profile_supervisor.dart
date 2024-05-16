@@ -1,26 +1,20 @@
-import 'dart:async';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter/material.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:school_account/classes/loading.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/edit_profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/edit_profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 import '../components/child_data_item.dart';
-import '../components/custom_app_bar.dart';
-import '../components/added_child_card.dart';
+
 
 class ProfileSupervisorScreen extends StatefulWidget {
   @override
@@ -30,9 +24,93 @@ class ProfileSupervisorScreen extends StatefulWidget {
 class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<ChildDataItem> children = [];
+  List<QueryDocumentSnapshot> data = [];
+  File ? _selectedImage;
+  String? imageUrl;
+  File? file ;
+
+
+  //function choose photo from gallery
+  Future _pickImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImage=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
+    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+    Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
+
+
+
+    //Handle errors/success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+      return imageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+
+  // getData() async {
+  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
+  //   setState(() {
+  //     data = querySnapshot.docs;
+  //   });
+  //
+  //   // الآن معالجة البيانات المستردة
+  //   var parentData = data.firstWhere(
+  //         (doc) => doc['state'] == 2 && doc['phoneNumber'] != null,
+  //     orElse: () => null,
+  //   );
+  //
+  //   // إذا تم العثور على المستند وليس قيمته فارغة، فاعرض اسمه، وإلا عرض "لا توجد بيانات"
+  //   String parentName = parentData != null ? parentData['name'] : 'لا توجد بيانات';
+  // }
+
+  getData() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
+    // data.addAll(querySnapshot.docs);
+    setState(() {
+      data = querySnapshot.docs;
+    });
+  }
+
+  @override
+  void initState() {
+    getData();
+    setState(() {
+
+    });
+    // getDataForAcceptFilter();
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    if (data.isEmpty) {
+      return Center(
+        child: Loading(),
+      );
+    }
+//     var parentData = data.firstWhere(
+//           (doc) => doc['state'] == 2 && doc['phoneNumber'] != null,
+//
+//     );
+//
+// // If the document is found and not null, return its name, otherwise display "No data found"
+//     String parentName = parentData != null ? parentData['name'] : 'No data found';
+
     return Scaffold(
         backgroundColor: Colors.white,
         endDrawer: SupervisorDrawer(),
@@ -123,12 +201,18 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                         EdgeInsets.only(left: 105.0 , top: 5 ),
                         child: Stack(
                           children: [
-                            CircleAvatar(
-                              radius: 52.5,
-                              backgroundColor: Color(0xff442B72),
+                            GestureDetector(
+                              onTap: (){
+                                _pickImageFromGallery();
+                                print('object');
+                              },
                               child: CircleAvatar(
-                                backgroundImage: AssetImage("assets/images/Ellipse 1.png"),
-                                radius: 50.5,
+                                radius: 52.5,
+                                backgroundColor: Color(0xff442B72),
+                                child: CircleAvatar(
+                                  backgroundImage: NetworkImage('${data[0]['busphoto'] }'),
+                                  radius: 50.5,
+                                ),
                               ),
                             ),
                             (sharedpref?.getString('lang') == 'ar')?
@@ -167,9 +251,44 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                   EdgeInsets.only(left: 20.0, top: 15),
                                                   child: Row(
                                                     children: [
-                                                      Image.asset('assets/images/Vector (13)profile.png',
-                                                        width: 55,
-                                                        height: 55,),
+                                                      GestureDetector(
+                                                        child: _selectedImage != null
+                                                            ? Image.file(
+                                                          _selectedImage!,  // Display the uploaded image
+                                                          width: 83,  // Set width as per your preference
+                                                          height: 78.5,  // Set height as per your preference
+                                                          fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                                        )
+                                                            : Container(
+                                                          width: 65, // Adjust size as needed
+                                                          height: 65,
+                                                          decoration: BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            border: Border.all(
+                                                              color: Color(0xffCCCCCC), // Adjust border color
+                                                              width: 2, // Adjust border width
+                                                            ),
+                                                          ),
+                                                          child: Align(alignment: Alignment.bottomCenter,
+                                                            child: CircleAvatar(radius: 20,
+                                                              backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                                              ,backgroundColor: Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        // child: Image.asset('assets/images/Vector (13)profile.png',
+                                                        //   width: 55,
+                                                        //   height: 55,),
+                                                        onTap:()async {
+
+                                                          await _pickImageFromGallery();
+
+                                                          print('objectttt');
+                                                          setState(() {
+
+                                                          });}  , // Call function when tapped
+                                                      ),
+                                                      if ( file != null ) Image.file(file!),
                                                       SizedBox(width: 15,),
                                                       Text('Select profile picture'.tr,
                                                         style: TextStyle(
@@ -306,9 +425,26 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 55.0),
             child: GestureDetector(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>EditProfileSupervisorScreen()));
-              },
+                onTap: () {
+                  if (data.isNotEmpty) { // التحقق من أن القائمة ليست فارغة
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                        EditProfileSupervisorScreen(
+                          docid: data[0].id,
+                          oldName: data[0].get('name'),
+                          oldNumber: data[0].get('phoneNumber'),
+                          oldEmail: data[0].get('email'),
+                          oldPhoto: data[0].get('busphoto')
+                          // Image.asset( 'assets/images/Ellipse 1.png', ),
+                        )
+                    )).then((value) {
+                      if (value == true && data.isNotEmpty) {
+                        getData();
+                      }
+                    });
+                  } else {
+                    print('Data list is empty');
+                  }
+                },
               child: SizedBox(
               width: 87,
                 height: 29,
@@ -346,18 +482,21 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                 ],
 
               ),
-            SizedBox(
+                        SizedBox(
                           height: 8,
                         ),
-                        Center(
-                          child: Text('Atef Latef'.tr
-                            , style: TextStyle(
-                              fontSize: 20 ,
-                              // height:  0.94,
-                              fontFamily: 'Poppins-SemiBold',
-                              fontWeight: FontWeight.w600 ,
-                              color: Color(0xff442B72),),),
-                        ) ,
+              Center(
+                child: Text(
+                  // parentName,
+                  '${data[0]['name'] }',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: 'Poppins-SemiBold',
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff442B72),
+                  ),
+                ),
+              ),
               SizedBox(height: 30,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -401,7 +540,8 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                         fontWeight: FontWeight.w700 ,
                                         color: Color(0xff442B72),),),
                                     SizedBox(height: 10,),
-                                    Text('0128061532'.tr
+                                    Text(
+                                      '${data[0]['phoneNumber'] }'
                                       , style: TextStyle(
                                         fontSize: 12 ,
                                         height:  0.94,
@@ -453,7 +593,8 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                         fontWeight: FontWeight.w700 ,
                                         color: Color(0xff442B72),),),
                                     SizedBox(height: 7,),
-                                    Text('ateflatif@gmail.com'.tr
+                                    Text(
+                                      '${data[0]['email'] }'
                                       , style: TextStyle(
                                         fontSize: 12 ,
                                         height:  0.94,

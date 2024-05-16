@@ -1,36 +1,131 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter/material.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/edit_add_parent.dart';
-import 'package:school_account/supervisor_parent/screens/edit_profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/child_data_item.dart';
-import '../components/custom_app_bar.dart';
-import '../components/added_child_card.dart';
+
 
 class EditProfileSupervisorScreen extends StatefulWidget {
+  final String docid;
+  final String oldName;
+  final String oldEmail;
+  final String oldPhoto;
+  final String oldNumber;
+
+  const EditProfileSupervisorScreen({super.key,
+    required this.docid,
+    required this.oldName,
+    required this.oldEmail,
+    required this.oldNumber,
+    required this.oldPhoto ,});
   @override
   _EditProfileSupervisorScreenState createState() => _EditProfileSupervisorScreenState();
 }
 
 class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _phoneNumberController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _nameController = TextEditingController();
+  bool nameError = true;
+  bool phoneError = true;
+  bool emailError = true;
+  File ? _selectedImage;
+  String? imageUrl;
+  File? file ;
+  GlobalKey<FormState> formState = GlobalKey<FormState>();
+  CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
   // List<ChildDataItem> children = [];
+
+  Future _pickImageFromGallery() async{
+    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(returnedImage ==null) return;
+    setState(() {
+      _selectedImage=File(returnedImage.path);
+    });
+
+    //Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images_supervisor');
+    Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      //Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+      setState(() {
+
+      });
+      return imageUrl;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return '';
+      //Some error occurred
+    }
+  }
+
+
+  editAddSupervisor() async {
+    print('editAddParent called');
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+        try {
+          setState(() {
+
+          });
+          print('updating document...');
+
+          await Supervisor.doc(widget.docid).update({
+            'phoneNumber': _phoneNumberController.text,
+            'name': _nameController.text,
+            'email': _emailController.text,
+            'busphoto':imageUrl,
+
+
+          });
+          print('document updated successfully');
+
+          // تحديث حالة الواجهة
+          setState(() {
+            // _pickImageFromGallery();
+            });
+        } catch (e) {
+          print('Error updating document: $e');
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.oldName!;
+    _phoneNumberController.text = widget.oldNumber!;
+    _emailController.text = widget.oldEmail!;
+    imageUrl= widget.oldPhoto;
+    setState(() {
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,330 +201,410 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
           preferredSize: Size.fromHeight(70),
         ),
         // Custom().customAppBar(context, 'Profile'.tr),
-        body: SingleChildScrollView(
-            child:
-            // children.isNotEmpty?
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 30.0),
-                  child: SizedBox(
-                    width: 230,
-                    child: Padding(
-                      padding:(sharedpref?.getString('lang') == 'ar')?
-                      EdgeInsets.only(right: 120.0 ):
-                      EdgeInsets.only(left: 120.0 ),
-                      child: Stack(
+        body: Form(
+          key: formState,
+          child: SingleChildScrollView(
+              child:
+              // children.isNotEmpty?
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30.0),
+                    child: SizedBox(
+                      width: 230,
+                      child: Padding(
+                        padding:(sharedpref?.getString('lang') == 'ar')?
+                        EdgeInsets.only(right: 120.0 ):
+                        EdgeInsets.only(left: 120.0 ),
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: (){
+                                _pickImageFromGallery();
+                                print('edit');
+                              },
+                              child:  CircleAvatar(
+                                  radius: 52.5,
+                                  backgroundColor: Color(0xff442B72),
+                                  child: CircleAvatar(
+                                    backgroundImage: NetworkImage( '$imageUrl',),
+                                    radius: 50.5,)
+                              ),
+                            ),
+                            (sharedpref?.getString('lang') == 'ar')?
+                            Positioned(
+                              bottom: 2,
+                              left: 10,
+                              child:  Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    // shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Color(0xff442B72),
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.all(Radius.circular(50.0),),),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(3.0),
+                                    child: Image.asset(
+                                      'assets/images/image-editing 1.png' ,),
+                                  )
+                              ),
+                            ):
+                            Positioned(
+                              bottom: 2,
+                              right: 10,
+                              child:  Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    // shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Color(0xff442B72),
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.all(Radius.circular(50.0),),),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(3.0),
+                                    child: Image.asset(
+                                      'assets/images/image-editing 1.png' ,),
+                                  )
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 18,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child:
+                    Text.rich(
+                      TextSpan(
                         children: [
-                          GestureDetector(
-                            child: CircleAvatar(
-                                radius: 52.5,
-                                backgroundColor: Color(0xff442B72),
-                                child: CircleAvatar(
-                                  backgroundImage: AssetImage("assets/images/Ellipse 1.png" ,
-                                  ),
-                                  radius: 50.5,)
+                          TextSpan(
+                            text: 'Name'.tr,
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 15,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                              height: 1.07,
                             ),
                           ),
-                          (sharedpref?.getString('lang') == 'ar')?
-                          Positioned(
-                            bottom: 2,
-                            left: 10,
-                            child:  Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  // shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Color(0xff442B72),
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(50.0),),),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: Image.asset(
-                                    'assets/images/image-editing 1.png' ,),
-                                )
-                            ),
-                          ):
-                          Positioned(
-                            bottom: 2,
-                            right: 10,
-                            child:  Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  // shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Color(0xff442B72),
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(50.0),),),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: Image.asset(
-                                    'assets/images/image-editing 1.png' ,),
-                                )
+                          TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 15,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                              height: 1.07,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child:
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Name'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 15,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            height: 1.07,
-                          ),
-                        ),
-                        TextSpan(
-                          text: ' *',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 15,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            height: 1.07,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ) ,
-                SizedBox(height: 10,),
-                Center(
-                  child: SizedBox(
-                    width: 277,
-                    height: 38,
-                    child: TextFormField(
-                      cursorColor: const Color(0xFF442B72),
-                      textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                      TextDirection.rtl:
-                      TextDirection.ltr,
-                      scrollPadding:  EdgeInsets.symmetric(
-                          vertical: 30),
-                      decoration:  InputDecoration(
-                        alignLabelWithHint: true,
-                        counterText: "",
-                        fillColor: const Color(0xFFF1F1F1),
-                        filled: true,
-                        contentPadding:
-                        (sharedpref?.getString('lang') == 'ar') ?
-                        EdgeInsets.fromLTRB(0, 0, 17, 40):
-                        EdgeInsets.fromLTRB(17, 0, 0, 40),
-                        hintText:'Rania Ahmed'.tr,
-                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                        hintStyle: const TextStyle(
+                  ) ,
+                  SizedBox(height: 10,),
+                  Center(
+                    child: SizedBox(
+                      width: 277,
+                      height: 38,
+                      child: TextFormField(
+                        style: TextStyle(
                           color: Color(0xFF442B72),
-                          fontSize: 12,
-                          fontFamily: 'Poppins-Light',
-                          fontWeight: FontWeight.w400,
-                          height: 1.33,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide: BorderSide(
+                      ),
+                        controller: _nameController,
+                        cursorColor: const Color(0xFF442B72),
+                        textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                        TextDirection.rtl:
+                        TextDirection.ltr,
+                        scrollPadding:  EdgeInsets.symmetric(
+                            vertical: 30),
+                        decoration:  InputDecoration(
+                          alignLabelWithHint: true,
+                          counterText: "",
+                          fillColor: const Color(0xFFF1F1F1),
+                          filled: true,
+                          contentPadding:
+                          (sharedpref?.getString('lang') == 'ar') ?
+                          EdgeInsets.fromLTRB(0, 0, 17, 40):
+                          EdgeInsets.fromLTRB(17, 0, 0, 40),
+                          hintText:''.tr,
+                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                          hintStyle: const TextStyle(
                             color: Color(0xFF442B72),
-                            width: 0.5,
-                          ),),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide: BorderSide(
-                            color: Color(0xFF442B72),
-                            width: 0.5,
+                            fontSize: 12,
+                            fontFamily: 'Poppins-Light',
+                            fontWeight: FontWeight.w400,
+                            height: 1.33,
                           ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF442B72),
+                              width: 0.5,
+                            ),),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF442B72),
+                              width: 0.5,
+                            ),
+                          ),
+                          // enabledBorder: myInputBorder(),
+                          // focusedBorder: myFocusBorder(),
                         ),
-                        // enabledBorder: myInputBorder(),
-                        // focusedBorder: myFocusBorder(),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child:
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Number'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 15,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            height: 1.07,
-                          ),
-                        ),
-                        TextSpan(
-                          text: ' *',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 15,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            height: 1.07,
-                          ),
-                        ),
-                      ],
+                  nameError ? Container(): Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 48),
+                    child: Text(
+                      "Please enter your name".tr,
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
-                ) ,
-                SizedBox(height: 10,),
-                Center(
-                  child: SizedBox(
-                    width: 277,
-                    height: 38,
-                    child: TextFormField(
-                      cursorColor: const Color(0xFF442B72),
-                      textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                      TextDirection.rtl:
-                      TextDirection.ltr,
-                      scrollPadding:  EdgeInsets.symmetric(
-                          vertical: 30),
-                      decoration:  InputDecoration(
-                        alignLabelWithHint: true,
-                        counterText: "",
-                        fillColor: const Color(0xFFF1F1F1),
-                        filled: true,
-                        contentPadding:
-                        (sharedpref?.getString('lang') == 'ar') ?
-                        EdgeInsets.fromLTRB(0, 0, 17, 40):
-                        EdgeInsets.fromLTRB(17, 0, 0, 40),
-                        hintText:'0128361532'.tr,
-                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF442B72),
-                          fontSize: 12,
-                          fontFamily: 'Poppins-Light',
-                          fontWeight: FontWeight.w400,
-                          height: 1.33,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide: BorderSide(
-                            color: Color(0xFF442B72),
-                            width: 0.5,
-                          ),),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide: BorderSide(
-                            color: Color(0xFF442B72),
-                            width: 0.5,
+                  SizedBox(
+                    height: 18,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child:
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Number'.tr,
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 15,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                              height: 1.07,
+                            ),
                           ),
+                          TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 15,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                              height: 1.07,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ) ,
+                  SizedBox(height: 10,),
+                  Center(
+                    child: SizedBox(
+                      width: 277,
+                      height: 38,
+                      child: TextFormField(
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
                         ),
-                        // enabledBorder: myInputBorder(),
-                        // focusedBorder: myFocusBorder(),
+                        controller: _phoneNumberController,
+                        cursorColor: const Color(0xFF442B72),
+                        textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                        TextDirection.rtl:
+                        TextDirection.ltr,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          LengthLimitingTextInputFormatter(11),
+                          FilteringTextInputFormatter.digitsOnly],
+                        scrollPadding:  EdgeInsets.symmetric(
+                            vertical: 30),
+                        decoration:  InputDecoration(
+                          alignLabelWithHint: true,
+                          counterText: "",
+                          fillColor: const Color(0xFFF1F1F1),
+                          filled: true,
+                          contentPadding:
+                          (sharedpref?.getString('lang') == 'ar') ?
+                          EdgeInsets.fromLTRB(0, 0, 17, 40):
+                          EdgeInsets.fromLTRB(17, 0, 0, 40),
+                          hintText:''.tr,
+                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                          hintStyle: const TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 12,
+                            fontFamily: 'Poppins-Light',
+                            fontWeight: FontWeight.w400,
+                            height: 1.33,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF442B72),
+                              width: 0.5,
+                            ),),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF442B72),
+                              width: 0.5,
+                            ),
+                          ),
+                          // enabledBorder: myInputBorder(),
+                          // focusedBorder: myFocusBorder(),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child:
-                    Text(
-                     'Email'.tr,
-                      style: TextStyle(
+                  phoneError ? Container(): Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 48),
+                    child: Text(
+                      "Please enter your phone Number".tr,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 18,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child:
+                      Text(
+                       'Email'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                          height: 1.07,
+                        ),
+                      ),
+                  ) ,
+                  SizedBox(height: 10,),
+                  Center(
+                    child: SizedBox(
+                      width: 277,
+                      height: 38,
+                      child: TextFormField(
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                        ),
+                        controller: _emailController,
+                        cursorColor: const Color(0xFF442B72),
+                        textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                        TextDirection.rtl:
+                        TextDirection.ltr,
+                        scrollPadding:  EdgeInsets.symmetric(
+                            vertical: 30),
+                        decoration:  InputDecoration(
+                          alignLabelWithHint: true,
+                          counterText: "",
+                          fillColor: const Color(0xFFF1F1F1),
+                          filled: true,
+                          contentPadding:
+                          (sharedpref?.getString('lang') == 'ar') ?
+                          EdgeInsets.fromLTRB(0, 0, 17, 40):
+                          EdgeInsets.fromLTRB(17, 0, 0, 40),
+                          hintText:''.tr,
+                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                          hintStyle: const TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 12,
+                            fontFamily: 'Poppins-Light',
+                            fontWeight: FontWeight.w400,
+                            height: 1.33,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF442B72),
+                              width: 0.5,
+                            ),),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF442B72),
+                              width: 0.5,
+                            ),
+                          ),
+                          // enabledBorder: myInputBorder(),
+                          // focusedBorder: myFocusBorder(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  emailError ? Container(): Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 48),
+                    child: Text(
+                      "Please enter your email".tr,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 35,
+                  ),
+                  Center(
+                    child: ElevatedSimpleButton(
+                        txt: 'Save'.tr,
+                        fontFamily: 'Poppins-Regular',
+                        width: 278,
+                        hight: 48,
+                        onPress: (){
+                          if (_nameController.text.length == 0) {
+                            nameError = false;
+                            setState(() {
+
+                            });
+                          } else if (_nameController.text.length > 0) {
+                            nameError = true;
+                            setState(() {
+
+                            });
+                          }
+                          if (_phoneNumberController.text.length < 11) {
+                            phoneError = false;
+                            setState(() {
+
+                            });
+                          } else if (_phoneNumberController.text.length > 10) {
+                            phoneError = true;
+                            setState(() {
+
+                            });
+                          }
+                          if (_emailController.text.length < 1) {
+                            emailError = false;
+                            setState(() {
+
+                            });
+                          } else if (_emailController.text.length > 0) {
+                            emailError = true;
+                            setState(() {
+
+                            });
+                          }
+                          if( nameError && emailError && phoneError){
+                          editAddSupervisor();
+                          DataSavedSnackBar(context, 'Data saved successfully');
+                          Navigator.pop(context , true);
+                          }
+                        },
                         color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1.07,
-                      ),
-                    ),
-                ) ,
-                SizedBox(height: 10,),
-                Center(
-                  child: SizedBox(
-                    width: 277,
-                    height: 38,
-                    child: TextFormField(
-                      cursorColor: const Color(0xFF442B72),
-                      textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                      TextDirection.rtl:
-                      TextDirection.ltr,
-                      scrollPadding:  EdgeInsets.symmetric(
-                          vertical: 30),
-                      decoration:  InputDecoration(
-                        alignLabelWithHint: true,
-                        counterText: "",
-                        fillColor: const Color(0xFFF1F1F1),
-                        filled: true,
-                        contentPadding:
-                        (sharedpref?.getString('lang') == 'ar') ?
-                        EdgeInsets.fromLTRB(0, 0, 17, 40):
-                        EdgeInsets.fromLTRB(17, 0, 0, 40),
-                        hintText:'ahmedatef@gmail.com'.tr,
-                        floatingLabelBehavior:  FloatingLabelBehavior.never,
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF442B72),
-                          fontSize: 12,
-                          fontFamily: 'Poppins-Light',
-                          fontWeight: FontWeight.w400,
-                          height: 1.33,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide: BorderSide(
-                            color: Color(0xFF442B72),
-                            width: 0.5,
-                          ),),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide: BorderSide(
-                            color: Color(0xFF442B72),
-                            width: 0.5,
-                          ),
-                        ),
-                        // enabledBorder: myInputBorder(),
-                        // focusedBorder: myFocusBorder(),
-                      ),
-                    ),
+                        fontSize: 16),
                   ),
-                ),
-                SizedBox(
-                  height: 35,
-                ),
-                Center(
-                  child: ElevatedSimpleButton(
-                      txt: 'Save'.tr,
-                      fontFamily: 'Poppins-Regular',
-                      width: 278,
-                      hight: 48,
-                      onPress: (){
-                        DataSavedSnackBar(context, 'Data saved successfully');
-                      },
-                      color: Color(0xFF442B72),
-                      fontSize: 16),
-                ),
 
 
-              ],
-            )
+                ],
+              )
+          ),
         ),
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation:

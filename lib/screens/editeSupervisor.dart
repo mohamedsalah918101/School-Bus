@@ -384,6 +384,10 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                 child: TextFormField(
                                   controller: _phonenumber,
                                   focusNode: _PhoneNumberFocus,
+                                  inputFormatters: <TextInputFormatter>[
+                                    //FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                    LengthLimitingTextInputFormatter(13), // Limit the length programmatically
+                                  ],
                                   onFieldSubmitted: (value) {
                                     // move to the next field when the user presses the "Done" button
                                     FocusScope.of(context).requestFocus(_EmailFocus);

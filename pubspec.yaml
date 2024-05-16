@@ -85,6 +85,7 @@ dev_dependencies:
   google_maps_place_picker_mb: ^3.0.2
   geolocator: ^9.0.1
   permission_handler: ^10.2.0
+  #image_picker: ^1.0.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
