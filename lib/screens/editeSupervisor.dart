@@ -384,6 +384,10 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                 child: TextFormField(
                                   controller: _phonenumber,
                                   focusNode: _PhoneNumberFocus,
+                                  inputFormatters: <TextInputFormatter>[
+                                    //FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                    LengthLimitingTextInputFormatter(13), // Limit the length programmatically
+                                  ],
                                   onFieldSubmitted: (value) {
                                     // move to the next field when the user presses the "Done" button
                                     FocusScope.of(context).requestFocus(_EmailFocus);
@@ -570,7 +574,14 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
 
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<QueryDocumentSnapshot> data = [];
 
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:2) .get();
     data.addAll(querySnapshot.docs);
     setState(() {
 
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      padding: const EdgeInsets.only(right: 15.0),
                       child: InkWell(onTap: (){
                         Scaffold.of(context).openEndDrawer();
                       },
@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 50,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Stack(
                     children: [
 
@@ -291,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 30,),
 
                             Container(
-                              width:290,
+                              width:320,
                               decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
@@ -454,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 30,),
 
                             Container(
-                              width:290,
+                              width:320,
                               decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
@@ -818,7 +818,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

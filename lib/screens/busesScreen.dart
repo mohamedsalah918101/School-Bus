@@ -258,7 +258,7 @@ final _firestore = FirebaseFirestore.instance;
                                       },
                                       child: const Icon(
                                         Icons.arrow_back_ios_new_rounded,
-                                        size: 23,
+                                        size: 26,
                                         color: Color(0xff442B72),
                                       ),
                                     ),
@@ -273,7 +273,7 @@ final _firestore = FirebaseFirestore.instance;
                                           fontSize: 20,
                                           fontFamily: 'Poppins-Bold',
                                           fontWeight: FontWeight.w700,
-                                          height: 0.64,
+                                         height: 0.64,
                                         ),
                                       ),
                                     ),
@@ -584,7 +584,7 @@ final _firestore = FirebaseFirestore.instance;
                                               // Determine the fallback image asset based on the selected filter
                                               String defaultImageAsset = selectedFilter == 'Bus Number'
                                                   ? 'assets/imgs/school/bus 2.png' // Default image for Bus Number filter
-                                                  : 'assets/imgs/school/default_driver_image.png'; // Default image for Driver Name filter
+                                                  : 'assets/imgs/school/empty_supervisor.png'; // Default image for Driver Name filter
                                               return
                                                 Column(
                                                   children: [
@@ -641,8 +641,11 @@ final _firestore = FirebaseFirestore.instance;
                                                             Radius.circular(10.0),
                                                           ),
                                                         ),
-                                                        icon: Icon(Icons.more_vert,
-                                                            size: 30, color: Color(0xFF442B72)),
+                                                        icon: Padding(
+                                                          padding: const EdgeInsets.only(left: 10),
+                                                          child: Icon(Icons.more_vert,
+                                                              size: 30, color: Color(0xFF442B72)),
+                                                        ),
                                                         itemBuilder: (BuildContext context) =>
                                                         <PopupMenuEntry<String>>[
                                                           PopupMenuItem<String>(
@@ -1116,7 +1119,14 @@ final _firestore = FirebaseFirestore.instance;
 
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

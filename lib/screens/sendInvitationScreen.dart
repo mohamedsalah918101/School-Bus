@@ -57,7 +57,8 @@ class _SendInvitationState extends State<SendInvitation> {
         'email': _emailController.text,
         'phoneNumber': _phoneNumberController.text,
         'state':0,
-        'invite':1
+        'invite':1,
+        'busphoto':'',
       };
       print('phonenum');
       print( _phoneNumberController.text);
@@ -113,7 +114,7 @@ class _SendInvitationState extends State<SendInvitation> {
         ));
   }
   bool _phoneNumberEntered = true;
-
+bool _nameEntered =true;
   bool _validatePhoneNumber() {
     bool isValid = _phoneNumberController.text.isNotEmpty;
     setState(() {
@@ -190,7 +191,7 @@ class _SendInvitationState extends State<SendInvitation> {
                             fontSize: 25,
                             fontFamily: 'Poppins-Bold',
                             fontWeight: FontWeight.w700,
-                            height: 0.64,
+                         //   height: 0.64,
                           ),
                         ),
                       ),
@@ -312,7 +313,7 @@ class _SendInvitationState extends State<SendInvitation> {
                             SizedBox(height: 10,),
                             Container(
                               width: constrains.maxWidth / 1.2,
-                              height: 44,
+                              //height: 44,
                               child:
                               TextFormField(
 
@@ -343,7 +344,15 @@ class _SendInvitationState extends State<SendInvitation> {
                                     fontSize: 12,
                                     fontFamily: 'Poppins-Bold',
                                     fontWeight: FontWeight.w700,
-                                    height: 1.33,
+                                   // height: 1.33,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                    borderSide:  BorderSide(
+                                      color: !_nameEntered
+                                          ? Colors.red // Red border if phone number not entered
+                                          : Color(0xFFFFC53E),
+                                    ),
                                   ),
                                   enabledBorder: myInputBorder(),
                                   // focusedBorder: myFocusBorder(),
@@ -457,6 +466,7 @@ class _SendInvitationState extends State<SendInvitation> {
                                 style: TextStyle(color: Color(0xFF442B72),height: 1.5),
                                 dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
                                 decoration: InputDecoration(
+                                  errorText: _validatePhone ? "Please Enter Your Phone" : null,
                                   fillColor: Color(0xffF1F1F1),
                                   filled: true,
                                   hintText: 'Phone Number'.tr,
@@ -749,7 +759,14 @@ class _SendInvitationState extends State<SendInvitation> {
 
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

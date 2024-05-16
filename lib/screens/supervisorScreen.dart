@@ -243,25 +243,30 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                     },
                                     child: const Icon(
                                       Icons.arrow_back_ios_new_rounded,
-                                      size: 23,
+                                      size: 26,
                                       color: Color(0xff442B72),
                                     ),
                                   ),
                                 ),
+
                                 Expanded(
                                   child: Center(
-                                    child: Text(
-                                      "Supervisors".tr,
-                                      style: TextStyle(
-                                        color: Color(0xFF993D9A),
-                                        fontSize: 25,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700,
-                                        height: 0.64,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 15),
+                                      child: Text(
+                                        "Supervisors".tr,
+                                        style: TextStyle(
+                                          color: Color(0xFF993D9A),
+                                          fontSize: 25,
+                                          fontFamily: 'Poppins-Bold',
+                                          fontWeight: FontWeight.w700,
+                                         // height: 0.99,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
+
                                 Padding(
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 12.0),
@@ -292,7 +297,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                           height: 20,
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
                           child: Stack(
                             children: [
                               Padding(
@@ -381,158 +386,161 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                           // Image(image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
                                           // width: 27.62,
                                           // height: 21.6,),
-                                          PopupMenuButton<String>(
-                                            child: Image(
-                                              image: AssetImage(
-                                                  "assets/imgs/school/icons8_slider 2.png"),
-                                              width: 29,
-                                              height: 29,
-                                              color: Color(
-                                                  0xFF442B72), // Optionally, you can set the color of the image
-                                            ),
-                                            // icon: FaIcon(
-                                            //   FontAwesomeIcons.sliders,
-                                            //   size: 20, // Adjust the size as needed
-                                            //   color: Color(0xFF442B72), // Set the color of the icon
-                                            // ),
-                                            itemBuilder: (BuildContext context) {
-                                              return [
-                                                PopupMenuItem<String>(
-                                                  value: 'custom',
-                                                  child: Column(
-                                                    children: [
-                                                      Container(
+                                          Padding(
+                                            padding: EdgeInsets.only(right: 12),
+                                            child: PopupMenuButton<String>(
+                                              child: Image(
+                                                image: AssetImage(
+                                                    "assets/imgs/school/icons8_slider 2.png"),
+                                                width: 29,
+                                                height: 29,
+                                                color: Color(
+                                                    0xFF442B72), // Optionally, you can set the color of the image
+                                              ),
+                                              // icon: FaIcon(
+                                              //   FontAwesomeIcons.sliders,
+                                              //   size: 20, // Adjust the size as needed
+                                              //   color: Color(0xFF442B72), // Set the color of the icon
+                                              // ),
+                                              itemBuilder: (BuildContext context) {
+                                                return [
+                                                  PopupMenuItem<String>(
+                                                    value: 'custom',
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
 
-                                                        child: DropdownRadiobutton(
-                                                          items: [
-                                                            DropdownCheckboxItem(
-                                                                label: 'Accepted'),
-                                                            DropdownCheckboxItem(
-                                                                label: 'Rejected'),
-                                                            DropdownCheckboxItem(
-                                                                label: 'Waiting'),
-                                                          ],
-                                                          selectedItems:
-                                                              selectedItems,
-                                                          onSelectionChanged:
-                                                              (items) {
-                                                            setState(() {
-                                                              selectedItems = items;
-                                                              if (items.first.label == 'Accepted') {
-                                                                selectedValueAccept = 'Accepted';
-                                                                selectedValueDecline = null;
-                                                                selectedValueWaiting = null;
-                                                              } else if (items.first.label == 'Rejected') {
-                                                                selectedValueAccept = null;
-                                                                selectedValueDecline = 'Rejected';
-                                                                selectedValueWaiting = null;
-                                                              } else if (items.first.label == 'Waiting') {
-                                                                selectedValueAccept = null;
-                                                                selectedValueDecline = null;
-                                                                selectedValueWaiting = 'Waiting';
+                                                          child: DropdownRadiobutton(
+                                                            items: [
+                                                              DropdownCheckboxItem(
+                                                                  label: 'Accepted'),
+                                                              DropdownCheckboxItem(
+                                                                  label: 'Rejected'),
+                                                              DropdownCheckboxItem(
+                                                                  label: 'Waiting'),
+                                                            ],
+                                                            selectedItems:
+                                                                selectedItems,
+                                                            onSelectionChanged:
+                                                                (items) {
+                                                              setState(() {
+                                                                selectedItems = items;
+                                                                if (items.first.label == 'Accepted') {
+                                                                  selectedValueAccept = 'Accepted';
+                                                                  selectedValueDecline = null;
+                                                                  selectedValueWaiting = null;
+                                                                } else if (items.first.label == 'Rejected') {
+                                                                  selectedValueAccept = null;
+                                                                  selectedValueDecline = 'Rejected';
+                                                                  selectedValueWaiting = null;
+                                                                } else if (items.first.label == 'Waiting') {
+                                                                  selectedValueAccept = null;
+                                                                  selectedValueDecline = null;
+                                                                  selectedValueWaiting = 'Waiting';
+                                                                }
                                                               }
-                                                            }
-                                                            );
-                                                          },
+                                                              );
+                                                            },
+                                                          ),
                                                         ),
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 100,
-                                                            child: ElevatedButton(
-                                                              onPressed: () {
-                                                                // Handle cancel action
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              style: ButtonStyle(
-                                                                backgroundColor:
-                                                                    MaterialStateProperty
-                                                                        .all<Color>(Color(
-                                                                            0xFF442B72)),
-                                                                shape: MaterialStateProperty
-                                                                    .all<
-                                                                        RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(
-                                                                                10), // Adjust the radius as needed
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            SizedBox(
+                                                              width: 100,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {
+                                                                  // Handle cancel action
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                style: ButtonStyle(
+                                                                  backgroundColor:
+                                                                      MaterialStateProperty
+                                                                          .all<Color>(Color(
+                                                                              0xFF442B72)),
+                                                                  shape: MaterialStateProperty
+                                                                      .all<
+                                                                          RoundedRectangleBorder>(
+                                                                    RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .circular(
+                                                                                  10), // Adjust the radius as needed
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              child: GestureDetector(
-                                                                child: Text(
-                                                                  'Apply',
-                                                                  style: TextStyle(
-                                                                      fontSize: 18),
+                                                                child: GestureDetector(
+                                                                  child: Text(
+                                                                    'Apply',
+                                                                    style: TextStyle(
+                                                                        fontSize: 18),
+                                                                  ),
+                                                                  onTap: (){
+                                                                    if (selectedValueAccept != null) {
+                                                                      currentFilter = 'Accepted';
+                                                                      getDataForAcceptFilter();
+                                                                      Navigator.pop(context);
+                                                                      print('2');
+                                                                    }else  if (selectedValueDecline != null) {
+                                                                      currentFilter = 'Rejected';
+                                                                      getDataForDeclinedFilter();
+                                                                      Navigator.pop(context);
+                                                                      print('0');
+                                                                    }else  if (selectedValueWaiting != null) {
+                                                                      currentFilter = 'Waiting';
+                                                                      getDataForWaitingFilter();
+                                                                      Navigator.pop(context);
+                                                                      print('1');
+                                                                    }
+                                                                  },
                                                                 ),
-                                                                onTap: (){
-                                                                  if (selectedValueAccept != null) {
-                                                                    currentFilter = 'Accepted';
-                                                                    getDataForAcceptFilter();
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 3,
+                                                            ),
+
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets.all(
+                                                                      5.0),
+                                                              child: GestureDetector(
+                                                                onTap:(){
+                                                                     getData();
                                                                     Navigator.pop(context);
-                                                                    print('2');
-                                                                  }else  if (selectedValueDecline != null) {
-                                                                    currentFilter = 'Rejected';
-                                                                    getDataForDeclinedFilter();
-                                                                    Navigator.pop(context);
-                                                                    print('0');
-                                                                  }else  if (selectedValueWaiting != null) {
-                                                                    currentFilter = 'Waiting';
-                                                                    getDataForWaitingFilter();
-                                                                    Navigator.pop(context);
-                                                                    print('1');
-                                                                  }
                                                                 },
+                                                                child: Text(
+                                                                  "Reset",
+                                                                  style: TextStyle(
+                                                                      color: Color(
+                                                                          0xFF442B72),
+                                                                      fontSize: 20),
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            width: 3,
-                                                          ),
+                                                            )
+                                                          ],
+                                                        ),
 
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets.all(
-                                                                    5.0),
-                                                            child: GestureDetector(
-                                                              onTap:(){
-                                                                   getData();
-                                                                  Navigator.pop(context);
-                                                              },
-                                                              child: Text(
-                                                                "Reset",
-                                                                style: TextStyle(
-                                                                    color: Color(
-                                                                        0xFF442B72),
-                                                                    fontSize: 20),
-                                                              ),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ];
-                                            },
-                                            // onSelected: (String value) {
-                                            //   // Handle selection here
-                                            //   print('Selected: $value');
-                                            // },
-                                            // onSelected: ( value) {
-                                            //   setState(() {
-                                            //     _selectedOption = value; // Update selected option
-                                            //   });
-                                            //   // Handle any additional actions based on the selected option
-                                            //   print('Selected: $value');
-                                            // },
+                                                ];
+                                              },
+                                              // onSelected: (String value) {
+                                              //   // Handle selection here
+                                              //   print('Selected: $value');
+                                              // },
+                                              // onSelected: ( value) {
+                                              //   setState(() {
+                                              //     _selectedOption = value; // Update selected option
+                                              //   });
+                                              //   // Handle any additional actions based on the selected option
+                                              //   print('Selected: $value');
+                                              // },
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -606,11 +614,41 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 //                                               height: 61,
 //                                             );
 //                                           }
-                                            filteredData[index]['busphoto'] != null ? Image.network(filteredData[index]['busphoto']as String, width: 61, height: 61,
+                                            filteredData[index]['busphoto'] != null ?
+                                            Image.network(filteredData[index]['busphoto']as String, width: 61, height: 61,
                                               errorBuilder: (context, error, stackTrace) {
-                                                return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                                return Container(
+                                                    width:50,
+                                                    height:40,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: Color(0xffCCCCCC),
+                                                        width: 2.0,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                      child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                    ));
+                                                  //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
                                               },
-                                            ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                            ):
+                                            //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
+                                            Container(
+                                                width:50,
+                                                height:40,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Color(0xffCCCCCC),
+                                                    width: 2.0,
+                                                  ),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                  child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                )),
                                             //Image.asset('assets/imgs/school/Ellipse 1.png'), // Icon or image
 
                                             title: Text(
@@ -640,8 +678,11 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                   Radius.circular(10.0),
                                                 ),
                                               ),
-                                              icon: Icon(Icons.more_vert,
-                                                  size: 30, color: Color(0xFF442B72)),
+                                              icon: Padding(
+                                                padding: const EdgeInsets.only(left: 14),
+                                                child: Icon(Icons.more_vert,
+                                                    size: 30, color: Color(0xFF442B72)),
+                                              ),
                                               itemBuilder: (BuildContext context) =>
                                               <PopupMenuEntry<String>>[
                                                 PopupMenuItem<String>(
@@ -834,8 +875,10 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                 Alignment.centerLeft,
                                                                 child: CircleAvatar(
                                                                   radius: 35,
-                                                                  backgroundImage: AssetImage(
-                                                                      'assets/imgs/school/Ellipse 1.png'),
+                                                                  backgroundImage:
+                                                                  AssetImage(
+                                                                      'assets/imgs/school/Ellipse 1.png'
+                                                                  ),
                                                                 ),
                                                               ),
                                                               SizedBox(
@@ -937,6 +980,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                 },
                                               );
                                             },
+
                                           );
                                         },
                                       ),
@@ -1023,7 +1067,14 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
             child: BottomAppBar(
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
-              shape: const CircularNotchedRectangle(),
+              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(38.5),
+                      topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(

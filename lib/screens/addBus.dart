@@ -38,6 +38,7 @@ class _AddBusState extends State<AddBus> {
   TextEditingController _driverNumber=TextEditingController();
   TextEditingController _busNumber=TextEditingController();
   TextEditingController _supervisor=TextEditingController();
+  TextEditingController _supervisorController = TextEditingController();
   final _driverNameFocus = FocusNode();
   final _driverNumberFocus = FocusNode();
   final _busNumberFocus = FocusNode();
@@ -51,7 +52,7 @@ class _AddBusState extends State<AddBus> {
   bool _validateDriverName = false;
   bool _validateDriverNumber = false;
   bool _validateBusNumber = false;
-  TextEditingController _supervisorController = TextEditingController();
+
   //function choose photo from gallery
   Future _pickImageFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -1000,7 +1001,14 @@ class _AddBusState extends State<AddBus> {
 
                 color: const Color(0xFF442B72),
                 clipBehavior: Clip.antiAlias,
-                shape: const CircularNotchedRectangle(),
+                shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(38.5),
+                        topRight: Radius.circular(38.5))),
+                    RoundedRectangleBorder(
+                        borderRadius:
+                        BorderRadius.all(Radius.circular(50)))),
+                //CircularNotchedRectangle(),
                 //shape of notch
                 notchMargin: 7,
                 child: SizedBox(
