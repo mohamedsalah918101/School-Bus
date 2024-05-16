@@ -29,11 +29,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   List<QueryDocumentSnapshot> data = [];
   final _firestore = FirebaseFirestore.instance;
 
-
-
-
-
-
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
     data.addAll(querySnapshot.docs);
@@ -118,6 +113,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               }
 
                               Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                              sharedpref?.getString('lang') == 'en';
                               return Text(
                                 '${'Welcome, '+data['name']}',
                                 style: TextStyle(

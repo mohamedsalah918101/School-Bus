@@ -63,8 +63,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
-        <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA"/>
+
     </application>
     <!-- new code for url lancher package-->
     <!-- Provide required visibility configuration for API level 30 and above -->
