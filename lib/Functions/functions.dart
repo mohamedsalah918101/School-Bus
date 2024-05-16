@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
 
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
+List<DropdownCheckboxItem> selectedItems = [];
 
 final String DynamicLink = 'https://schoolbusapp.page.link/requestdata';
 final String Link = 'https://schoolbusapp.page.link/requestdata';
