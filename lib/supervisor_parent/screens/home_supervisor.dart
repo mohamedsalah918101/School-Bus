@@ -67,29 +67,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(width: 55),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 8.0 , left: 20),
-                      //   child: Text(
-                      //          'Welcome, '.tr,
-                      //           style: TextStyle(
-                      //             color: Color(0xFF993D9A),
-                      //             fontSize: 16,
-                      //             fontFamily: 'Poppins-Bold',
-                      //             fontWeight: FontWeight.w700,
-                      //             height: 1,
-                      //           ),
-                      //         // TextSpan(
-                      //         //   text: 'Ahmed',
-                      //         //   style: TextStyle(
-                      //         //     color: Color(0xFF993D9A),
-                      //         //     fontSize: 16,
-                      //         //     fontFamily: 'Poppins-Bold',
-                      //         //     fontWeight: FontWeight.w700,
-                      //         //     height: 1,
-                      //         //   ),
-                      //         // ),
-                      //   ),
-                      // ),
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0 ),
                         child: FutureBuilder(
@@ -231,7 +208,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 0),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 25.0),
                             child: GestureDetector(
@@ -244,7 +221,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: data.length*92,
+                                    height: 300,
                                     width: double.infinity,
                                     child: ListView.builder(
                                       shrinkWrap: true,
@@ -260,7 +237,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)
-
                                               for (var child in childern)
                                             SizedBox(
                                               width: double.infinity,

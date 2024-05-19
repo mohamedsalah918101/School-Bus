@@ -43,11 +43,10 @@ class _AddParentsState extends State<AddParents> {
   bool allChildFieldsFilled = false;
 
   void _addDataToFirestore() async {
-    setState(() {});
     int numberOfChildren = int.parse(_numberOfChildrenController.text);
     List<Map<String, dynamic>> childrenData = List.generate(
       numberOfChildren,
-      (index) => {
+          (index) => {
         'name': nameChildControllers[index].text,
         'grade': gradeControllers[index].text,
       },
@@ -58,47 +57,114 @@ class _AddParentsState extends State<AddParents> {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
-      'childern': childrenData,
+      'children': childrenData,
       'state': 0,
       'invite': 1
-      // 'gender': gender
     };
-    // Add the data to the Firestore collection
-    var check = await addParentCheck(_phoneNumberController.text);
-    if (!check) {
-      var res = await checkUpdate(_phoneNumberController.text);
-      if (!res) {
-        await _firestore.collection('parent').add(data).then((docRef) async {
-          String docid = docRef.id;
-          print('Data added with document ID: ${docRef.id}');
-          var res = await createDynamicLink(
-              true, docid, _phoneNumberController.text, 'parent');
-          if (res == "success") {
-            InvitationSendSnackBar(
-                context, 'Invitation sent successfully', Color(0xFFFF3C3C));
-          } else {
-            InvitationSendSnackBar(
-                context, 'Invitation doesn\'t sent', Color(0xFF4CAF50));
-          }
-          _nameController.clear();
-          _phoneNumberController.clear();
-          _numberOfChildrenController.clear();
-          nameChildControllers.clear();
-          nameChildControllers.clear();
-          gradeControllers.clear();
-        }).catchError((error) {
-          print('Failed to add data: $error');
-        });
-        // Clear the text fields
+
+    try {
+      print('Checking parent existence...');
+      var check = await addParentCheck(_phoneNumberController.text);
+      if (!check) {
+        print('Parent does not exist. Checking for update...');
+        var res = await checkUpdate(_phoneNumberController.text);
+        if (!res) {
+          print('Adding new parent to Firestore...');
+          await _firestore.collection('parent').add(data).then((docRef) async {
+            print('Data added with document ID: ${docRef.id}');
+            String docid = docRef.id;
+            var res = await createDynamicLink(
+                true, docid, _phoneNumberController.text, 'parent');
+            if (res == "success") {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Invitation sent successfully'),
+                backgroundColor: Color(0xFFFF3C3C),
+              ));
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Invitation doesn\'t sent'),
+                backgroundColor: Color(0xFF4CAF50),
+              ));
+            }
+            _nameController.clear();
+            _phoneNumberController.clear();
+            _numberOfChildrenController.clear();
+            nameChildControllers.clear();
+            gradeControllers.clear();
+          }).catchError((error) {
+            print('Failed to add data: $error');
+          });
+        } else {
+          await _firestore.collection('parent').doc(docID).update(data);
+        }
       } else {
-        await _firestore.collection('parent').doc(docID).update(data);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('This phone number is already added.'),
+        ));
       }
-    }
-    else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('this phone already added')));
+    } catch (e) {
+      print('Error: $e');
     }
   }
+
+
+  // void _addDataToFirestore() async {
+  //   setState(() {});
+  //   int numberOfChildren = int.parse(_numberOfChildrenController.text);
+  //   List<Map<String, dynamic>> childrenData = List.generate(
+  //     numberOfChildren,
+  //     (index) => {
+  //       'name': nameChildControllers[index].text,
+  //       'grade': gradeControllers[index].text,
+  //     },
+  //   );
+  //
+  //   Map<String, dynamic> data = {
+  //     'typeOfParent': selectedValue,
+  //     'name': _nameController.text,
+  //     'numberOfChildren': _numberOfChildrenController.text,
+  //     'phoneNumber': _phoneNumberController.text,
+  //     'childern': childrenData,
+  //     'state': 0,
+  //     'invite': 1
+  //     // 'gender': gender
+  //   };
+  //   // Add the data to the Firestore collection
+  //   var check = await addParentCheck(_phoneNumberController.text);
+  //   if (!check) {
+  //     var res = await checkUpdate(_phoneNumberController.text);
+  //     if (!res) {
+  //       await _firestore.collection('parent').add(data).then((docRef) async {
+  //         String docid = docRef.id;
+  //         print('Data added with document ID: ${docRef.id}');
+  //         var res = await createDynamicLink(
+  //             true, docid, _phoneNumberController.text, 'parent');
+  //         if (res == "success") {
+  //           InvitationSendSnackBar(
+  //               context, 'Invitation sent successfully', Color(0xFFFF3C3C));
+  //         } else {
+  //           InvitationSendSnackBar(
+  //               context, 'Invitation doesn\'t sent', Color(0xFF4CAF50));
+  //         }
+  //         _nameController.clear();
+  //         _phoneNumberController.clear();
+  //         _numberOfChildrenController.clear();
+  //         nameChildControllers.clear();
+  //         nameChildControllers.clear();
+  //         gradeControllers.clear();
+  //       }).catchError((error) {
+  //         print('Failed to add data: $error');
+  //       });
+  //       // Clear the text fields
+  //     } else {
+  //       await _firestore.collection('parent').doc(docID).update(data);
+  //     }
+  //   }
+  //   else {
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(SnackBar(content: Text('this phone already added')));
+  //   }
+  // }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];

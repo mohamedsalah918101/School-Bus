@@ -23,6 +23,7 @@ class ProfileSupervisorScreen extends StatefulWidget {
 
 class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _firestore = FirebaseFirestore.instance;
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
   File ? _selectedImage;
@@ -60,22 +61,6 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
       //Some error occurred
     }
   }
-
-  // getData() async {
-  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
-  //   setState(() {
-  //     data = querySnapshot.docs;
-  //   });
-  //
-  //   // الآن معالجة البيانات المستردة
-  //   var parentData = data.firstWhere(
-  //         (doc) => doc['state'] == 2 && doc['phoneNumber'] != null,
-  //     orElse: () => null,
-  //   );
-  //
-  //   // إذا تم العثور على المستند وليس قيمته فارغة، فاعرض اسمه، وإلا عرض "لا توجد بيانات"
-  //   String parentName = parentData != null ? parentData['name'] : 'لا توجد بيانات';
-  // }
 
   getData() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
@@ -203,17 +188,47 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                           children: [
                             GestureDetector(
                               onTap: (){
-                                _pickImageFromGallery();
+                                // _pickImageFromGallery();
                                 print('object');
                               },
-                              child: CircleAvatar(
-                                radius: 52.5,
-                                backgroundColor: Color(0xff442B72),
-                                child: CircleAvatar(
-                                  backgroundImage: NetworkImage('${data[0]['busphoto'] }'),
-                                  radius: 50.5,
-                                ),
+                              child:FutureBuilder(
+                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (snapshot.data?.data() == null) {
+                                      return Text(
+                                        'No data available',
+                                        style: TextStyle(
+                                          color: Color(0xff442B72),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Regular',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      );
+                                    }
+
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                    sharedpref?.getString('lang') == 'en';
+                                    return
+                                    CircleAvatar(
+                                      radius: 52.5,
+                                      backgroundColor: Color(0xff442B72),
+                                      child: CircleAvatar(
+                                        backgroundImage: NetworkImage('${data['busphoto'] }'),
+                                        radius: 50.5,
+                                      ),
+                                    );
+                                  }
+
+                                  return CircularProgressIndicator();
+                                },
                               ),
+
                             ),
                             (sharedpref?.getString('lang') == 'ar')?
                             Positioned(
@@ -281,7 +296,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                         //   height: 55,),
                                                         onTap:()async {
 
-                                                          await _pickImageFromGallery();
+                                                          // await _pickImageFromGallery();
 
                                                           print('objectttt');
                                                           setState(() {
@@ -426,7 +441,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
             padding: const EdgeInsets.only(bottom: 55.0),
             child: GestureDetector(
                 onTap: () {
-                  if (data.isNotEmpty) { // التحقق من أن القائمة ليست فارغة
+                  if (data.isNotEmpty) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) =>
                         EditProfileSupervisorScreen(
                           docid: data[0].id,
@@ -486,15 +501,42 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                           height: 8,
                         ),
               Center(
-                child: Text(
-                  // parentName,
-                  '${data[0]['name'] }',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Poppins-SemiBold',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff442B72),
-                  ),
+                child: FutureBuilder(
+                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Something went wrong');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.data?.data() == null) {
+                        return Text(
+                          'No data available',
+                          style: TextStyle(
+                            color: Color(0xff442B72),
+                            fontSize: 12,
+                            fontFamily: 'Poppins-Regular',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        );
+                      }
+
+                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                      sharedpref?.getString('lang') == 'en';
+                      return Text(
+                        '${data['name']}',
+                        style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'Poppins-SemiBold',
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff442B72),
+                            ),
+                      );
+                    }
+
+                    return CircularProgressIndicator();
+                  },
                 ),
               ),
               SizedBox(height: 30,),
@@ -529,25 +571,54 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                 ),
                                 SizedBox(width: 7,),
                                 Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text('Number'.tr
                                       , style: TextStyle(
-                                        fontSize: 15 ,
+                                        fontSize: 14 ,
                                         height:  0.94,
                                         fontFamily: 'Poppins-Bold',
                                         fontWeight: FontWeight.w700 ,
                                         color: Color(0xff442B72),),),
-                                    SizedBox(height: 10,),
-                                    Text(
-                                      '${data[0]['phoneNumber'] }'
-                                      , style: TextStyle(
-                                        fontSize: 12 ,
-                                        height:  0.94,
-                                        fontFamily: 'Poppins-Light',
-                                        fontWeight: FontWeight.w400 ,
-                                        color: Color(0xff442B72),),),
+                                    SizedBox(height: 2,),
+                                    FutureBuilder(
+                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                        if (snapshot.hasError) {
+                                          return Text('Something went wrong');
+                                        }
+
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.data?.data() == null) {
+                                            return Text(
+                                              'No data available',
+                                              style: TextStyle(
+                                                color: Color(0xff442B72),
+                                                fontSize: 12,
+                                                fontFamily: 'Poppins-Regular',
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            );
+                                          }
+
+                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                          sharedpref?.getString('lang') == 'en';
+                                          return Text(
+                                            '${data['phoneNumber']}',
+                                            style: TextStyle(
+                                                  fontSize: 11 ,
+                                                  height:  2.94,
+                                                  fontFamily: 'Poppins-Light',
+                                                  fontWeight: FontWeight.w400 ,
+                                                  color: Color(0xff442B72),),
+                                          );
+                                        }
+
+                                        return CircularProgressIndicator();
+                                      },
+                                    ),
                                   ],
                                 ),
                               ],
@@ -582,25 +653,56 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                 ),
                                 SizedBox(width: 7,),
                                 Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Email'.tr
-                                      , style: TextStyle(
-                                        fontSize: 15 ,
-                                        // height:  0.94,
+                                    Text('Email'.tr,
+                                      style: TextStyle(
+                                        fontSize: 14 ,
+                                        height:  0.94,
                                         fontFamily: 'Poppins-Bold',
                                         fontWeight: FontWeight.w700 ,
                                         color: Color(0xff442B72),),),
-                                    SizedBox(height: 7,),
-                                    Text(
-                                      '${data[0]['email'] }'
-                                      , style: TextStyle(
-                                        fontSize: 12 ,
-                                        height:  0.94,
-                                        fontFamily: 'Poppins-Light',
-                                        fontWeight: FontWeight.w400 ,
-                                        color: Color(0xff442B72),),),
+                                    SizedBox(height: 0,),
+                                    FutureBuilder(
+                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                        if (snapshot.hasError) {
+                                          return Text('Something went wrong');
+                                        }
+
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (snapshot.data?.data() == null) {
+                                            return Text(
+                                              'No data available',
+                                              style: TextStyle(
+                                                color: Color(0xff442B72),
+                                                fontSize: 12,
+                                                fontFamily: 'Poppins-Regular',
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            );
+                                          }
+
+                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                          sharedpref?.getString('lang') == 'en';
+                                          return Text(
+                                            '${data['email']}',
+                                            style: TextStyle(
+                                              fontSize: 11 ,
+                                                  height:  2.94,
+                                                  fontFamily: 'Poppins-Light',
+                                                  fontWeight: FontWeight.w300 ,
+                                                  color: Color(0xff442B72),
+                                            ),
+                                          );
+                                        }
+
+                                        return CircularProgressIndicator();
+                                      },
+                                    ),
+
                                   ],
                                 ),
                               ],
