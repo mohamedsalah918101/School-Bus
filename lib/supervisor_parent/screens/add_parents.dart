@@ -627,11 +627,6 @@ class _AddParentsState extends State<AddParents> {
                     ),
                   ),
                   SizedBox(
-                    height: 10,
-                  ),
-                  //test
-
-                  SizedBox(
                     height: 13,
                   ),
                   Padding(
@@ -661,8 +656,7 @@ class _AddParentsState extends State<AddParents> {
                             borderRadius: BorderRadius.all(Radius.circular(7)),
                             borderSide: BorderSide(
                               color: !_phoneNumberEntered
-                                  ? Colors
-                                      .red // Red border if phone number not entered
+                                  ? Colors.red // Red border if phone number not entered
                                   : Color(0xFFFFC53E),
                             ),
                           ),
@@ -705,7 +699,7 @@ class _AddParentsState extends State<AddParents> {
                   phoneError
                       ? Container()
                       : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 48),
+                          padding: const EdgeInsets.symmetric(horizontal: 48 , ),
                           child: Text(
                             "Please enter your phone number".tr,
                             style: TextStyle(color: Colors.red),
@@ -1415,7 +1409,7 @@ class _AddParentsState extends State<AddParents> {
                                 nameError = true;
                               }
 
-                              if (_phoneNumberController.text.length == 12) {
+                              if (_phoneNumberController.text.length < 10) {
                                 phoneError = false;
                               } else {
                                 phoneError = true;

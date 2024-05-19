@@ -226,14 +226,16 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     child: ListView.builder(
                                       shrinkWrap: true,
                                       physics: NeverScrollableScrollPhysics(),
-                                      itemCount: 3,
+                                      itemCount: data.length,
                                       // data?[0]['childern'].length,
                                       // data.length,
                                       itemBuilder: (BuildContext context, int index) {
-                                        List childern = data[index]['childern'];
+                                        List childern = data[index]['childern'] ?? [];
+                                        // List childern = data[index]['childern'];
                                         // // Get the last 3 children or fewer if there are less than 3
                                         // int startIndex = childern.length - 3;
                                         // startIndex = startIndex < 0 ? 0 : startIndex;
+
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)

@@ -33,132 +33,234 @@ class _CheckInCardState extends State<CheckInCard> {
         ),
         child: Padding(
             padding: (sharedpref?.getString('lang') == 'ar')?
-            EdgeInsets.only(right: 10.0 , top: 15) :
-            EdgeInsets.only(left: 10.0 , top: 15),
+            EdgeInsets.only(right: 10.0 , left: 10) :
+            EdgeInsets.only(left: 10.0 , right: 10 , bottom: 0),
+            // EdgeInsets.only(left: 10.0 , right: 10 , bottom: 15),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Image.asset(
-                      'assets/images/Ellipse 6.png',
-                      height: 50,
-                      width: 50,
-                    ),
-                    const SizedBox(
-                      width: 7,
-                    ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                            'Shady Ayman'.tr,
-                            style: TextStyle(
-                              color: Color(0xff442B72),
-                              fontSize: 17,
-                              fontFamily: 'Poppins-SemiBold',
-                              fontWeight: FontWeight.w600,
-                              height: 0.94,
-                            ),
+                          Image.asset(
+                            'assets/images/Ellipse 6.png',
+                            height: 50,
+                            width: 50,
                           ),
-                          SizedBox(
-                            height: 4,
+                          const SizedBox(
+                            width: 7,
                           ),
-                          Text.rich(
-                            TextSpan(
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextSpan(
-                                  text: 'Grade: '.tr,
+                                Text(
+                                  'Shady Ayman'.tr,
                                   style: TextStyle(
-                                    color: Color(0xFF919191),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Light',
-                                    fontWeight: FontWeight.w400,
-                                    // height: 1.33,
+                                    color: Color(0xff442B72),
+                                    fontSize: 17,
+                                    fontFamily: 'Poppins-SemiBold',
+                                    fontWeight: FontWeight.w600,
+                                    height: 0.94,
                                   ),
                                 ),
-                                TextSpan(
-                                  text: '4',
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Light',
-                                    fontWeight: FontWeight.w400,
-                                    // height: 1.33,
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Grade: '.tr,
+                                        style: TextStyle(
+                                          color: Color(0xFF919191),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Light',
+                                          fontWeight: FontWeight.w400,
+                                          // height: 1.33,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '4',
+                                        style: TextStyle(
+                                          color: Color(0xFF442B72),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Light',
+                                          fontWeight: FontWeight.w400,
+                                          // height: 1.33,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                          // SizedBox(width: 27,),
+
+
                         ],
                       ),
                     ),
-                    SizedBox(width: 27,),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5.0),
-                      child: SizedBox(
-                        width: 80,
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              padding:  EdgeInsets.all(0),
-                              backgroundColor: Color(0xFF442B72),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5)
-                              )
-                          ),
-                          onPressed: (){
-                            Checkin = !Checkin;
-                            setState(() {
-                            });
-                          },
-                          child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
-                            style: TextStyle(
-                                fontFamily: 'Poppins-SemiBold',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                                fontSize: 13
-                            ),),
+                    Column(
+                      children: [
+                        SizedBox(height: 20),
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: 40,
+                              width: 80,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    padding:  EdgeInsets.all(0),
+                                    backgroundColor: Color(0xFF442B72),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5)
+                                    )
+                                ),
+                                onPressed: (){
+                                  Checkin = !Checkin;
+                                  setState(() {
+                                  });
+                                },
+                                child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins-SemiBold',
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      fontSize: 13
+                                  ),),
 
 
+                              ),
+                            ),
+                            SizedBox(height: 15,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                  color: Color(0xff442B72),
+                                  width: 28,
+                                  height: 28,),
+                                SizedBox(width: 9),
+                                GestureDetector(
+                                  child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                    color: Color(0xff442B72),
+                                    width: 26,
+                                    height: 26,),
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) =>
+                                            ChatScreen()));
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
+                      ],
+                    )
+                    // Column(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(top: 5.0),
+                    //       child: SizedBox(
+                    //         width: 80,
+                    //         height: 40,
+                    //         child: ElevatedButton(
+                    //           style: ElevatedButton.styleFrom(
+                    //               padding:  EdgeInsets.all(0),
+                    //               backgroundColor: Color(0xFF442B72),
+                    //               shape: RoundedRectangleBorder(
+                    //                   borderRadius: BorderRadius.circular(5)
+                    //               )
+                    //           ),
+                    //           onPressed: (){
+                    //             Checkin = !Checkin;
+                    //             setState(() {
+                    //             });
+                    //           },
+                    //           child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                    //             style: TextStyle(
+                    //                 fontFamily: 'Poppins-SemiBold',
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: Colors.white,
+                    //                 fontSize: 13
+                    //             ),),
+                    //
+                    //
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: (sharedpref?.getString('lang') == 'ar')?
+                    //       EdgeInsets.only(top: 12, right:220 ):
+                    //       EdgeInsets.only(top: 12, left:220 ),
+                    //       child: Row(
+                    //         mainAxisAlignment: MainAxisAlignment.start,
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                    //             color: Color(0xff442B72),
+                    //             width: 28,
+                    //             height: 28,),
+                    //           SizedBox(width: 9),
+                    //           GestureDetector(
+                    //             child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                    //               color: Color(0xff442B72),
+                    //               width: 26,
+                    //               height: 26,),
+                    //             onTap: () {
+                    //               Navigator.of(context).push(
+                    //                   MaterialPageRoute(builder: (context) =>
+                    //                       ChatScreen()));
+                    //             },
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
-                Padding(
-                  padding: (sharedpref?.getString('lang') == 'ar')?
-                  EdgeInsets.only(top: 12, right:220 ):
-                  EdgeInsets.only(top: 12, left:220 ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                        color: Color(0xff442B72),
-                        width: 28,
-                        height: 28,),
-                      SizedBox(width: 9),
-                      GestureDetector(
-                        child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                          color: Color(0xff442B72),
-                          width: 26,
-                          height: 26,),
-                        onTap: () {
-                          Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) =>
-                                  ChatScreen()));
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: (sharedpref?.getString('lang') == 'ar')?
+                //   EdgeInsets.only(top: 12, right:220 ):
+                //   EdgeInsets.only(top: 12, left:220 ),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                //         color: Color(0xff442B72),
+                //         width: 28,
+                //         height: 28,),
+                //       SizedBox(width: 9),
+                //       GestureDetector(
+                //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                //           color: Color(0xff442B72),
+                //           width: 26,
+                //           height: 26,),
+                //         onTap: () {
+                //           Navigator.of(context).push(
+                //               MaterialPageRoute(builder: (context) =>
+                //                   ChatScreen()));
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
               ],
             )),
