@@ -147,7 +147,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 25,),
+                            // SizedBox(width: 25,),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 25.0),
                               child: SizedBox(
