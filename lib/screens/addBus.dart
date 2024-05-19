@@ -10,6 +10,7 @@ import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
+import '../Functions/functions.dart';
 import '../classes/dropdownCheckbox.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -89,13 +90,13 @@ class _AddBusState extends State<AddBus> {
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 0) // Example condition
         .get();
 
    // data.addAll(querySnapshot.docs);
     for(int i=0;i<querySnapshot.docs.length;i++)
       {
-        items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name')));
+        items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber')));
       }
     setState(() {
 
@@ -141,11 +142,21 @@ class _AddBusState extends State<AddBus> {
     // }
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
+
+    List<Map<String, dynamic>> supervisorsList = List.generate(
+      selectedItems.length,
+          (index) => {
+        'name': selectedItems[index].label,
+        'phone': selectedItems[index].phone,
+         'id': selectedItems[index].docID,
+
+          },
+    );
     Map<String, dynamic> data = {
       'namedriver': _driverName.text,
       'phonedriver': _driverNumber.text,
       'busnumber': _busNumber.text,
-      'supervisorname':_supervisor.text,
+      'supervisors':supervisorsList,
       'imagedriver':imageUrl ??'',
       'busphoto':busimage ??'',
     };
@@ -175,6 +186,7 @@ class _AddBusState extends State<AddBus> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    selectedItems.clear();
     getData();
   }
   OutlineInputBorder myInputBorder() {
@@ -888,7 +900,8 @@ class _AddBusState extends State<AddBus> {
                     //   ),
                     // ),
                               Container(
-                                child:DropdownCheckbox(
+                                child:
+                                DropdownCheckbox(
                                     controller: _supervisorController,
                                 items:
                                   items

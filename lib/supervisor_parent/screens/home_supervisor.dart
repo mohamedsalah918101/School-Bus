@@ -95,8 +95,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               return Text(
                                 '${'Welcome, '+data['name']}',
                                 style: TextStyle(
-                                  color: Color(0xff993D9A),
-                                  fontSize: 16,
+                                  color: Color(0xff442B72),
+                                  fontSize: 15,
                                   fontFamily: 'Poppins-Bold',
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -164,6 +164,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                 : EdgeInsets.symmetric(horizontal: 28.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              // mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
                                   'Children'.tr,
@@ -174,6 +175,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
+                                // SizedBox(
+                                //   width: (sharedpref?.getString('lang') == 'ar') ? 190 : 168,
+                                // ),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -222,124 +226,120 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     child: ListView.builder(
                                       shrinkWrap: true,
                                       physics: NeverScrollableScrollPhysics(),
-                                      itemCount: data.length,
+                                      itemCount: 3,
                                       // data?[0]['childern'].length,
                                       // data.length,
                                       itemBuilder: (BuildContext context, int index) {
-                                        List children = data[index]['children'] ?? [];
-                                        // List childern = data[index]['childern'];
-                                        // // Get the last 3 children or fewer if there are less than 3
-                                        // int startIndex = childern.length - 3;
-                                        // startIndex = startIndex < 0 ? 0 : startIndex;
+                                        List children = data[index]['children'];
 
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)
-                                              for (var child in children)
-                                            SizedBox(
-                                              width: double.infinity,
-                                              height:  92,
-                                              child: Card(
-                                                elevation: 8,
-                                                color: Colors.white,
-                                                surfaceTintColor: Colors.transparent,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(8.0),
+                                            for (var child in children)
+                                              SizedBox(
+                                                width: double.infinity,
+                                                height:  92,
+                                                child: Card(
+                                                  elevation: 8,
+                                                  color: Colors.white,
+                                                  surfaceTintColor: Colors.transparent,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8.0),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: (sharedpref?.getString('lang') == 'ar')?
+                                                    EdgeInsets.only(top: 15.0 , right: 12,):
+                                                    EdgeInsets.only(top: 15.0 , left: 12,),
+                                                    child:  Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 8.0),
+                                                          child: Image.asset('assets/images/Ellipse 1.png',
+                                                            width: 36,
+                                                            height: 36,),
+                                                        ),
+                                                        SizedBox(width: 12,),
+                                                        Column(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              // '${childern[i]['name']}',
+
+                                                              '${child['name']}',
+
+                                                              style: TextStyle(
+                                                                color: Color(0xff442B72),
+                                                                fontSize: 15,
+                                                                fontFamily: 'Poppins-SemiBold',
+                                                                fontWeight: FontWeight.w600,
+                                                                // height: 1,
+                                                              ),
+                                                            ),
+                                                            // Text('${data[index]['childern']?[0]['name'] }',
+                                                            // Text('${data[index]['childern']?[0-3]['name'] }',
+
+                                                            Text.rich(
+                                                              TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Grade: '.tr,
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF919191),
+                                                                      fontSize: 12,
+                                                                      fontFamily: 'Poppins-Light',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      // height: 1.33,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '${data[index]['children']?[0]['grade'] }',
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF442B72),
+                                                                      fontSize: 12,
+                                                                      fontFamily: 'Poppins-Light',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      // height: 1.33,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Text.rich(
+                                                              TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Address: '.tr,
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF919191),
+                                                                      fontSize: 12,
+                                                                      fontFamily: 'Poppins-Light',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      height: 1.33,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '16 Khaled st,Asyut,Egypt',
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF442B72),
+                                                                      fontSize: 12,
+                                                                      fontFamily: 'Poppins-Light',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      height: 1.33,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),),
+
                                                 ),
-                                                child: Padding(
-                                                  padding: (sharedpref?.getString('lang') == 'ar')?
-                                                  EdgeInsets.only(top: 15.0 , right: 12,):
-                                                  EdgeInsets.only(top: 15.0 , left: 12,),
-                                                  child:  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(top: 8.0),
-                                                        child: Image.asset('assets/images/Ellipse 1.png',
-                                                          width: 36,
-                                                          height: 36,),
-                                                      ),
-                                                      SizedBox(width: 12,),
-                                                      Column(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                               Text(
-                                                 // '${childern[i]['name']}',
-
-                                                 '${child['name']}',
-
-                                              style: TextStyle(
-                                              color: Color(0xff442B72),
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-SemiBold',
-                                              fontWeight: FontWeight.w600,
-                                              // height: 1,
                                               ),
-                                              ),
-                                            // Text('${data[index]['childern']?[0]['name'] }',
-                                                          // Text('${data[index]['childern']?[0-3]['name'] }',
-
-                                                          Text.rich(
-                                                            TextSpan(
-                                                              children: [
-                                                                TextSpan(
-                                                                  text: 'Grade: '.tr,
-                                                                  style: TextStyle(
-                                                                    color: Color(0xFF919191),
-                                                                    fontSize: 12,
-                                                                    fontFamily: 'Poppins-Light',
-                                                                    fontWeight: FontWeight.w400,
-                                                                    // height: 1.33,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text: '${data[index]['children']?[0]['grade'] }',
-                                                                  style: TextStyle(
-                                                                    color: Color(0xFF442B72),
-                                                                    fontSize: 12,
-                                                                    fontFamily: 'Poppins-Light',
-                                                                    fontWeight: FontWeight.w400,
-                                                                    // height: 1.33,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Text.rich(
-                                                            TextSpan(
-                                                              children: [
-                                                                TextSpan(
-                                                                  text: 'Address: '.tr,
-                                                                  style: TextStyle(
-                                                                    color: Color(0xFF919191),
-                                                                    fontSize: 12,
-                                                                    fontFamily: 'Poppins-Light',
-                                                                    fontWeight: FontWeight.w400,
-                                                                    height: 1.33,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text: '16 Khaled st,Asyut,Egypt',
-                                                                  style: TextStyle(
-                                                                    color: Color(0xFF442B72),
-                                                                    fontSize: 12,
-                                                                    fontFamily: 'Poppins-Light',
-                                                                    fontWeight: FontWeight.w400,
-                                                                    height: 1.33,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),),
-
-                                              ),
-                                            ),
                                             SizedBox(height: 0,)
                                           ],
                                         );
@@ -389,21 +389,21 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
           floatingActionButtonLocation:
           FloatingActionButtonLocation.centerDocked,
           floatingActionButton: FloatingActionButton(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100)),
-          backgroundColor: Color(0xff442B72),
-          onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => ProfileSupervisorScreen(
-          )));
-          },
-          child:
-          Image.asset(
-          'assets/images/174237 1.png',
-          height: 33,
-          width: 33,
-              fit: BoxFit.cover,
-            )
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
+              backgroundColor: Color(0xff442B72),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ProfileSupervisorScreen(
+                    )));
+              },
+              child:
+              Image.asset(
+                'assets/images/174237 1.png',
+                height: 33,
+                width: 33,
+                fit: BoxFit.cover,
+              )
           ),
           bottomNavigationBar: Directionality(
               textDirection: Get.locale == Locale('ar')

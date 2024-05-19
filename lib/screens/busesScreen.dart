@@ -83,7 +83,13 @@ getData()async{
     //filteredData = List.from(data);
   });
 }
-void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ) {
+void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ,List<dynamic>supervisors) {
+ List<DropdownCheckboxItem>allSupervisors=[];
+ for(int i=0;i<supervisors.length;i++){
+   allSupervisors.add(DropdownCheckboxItem(label: supervisors[i]['name'],phone: supervisors[i]['phone'],docID: supervisors[i]['id']));
+ }
+ selectedItems.clear();
+ selectedItems=allSupervisors;
   Navigator.push(
     context,
     MaterialPageRoute(
@@ -93,7 +99,7 @@ void _editBusDocument(String documentId, String imagedriver, String namedriver, 
           olddrivername:namedriver,
           olddriverphone:driverphone,
          oldphotobus:photobus,
-          olddnumberbus:numberbus
+          olddnumberbus:numberbus, allSupervisors: allSupervisors,
       ),
     ),
   );
@@ -657,12 +663,14 @@ final _firestore = FirebaseFirestore.instance;
                                                                 setState(() {
                                                                   isEditingBus = true;
                                                                   _editBusDocument(
-                                                                    data[index].id,
-                                                                    data[index]['busnumber'],
-                                                                    data[index]['busphoto'],
-                                                                    data[index]['imagedriver'],
-                                                                    data[index]['namedriver'],
-                                                                    data[index]['phonedriver'],
+                                                                      data[index].id,
+                                                                      data[index]['imagedriver'],
+                                                                      data[index]['namedriver'],
+                                                                      data[index]['phonedriver'],
+                                                                      data[index]['busphoto'],
+                                                                      data[index]['busnumber'],
+                                                                      data[index]['supervisors']
+
                                                                   );
                                                                   // _editSupervisorDocument(
                                                                   //   data[index].id,
@@ -731,19 +739,23 @@ final _firestore = FirebaseFirestore.instance;
                                                         onSelected: (String value) {
                                                           // Handle selection here
                                                           if (value == 'edit') {
+                                                         //   print('daaaata'+data[index]['supervisors'].toString());
+
                                                             // Handle edit action
                                                             setState(() {
                                                               isEditingBus = true;
                                                               _editBusDocument(
                                                                 data[index].id,
-                                                                data[index]['busnumber'],
-                                                                data[index]['busphoto'],
                                                                 data[index]['imagedriver'],
                                                                 data[index]['namedriver'],
                                                                 data[index]['phonedriver'],
+                                                                data[index]['busphoto'],
+                                                                data[index]['busnumber'],
+                                                                data[index]['supervisors']
+
+
                                                               );
                                                             });
-
                                                             // Navigator.pushReplacement(
                                                             //     context,
                                                             //     MaterialPageRoute(
