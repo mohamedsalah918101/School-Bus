@@ -59,7 +59,7 @@ class _AddParentsState extends State<AddParents> {
       'phoneNumber': _phoneNumberController.text,
       'children': childrenData,
       'state': 0,
-      'invite': 1
+      'invite': 0
     };
 
     try {
@@ -74,28 +74,59 @@ class _AddParentsState extends State<AddParents> {
             print('Data added with document ID: ${docRef.id}');
             String docid = docRef.id;
             var res = await createDynamicLink(
-                true, docid, _phoneNumberController.text, 'parent');
+                false, docid, _phoneNumberController.text, 'parent');
             if (res == "success") {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('Invitation sent successfully'),
                 backgroundColor: Color(0xFFFF3C3C),
               ));
+              await _firestore.collection('parent').doc(docid).update({'invite':1});
+              count =0;              showList =false;
+              setState(() {
+
+              });
+              _nameController.clear();
+              _phoneNumberController.clear();
+              _numberOfChildrenController.clear();
+              nameChildControllers.clear();
+              gradeControllers.clear();
+
             } else {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('Invitation doesn\'t sent'),
                 backgroundColor: Color(0xFF4CAF50),
               ));
             }
+
+          }).catchError((error) {
+            print('Failed to add data: $error');
+          });
+        } else {
+        if(invitCheck == 0){
+          var res = await createDynamicLink(
+              false, docID, _phoneNumberController.text, 'parent');
+          if (res == "success") {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Invitation sent successfully'),
+              backgroundColor: Color(0xFFFF3C3C),
+            ));
+            await _firestore.collection('parent').doc(docID).update(
+                {'invite': 1});
+            count = 0;
+            showList = false;
+            setState(() {
+
+            });
             _nameController.clear();
             _phoneNumberController.clear();
             _numberOfChildrenController.clear();
             nameChildControllers.clear();
             gradeControllers.clear();
-          }).catchError((error) {
-            print('Failed to add data: $error');
-          });
-        } else {
-          await _firestore.collection('parent').doc(docID).update(data);
+          }}else{
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('This phone number is already added.'),
+        ));}
+         // await _firestore.collection('parent').doc(docID).update(data);
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

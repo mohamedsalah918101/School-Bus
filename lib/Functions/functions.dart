@@ -182,6 +182,7 @@ Future<bool> addParentCheck(String phoneNumber) async {
   }
 }
 String docID='';
+int invitCheck=0;
 Future<bool> checkUpdate(String phoneNumber) async {
 
   try {
@@ -194,6 +195,7 @@ Future<bool> checkUpdate(String phoneNumber) async {
       if(snapshot.size > 0){
         loginType = 'parent';
         docID =snapshot.docs[0].id;
+        invitCheck =snapshot.docs[0].get('invite');
         return true;
 
 
