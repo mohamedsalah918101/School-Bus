@@ -80,7 +80,7 @@ class _EditAddParentsState extends State<EditAddParents> {
             'typeOfParent': selectedValue,
             'name': _nameController.text,
             'numberOfChildren': _numberOfChildrenController.text,
-            'childern': childrenData, // إضافة بيانات الأطفال هنا
+            'children': childrenData, // إضافة بيانات الأطفال هنا
           });
 
           print('document updated successfully');

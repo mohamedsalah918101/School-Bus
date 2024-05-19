@@ -95,8 +95,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               return Text(
                                 '${'Welcome, '+data['name']}',
                                 style: TextStyle(
-                                  color: Color(0xff442B72),
-                                  fontSize: 15,
+                                  color: Color(0xff993D9A),
+                                  fontSize: 16,
                                   fontFamily: 'Poppins-Bold',
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -109,7 +109,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 13.0),
                         child: IconButton(
                           onPressed: () {
                             _scaffoldKey.currentState!.openEndDrawer();
@@ -161,10 +161,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           Padding(
                             padding: (sharedpref?.getString('lang') == 'ar')
                                 ? EdgeInsets.symmetric(horizontal: 30.0)
-                                : EdgeInsets.symmetric(horizontal: 25.0),
+                                : EdgeInsets.symmetric(horizontal: 28.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              // mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
                                   'Children'.tr,
@@ -175,9 +174,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                // SizedBox(
-                                //   width: (sharedpref?.getString('lang') == 'ar') ? 190 : 168,
-                                // ),
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -230,7 +226,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                       // data?[0]['childern'].length,
                                       // data.length,
                                       itemBuilder: (BuildContext context, int index) {
-                                        List childern = data[index]['childern'] ?? [];
+                                        List children = data[index]['children'] ?? [];
                                         // List childern = data[index]['childern'];
                                         // // Get the last 3 children or fewer if there are less than 3
                                         // int startIndex = childern.length - 3;
@@ -239,7 +235,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)
-                                              for (var child in childern)
+                                              for (var child in children)
                                             SizedBox(
                                               width: double.infinity,
                                               height:  92,
@@ -299,7 +295,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                                   ),
                                                                 ),
                                                                 TextSpan(
-                                                                  text: '${data[index]['childern']?[0]['grade'] }',
+                                                                  text: '${data[index]['children']?[0]['grade'] }',
                                                                   style: TextStyle(
                                                                     color: Color(0xFF442B72),
                                                                     fontSize: 12,
