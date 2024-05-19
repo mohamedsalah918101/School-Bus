@@ -102,7 +102,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                 ),
                               );
                             }
-
                             return CircularProgressIndicator();
                           },
                         ),
