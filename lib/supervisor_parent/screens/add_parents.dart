@@ -566,7 +566,7 @@ class _AddParentsState extends State<AddParents> {
                           textDirection: (sharedpref?.getString('lang') == 'ar')
                               ? TextDirection.rtl
                               : TextDirection.ltr,
-                          // autofocus: true,
+                          autofocus: true,
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.text,
                           textAlign: (sharedpref?.getString('lang') == 'ar')
@@ -666,6 +666,7 @@ class _AddParentsState extends State<AddParents> {
                       width: 277,
                       height: 65,
                       child: IntlPhoneField(
+                        textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
                         cursorColor: Color(0xFF442B72),
                         controller: _phoneNumberController,
                         dropdownIconPosition: IconPosition.trailing,

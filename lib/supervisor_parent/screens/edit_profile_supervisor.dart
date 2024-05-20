@@ -46,6 +46,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   String? imageUrl;
   File? file ;
   GlobalKey<FormState> formState = GlobalKey<FormState>();
+  final _firestore = FirebaseFirestore.instance;
   CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
   // List<ChildDataItem> children = [];
 
@@ -77,7 +78,6 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
     }
   }
 
-
   editAddSupervisor() async {
     print('editAddParent called');
     if (formState.currentState != null) {
@@ -95,8 +95,6 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
             'name': _nameController.text,
             'email': _emailController.text,
             'busphoto':imageUrl,
-
-
           });
           print('document updated successfully');
 
@@ -219,19 +217,49 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                         EdgeInsets.only(left: 120.0 ),
                         child: Stack(
                           children: [
-                            GestureDetector(
-                              onTap: (){
-                                _pickImageFromGallery();
-                                print('edit');
-                              },
-                              child:  CircleAvatar(
-                                  radius: 52.5,
-                                  backgroundColor: Color(0xff442B72),
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage( '$imageUrl',),
-                                    radius: 50.5,)
+                            // CircleAvatar(
+                            //     radius: 52.5,
+                            //     backgroundColor: Color(0xff442B72),
+                            //     child: CircleAvatar(
+                            //       backgroundImage: NetworkImage( '$imageUrl',),
+                            //       radius: 50.5,)
+                            // ),
+                        FutureBuilder(
+                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                              return Text(
+                                'No data available',
+                                style: TextStyle(
+                                  color: Color(0xff442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Regular',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              );
+                            }
+
+                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                            String? busphoto = data['busphoto'] as String?;
+                            String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
+                            return CircleAvatar(
+                              radius: 52.5,
+                              backgroundColor: Color(0xff442B72),
+                              child: CircleAvatar(
+                                backgroundImage: NetworkImage(imageUrl),
+                                radius: 50.5,
                               ),
-                            ),
+                            );
+                          }
+
+                          return CircularProgressIndicator();
+                        },
+                      ),
                             (sharedpref?.getString('lang') == 'ar')?
                             Positioned(
                               bottom: 2,
@@ -268,10 +296,16 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                                       width: 2.0,
                                     ),
                                     borderRadius: BorderRadius.all(Radius.circular(50.0),),),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: Image.asset(
-                                      'assets/images/image-editing 1.png' ,),
+                                  child: GestureDetector(
+                                    onTap: (){
+                                      print('test');
+                                      _pickImageFromGallery();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: Image.asset(
+                                        'assets/images/image-editing 1.png' ,),
+                                    ),
                                   )
                               ),
                             ),

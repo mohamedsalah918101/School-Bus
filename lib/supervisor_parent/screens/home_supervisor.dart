@@ -142,7 +142,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                         color: Color(0xff442B72).withOpacity(0.11),
                       ),
 
-                      // sharedpref!.getInt('invit') == 0 ?
+                      sharedpref!.getInt('invit') == 1 ?
                       Column(
                         children: [
                           SizedBox(height: 20),
@@ -352,30 +352,30 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           SizedBox(height: 44),
                         ],
                       )
-                      //     : Column(
-                      //   children: [
-                      //     SizedBox(height: 45,),
-                      //     Image.asset('assets/images/Group 237684.png',
-                      //     ),
-                      //     Text('No Data Found'.tr,
-                      //       style: TextStyle(
-                      //         color: Color(0xff442B72),
-                      //         fontFamily: 'Poppins-Regular',
-                      //         fontWeight: FontWeight.w500,
-                      //         fontSize: 19,
-                      //       ),
-                      //     ),
-                      //     Text('You haven’t added any \n '
-                      //         'data yet'.tr,
-                      //       textAlign: TextAlign.center,
-                      //       style: TextStyle(
-                      //         color: Color(0xffBE7FBF),
-                      //         fontFamily: 'Poppins-Light',
-                      //         fontWeight: FontWeight.w400,
-                      //         fontSize: 12,
-                      //       ),)
-                      //   ],
-                      // ),
+                          : Column(
+                        children: [
+                          SizedBox(height: 45,),
+                          Image.asset('assets/images/Group 237684.png',
+                          ),
+                          Text('No Data Found'.tr,
+                            style: TextStyle(
+                              color: Color(0xff442B72),
+                              fontFamily: 'Poppins-Regular',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 19,
+                            ),
+                          ),
+                          Text('You haven’t added any \n '
+                              'data yet'.tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xffBE7FBF),
+                              fontFamily: 'Poppins-Light',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),)
+                        ],
+                      ),
                     ],
                   ),
                 ),

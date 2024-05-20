@@ -384,9 +384,16 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                   EdgeInsets.only(left: 20.0, top: 15),
                                                   child: Row(
                                                     children: [
-                                                      Image.asset('assets/images/Vector (13)profile.png',
-                                                      width: 55,
-                                                      height: 55,),
+                                                      GestureDetector(
+                                                       onTap:(){
+                                                         _pickImageFromGallery();
+                                                         print('object');
+                                                       },
+
+                                                        child: Image.asset('assets/images/Vector (13)profile.png',
+                                                        width: 55,
+                                                        height: 55,),
+                                                      ),
                                                       SizedBox(width: 15,),
                                                       Text('Select profile picture',
                                                         style: TextStyle(

@@ -30,8 +30,6 @@ class _ParentsViewState extends State<ParentsView> {
   String? selectedValueDecline;
   String? selectedValueWaiting;
   List<DropdownCheckboxItem> selectedItems = [];
-  // List<Map<String, dynamic>> data2 = [];
-
   int get dataLength => data.length;
   List<QueryDocumentSnapshot> data = [];
   bool isAcceptFiltered = false;
@@ -39,6 +37,8 @@ class _ParentsViewState extends State<ParentsView> {
   bool isWaitingFiltered = false;
   bool isFiltered  = false;
   String? currentFilter;
+  TextEditingController _searchController = TextEditingController();
+  String SearchQuery = '';
 
   void _deleteSupervisorDocument(String documentId) {
     FirebaseFirestore.instance
@@ -101,20 +101,51 @@ class _ParentsViewState extends State<ParentsView> {
     });
   }
 
-  getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
-    // data.addAll(querySnapshot.docs);
-    setState(() {
-      data = querySnapshot.docs;
-
-    });
-  }
+  // getData()async{
+  //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+  //   // data.addAll(querySnapshot.docs);
+  //   setState(() {
+  //     data = querySnapshot.docs;
+  //
+  //   });
+  // }
 
   @override
   void initState() {
+    _searchController.addListener(_onSearchChanged);
     getData();
     // getDataForAcceptFilter();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  _onSearchChanged() {
+    setState(() {
+      SearchQuery = _searchController.text.trim();
+    });
+    getData(query: SearchQuery);
+  }
+
+  Future<void> getData({String query = ""}) async {
+    QuerySnapshot querySnapshot;
+    if (query.isEmpty) {
+      querySnapshot = await FirebaseFirestore.instance.collection('parent').get();
+    } else {
+      querySnapshot = await FirebaseFirestore.instance
+          .collection('parent')
+          .where('name', isGreaterThanOrEqualTo: query)
+          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+    }
+    setState(() {
+      data = querySnapshot.docs;
+    });
   }
 
   @override
@@ -227,11 +258,13 @@ class _ParentsViewState extends State<ParentsView> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               SizedBox(
                                 width: 271,
                                 height: 42,
                                 child: TextField(
+                                  controller: _searchController,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Color(0xffF1F1F1),
@@ -260,9 +293,9 @@ class _ParentsViewState extends State<ParentsView> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                width: 20
-                              ),
+                              // SizedBox(
+                              //   width: 20
+                              // ),
                               PopupMenuButton<String>(
                                 child: Image(
                                   image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
@@ -368,12 +401,21 @@ class _ParentsViewState extends State<ParentsView> {
                             ],
                           ),
                         ),
+                        //ListView.builder(
+                        //               itemCount: searchResults.length,
+                        //               itemBuilder: (context, index) {
+                        //                 return ListTile(
+                        //                   title: Text(searchResults[index]),
+                        //                 );
+                        //               },
+                        //             ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 28.0),
                           child:
                           ListView.builder(
                             shrinkWrap: true,
                             itemCount: data.length,
+                            // itemCount: data.length,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               return Column(
