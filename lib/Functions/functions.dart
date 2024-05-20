@@ -1,14 +1,45 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
+dynamic platform;
 
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
 List<DropdownCheckboxItem> selectedItems = [];
+class ValueNotifying {
+  ValueNotifier value = ValueNotifier(0);
 
+  void incrementNotifier() {
+    value.value++;
+  }
+}
+
+ValueNotifying valueNotifier = ValueNotifying();
+
+class ValueNotifyingHome {
+  ValueNotifier value = ValueNotifier(0);
+
+  void incrementNotifier() {
+    value.value++;
+  }
+}
+
+class ValueNotifyingNotification {
+  ValueNotifier value = ValueNotifier(0);
+
+  void incrementNotifier() {
+    value.value++;
+  }
+}
+
+ValueNotifying valueNotifierHome = ValueNotifying();
+ValueNotifying valueNotifiercheck = ValueNotifying();
+ValueNotifyingNotification valueNotifierNotification =
+ValueNotifyingNotification();
 final String DynamicLink = 'https://schoolbusapp.page.link/requestdata';
 final String Link = 'https://schoolbusapp.page.link/requestdata';
 bool _isCreatingLink = false;
@@ -95,6 +126,12 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
         id =snapshot.docs[0].id;
         sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
         sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
+        sharedpref!.setString('name',snapshot.docs[0].get('name'));
+
+        if(snapshot.docs[0].data().toString().contains('address'))
+        sharedpref!.setInt('address',1);
+        else
+          sharedpref!.setInt('address',0);
 
         return true;
       }else{

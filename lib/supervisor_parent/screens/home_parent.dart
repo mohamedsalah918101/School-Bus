@@ -79,7 +79,7 @@ class HomeParentState extends State<HomeParent> {
                             ),
                           ),
                           TextSpan(
-                            text: 'Joly',
+                            text: sharedpref!.getString('name').toString(),
                             style: TextStyle(
                               color: Color(0xFF993D9A),
                               fontSize: 16,

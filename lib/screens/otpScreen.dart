@@ -103,6 +103,8 @@ class _OtpScreenState extends State<OtpScreen> {
         await sharedpref!.setString('id', docRef.id);
         await sharedpref!.setInt('invitstate',0);
         await sharedpref!.setInt('invit',0);
+        sharedpref!.setString('name',widget.name!);
+
         Navigator.push(
             context,
             MaterialPageRoute(

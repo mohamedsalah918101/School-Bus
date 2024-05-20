@@ -41,6 +41,7 @@ class _AddParentsState extends State<AddParents> {
   String selectedValue = '';
   bool _phoneNumberEntered = true;
   bool allChildFieldsFilled = false;
+  String enteredPhoneNumber='';
 
   void _addDataToFirestore() async {
     int numberOfChildren = int.parse(_numberOfChildrenController.text);
@@ -49,6 +50,7 @@ class _AddParentsState extends State<AddParents> {
           (index) => {
         'name': nameChildControllers[index].text,
         'grade': gradeControllers[index].text,
+            'gender':genderSelection[index]
       },
     );
 
@@ -56,25 +58,28 @@ class _AddParentsState extends State<AddParents> {
       'typeOfParent': selectedValue,
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
-      'phoneNumber': _phoneNumberController.text,
+      'phoneNumber':enteredPhoneNumber,
       'children': childrenData,
       'state': 0,
-      'invite': 0
+      'invite': 0,
+      'supervisor':sharedpref!.getString('id'),
+      'supervisor_name':sharedpref!.getString('name')
+
     };
 
     try {
       print('Checking parent existence...');
-      var check = await addParentCheck(_phoneNumberController.text);
+      var check = await addParentCheck(enteredPhoneNumber);
       if (!check) {
         print('Parent does not exist. Checking for update...');
-        var res = await checkUpdate(_phoneNumberController.text);
+        var res = await checkUpdate(enteredPhoneNumber);
         if (!res) {
           print('Adding new parent to Firestore...');
           await _firestore.collection('parent').add(data).then((docRef) async {
             print('Data added with document ID: ${docRef.id}');
             String docid = docRef.id;
             var res = await createDynamicLink(
-                false, docid, _phoneNumberController.text, 'parent');
+                false, docid, enteredPhoneNumber, 'parent');
             if (res == "success") {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('Invitation sent successfully'),
@@ -123,12 +128,15 @@ class _AddParentsState extends State<AddParents> {
             nameChildControllers.clear();
             gradeControllers.clear();
           }}else{
+          // added parent new update
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('This phone number is already added.'),
         ));}
          // await _firestore.collection('parent').doc(docID).update(data);
         }
       } else {
+
+        //added in another type
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('This phone number is already added.'),
         ));
@@ -722,6 +730,8 @@ class _AddParentsState extends State<AddParents> {
                         initialCountryCode: 'EG',
                         // Set initial country code if needed
                         onChanged: (phone) {
+                          enteredPhoneNumber = phone.completeNumber;
+
                           // Update the enteredPhoneNumber variable with the entered phone number
                         },
                       ),

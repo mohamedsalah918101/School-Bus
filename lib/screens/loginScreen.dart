@@ -80,51 +80,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
 
     }
   }
-  // sendOtp() async {
-  //   await FirebaseAuth.instance.verifyPhoneNumber(
-  //     phoneNumber: '+2' + userLoginData.read('phoneV'),
-  //     verificationCompleted: (PhoneAuthCredential credential) {},
-  //     verificationFailed: (FirebaseAuthException e) {
-  //       showCustomSnackBar('Can\'t send code', e.toString());
-  //     },
-  //     codeSent: (String verificationId, int? resendToken) {
-  //       verificationID = verificationId;
-  //     },
-  //     codeAutoRetrievalTimeout: (String verificationId) {},
-  //   );
-  // }
-  // checkOtp() async {
-  //   PhoneAuthCredential credential = PhoneAuthProvider.credential(
-  //     verificationId: verificationID!,
-  //     smsCode: otpValue,
-  //   );
-  //   try {
-  //     await FirebaseAuth.instance.signInWithCredential(credential);
-  //     await SignupRepo().verifyPhone();
-  //     userLoginData.write('phoneVerify', true);
-  //     // if (userLoginData.read('isRegistered')) {
-  //     //   Get.offAllNamed(AppRoutes.signIn);
-  //     // } else {
-  //     //   final firebase = FirebaseDatabase.instance.ref();
-  //     //   var authFCM =  FirebaseAuth.instance.currentUser!.uid;
-  //     //   firebase.child('drivers/${authFCM}').update({
-  //     //     'id': '${userLoginData.read('idV')}',
-  //     //     'is_approve': userLoginData.read('isApprove') ? 1 : 0,
-  //     //     'is_active': 0,
-  //     //     'is_available':1,
-  //     //     // 'restaurant_id':res.data['owner_id_v'].toString()!= 'null' ? res.data['owner_id_v'].toString() :0
-  //     //   });
-  //     //   if (!userLoginData.read('isApprove')) {
-  //     //     Get.offAllNamed(AppRoutes.pending);
-  //     //   } else {
-  //     //     Get.offAllNamed(AppRoutes.layout);
-  //     //   }
-  //     // }
-  //     // Navigate to next screen upon successful authentication
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,

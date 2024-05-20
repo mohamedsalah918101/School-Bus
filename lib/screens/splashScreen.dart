@@ -5,6 +5,8 @@ import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/no_invitation.dart';
 
 import '../main.dart';
+import '../supervisor_parent/screens/accept_invitation_parent.dart';
+import '../supervisor_parent/screens/accept_invitation_supervisor.dart';
 import '../supervisor_parent/screens/final_invitation_parent.dart';
 import '../supervisor_parent/screens/final_invitation_supervisor.dart';
 import '../supervisor_parent/screens/home_parent.dart';
@@ -46,21 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ?
                     // AddParents(),
                     LoginScreen()
-                    : sharedpref!.getString('type').toString() == 'schooldata'
-                        ? sharedpref!.getInt('allData') == 1
-                            ? HomeScreen()
-                            : SchoolData()
-                        : sharedpref!.getString('type').toString() == 'parent'
-                            ? sharedpref!.getInt('invit') == 1
-                                ? sharedpref!.getInt('invitstate') == 1
-                                    ? MapParentScreen()
-                                    : FinalAcceptInvitationParent()
-                                : sharedpref!.getInt('skip') == 1 ?  MapParentScreen():NoInvitation(selectedImage: 3)
-                            : sharedpref!.getInt('invit') == 1
-                                ? sharedpref!.getInt('invitstate') == 1
-                                    ? HomeForSupervisor()
-                                    : FinalAcceptInvitationSupervisor()
-                                :  sharedpref!.getInt('skip') == 1 ? HomeForSupervisor() :NoInvitation(selectedImage: 2)));
+                    : openPage()));
       }
     });
   }
@@ -115,6 +103,51 @@ class _SplashScreenState extends State<SplashScreen>
       // )
       //
     );
+  }
+
+  StatefulWidget openPage() {
+    if(sharedpref!.getString('type').toString() == 'schooldata'){
+    if(sharedpref!.getInt('allData') == 1)
+    return HomeScreen();
+        else return SchoolData();
+    }else if(sharedpref!.getString('type').toString() == 'parent'){
+      if( sharedpref!.getInt('invit') == 0 ){
+        if(sharedpref!.getInt('skip') == 1)
+          return HomeParent();
+            else
+          return NoInvitation(selectedImage: 3);
+
+      }else{
+        if(sharedpref!.getInt('invitstate') == 1){
+          if (sharedpref!.getInt('address') == 1)
+          return  HomeParent();
+          else
+            return  MapParentScreen();
+
+
+        }
+        else
+          return  AcceptInvitationParent();
+      }
+    }else{
+      if( sharedpref!.getInt('invit') == 0 ){
+        if(sharedpref!.getInt('skip') == 1)
+          return  HomeForSupervisor();
+        else
+          return   NoInvitation(selectedImage: 2);
+
+      }else{
+        if(sharedpref!.getInt('invitstate') == 1)
+          return   HomeForSupervisor();
+        else
+          return   AcceptInvitationSupervisor();
+      }
+    }
+
+
+
+
+
   }
 }
 //invit lw mogod--lw gat invite b3d ---lw ft7t invite --otp

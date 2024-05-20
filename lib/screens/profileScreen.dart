@@ -502,75 +502,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: ElevatedButton(
                          onPressed: () {
                            Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
-                        //   // String currentUserId = sharedpref!.getString('id');
-                        //   // QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-                        //   //     .collection('schooldata')
-                        //   //     .where('id', isEqualTo: currentUserId)
-                        //   //     .get();
-                        //   // if (querySnapshot.docs.isNotEmpty) {
-                        //   //   DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
-                        //   //   _editProfileDocument(
-                        //   //     documentSnapshot.id,
-                        //   //     documentSnapshot['nameEnglish'],
-                        //   //     documentSnapshot['nameArabic'],
-                        //   //     documentSnapshot['address'],
-                        //   //     documentSnapshot['coordinatorName'],
-                        //   //     documentSnapshot['supportNumber'],
-                        //   //     documentSnapshot['photo'],
-                        //   //   );
-                        //   // }
-                        // // لسه معملتش ان الداته تتنقل لصفحه الايديت
-
-//                            getCurrentIdFromSharedPreferences();
-// // Find the index of the document with the current ID in the data list
-//                            final int index = data.indexWhere((doc) => doc.id == currentId);
-//                            print("shahd");
-//                     print(index);
-// // Use the found index to access the document's data
-//                            if (index != -1) {
-//                              _editProfileDocument(
-//                                  data[index].id,
-//                                  data[index]['nameEnglish'],
-//                                  data[index]['nameArabic'],
-//                                  data[index]['address'],
-//                                  data[index]['coordinatorName'],
-//                                  data[index]['supportNumber'],
-//                                  data[index]['photo']
-//                              );
-//                            } else {
-//                              // Handle the case where the document with the current ID is not found in the data list
-//                            }
-//                            _editProfileDocument(
-//                                  data[0].id,
-//                                  data[0]['nameEnglish'],
-//                                  data[0]['nameArabic'],
-//                                  data[0]['address'],
-//                                  data[0]['coordinatorName'],
-//                                  data[0]['supportNumber'],
-//                                  data[0]['photo']
-//                              );
 
                          },
-                        // onPressed: () async {
-                        //   DocumentSnapshot? userProfile = await getUserProfileData();
-                        //
-                        //   if (userProfile != null) {
-                        //     _editProfileDocument(
-                        //       userProfile.id,
-                        //       userProfile['nameEnglish'],
-                        //       userProfile['nameArabic'],
-                        //       userProfile['address'],
-                        //       userProfile['coordinatorName'],
-                        //       userProfile['supportNumber'],
-                        //       userProfile['schoolLogo'],
-                        //     );
-                        //     // Handle retrieved user profile data
-                        //     print('User Profile Data: ${userProfile.data()}');
-                        //   } else {
-                        //     // Handle error
-                        //     print('Failed to fetch user profile data');
-                        //   }
-                        // },
+
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
