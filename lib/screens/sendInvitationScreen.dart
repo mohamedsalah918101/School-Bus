@@ -35,7 +35,6 @@ class _SendInvitationState extends State<SendInvitation> {
   String kPickerName='';
   PhoneContact? _phoneContact;
 
-
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
   String docid='';
@@ -48,6 +47,10 @@ class _SendInvitationState extends State<SendInvitation> {
   final _nameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
+
+
+  bool nameerror=true;
+  bool phoneerror= true;
   final _firestore = FirebaseFirestore.instance;
   String enteredPhoneNumber='';
   void _addDataToFirestore() async {
@@ -314,7 +317,7 @@ bool _nameEntered =true;
                             SizedBox(height: 10,),
                             Container(
                               width: constrains.maxWidth / 1.2,
-                              //height: 44,
+                              height: 44,
                               child:
                               TextFormField(
 
@@ -331,7 +334,7 @@ bool _nameEntered =true;
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
-                                  errorText: _validateName ? "Please Enter Your Name" : null,
+                                  //errorText: _validateName ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -345,7 +348,7 @@ bool _nameEntered =true;
                                     fontSize: 12,
                                     fontFamily: 'Poppins-Bold',
                                     fontWeight: FontWeight.w700,
-                                   // height: 1.33,
+                                    height: 1.33,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -359,6 +362,15 @@ bool _nameEntered =true;
                                   // focusedBorder: myFocusBorder(),
                                   // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
                                   focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                            nameerror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 30),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter name".tr,
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
                             ),
@@ -467,7 +479,7 @@ bool _nameEntered =true;
                                 style: TextStyle(color: Color(0xFF442B72),height: 1.5),
                                 dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
                                 decoration: InputDecoration(
-                                  errorText: _validatePhone ? "Please Enter Your Phone" : null,
+                                 // errorText: _validatePhone ? "Please Enter Your Phone" : null,
                                   fillColor: Color(0xffF1F1F1),
                                   filled: true,
                                   hintText: 'Phone Number'.tr,
@@ -524,6 +536,15 @@ bool _nameEntered =true;
 
                                 },
 
+                              ),
+                            ),
+                            phoneerror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 30),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter phone number".tr,
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ),
                             ),
                             // Container(
@@ -672,12 +693,24 @@ bool _nameEntered =true;
                                  async {
 
                                    setState(() {
-                                     _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                                     _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                     if (_nameController.text.isEmpty) {
+                                       nameerror = false;
+                                     } else {
+                                       nameerror = true;
+                                     }
+                                     if (_phoneNumberController.text.isEmpty) {
+                                       phoneerror = false;
+                                     } else {
+                                       phoneerror = true;
+                                     }
+                                     // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                                     // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                    });
-                                   if(! _nameController.text.isEmpty &&
+                                   if(nameerror
+                                  // ! _nameController.text.isEmpty
+                                       &&
                                        //! _phoneNumberController.text.isEmpty
-                                   _phoneNumberController.text.length == 10){
+                                   _phoneNumberController.text.length == 10 && phoneerror){
                                      _addDataToFirestore();
                                      var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
                                      if (res == "success") {

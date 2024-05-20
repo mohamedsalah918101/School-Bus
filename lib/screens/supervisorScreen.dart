@@ -114,6 +114,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
   }
+
+
   //fun sarch
 
 
@@ -557,8 +559,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                     SizedBox(
                                       height: 500,
                                       child: ListView.builder(
-                                        //itemCount: data.length,
-                                        itemCount: filteredData.length,
+                                        itemCount: data.length,
+                                        //itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
                                           String supervisorPhoneNumber = filteredData[index]['phoneNumber'];
                                           int state =data[index]['state']; // Assuming 'state' is the field from Firestore
@@ -661,7 +663,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                               ),
                                             ),
                                             subtitle: Text(
-                                              statusText,
+                                            //  '${filteredData[index]['state']}',
+                                             statusText,
                                               style: TextStyle(
                                                 color: statusColor,
                                                 fontSize: 13,
@@ -870,17 +873,44 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                           ),
                                                           Row(
                                                             children: [
-                                                              Align(
-                                                                alignment:
-                                                                Alignment.centerLeft,
-                                                                child: CircleAvatar(
-                                                                  radius: 35,
-                                                                  backgroundImage:
-                                                                  AssetImage(
-                                                                      'assets/imgs/school/Ellipse 1.png'
-                                                                  ),
+                                                              SizedBox(
+                                                                width: 80,
+                                                                height: 80,
+                                                                child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                    ? Image.network(
+                                                                  data[index]['busphoto'],
+                                                                  fit: BoxFit.scaleDown,
+                                                                )
+                                                                    // :  Container(
+                                                                    // width:30,
+                                                                    // height:20,
+                                                                    // decoration: BoxDecoration(
+                                                                    //   shape: BoxShape.circle,
+                                                                    //   border: Border.all(
+                                                                    //     color: Color(0xffCCCCCC),
+                                                                    //     width: 2.0,
+                                                                    //   ),
+                                                                    // ),
+                                                                    // child: Padding(
+                                                                    //   padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                                    //   child: Image.asset("assets/imgs/school/Vector (16).png",width: 5,height: 5,),
+                                                                    // )),
+                                                               : Image.asset(
+                                                                  'assets/imgs/school/empty_supervisor.png',
+                                                                  fit: BoxFit.scaleDown,
                                                                 ),
                                                               ),
+                                                              // Align(
+                                                              //   alignment:
+                                                              //   Alignment.centerLeft,
+                                                              //   child: CircleAvatar(
+                                                              //     radius: 35,
+                                                              //     backgroundImage:
+                                                              //     AssetImage(
+                                                              //         'assets/imgs/school/Ellipse 1.png'
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
                                                               SizedBox(
                                                                 width: 10,
                                                               ),
@@ -966,6 +996,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               SizedBox(width: 10),
                                                               Text(
                                                                 'Bus: 1234  ى ر س',
+                                                                //data[index]['bus_id']
                                                                 style: TextStyle(
                                                                   fontSize: 16,
                                                                   color: Color(0xFF442B72),

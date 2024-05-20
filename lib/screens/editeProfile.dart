@@ -103,7 +103,11 @@ class _EditeProfileState extends State<EditeProfile> {
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
   CollectionReference profile = FirebaseFirestore.instance.collection('schooldata');
 
-
+  Future<String> _getImageUrl() async {
+    final DocumentSnapshot<Map<String, dynamic>> snapshot =await FirebaseFirestore.instance.collection('schooldata').doc(sharedpref!.getString('id'))
+        .get();
+    return snapshot.data()?['photo'] ?? '';
+  }
   editProfile() async {
     print('editprofile called');
 
@@ -291,66 +295,138 @@ class _EditeProfileState extends State<EditeProfile> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Stack(
+                //     children: [
+                //
+                //       Center(
+                //         child: Padding(
+                //           padding: const EdgeInsets.only(top: 20),
+                //           //this part od code photo doesnot change when choose other image
+                //           child:_selectedImageEditeProfile != null
+                //               ? Image.file(
+                //             _selectedImageEditeProfile!,  // Display the uploaded image
+                //             width: 83,  // Set width as per your preference
+                //             height: 78.5,  // Set height as per your preference
+                //             fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                //           ):
+                //           GestureDetector(
+                //             onTap: ()async {
+                //                await _pickEditeImageProfileFromGallery();
+                //             },
+                //             child: CircleAvatar(
+                //               backgroundColor: Colors.white, // Set background color to white
+                //               radius:50, // Set the radius according to your preference
+                //               child: Image.asset(
+                //                 'assets/imgs/school/Ellipse 2 (2).png',
+                //                 fit: BoxFit.cover,
+                //                 width: 100, // Set width of the image
+                //                 height: 100, // Set height of the image
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //       Center(
+                //         child: Padding(
+                //           padding: const EdgeInsets.only(top: 95,left: 55),
+                //           child: Container(
+                //             decoration: BoxDecoration(
+                //                 shape: BoxShape.circle,
+                //                 border: Border.all(width: 3,color: Color(0xff432B72))
+                //             ),
+                //             child: CircleAvatar(
+                //               backgroundColor: Colors.white,
+                //               // Set background color to white
+                //               radius:10, // Set the radius according to your preference
+                //               child: GestureDetector(
+                //                 onTap: (){
+                //                   changePhotoDialog(context);
+                //               //    _pickEditeProfileImageFromGallery();
+                //                 },
+                //                 child: Image.asset(
+                //                   'assets/imgs/school/edite.png',
+                //                   fit: BoxFit.cover,
+                //                   width: 15, // Set width of the image
+                //                   height: 15, // Set height of the image
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ]
+                // ),
                 Stack(
-                    children: [
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: FutureBuilder<String>(
+                          future: _getImageUrl(),
+                          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
 
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          //this part od code photo doesnot change when choose other image
-                          child:_selectedImageEditeProfile != null
-                              ? Image.file(
-                            _selectedImageEditeProfile!,  // Display the uploaded image
-                            width: 83,  // Set width as per your preference
-                            height: 78.5,  // Set height as per your preference
-                            fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                          ):
-                          GestureDetector(
-                            onTap: ()async {
-                               await _pickEditeImageProfileFromGallery();
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white, // Set background color to white
-                              radius:50, // Set the radius according to your preference
-                              child: Image.asset(
-                                'assets/imgs/school/Ellipse 2 (2).png',
-                                fit: BoxFit.cover,
-                                width: 100, // Set width of the image
-                                height: 100, // Set height of the image
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 95,left: 55),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(width: 3,color: Color(0xff432B72))
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              // Set background color to white
-                              radius:10, // Set the radius according to your preference
-                              child: GestureDetector(
-                                onTap: (){
-                                  changePhotoDialog(context);
-                              //    _pickEditeProfileImageFromGallery();
+                            if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            }
+
+                            if (!snapshot.hasData || snapshot.data == null ) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  await _pickEditeImageProfileFromGallery();
                                 },
-                                child: Image.asset(
-                                  'assets/imgs/school/edite.png',
-                                  fit: BoxFit.cover,
-                                  width: 15, // Set width of the image
-                                  height: 15, // Set height of the image
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 50,
+                                  child: Image.asset(
+                                    'assets/imgs/school/Ellipse 2 (2).png',
+                                    fit: BoxFit.cover,
+                                    width: 100,
+                                    height: 100,
+                                  ),
                                 ),
+                              );
+                            }
+
+                            return Image.network(
+                              snapshot.data!,
+                              width: 83,
+                              height: 78.5,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 95, left: 55),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(width: 3, color: Color(0xff432B72)),
+                          ),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 10,
+                            child: GestureDetector(
+                              onTap: () {
+                                changePhotoDialog(context);
+                              },
+                              child: Image.asset(
+                                'assets/imgs/school/edite.png',
+                                fit: BoxFit.cover,
+                                width: 15,
+                                height: 15,
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ]
+                    ),
+                  ],
                 ),
 
 
@@ -1133,7 +1209,15 @@ class _EditeProfileState extends State<EditeProfile> {
                           onTap: (){
                             _pickEditeImageProfileFromGallery();
                           },
-                          child: CircleAvatar(
+                          child:
+                          // _selectedImageprofileEdite != null
+                          //     ? Image.file(
+                          //   _selectedImageprofileEdite!,  // Display the uploaded image
+                          //   width: 83,  // Set width as per your preference
+                          //   height: 78.5,  // Set height as per your preference
+                          //   fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                          // ):
+                          CircleAvatar(
                               backgroundColor:Color(0xffE2E1EE),
                               child: Image.asset("assets/imgs/school/Vectorphoto.png",width: 21,height: 16,)),
                         ),

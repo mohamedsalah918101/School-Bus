@@ -580,8 +580,12 @@ final _firestore = FirebaseFirestore.instance;
                                         height: 500,
                                         child: ListView.builder(
                                           // shrinkWrap: true,
-                                            itemCount: filteredData.length,
+                                            //itemCount: filteredData.length,
+                                          //itemCount: data.length,
+                                            itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' ?  filteredData.length : data.length,
                                             itemBuilder: (context, index) {
+
+
                                               String supervisorPhoneNumber = filteredData[index]['phonedriver'];
                                               // to change image depended on filter if filter with bus number show image of bus & if filter with driver name image of driver appear
                                               String imageUrl = selectedFilter == 'Bus Number'
@@ -762,11 +766,15 @@ final _firestore = FirebaseFirestore.instance;
                                                             //         builder: (context) =>
                                                             //             EditeSupervisor()));
                                                           } else if (value == 'delete') {
-                                                            deletePhotoDialog(context);
+                                                            //deletePhotoDialog(context);
                                                             //وقفت delete function علشان لما بسمح بيعمل error
 
-                                                           // _deletebusDocument(data[index].id);
-
+                                                          //  _deletebusDocument(data[index].id);
+                                                            if (index < filteredData.length) {
+                                                              _deletebusDocument(filteredData[index].id);
+                                                            } else {
+                                                              print('Invalid index: $index');
+                                                            }
                                                             // setState(() {
                                                             //
                                                             //   //showSnackBarFun(context);
@@ -776,6 +784,11 @@ final _firestore = FirebaseFirestore.instance;
                                                       ),
                                                       tileColor: Colors.white,
                                                       onTap: (){
+
+                                                        List<DropdownCheckboxItem>allSupervisors=[];
+                                                        for(int i=0;i<data[index]['supervisors'].length;i++){
+                                                          allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
+                                                        }
                                                         showModalBottomSheet(
                                                           shape: RoundedRectangleBorder(
                                                             borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -861,12 +874,25 @@ final _firestore = FirebaseFirestore.instance;
                                                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                       children: [
                                                                         SizedBox(
-                                                                            width: 80,
-                                                                            height: 80,
-                                                                            child: Image.network('${data[index]['busphoto']}',
-                                                                              fit: BoxFit.scaleDown,
-                                                                            )
-                                                                        )
+                                                                          width: 80,
+                                                                          height: 80,
+                                                                          child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                              ? Image.network(
+                                                                            data[index]['busphoto'],
+                                                                            fit: BoxFit.scaleDown,
+                                                                          )
+                                                                              : Image.asset(
+                                                                            'assets/imgs/school/ph_bus-light (1).png',
+                                                                            fit: BoxFit.scaleDown,
+                                                                          ),
+                                                                        ),
+                                                                        // SizedBox(
+                                                                        //     width: 80,
+                                                                        //     height: 80,
+                                                                        //     child: Image.network('${data[index]['busphoto']}',
+                                                                        //       fit: BoxFit.scaleDown,
+                                                                        //     )
+                                                                        // )
 
                                                                         // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
                                                                         // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
@@ -877,12 +903,25 @@ final _firestore = FirebaseFirestore.instance;
                                                                     Row(
                                                                       children: [
 
-                                                                        Align(
-                                                                          alignment: Alignment.centerLeft,
-                                                                          child: CircleAvatar(
-                                                                            radius: 35,
-                                                                            backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
-
+                                                                        // Align(
+                                                                        //   alignment: Alignment.centerLeft,
+                                                                        //   child: CircleAvatar(
+                                                                        //     radius: 35,
+                                                                        //     backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
+                                                                        //
+                                                                        //   ),
+                                                                        // ),
+                                                                        SizedBox(
+                                                                          width: 80,
+                                                                          height: 80,
+                                                                          child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
+                                                                              ? Image.network(
+                                                                            data[index]['imagedriver'],
+                                                                            fit: BoxFit.scaleDown,
+                                                                          )
+                                                                              : Image.asset(
+                                                                            'assets/imgs/school/empty_supervisor.png',
+                                                                            fit: BoxFit.scaleDown,
                                                                           ),
                                                                         ),
                                                                         SizedBox(width: 20,),
@@ -943,6 +982,8 @@ final _firestore = FirebaseFirestore.instance;
                                                                     SizedBox(height: 30),
                                                                     Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
                                                                     SizedBox(height: 10),
+
+
                                                                     Padding(
                                                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                       child: Row(
@@ -956,6 +997,8 @@ final _firestore = FirebaseFirestore.instance;
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: 10),
+
+
                                                                           Text(
                                                                             'Ahmed Atef',
                                                                             style: TextStyle(
@@ -1019,17 +1062,7 @@ final _firestore = FirebaseFirestore.instance;
                                                 );
 
                                             }),
-                                        // child: Column(
-                                        //   children: [
-                                        //     ListTile(
-                                        //       leading: Image.asset('assets/imgs/school/buses.png'),
-                                        //       title: Text('${data[index]['busnumber'] }',style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                        //       subtitle: Text("Driver name : Ahmed Atef",style:
-                                        //       TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                        //       trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-                                        //     ),
-                                        //   ],
-                                        // ),
+
                                       ),
 
                                       SizedBox(height: 40,),

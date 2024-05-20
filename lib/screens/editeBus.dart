@@ -77,13 +77,20 @@ class _EditeBusState extends State<EditeBus> {
           print('updating document...');
           List<Map<String, dynamic>> supervisorsList = List.generate(
             selectedItems.length,
-                (index) => {
-              'name': selectedItems[index].label,
-              'phone': selectedItems[index].phone,
-              'id': selectedItems[index].docID,
-
+                (index) {
+              FirebaseFirestore.instance
+                  .collection('supervisor')
+                  .doc(selectedItems[index].docID)
+                  .update({'bus_id':widget.docid
+              });
+              return {
+                'name': selectedItems[index].label,
+                'phone': selectedItems[index].phone,
+                'id': selectedItems[index].docID,
+              };
             },
           );
+
           await Bus.doc(widget.docid).update({
              'busnumber': _busnumbercontroller.text,
             'supervisors':supervisorsList,
@@ -111,11 +118,15 @@ class _EditeBusState extends State<EditeBus> {
   }
   File ? _selectedImagedriverEdite;
   String? imageUrldriver;
+
+  //String _selectedImageDriver = '';
   Future _pickImageDriverFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
     if(returnedImage ==null) return;
     setState(() {
       _selectedImagedriverEdite=File(returnedImage.path);
+
+
     });
 
     //Get a reference to storage root
@@ -372,11 +383,14 @@ class _EditeBusState extends State<EditeBus> {
                                       onTap: () {
                                         _pickImageDriverFromGallery();
                                       },
-                                      child: CircleAvatar(
+                                      child:
+                                      CircleAvatar(
                                         radius: 30,
                                         backgroundImage:(widget.oldphotodriver == null || widget.oldphotodriver == '') ? _selectedImagedriverEdite!= null
                                             ? Image.file(_selectedImagedriverEdite!, width: 83, height: 78.5, fit: BoxFit.cover).image
-                                            : AssetImage('assets/imgs/school/Ellipse 2 (1).png'):NetworkImage(widget.oldphotodriver!),
+                                            : AssetImage('assets/imgs/school/Ellipse 2 (1).png'):
+                                        NetworkImage(widget.oldphotodriver!),
+                                       // NetworkImage(_selectedImageDriver),
                                       ),
                                     ),
                                   ),
