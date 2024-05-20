@@ -10,6 +10,7 @@ import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
+import '../Functions/functions.dart';
 import '../classes/dropdownCheckbox.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -100,7 +101,7 @@ class _AddBusState extends State<AddBus> {
    // data.addAll(querySnapshot.docs);
     for(int i=0;i<querySnapshot.docs.length;i++)
       {
-        items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name')));
+        items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber')));
       }
     setState(() {
 
@@ -146,18 +147,38 @@ class _AddBusState extends State<AddBus> {
     // }
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
+
+    List<Map<String, dynamic>> supervisorsList = List.generate(
+      selectedItems.length,
+          (index) => {
+        'name': selectedItems[index].label,
+        'phone': selectedItems[index].phone,
+         'id': selectedItems[index].docID,
+
+          },
+    );
     Map<String, dynamic> data = {
       'namedriver': _driverName.text,
       'phonedriver': _driverNumber.text,
       'busnumber': _busNumber.text,
-      'supervisorname':_supervisor.text,
+      'supervisors':supervisorsList,
       'imagedriver':imageUrl ??'',
       'busphoto':busimage ??'',
     };
     // Add the data to the Firestore collection
     await _firestore.collection('busdata').add(data).then((docRef) {
       print('Data added with document ID: ${docRef.id}');
+      List.generate(
+        selectedItems.length,
+            (index) {
+          FirebaseFirestore.instance
+              .collection('supervisor')
+              .doc(selectedItems[index].docID)
+              .update({'bus_id':docRef.id
+          });
 
+        },
+      );
     }).catchError((error) {
       print('Failed to add data: $error');
     });
@@ -180,6 +201,7 @@ class _AddBusState extends State<AddBus> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    selectedItems.clear();
     getData();
   }
   OutlineInputBorder myInputBorder() {
@@ -932,20 +954,23 @@ class _AddBusState extends State<AddBus> {
                     //   ),
                     // ),
                               Container(
-                                child:DropdownCheckbox(
+                                child:
+                                DropdownCheckbox(
                                     controller: _supervisorController,
                                 items:
                                   items
                                  ),),
-                              supervisorerror?Container(): Padding(
-                                padding: const EdgeInsets.only(left: 32),
-                                child: Align( alignment: AlignmentDirectional.topStart,
-                                  child: Text(
-                                    "Please choose supervisor".tr,
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ),
+
+                              // supervisorerror?Container(): Padding(
+                              //   padding: const EdgeInsets.only(left: 32),
+                              //   child: Align( alignment: AlignmentDirectional.topStart,
+                              //     child: Text(
+                              //       "Please choose supervisor".tr,
+                              //       style: TextStyle(color: Colors.red),
+                              //     ),
+                              //   ),
+                              // ),
+                              //end empty code
                               // DropdownButtonFormField(value:null,items: [], onChanged: (value){}),
                               // DropdownButton<String>(
                               //   hint: Text('Select an option'),
@@ -998,7 +1023,9 @@ class _AddBusState extends State<AddBus> {
                                       });
                                       if (_driverNumber.text.length ==11 && namedrivererror && drivernumbererror
                                         // ! _driverNumber.text.isEmpty
-                                          && busnumbererror && supervisorerror && _selectedImagedriver != null && driverphotoerror
+                                          && busnumbererror
+                                          //&& supervisorerror
+                                          && _selectedImagedriver != null && driverphotoerror
                                           //_selectedImage != null && _selectedImagebus != null
                                           ){
 

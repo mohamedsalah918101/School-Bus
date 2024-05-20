@@ -1,5 +1,7 @@
 class DropdownCheckboxItem {
   final String label;
   bool isChecked;
-  DropdownCheckboxItem({required this.label, this.isChecked = false});
+  String? phone;
+  String? docID;
+  DropdownCheckboxItem({required this.label, this.isChecked = false, this.phone, this.docID});
 }

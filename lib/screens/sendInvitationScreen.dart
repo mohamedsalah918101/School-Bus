@@ -52,13 +52,14 @@ class _SendInvitationState extends State<SendInvitation> {
   bool nameerror=true;
   bool phoneerror= true;
   final _firestore = FirebaseFirestore.instance;
+  String enteredPhoneNumber='';
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
       // Define the data to add
       Map<String, dynamic> data = {
         'name': _nameController.text,
         'email': _emailController.text,
-        'phoneNumber': _phoneNumberController.text,
+        'phoneNumber': enteredPhoneNumber,
         'state':0,
         'invite':1,
         'busphoto':'',
@@ -66,9 +67,9 @@ class _SendInvitationState extends State<SendInvitation> {
       print('phonenum');
       print( _phoneNumberController.text);
       // Add the data to the Firestore collection
-      var check =await addSupervisorCheck(_phoneNumberController.text);
+      var check =await addSupervisorCheck(enteredPhoneNumber);
       if(!check) {
-        var res =await checkUpdateSupervisor(_phoneNumberController.text);
+        var res =await checkUpdateSupervisor(enteredPhoneNumber);
         if(!res) {
       await _firestore.collection('supervisor').add(data).then((docRef) {
         docid=docRef.id;
@@ -530,6 +531,7 @@ bool _nameEntered =true;
 
                                 initialCountryCode: 'EG', // Set initial country code if needed
                                 onChanged: (phone) {
+                                  enteredPhoneNumber = phone.completeNumber;
                                   // Update the enteredPhoneNumber variable with the entered phone number
 
                                 },
@@ -688,13 +690,8 @@ bool _nameEntered =true;
                                   txt: "Send invitation".tr,
                                  onPress: ()
                                  //async
-                                 {
-                                    // Navigator.push(
-                                    //     context ,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>  HomeScreen(),
-                                    //         maintainState: false)
-                                    // );
+                                 async {
+
                                    setState(() {
                                      if (_nameController.text.isEmpty) {
                                        nameerror = false;
@@ -715,8 +712,14 @@ bool _nameEntered =true;
                                        //! _phoneNumberController.text.isEmpty
                                    _phoneNumberController.text.length == 10 && phoneerror){
                                      _addDataToFirestore();
-                                     createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
-                                     showSnackBarFun(context);
+                                     var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+                                     if (res == "success") {
+                                       showSnackBarFun(
+                                           context, 'Invitation sent successfully',Color(0xFF4CAF50) );
+                                     } else {
+                                       showSnackBarFun(
+                                           context, 'Invitation doesn\'t sent',Color(0xFFFF3C3C) );
+                                     }
                                    }
                                    else{
                                      SnackBar(content: Text('Please,enter valid number'));
@@ -915,7 +918,7 @@ bool _nameEntered =true;
       ),
     );
   }
-  showSnackBarFun(context) {
+  showSnackBarFun(context,msg,color) {
     SnackBar snackBar = SnackBar(
 
       // content: const Text('Invitation sent successfully',
@@ -931,8 +934,8 @@ bool _nameEntered =true;
           ),
           SizedBox(width: 20), // Add some space between the image and the text
           Text(
-            'Invitation sent successfully',
-            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color: Color(0xff4CAF50)),
+            msg,
+            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),
           ),
         ],
       ),

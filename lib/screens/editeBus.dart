@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -31,13 +32,15 @@ class EditeBus extends StatefulWidget{
   final String? olddriverphone;
   final String? oldphotobus;
   final String? olddnumberbus;
-  const EditeBus({super.key,
+  List<DropdownCheckboxItem>allSupervisors;
+   EditeBus({super.key,
   required this.docid,
   required this.oldphotodriver,
   required this.olddrivername,
   required this.olddriverphone,
   required this.oldphotobus,
-  required this.olddnumberbus
+  required this.olddnumberbus,
+     required this.allSupervisors
   });
   //const EditeBus({super.key});
   @override
@@ -59,7 +62,6 @@ class _EditeBusState extends State<EditeBus> {
 
   MyLocalController ControllerLang = Get.find();
   String? _selectedSupervisor;
-  List<String> _supervisors = ['Supervisor 1', 'Supervisor 2', 'Supervisor 3'];
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
   editAddBus() async {
@@ -73,14 +75,29 @@ class _EditeBusState extends State<EditeBus> {
 
         try {
           print('updating document...');
+          List<Map<String, dynamic>> supervisorsList = List.generate(
+            selectedItems.length,
+                (index) {
+              FirebaseFirestore.instance
+                  .collection('supervisor')
+                  .doc(selectedItems[index].docID)
+                  .update({'bus_id':widget.docid
+              });
+              return {
+                'name': selectedItems[index].label,
+                'phone': selectedItems[index].phone,
+                'id': selectedItems[index].docID,
+              };
+            },
+          );
 
           await Bus.doc(widget.docid).update({
              'busnumber': _busnumbercontroller.text,
-             //'busphoto': _imagebuscontroller.reactive,
-            'imagedriver': imageUrldriver,
+            'supervisors':supervisorsList,
+            'imagedriver': imageUrldriver  ?? '',
             'namedriver':_namedrivercontroller.text,
             'phonedriver':_phonedrivercontroller.text,
-
+            'busphoto':imageUrldbus ??'',
           });
 
           print('document updated successfully');
@@ -101,11 +118,15 @@ class _EditeBusState extends State<EditeBus> {
   }
   File ? _selectedImagedriverEdite;
   String? imageUrldriver;
+
+  //String _selectedImageDriver = '';
   Future _pickImageDriverFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
     if(returnedImage ==null) return;
     setState(() {
       _selectedImagedriverEdite=File(returnedImage.path);
+
+
     });
 
     //Get a reference to storage root
@@ -170,8 +191,8 @@ class _EditeBusState extends State<EditeBus> {
     }
   }
 
-  List<DropdownCheckboxItem> items=[];
   List<QueryDocumentSnapshot> data = [];
+  List<DropdownCheckboxItem> items=[];
   getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 0) // Example condition
         .get();
@@ -179,7 +200,14 @@ class _EditeBusState extends State<EditeBus> {
     // data.addAll(querySnapshot.docs);
     for(int i=0;i<querySnapshot.docs.length;i++)
     {
-      items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name')));
+    var contain = selectedItems.where((element) => element.docID == querySnapshot.docs[i].id);
+    if (contain.isEmpty)
+      items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber'),isChecked: false));
+
+    else
+      items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber'),isChecked: true));
+
+
     }
     setState(() {
 
@@ -189,11 +217,17 @@ class _EditeBusState extends State<EditeBus> {
 // to lock in landscape view
   @override
   void initState() {
+
     super.initState();
+    selectedItems.clear();
+    selectedItems=widget.allSupervisors;
     //_imagedrivercontroller.reactive=widget.oldphotodriver!;
     _namedrivercontroller.text=widget.olddrivername!;
     _phonedrivercontroller.text=widget.olddriverphone!;
     _busnumbercontroller.text=widget.olddnumberbus!;
+    imageUrldbus=widget.oldphotobus!;
+    imageUrldriver=widget.oldphotodriver!;
+    getData();
     //imageUrldriver=widget.oldphotodriver!;
     //imageUrldbus=widget.oldphotobus!;
     // responsible
@@ -349,11 +383,14 @@ class _EditeBusState extends State<EditeBus> {
                                       onTap: () {
                                         _pickImageDriverFromGallery();
                                       },
-                                      child: CircleAvatar(
+                                      child:
+                                      CircleAvatar(
                                         radius: 30,
-                                        backgroundImage: _selectedImagedriverEdite!= null
+                                        backgroundImage:(widget.oldphotodriver == null || widget.oldphotodriver == '') ? _selectedImagedriverEdite!= null
                                             ? Image.file(_selectedImagedriverEdite!, width: 83, height: 78.5, fit: BoxFit.cover).image
-                                            : AssetImage('assets/imgs/school/Ellipse 2 (1).png'),
+                                            : AssetImage('assets/imgs/school/Ellipse 2 (1).png'):
+                                        NetworkImage(widget.oldphotodriver!),
+                                       // NetworkImage(_selectedImageDriver),
                                       ),
                                     ),
                                   ),
@@ -559,9 +596,10 @@ class _EditeBusState extends State<EditeBus> {
                                       children:[
                                         InteractiveViewer(
                                            // transformationController: _imagebuscontroller,
-                                            child:
+                                            child:(widget.oldphotobus == null || widget.oldphotobus == '') ?
                                             //Image.network(widget.oldphotobus),
-                                          Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,)
+                                          Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                                Image.network(widget.oldphotobus!,width: 75,height: 74,fit: BoxFit.cover,)
                                         ),
 
                                         Align(alignment: AlignmentDirectional.topEnd,
@@ -818,7 +856,8 @@ class _EditeBusState extends State<EditeBus> {
                               //   ),
                               // ),
                               Container(
-                                child:DropdownCheckbox(
+                                child:
+                                DropdownCheckbox(
                                     controller: _supervisorController,
                                     items:
                                     items

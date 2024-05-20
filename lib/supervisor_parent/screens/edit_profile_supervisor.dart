@@ -100,7 +100,6 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
           });
           print('document updated successfully');
 
-          // تحديث حالة الواجهة
           setState(() {
             // _pickImageFromGallery();
             });
