@@ -48,7 +48,7 @@ class _AddParentsState extends State<AddParents> {
 
   void _addDataToFirestore() async {
     setState(() {
-      _isLoading = true;
+     // _isLoading = true;
 
     });
     int numberOfChildren = int.parse(_numberOfChildrenController.text);

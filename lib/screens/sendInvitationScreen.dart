@@ -11,6 +11,7 @@ import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import '../Functions/functions.dart';
 import '../components/bottom_bar_item.dart';
+import '../components/dialogs.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
@@ -75,6 +76,16 @@ class _SendInvitationState extends State<SendInvitation> {
         docid=docRef.id;
         print('Data added with document ID: ${docRef.id}');
 
+
+//when put this code the invitation doesnot appear when phone number already exists but when add new supervisor the snackbar of faild appear
+//         var res =  createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+//         if (res == "success") {
+//           showSnackBarFun(
+//               context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
+//         } else {
+//           showSnackBarFun(
+//               context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+//         }
         // showSnackBarFun(context);
       }).catchError((error) {
         print('Failed to add data: $error');
@@ -91,7 +102,11 @@ class _SendInvitationState extends State<SendInvitation> {
           _emailController.clear();
         }
 
-      }      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+      }     // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+      else {
+        // Show dialog if the phone number is already added
+        Dialoge.SupervisorAlreadyAdded(context);
+      }
 
   }
  // }
@@ -225,6 +240,11 @@ bool _nameEntered =true;
                                            _phoneContact!.phoneNumber!.number!.isNotEmpty) {
                                          setState(() {
                                            kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                           if (kPickerNumber.startsWith('0')) {
+                                             kPickerNumber = kPickerNumber.substring(1);
+
+                                           }
+                                           kPickerNumber = kPickerNumber.replaceAll(' ', '');
                                            _phoneNumberController.text = kPickerNumber;
                                          });
                                        }
@@ -715,10 +735,10 @@ bool _nameEntered =true;
                                      var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
                                      if (res == "success") {
                                        showSnackBarFun(
-                                           context, 'Invitation sent successfully',Color(0xFF4CAF50) );
+                                           context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
                                      } else {
                                        showSnackBarFun(
-                                           context, 'Invitation doesn\'t sent',Color(0xFFFF3C3C) );
+                                           context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
                                      }
                                    }
                                    else{
@@ -918,7 +938,7 @@ bool _nameEntered =true;
       ),
     );
   }
-  showSnackBarFun(context,msg,color) {
+  showSnackBarFun(context,msg,color,photo) {
     SnackBar snackBar = SnackBar(
 
       // content: const Text('Invitation sent successfully',
@@ -927,12 +947,16 @@ bool _nameEntered =true;
       content: Row(
         children: [
           // Add your image here
-          Image.asset(
-            'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
-            width: 30, // Adjust width as needed
-            height: 30, // Adjust height as needed
+          Padding(
+            padding: const EdgeInsets.only(left: 50),
+            child: Image.asset(
+              photo,
+              // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
+              width: 30, // Adjust width as needed
+               height: 30, // Adjust height as needed
+            ),
           ),
-          SizedBox(width: 20), // Add some space between the image and the text
+          SizedBox(width: 10), // Add some space between the image and the text
           Text(
             msg,
             style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),

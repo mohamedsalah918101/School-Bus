@@ -39,9 +39,9 @@ class HomeParentState extends State<HomeParent> {
     try {
       DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
       if (documentSnapshot.exists) {
-        documentSnapshot.data().forEach((key, value) {
-          dataWidgets.add(Text('$key: $value'));
-        });
+        // documentSnapshot.data().forEach((key, value) {
+        //   dataWidgets.add(Text('$key: $value'));
+        // });
       } else {
         print("Document does not exist");
         return null;
