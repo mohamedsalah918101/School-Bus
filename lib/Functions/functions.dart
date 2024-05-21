@@ -144,6 +144,8 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
           id =snapshot.docs[0].id;
           sharedpref!.setInt('invitstate',snapshot.docs[0].get('state'));
           sharedpref!.setInt('invit',snapshot.docs[0].get('invite'));
+          sharedpref!.setString('name',snapshot.docs[0].get('name'));
+
           print('invitstate');
           print(snapshot.docs[0].get('invite').toString());
           return true;
@@ -220,6 +222,7 @@ Future<bool> addParentCheck(String phoneNumber) async {
 }
 String docID='';
 int invitCheck=0;
+int childNum=0;
 Future<bool> checkUpdate(String phoneNumber) async {
 
   try {
@@ -233,6 +236,10 @@ Future<bool> checkUpdate(String phoneNumber) async {
         loginType = 'parent';
         docID =snapshot.docs[0].id;
         invitCheck =snapshot.docs[0].get('invite');
+        if(snapshot.docs[0].data().toString().contains('numberOfChildren'))
+          childNum = 1;
+        else
+          childNum = 0;
         return true;
 
 
@@ -258,6 +265,8 @@ Future<bool> checkUpdateSupervisor(String phoneNumber) async {
     if(snapshot.size > 0){
       loginType = 'supervisor';
       docID =snapshot.docs[0].id;
+      invitCheck =snapshot.docs[0].get('invite');
+
       return true;
 
 
