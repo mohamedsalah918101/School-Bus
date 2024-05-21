@@ -856,8 +856,9 @@ class _EditeBusState extends State<EditeBus> {
                               //   ),
                               // ),
                               Container(
-                                child:
-                                DropdownCheckbox(
+                                child:DropdownCheckboxEditeBus
+                                //DropdownCheckbox
+                                  (
                                     controller: _supervisorController,
                                     items:
                                     items
@@ -1184,6 +1185,7 @@ class _EditeBusState extends State<EditeBus> {
                         width: 120,
                         hight: 38,
                         onPress: () => {
+
                         Navigator.pop(context),
                           showSnackBarDeleteFun(context),
                         }

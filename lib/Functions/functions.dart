@@ -171,7 +171,7 @@ Future<bool> addSupervisorCheck(String phoneNumber) async {
 
       return true;
     }else{
-      CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('parent');
+      CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
       Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
       QuerySnapshot snapshot = await queryOfNumber.get();
       print(snapshot.docs.toString()+'dataaa');
