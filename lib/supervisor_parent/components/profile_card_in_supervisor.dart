@@ -76,10 +76,6 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                           backgroundColor: Color(0xff442B72),
                           child: CircleAvatar(
                             backgroundImage:
-                            // (imageUrl != null && imageUrl!.isNotEmpty)
-                            //     ? NetworkImage(imageUrl!)
-                            //     : AssetImage('assets/images/download.png') as ImageProvider,
-
                             NetworkImage('${data['busphoto'] }'),
                             radius: 30.5,
                           ),

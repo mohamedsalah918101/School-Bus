@@ -21,6 +21,8 @@ class OtpScreen extends StatefulWidget {
   final String verificationId;
   int? type = 0;
   String? name;
+  String email = '';
+  String busphoto = '';
   String? phone;
   String? typeName;
 
@@ -81,6 +83,8 @@ class _OtpScreenState extends State<OtpScreen> {
     String userId = FirebaseAuth.instance.currentUser!.uid;
     Map<String, dynamic> data = {
       'name': widget.name,
+      'email': widget.email,
+      'busphoto': widget.busphoto,
       'phoneNumber': widget.phone,
     'state':0,
     'invite':0
@@ -104,6 +108,8 @@ class _OtpScreenState extends State<OtpScreen> {
         await sharedpref!.setInt('invitstate',0);
         await sharedpref!.setInt('invit',0);
         sharedpref!.setString('name',widget.name!);
+        sharedpref!.setString('email',widget.email!);
+        sharedpref!.setString('busphoto',widget.busphoto!);
 
         Navigator.push(
             context,

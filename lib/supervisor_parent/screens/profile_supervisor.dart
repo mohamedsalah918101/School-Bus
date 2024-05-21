@@ -171,559 +171,559 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
         body: SingleChildScrollView(
             child:
             // children.isNotEmpty?
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 25.0),
-                    child: SizedBox(
-                      width: 230,
-                      child: Padding(
-                        padding:  (sharedpref?.getString('lang') == 'ar') ?
-                        EdgeInsets.only(right: 105.0 , top: 5):
-                        EdgeInsets.only(left: 105.0 , top: 5 ),
-                        child: Stack(
-                          children: [
-                            GestureDetector(
-                              onTap: (){
-                                // _pickImageFromGallery();
-                                print('object');
-                              },
-                              child:FutureBuilder(
-                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text('Something went wrong');
-                                  }
-
-                                  if (snapshot.connectionState == ConnectionState.done) {
-                                    if (snapshot.data?.data() == null) {
-                                      return Text(
-                                        'No data available',
-                                        style: TextStyle(
-                                          color: Color(0xff442B72),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      );
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25.0),
+                      child: SizedBox(
+                        width: 230,
+                        child: Padding(
+                          padding:  (sharedpref?.getString('lang') == 'ar') ?
+                          EdgeInsets.only(right: 105.0 , top: 5):
+                          EdgeInsets.only(left: 105.0 , top: 5 ),
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  // _pickImageFromGallery();
+                                  print('object');
+                                },
+                                child:FutureBuilder(
+                                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Text('Something went wrong');
                                     }
 
-                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      if (snapshot.data?.data() == null) {
+                                        return Text(
+                                          'No data available',
+                                          style: TextStyle(
+                                            color: Color(0xff442B72),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        );
+                                      }
 
-                                    sharedpref?.getString('lang') == 'en';
-                                    return
-                                    CircleAvatar(
-                                      radius: 52.5,
-                                      backgroundColor: Color(0xff442B72),
-                                      child: CircleAvatar(
-                                        backgroundImage: NetworkImage('${data['busphoto'] }'),
-                                        radius: 50.5,
-                                      ),
-                                    );
-                                  }
+                                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
 
-                                  return CircularProgressIndicator();
-                                },
+                                      sharedpref?.getString('lang') == 'en';
+                                      return
+                                        CircleAvatar(
+                                          radius: 52.5,
+                                          backgroundColor: Color(0xff442B72),
+                                          child: CircleAvatar(
+                                            backgroundImage: NetworkImage('${data['busphoto'] }'),
+                                            radius: 50.5,
+                                          ),
+                                        );
+                                    }
+
+                                    return CircularProgressIndicator();
+                                  },
+                                ),
+
                               ),
-
-                            ),
-                            (sharedpref?.getString('lang') == 'ar')?
-                            Positioned(
-                              bottom: 2,
-                              left: 24,
-                              child: GestureDetector(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 25.0),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(
-                                                    13), // Rounded top left corner
-                                                topRight: Radius.circular(
-                                                    13), // Rounded top right corner
+                              (sharedpref?.getString('lang') == 'ar')?
+                              Positioned(
+                                bottom: 2,
+                                left: 24,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 25.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(
+                                                      13), // Rounded top left corner
+                                                  topRight: Radius.circular(
+                                                      13), // Rounded top right corner
+                                                ),
                                               ),
-                                            ),
-                                            height: 220,
-                                            child: Column(
-                                              children: [
-                                                Text('Change profile picture'.tr,
-                                                  style: TextStyle(
-                                                      color: Color(0xff771F98),
-                                                      fontSize: 19,
+                                              height: 220,
+                                              child: Column(
+                                                children: [
+                                                  Text('Change profile picture'.tr,
+                                                    style: TextStyle(
+                                                        color: Color(0xff771F98),
+                                                        fontSize: 19,
+                                                        fontFamily: 'Poppins-Regular',
+                                                        fontWeight: FontWeight.w500
+                                                    ),),
+                                                  Padding(
+                                                    padding: (sharedpref?.getString('lang') == 'ar')?
+                                                    EdgeInsets.only(right: 20.0 , top: 15):
+                                                    EdgeInsets.only(left: 20.0, top: 15),
+                                                    child: Row(
+                                                      children: [
+                                                        GestureDetector(
+                                                          child: _selectedImage != null
+                                                              ? Image.file(
+                                                            _selectedImage!,  // Display the uploaded image
+                                                            width: 83,  // Set width as per your preference
+                                                            height: 78.5,  // Set height as per your preference
+                                                            fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                                          )
+                                                              : Container(
+                                                            width: 65, // Adjust size as needed
+                                                            height: 65,
+                                                            decoration: BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              border: Border.all(
+                                                                color: Color(0xffCCCCCC), // Adjust border color
+                                                                width: 2, // Adjust border width
+                                                              ),
+                                                            ),
+                                                            child: Align(alignment: Alignment.bottomCenter,
+                                                              child: CircleAvatar(radius: 20,
+                                                                backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                                                ,backgroundColor: Colors.white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          // child: Image.asset('assets/images/Vector (13)profile.png',
+                                                          //   width: 55,
+                                                          //   height: 55,),
+                                                          onTap:()async {
+
+                                                            // await _pickImageFromGallery();
+
+                                                            print('objectttt');
+                                                            setState(() {
+
+                                                            });}  , // Call function when tapped
+                                                        ),
+                                                        if ( file != null ) Image.file(file!),
+                                                        SizedBox(width: 15,),
+                                                        Text('Select profile picture'.tr,
+                                                          style: TextStyle(
+                                                              color: Color(0xff442B72),
+                                                              fontSize: 15,
+                                                              fontFamily: 'Poppins-Bold',
+                                                              fontWeight: FontWeight.w700
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 40),
+                                                  ElevatedSimpleButton(
+                                                      txt: 'Save'.tr,
                                                       fontFamily: 'Poppins-Regular',
-                                                      fontWeight: FontWeight.w500
-                                                  ),),
-                                                Padding(
-                                                  padding: (sharedpref?.getString('lang') == 'ar')?
-                                                  EdgeInsets.only(right: 20.0 , top: 15):
-                                                  EdgeInsets.only(left: 20.0, top: 15),
-                                                  child: Row(
-                                                    children: [
-                                                      GestureDetector(
-                                                        child: _selectedImage != null
-                                                            ? Image.file(
-                                                          _selectedImage!,  // Display the uploaded image
-                                                          width: 83,  // Set width as per your preference
-                                                          height: 78.5,  // Set height as per your preference
-                                                          fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                                                        )
-                                                            : Container(
-                                                          width: 65, // Adjust size as needed
-                                                          height: 65,
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            border: Border.all(
-                                                              color: Color(0xffCCCCCC), // Adjust border color
-                                                              width: 2, // Adjust border width
-                                                            ),
-                                                          ),
-                                                          child: Align(alignment: Alignment.bottomCenter,
-                                                            child: CircleAvatar(radius: 20,
-                                                              backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
-                                                              ,backgroundColor: Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        // child: Image.asset('assets/images/Vector (13)profile.png',
-                                                        //   width: 55,
-                                                        //   height: 55,),
-                                                        onTap:()async {
-
-                                                          // await _pickImageFromGallery();
-
-                                                          print('objectttt');
-                                                          setState(() {
-
-                                                          });}  , // Call function when tapped
-                                                      ),
-                                                      if ( file != null ) Image.file(file!),
-                                                      SizedBox(width: 15,),
-                                                      Text('Select profile picture'.tr,
-                                                        style: TextStyle(
-                                                            color: Color(0xff442B72),
-                                                            fontSize: 15,
-                                                            fontFamily: 'Poppins-Bold',
-                                                            fontWeight: FontWeight.w700
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 40),
-                                                ElevatedSimpleButton(
-                                                    txt: 'Save'.tr,
-                                                    fontFamily: 'Poppins-Regular',
-                                                    width: 278,
-                                                    hight: 48,
-                                                    onPress: (){},
-                                                    color: Color(0xff442B72),
-                                                    fontSize: 16)
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      });
-                                },
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: Color(0xff442B72),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: Image.asset('assets/images/image-editing 1.png'),
-                                  ),
-                                ),
-                              ),
-                            ):
-                            Positioned(
-                              bottom: 2,
-                              right: 24,
-                              child: GestureDetector(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 25.0),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                             borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(
-                                                    13), // Rounded top left corner
-                                                topRight: Radius.circular(
-                                                    13), // Rounded top right corner
+                                                      width: 278,
+                                                      hight: 48,
+                                                      onPress: (){},
+                                                      color: Color(0xff442B72),
+                                                      fontSize: 16)
+                                                ],
                                               ),
                                             ),
-                                            height: 220,
-                                            child: Column(
-                                              children: [
-                                                Text('Change profile picture',
-                                                style: TextStyle(
-                                                  color: Color(0xff771F98),
-                                                  fontSize: 19,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w500
-                                                ),),
-                                                Padding(
-                                                  padding: (sharedpref?.getString('lang') == 'ar')?
-                                                  EdgeInsets.only(right: 20.0 , top: 15):
-                                                  EdgeInsets.only(left: 20.0, top: 15),
-                                                  child: Row(
-                                                    children: [
-                                                      GestureDetector(
-                                                       onTap:(){
-                                                         _pickImageFromGallery();
-                                                         print('object');
-                                                       },
-
-                                                        child: Image.asset('assets/images/Vector (13)profile.png',
-                                                        width: 55,
-                                                        height: 55,),
-                                                      ),
-                                                      SizedBox(width: 15,),
-                                                      Text('Select profile picture',
-                                                        style: TextStyle(
-                                                            color: Color(0xff442B72),
-                                                            fontSize: 15,
-                                                            fontFamily: 'Poppins-Bold',
-                                                            fontWeight: FontWeight.w700
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 40),
-                                                ElevatedSimpleButton(
-                                                    txt: 'Save',
-                                                    fontFamily: 'Poppins-Regular',
-                                                    width: 278,
-                                                    hight: 48,
-                                                    onPress: (){},
-                                                    color: Color(0xff442B72),
-                                                    fontSize: 16)
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      });
-                                },
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: Color(0xff442B72),
-                                      width: 2.0,
+                                          );
+                                        });
+                                  },
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Color(0xff442B72),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(50.0)),
                                     ),
-                                    borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: Image.asset('assets/images/image-editing 1.png'),
+                                    ),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: Image.asset('assets/images/image-editing 1.png'),
+                                ),
+                              ):
+                              Positioned(
+                                bottom: 2,
+                                right: 24,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 25.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(
+                                                      13), // Rounded top left corner
+                                                  topRight: Radius.circular(
+                                                      13), // Rounded top right corner
+                                                ),
+                                              ),
+                                              height: 220,
+                                              child: Column(
+                                                children: [
+                                                  Text('Change profile picture',
+                                                    style: TextStyle(
+                                                        color: Color(0xff771F98),
+                                                        fontSize: 19,
+                                                        fontFamily: 'Poppins-Regular',
+                                                        fontWeight: FontWeight.w500
+                                                    ),),
+                                                  Padding(
+                                                    padding: (sharedpref?.getString('lang') == 'ar')?
+                                                    EdgeInsets.only(right: 20.0 , top: 15):
+                                                    EdgeInsets.only(left: 20.0, top: 15),
+                                                    child: Row(
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap:(){
+                                                            _pickImageFromGallery();
+                                                            print('object');
+                                                          },
+
+                                                          child: Image.asset('assets/images/Vector (13)profile.png',
+                                                            width: 55,
+                                                            height: 55,),
+                                                        ),
+                                                        SizedBox(width: 15,),
+                                                        Text('Select profile picture',
+                                                          style: TextStyle(
+                                                              color: Color(0xff442B72),
+                                                              fontSize: 15,
+                                                              fontFamily: 'Poppins-Bold',
+                                                              fontWeight: FontWeight.w700
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 40),
+                                                  ElevatedSimpleButton(
+                                                      txt: 'Save',
+                                                      fontFamily: 'Poppins-Regular',
+                                                      width: 278,
+                                                      hight: 48,
+                                                      onPress: (){},
+                                                      color: Color(0xff442B72),
+                                                      fontSize: 16)
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        });
+                                  },
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Color(0xff442B72),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: Image.asset('assets/images/image-editing 1.png'),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 55.0),
-            child: GestureDetector(
-                onTap: () {
-                  if (data.isNotEmpty) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                        EditProfileSupervisorScreen(
-                          docid: data[0].id,
-                          oldName: data[0].get('name'),
-                          oldNumber: data[0].get('phoneNumber'),
-                          oldEmail: data[0].get('email'),
-                          oldPhoto: data[0].get('busphoto')
-                          // Image.asset( 'assets/images/Ellipse 1.png', ),
-                        )
-                    )).then((value) {
-                      if (value == true && data.isNotEmpty) {
-                        getData();
-                      }
-                    });
-                  } else {
-                    print('Data list is empty');
-                  }
-                },
-              child: SizedBox(
-              width: 87,
-                height: 29,
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(17),
-                      border: Border.all(
-                        width: 1,
-                        color: Color(0xFF432B72),
-                      )
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        (sharedpref?.getString('lang') == 'ar')?
-                        'assets/images/edittt_white_translate.png' :
-                        'assets/images/edittt_white.png',
-                        width: 13.45,
-                        height: 13.45,),
-                      SizedBox(width: 7,),
-                      Text('Edit'.tr,
-                        style: TextStyle(
-                          color: Color(0xff442B72),
-                          fontSize: 16,
-                          fontFamily: 'Poppins-Light',
-                          fontWeight: FontWeight.w400,
-                        ),),
-                    ],
-                  ),)
-                ),
-            ),
-          ),
-                ],
-
-              ),
-                        SizedBox(
-                          height: 8,
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 55.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (data.isNotEmpty) {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                EditProfileSupervisorScreen(
+                                    docid: data[0].id,
+                                    oldName: data[0].get('name'),
+                                    oldNumber: data[0].get('phoneNumber'),
+                                    oldEmail: data[0].get('email'),
+                                    oldPhoto: data[0].get('busphoto')
+                                  // Image.asset( 'assets/images/Ellipse 1.png', ),
+                                )
+                            )).then((value) {
+                              if (value == true && data.isNotEmpty) {
+                                getData();
+                              }
+                            });
+                          } else {
+                            print('Data list is empty');
+                          }
+                        },
+                        child: SizedBox(
+                            width: 87,
+                            height: 29,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(17),
+                                  border: Border.all(
+                                    width: 1,
+                                    color: Color(0xFF432B72),
+                                  )
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    (sharedpref?.getString('lang') == 'ar')?
+                                    'assets/images/edittt_white_translate.png' :
+                                    'assets/images/edittt_white.png',
+                                    width: 13.45,
+                                    height: 13.45,),
+                                  SizedBox(width: 7,),
+                                  Text('Edit'.tr,
+                                    style: TextStyle(
+                                      color: Color(0xff442B72),
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins-Light',
+                                      fontWeight: FontWeight.w400,
+                                    ),),
+                                ],
+                              ),)
                         ),
-              Center(
-                child: FutureBuilder(
-                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Something went wrong');
-                    }
+                      ),
+                    ),
+                  ],
 
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.data?.data() == null) {
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Center(
+                  child: FutureBuilder(
+                    future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data?.data() == null) {
+                          return Text(
+                            'No data available',
+                            style: TextStyle(
+                              color: Color(0xff442B72),
+                              fontSize: 12,
+                              fontFamily: 'Poppins-Regular',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          );
+                        }
+
+                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                        sharedpref?.getString('lang') == 'en';
                         return Text(
-                          'No data available',
+                          '${data['name']}',
                           style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Poppins-SemiBold',
+                            fontWeight: FontWeight.w600,
                             color: Color(0xff442B72),
-                            fontSize: 12,
-                            fontFamily: 'Poppins-Regular',
-                            fontWeight: FontWeight.w400,
                           ),
                         );
                       }
 
-                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                      sharedpref?.getString('lang') == 'en';
-                      return Text(
-                        '${data['name']}',
-                        style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'Poppins-SemiBold',
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff442B72),
-                            ),
-                      );
-                    }
-
-                    return CircularProgressIndicator();
-                  },
+                      return CircularProgressIndicator();
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(height: 30,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  children: [
-                    SizedBox(
-                        width: 148,
-                        height: 65,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(11),
-                              border: Border.all(
-                                width: 1,
-                                color: Color(0xFF432B72),
-                              )
-                          ),
-                          child: Padding(
-                            padding: (sharedpref?.getString('lang') == 'ar')?
-                            EdgeInsets.only(right: 12.0, top: 12):
-                            EdgeInsets.only(left: 12.0, top: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 1.0),
-                                  child: Image.asset('assets/images/call_icon.png',
-                                    width: 12,
-                                    height: 12,),
-                                ),
-                                SizedBox(width: 7,),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Number'.tr
-                                      , style: TextStyle(
-                                        fontSize: 14 ,
-                                        height:  0.94,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700 ,
-                                        color: Color(0xff442B72),),),
-                                    SizedBox(height: 2,),
-                                    FutureBuilder(
-                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                        if (snapshot.hasError) {
-                                          return Text('Something went wrong');
-                                        }
-
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.data?.data() == null) {
-                                            return Text(
-                                              'No data available',
-                                              style: TextStyle(
-                                                color: Color(0xff442B72),
-                                                fontSize: 12,
-                                                fontFamily: 'Poppins-Regular',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            );
-                                          }
-
-                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                          sharedpref?.getString('lang') == 'en';
-                                          return Text(
-                                            '${data['phoneNumber']}',
-                                            style: TextStyle(
-                                                  fontSize: 11 ,
-                                                  height:  2.94,
-                                                  fontFamily: 'Poppins-Light',
-                                                  fontWeight: FontWeight.w400 ,
-                                                  color: Color(0xff442B72),),
-                                          );
-                                        }
-
-                                        return CircularProgressIndicator();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
+                SizedBox(height: 30,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                          width: 148,
+                          height: 65,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(11),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Color(0xFF432B72),
+                                )
                             ),
-                          ),)
-                    ),
-                    SizedBox(width: 10,),
-                    SizedBox(
-                        width: 170,
-                        height: 65,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(11),
-                              border: Border.all(
-                                width: 1,
-                                color: Color(0xFF432B72),
-                              )
-                          ),
-                          child: Padding(
-                            padding: (sharedpref?.getString('lang') == 'ar')?
-                            EdgeInsets.only(right: 12.0 , top: 12):
-                            EdgeInsets.only(left: 12.0, top: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 1.0),
-                                  child: Image.asset('assets/images/Vector (13)email.png',
-                                    width: 16,
-                                    height: 16,),
-                                ),
-                                SizedBox(width: 7,),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Email'.tr,
-                                      style: TextStyle(
-                                        fontSize: 14 ,
-                                        height:  0.94,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700 ,
-                                        color: Color(0xff442B72),),),
-                                    SizedBox(height: 0,),
-                                    FutureBuilder(
-                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                        if (snapshot.hasError) {
-                                          return Text('Something went wrong');
-                                        }
-
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (snapshot.data?.data() == null) {
-                                            return Text(
-                                              'No data available',
-                                              style: TextStyle(
-                                                color: Color(0xff442B72),
-                                                fontSize: 12,
-                                                fontFamily: 'Poppins-Regular',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            );
+                            child: Padding(
+                              padding: (sharedpref?.getString('lang') == 'ar')?
+                              EdgeInsets.only(right: 12.0, top: 12):
+                              EdgeInsets.only(left: 12.0, top: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 1.0),
+                                    child: Image.asset('assets/images/call_icon.png',
+                                      width: 12,
+                                      height: 12,),
+                                  ),
+                                  SizedBox(width: 7,),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Number'.tr
+                                        , style: TextStyle(
+                                          fontSize: 14 ,
+                                          height:  0.94,
+                                          fontFamily: 'Poppins-Bold',
+                                          fontWeight: FontWeight.w700 ,
+                                          color: Color(0xff442B72),),),
+                                      SizedBox(height: 2,),
+                                      FutureBuilder(
+                                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                          if (snapshot.hasError) {
+                                            return Text('Something went wrong');
                                           }
 
-                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                          sharedpref?.getString('lang') == 'en';
-                                          return Text(
-                                            '${data['email']}',
-                                            style: TextStyle(
-                                              fontSize: 11 ,
-                                                  height:  2.94,
-                                                  fontFamily: 'Poppins-Light',
-                                                  fontWeight: FontWeight.w300 ,
+                                          if (snapshot.connectionState == ConnectionState.done) {
+                                            if (snapshot.data?.data() == null) {
+                                              return Text(
+                                                'No data available',
+                                                style: TextStyle(
                                                   color: Color(0xff442B72),
-                                            ),
-                                          );
-                                        }
+                                                  fontSize: 12,
+                                                  fontFamily: 'Poppins-Regular',
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              );
+                                            }
 
-                                        return CircularProgressIndicator();
-                                      },
-                                    ),
+                                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
 
-                                  ],
-                                ),
-                              ],
+                                            sharedpref?.getString('lang') == 'en';
+                                            return Text(
+                                              '${data['phoneNumber']}',
+                                              style: TextStyle(
+                                                fontSize: 11 ,
+                                                height:  2.94,
+                                                fontFamily: 'Poppins-Light',
+                                                fontWeight: FontWeight.w400 ,
+                                                color: Color(0xff442B72),),
+                                            );
+                                          }
+
+                                          return CircularProgressIndicator();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),)
+                      ),
+                      SizedBox(width: 10,),
+                      SizedBox(
+                          width: 170,
+                          height: 65,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(11),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Color(0xFF432B72),
+                                )
                             ),
-                          ),)
-                    ),
-                  ],
-                ),
-              )
+                            child: Padding(
+                              padding: (sharedpref?.getString('lang') == 'ar')?
+                              EdgeInsets.only(right: 12.0 , top: 12):
+                              EdgeInsets.only(left: 12.0, top: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 1.0),
+                                    child: Image.asset('assets/images/Vector (13)email.png',
+                                      width: 16,
+                                      height: 16,),
+                                  ),
+                                  SizedBox(width: 7,),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Email'.tr,
+                                        style: TextStyle(
+                                          fontSize: 14 ,
+                                          height:  0.94,
+                                          fontFamily: 'Poppins-Bold',
+                                          fontWeight: FontWeight.w700 ,
+                                          color: Color(0xff442B72),),),
+                                      SizedBox(height: 0,),
+                                      FutureBuilder(
+                                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                          if (snapshot.hasError) {
+                                            return Text('Something went wrong');
+                                          }
 
-            ],
-          )
-                //no data
-            // :
+                                          if (snapshot.connectionState == ConnectionState.done) {
+                                            if (snapshot.data?.data() == null) {
+                                              return Text(
+                                                'No data available',
+                                                style: TextStyle(
+                                                  color: Color(0xff442B72),
+                                                  fontSize: 12,
+                                                  fontFamily: 'Poppins-Regular',
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              );
+                                            }
+
+                                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                            sharedpref?.getString('lang') == 'en';
+                                            return Text(
+                                              '${data['email']}',
+                                              style: TextStyle(
+                                                fontSize: 11 ,
+                                                height:  2.94,
+                                                fontFamily: 'Poppins-Light',
+                                                fontWeight: FontWeight.w300 ,
+                                                color: Color(0xff442B72),
+                                              ),
+                                            );
+                                          }
+
+                                          return CircularProgressIndicator();
+                                        },
+                                      ),
+
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),)
+                      ),
+                    ],
+                  ),
+                )
+
+              ],
+            )
+          //no data
+          // :
           // Center(
           //   child: Column(
           //        children: [

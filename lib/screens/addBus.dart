@@ -170,7 +170,7 @@ class _AddBusState extends State<AddBus> {
       print('Data added with document ID: ${docRef.id}');
       List.generate(
         selectedItems.length,
-            (index) {
+            (index) {return
           FirebaseFirestore.instance
               .collection('supervisor')
               .doc(selectedItems[index].docID)
