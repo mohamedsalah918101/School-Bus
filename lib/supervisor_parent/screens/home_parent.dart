@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -28,10 +29,28 @@ class HomeParent extends StatefulWidget {
 }
 
 class HomeParentState extends State<HomeParent> {
+  final _firestore = FirebaseFirestore.instance;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   // List<ChildDataItem> children = [];
   // late Function() onTapMenu;
-
+  List<QueryDocumentSnapshot> data = [];
+  getData()async{
+    try {
+      DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
+      if (documentSnapshot.exists) {
+        documentSnapshot.data().forEach((key, value) {
+          dataWidgets.add(Text('$key: $value'));
+        });
+      } else {
+        print("Document does not exist");
+        return null;
+      }
+    } catch (e) {
+      print("Error getting document: $e");
+      return null;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -137,7 +156,8 @@ class HomeParentState extends State<HomeParent> {
                       const SizedBox(
                         height: 7,
                       ),
-                      // children.isNotEmpty?
+                      sharedpref!.getInt('invit') == 1 ?
+
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 19.0),
                           child:  ListView.builder(
@@ -153,32 +173,32 @@ class HomeParentState extends State<HomeParent> {
                                   ],
                                 );
                             },
-                          ),),
-                          // :
-                          // Column(
-                          //   children: [
-                          //     SizedBox(height: 45,),
-                          //     Image.asset('assets/images/Group 237684.png',
-                          //     ),
-                          //     Text('No Data Found'.tr,
-                          //       style: TextStyle(
-                          //         color: Color(0xff442B72),
-                          //         fontFamily: 'Poppins-Regular',
-                          //         fontWeight: FontWeight.w500,
-                          //         fontSize: 19,
-                          //       ),
-                          //     ),
-                          //     Text('You haven’t added any \n '
-                          //         'data yet'.tr,
-                          //       textAlign: TextAlign.center,
-                          //       style: TextStyle(
-                          //         color: Color(0xffBE7FBF),
-                          //         fontFamily: 'Poppins-Light',
-                          //         fontWeight: FontWeight.w400,
-                          //         fontSize: 12,
-                          //       ),)
-                          //   ],
-                          // ),
+                          ),)
+                          :
+                          Column(
+                            children: [
+                              SizedBox(height: 45,),
+                              Image.asset('assets/images/Group 237684.png',
+                              ),
+                              Text('No Data Found'.tr,
+                                style: TextStyle(
+                                  color: Color(0xff442B72),
+                                  fontFamily: 'Poppins-Regular',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 19,
+                                ),
+                              ),
+                              Text('You haven’t added any \n '
+                                  'data yet'.tr,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xffBE7FBF),
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                ),)
+                            ],
+                          ),
                       const SizedBox(
                         height: 44,
                       ),
