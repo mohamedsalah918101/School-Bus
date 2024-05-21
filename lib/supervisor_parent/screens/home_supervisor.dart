@@ -131,16 +131,108 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
                     children: [
                       SizedBox(height: 20),
+                      sharedpref!.getInt('invit') == 0 ?
+                     Padding(
+                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                       child: Row(
+                         children: [
+                           Image.asset('assets/images/Group 237679 (2).png' ,
+                             width:44 , height: 44,),
+                           SizedBox(width: 10,),
+                           Column(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               FutureBuilder(
+                                 future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                 builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                   if (snapshot.hasError) {
+                                     return Text('Something went wrong');
+                                   }
+
+                                   if (snapshot.connectionState == ConnectionState.done) {
+                                     if (snapshot.data?.data() == null) {
+                                       return Text(
+                                         'No data available',
+                                         style: TextStyle(
+                                           color: Color(0xff442B72),
+                                           fontSize: 12,
+                                           fontFamily: 'Poppins-Regular',
+                                           fontWeight: FontWeight.w400,
+                                         ),
+                                       );
+                                     }
+
+                                     Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                     return Text(
+                                       '${data['name']}',
+                                       style: TextStyle(
+                                         color: Color(0xff442B72),
+                                         fontSize: 16,
+                                         fontFamily: 'Poppins-Bold',
+                                         fontWeight: FontWeight.w600,
+                                       ),
+                                     );
+                                   }
+
+                                   return CircularProgressIndicator();
+                                 },
+                               ),
+                               SizedBox(height: 3,),
+                               FutureBuilder(
+                                 future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                 builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                   if (snapshot.hasError) {
+                                     return Text('Something went wrong');
+                                   }
+
+                                   if (snapshot.connectionState == ConnectionState.done) {
+                                     if (snapshot.data?.data() == null) {
+                                       return Text(
+                                         'No data available',
+                                         style: TextStyle(
+                                           color: Color(0xff442B72),
+                                           fontSize: 12,
+                                           fontFamily: 'Poppins-Regular',
+                                           fontWeight: FontWeight.w400,
+                                         ),
+                                       );
+                                     }
+
+                                     Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                     return Text(
+                                       '${data['phoneNumber']}',
+                                       style: TextStyle(
+                                         color: Color(0xff442B72),
+                                         fontSize: 12,
+                                         fontFamily: 'Poppins-Regular',
+                                         fontWeight: FontWeight.w400,
+                                       ),
+                                     );
+                                   }
+
+                                   return CircularProgressIndicator();
+                                 },
+                               ),
+                             ],
+                           ),
+                         ],
+                       ),
+                     ):
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 25.0),
                         child: ProfileCardInSupervisor(),
                       ),
                       SizedBox(height: 25),
+                      sharedpref!.getInt('invit') == 1 ?
+
                       Container(
                         height: 2,
                         width: 276,
                         color: Color(0xff442B72).withOpacity(0.11),
-                      ),
+                      ):SizedBox(
+                        height: 20,
+                          child: Container()),
 
                       sharedpref!.getInt('invit') == 1 ?
                       Column(
@@ -225,12 +317,11 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     child: ListView.builder(
                                       shrinkWrap: true,
                                       physics: NeverScrollableScrollPhysics(),
-                                      itemCount: 3,
+                                      itemCount: data.length,
                                       // data?[0]['childern'].length,
                                       // data.length,
                                       itemBuilder: (BuildContext context, int index) {
                                         List children = data[index]['children'];
-
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)

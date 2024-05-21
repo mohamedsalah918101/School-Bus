@@ -100,7 +100,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
 
           setState(() {
             // _pickImageFromGallery();
-            });
+          });
         } catch (e) {
           print('Error updating document: $e');
         }
@@ -224,42 +224,42 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                             //       backgroundImage: NetworkImage( '$imageUrl',),
                             //       radius: 50.5,)
                             // ),
-                        FutureBuilder(
-                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                          if (snapshot.hasError) {
-                            return Text('Something went wrong');
-                          }
+                            FutureBuilder(
+                              future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Something went wrong');
+                                }
 
-                          if (snapshot.connectionState == ConnectionState.done) {
-                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                              return Text(
-                                'No data available',
-                                style: TextStyle(
-                                  color: Color(0xff442B72),
-                                  fontSize: 12,
-                                  fontFamily: 'Poppins-Regular',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              );
-                            }
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                                    return Text(
+                                      'No data available',
+                                      style: TextStyle(
+                                        color: Color(0xff442B72),
+                                        fontSize: 12,
+                                        fontFamily: 'Poppins-Regular',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    );
+                                  }
 
-                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                            String? busphoto = data['busphoto'] as String?;
-                            String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
-                            return CircleAvatar(
-                              radius: 52.5,
-                              backgroundColor: Color(0xff442B72),
-                              child: CircleAvatar(
-                                backgroundImage: NetworkImage(imageUrl),
-                                radius: 50.5,
-                              ),
-                            );
-                          }
+                                  Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                  String? busphoto = data['busphoto'] as String?;
+                                  String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
+                                  return CircleAvatar(
+                                    radius: 52.5,
+                                    backgroundColor: Color(0xff442B72),
+                                    child: CircleAvatar(
+                                      backgroundImage: NetworkImage(imageUrl),
+                                      radius: 50.5,
+                                    ),
+                                  );
+                                }
 
-                          return CircularProgressIndicator();
-                        },
-                      ),
+                                return CircularProgressIndicator();
+                              },
+                            ),
                             (sharedpref?.getString('lang') == 'ar')?
                             Positioned(
                               bottom: 2,
@@ -355,7 +355,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                       child: TextFormField(
                         style: TextStyle(
                           color: Color(0xFF442B72),
-                      ),
+                        ),
                         controller: _nameController,
                         cursorColor: const Color(0xFF442B72),
                         textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -510,16 +510,16 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40.0),
                     child:
-                      Text(
-                       'Email'.tr,
-                        style: TextStyle(
-                          color: Color(0xFF442B72),
-                          fontSize: 15,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                          height: 1.07,
-                        ),
+                    Text(
+                      'Email'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 15,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                        height: 1.07,
                       ),
+                    ),
                   ) ,
                   SizedBox(height: 10,),
                   Center(
@@ -625,9 +625,9 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                             });
                           }
                           if( nameError && emailError && phoneError){
-                          editAddSupervisor();
-                          DataSavedSnackBar(context, 'Data saved successfully');
-                          Navigator.pop(context , true);
+                            editAddSupervisor();
+                            DataSavedSnackBar(context, 'Data saved successfully');
+                            Navigator.pop(context , true);
                           }
                         },
                         color: Color(0xFF442B72),
