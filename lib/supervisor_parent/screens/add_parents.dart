@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/Functions/functions.dart';
+import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
@@ -20,6 +22,9 @@ class AddParents extends StatefulWidget {
 }
 
 class _AddParentsState extends State<AddParents> {
+  String kPickerNumber='';
+  String kPickerName='';
+  PhoneContact? _phoneContact;
   List<TextEditingController> nameChildControllers = [];
   List<TextEditingController> gradeControllers = [];
   late final int selectedImage;
@@ -81,10 +86,10 @@ class _AddParentsState extends State<AddParents> {
             var res = await createDynamicLink(
                 false, docid, enteredPhoneNumber, 'parent');
             if (res == "success") {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Invitation sent successfully'),
-                backgroundColor: Color(0xFFFF3C3C),
-              ));
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text('Invitation sent successfully'),
+              //   backgroundColor: Color(0xFFFF3C3C),
+              // ));
               await _firestore.collection('parent').doc(docid).update({'invite':1});
               count =0;              showList =false;
               setState(() {
@@ -97,10 +102,12 @@ class _AddParentsState extends State<AddParents> {
               gradeControllers.clear();
 
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Invitation doesn\'t sent'),
-                backgroundColor: Color(0xFF4CAF50),
-              ));
+              InvitationSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFF4CAF50));
+
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text('Invitation doesn\'t sent'),
+              //   backgroundColor: Color(0xFF4CAF50),
+              // ));
             }
 
           }).catchError((error) {
@@ -111,10 +118,11 @@ class _AddParentsState extends State<AddParents> {
           var res = await createDynamicLink(
               false, docID, _phoneNumberController.text, 'parent');
           if (res == "success") {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Invitation sent successfully'),
-              backgroundColor: Color(0xFFFF3C3C),
-            ));
+            InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFFFF3C3C));
+            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            //   content: Text('Invitation sent successfully'),
+            //   backgroundColor: Color(0xFFFF3C3C),
+            // ));
             await _firestore.collection('parent').doc(docID).update(
                 {'invite': 1});
             count = 0;
@@ -129,9 +137,12 @@ class _AddParentsState extends State<AddParents> {
             gradeControllers.clear();
           }}else{
           // added parent new update
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('This phone number is already added.'),
-        ));}
+          Dialoge.CantAddNewParent(context);
+
+          //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text('This phone number is already added.'),
+        // ));
+        }
          // await _firestore.collection('parent').doc(docID).update(data);
         }
       } else {
@@ -225,64 +236,135 @@ class _AddParentsState extends State<AddParents> {
             SizedBox(
               height: 35,
             ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 17.0),
-                      child: Image.asset(
-                        (sharedpref?.getString('lang') == 'ar')
-                            ? 'assets/images/Layer 1.png'
-                            : 'assets/images/fi-rr-angle-left.png',
-                        width: 20,
-                        height: 22,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: (sharedpref?.getString('lang') == 'ar')
-                        ? EdgeInsets.only(right: 40)
-                        : EdgeInsets.only(left: 40),
-                    child: Text(
-                      'Parents'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF993D9A),
-                        fontSize: 16,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/icons8_Add_Male_User_Group 1.png',
-                          width: 27,
-                          height: 27,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _scaffoldKey.currentState!.openEndDrawer();
-                          },
-                          icon: const Icon(
-                            Icons.menu_rounded,
-                            color: Color(0xff442B72),
-                            size: 35,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child:
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 0.0),
+                          child: Image.asset(
+                            (sharedpref?.getString('lang') == 'ar')
+                                ? 'assets/images/Layer 1.png'
+                                : 'assets/images/fi-rr-angle-left.png',
+                            width: 20,
+                            height: 22,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 5,),
+                      Padding(
+                        padding: (sharedpref?.getString('lang') == 'ar')
+                            ? EdgeInsets.only(right: 0)
+                            : EdgeInsets.only(left: 0),
+                        child: Text(
+                          'Parents'.tr,
+                          style: TextStyle(
+                            color: Color(0xFF993D9A),
+                            fontSize: 16,
+                            fontFamily: 'Poppins-Bold',
+                            fontWeight: FontWeight.w700,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+
+                          InkWell(onTap: (){},
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () async{
+                                    bool permission = await FlutterContactPicker.requestPermission();
+                                    if(permission){
+                                      if(await FlutterContactPicker.hasPermission()){
+                                        _phoneContact=await FlutterContactPicker.pickPhoneContact();
+                                        if(_phoneContact!=null){
+                                          if(_phoneContact!.fullName!.isNotEmpty){
+                                            setState(() {
+                                              kPickerName=_phoneContact!.fullName.toString();
+                                              _nameController.text=kPickerName;
+                                            });
+                                          }
+                                          if (_phoneContact!.phoneNumber != null &&
+                                              _phoneContact!.phoneNumber!.number != null &&
+                                              _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+                                            setState(() {
+                                              kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                              _phoneNumberController.text = kPickerNumber;
+                                            });
+                                          }
+                                          // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+                                          //   setState(() {
+                                          //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+                                          //     _phoneNumberController.text=kPickerNumber;
+                                          //   });
+                                          // }
+                                        }
+
+                                      }
+                                    }
+                                  },
+                                  child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+                                    color: Color(0xff442B72),),
+                                ),
+                                SizedBox(width: 10,),
+                                IconButton(
+                                  onPressed: () {
+                                    _scaffoldKey.currentState!.openEndDrawer();
+                                  },
+                                  icon: const Icon(
+                                    Icons.menu_rounded,
+                                    color: Color(0xff442B72),
+                                    size: 35,
+                                  ),
+                                ),
+                                // InkWell(onTap: (){
+                                //   Scaffold.of(context).openEndDrawer();
+                                // },
+                                //   child: Icon(
+                                //     Icons.menu_rounded,
+                                //     size: 40,
+                                //     color: Color(0xff442B72),
+                                //   ),)
+
+                              ],
+                            ),
+                          ),
+
+
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                      // Row(
+                      //     children: [
+                      //       Image.asset(
+                      //         'assets/images/icons8_Add_Male_User_Group 1.png',
+                      //         width: 27,
+                      //         height: 27,
+                      //       ),
+                      //       IconButton(
+                      //         onPressed: () {
+                      //           _scaffoldKey.currentState!.openEndDrawer();
+                      //         },
+                      //         icon: const Icon(
+                      //           Icons.menu_rounded,
+                      //           color: Color(0xff442B72),
+                      //           size: 35,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                    ],
                   ),
-                ],
-              ),
+
+
+
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -1466,6 +1548,8 @@ class _AddParentsState extends State<AddParents> {
                               for (int i = 0; i < nameChildControllers.length; i++) {
                                 if (nameChildControllers[i].text.isEmpty || gradeControllers[i].text.isEmpty) {
                                   allChildFieldsFilled = false;
+                                  GradeError = false;
+                                  nameChildeError = false;
                                   print('failed');
                                   break;
                                 } else {
@@ -1485,15 +1569,13 @@ class _AddParentsState extends State<AddParents> {
 
                             });
                             if (
-                                // allChildFieldsFilled &&
-                                // GradeError &&
+                            // !allChildFieldsFilled&&
+                            //     GradeError == true &&
                                 // nameChildeError &&
-
                                 typeOfParentError &&
                                     nameError &&
                                     phoneError &&
                                     numberOfChildrenError
-                            // && GradeError
                             ) {
                               _addDataToFirestore();
                               print('object send done');

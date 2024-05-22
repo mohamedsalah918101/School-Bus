@@ -188,7 +188,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                             children: [
                               GestureDetector(
                                 onTap: (){
-                                  // _pickImageFromGallery();
+                                  _pickImageFromGallery();
                                   print('object');
                                 },
                                 child:FutureBuilder(
@@ -412,7 +412,11 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                       fontFamily: 'Poppins-Regular',
                                                       width: 278,
                                                       hight: 48,
-                                                      onPress: (){},
+                                                      onPress: (){
+                                                        Navigator.of(context).pop();
+                                                        // _pickImageFromGallery();
+
+                                                      },
                                                       color: Color(0xff442B72),
                                                       fontSize: 16)
                                                 ],

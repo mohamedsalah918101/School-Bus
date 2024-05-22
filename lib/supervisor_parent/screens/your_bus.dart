@@ -1,26 +1,15 @@
-import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter/material.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
-import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/edit_profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 import '../components/child_data_item.dart';
-import '../components/custom_app_bar.dart';
-import '../components/added_child_card.dart';
+
 
 class YourBus extends StatefulWidget {
   @override
@@ -28,6 +17,126 @@ class YourBus extends StatefulWidget {
 }
 
 class _YourBusState extends State<YourBus> {
+  List<QueryDocumentSnapshot> data = [];
+  final _firestore = FirebaseFirestore.instance;
+
+  Future<void> getDataForBus() async {
+    try {
+      // Retrieve supervisor ID from shared preferences
+      String? supervisorId = sharedpref?.getString('id');
+      if (supervisorId == null || supervisorId.isEmpty) {
+        // If the supervisorId is null or empty, log a message and return
+        print('Supervisor ID is null or empty');
+        return;
+      }
+      print('Retrieved Supervisor ID: $supervisorId');
+
+      // Get the 'phoneNumber' field from the 'supervisor' collection
+      DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+          .collection('supervisor')
+          .doc(supervisorId)
+          .get();
+
+      if (supervisorDoc.exists) {
+        // Retrieve the 'name' field from the 'supervisor' document
+        String supervisorName = supervisorDoc.get('name');
+        print('Retrieved Supervisor Name: $supervisorName');
+
+        // Now query the 'busdata' collection where the 'supervisors.name' field matches
+        QuerySnapshot busDataQuery = await FirebaseFirestore.instance
+            .collection('busdata')
+            .where('namedriver', isEqualTo: supervisorName)
+            .get();
+
+        if (busDataQuery.docs.isNotEmpty) {
+          // If there are matching documents, clear the 'data' list and add the new documents
+          setState(() {
+            data.clear();
+            data.addAll(busDataQuery.docs);
+          });
+          print('Bus data fetched successfully');
+
+          // Iterate through the documents in the 'busdata' collection
+          for (var busDoc in busDataQuery.docs) {
+            // Access the 'test' subcollection
+            QuerySnapshot testSubcollection = await busDoc.reference.collection('supervisors').get();
+
+            // Iterate through the documents in the 'test' subcollection
+            for (var testDoc in testSubcollection.docs) {
+              // Retrieve the 'name' field from the 'test' subcollection
+              String testName = testDoc.get('name');
+              print('Test Name: $testName');
+            }
+          }
+        } else {
+          // If there are no matching documents, log a message
+          print('No matching bus data found');
+        }
+      } else {
+        // If the supervisor document does not exist, log a message
+        print('Supervisor document does not exist');
+      }
+    } catch (e) {
+      // If any errors occur, log the error message
+      print('Error fetching data: $e');
+    }
+  }
+
+
+  // Future<void> getDataForBus() async {
+  //   try {
+  //     // Retrieve supervisor ID from shared preferences
+  //     String? supervisorId = sharedpref?.getString('id');
+  //     if (supervisorId == null || supervisorId.isEmpty) {
+  //       print('Supervisor ID is null or empty');
+  //       return;
+  //     }
+  //     print('Retrieved Supervisor ID: $supervisorId');
+  //
+  //     // Get the 'phoneNumber' field from the 'supervisor' collection
+  //     DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+  //         .collection('supervisor')
+  //         .doc(supervisorId)
+  //         .get();
+  //
+  //     if (supervisorDoc.exists) {
+  //       String supervisorPhoneNumber = supervisorDoc.get('name');
+  //       print('Retrieved Supervisor Phone Number: $supervisorPhoneNumber');
+  //
+  //       // Now query the 'busdata' collection where the 'phonedriver' field matches
+  //       QuerySnapshot busDataQuery = await FirebaseFirestore.instance
+  //           .collection('busdata')
+  //           .where('name', isEqualTo: supervisorPhoneNumber)
+  //           .get();
+  //
+  //       if (busDataQuery.docs.isNotEmpty) {
+  //         setState(() {
+  //           data.clear();
+  //           data.addAll(busDataQuery.docs);
+  //         });
+  //         print('Bus data fetched successfully');
+  //       } else {
+  //         print('No matching bus data found');
+  //       }
+  //     } else {
+  //       print('Supervisor document does not exist');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching data: $e');
+  //   }
+  // }
+
+
+
+  @override
+  void initState() {
+    getDataForBus();
+    super.initState();
+    setState(() {
+
+    });
+  }
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<ChildDataItem> children = [];
 
@@ -127,13 +236,60 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child: Text('Ahmed Karim',
-                              style: TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
-                              ),),
+                            child:
+
+                            FutureBuilder<DocumentSnapshot>(
+                              future: FirebaseFirestore.instance
+                                  .collection('busdata')
+                                  .doc(sharedpref?.getString('id'))
+                                  .get(),
+                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  print('Error: ${snapshot.error}');
+                                  return Center(child: Text('Something went wrong'));
+                                }
+
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  if (snapshot.data == null || !snapshot.data!.exists) {
+                                    print('No data found for document ID: ${sharedpref?.getString('id')}');
+                                    return Text(
+                                      'No data available',
+                                      style: TextStyle(
+                                        color: Color(0xff442B72),
+                                        fontSize: 12,
+                                        fontFamily: 'Poppins-Regular',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    );
+                                  }
+
+                                  Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                  print('Data retrieved: $data');
+                                  return Text(
+                                    '${'Welcome, '+data['namedriver']}',
+                                    style: TextStyle(
+                                      color: Color(0xff442B72),
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  );
+                                }
+
+                                return CircularProgressIndicator();
+                              },
+                            ),
+
+
+                            // Text(
+                            //
+                            //   '${'Welcome, '+data[0]['namedriver'].toString()}',
+                            //   style: TextStyle(
+                            //     color: Color(0xFF442B72),
+                            //     fontSize: 12,
+                            //     fontFamily: 'Poppins-Light',
+                            //     fontWeight: FontWeight.w400,
+                            //   ),),
                           ),
                           SizedBox(height: 20,),
                           Text('Driver Number'.tr,

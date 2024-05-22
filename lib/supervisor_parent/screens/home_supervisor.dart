@@ -234,7 +234,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                         height: 20,
                           child: Container()),
 
-                      sharedpref!.getInt('invit') == 1 ?
+                      sharedpref!.getInt('invit') == 0 ?
                       Column(
                         children: [
                           SizedBox(height: 20),
@@ -397,32 +397,85 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                                 ],
                                                               ),
                                                             ),
-                                                            Text.rich(
-                                                              TextSpan(
-                                                                children: [
-                                                                  TextSpan(
-                                                                    text: 'Address: '.tr,
-                                                                    style: TextStyle(
-                                                                      color: Color(0xFF919191),
-                                                                      fontSize: 12,
-                                                                      fontFamily: 'Poppins-Light',
-                                                                      fontWeight: FontWeight.w400,
-                                                                      height: 1.33,
-                                                                    ),
-                                                                  ),
-                                                                  TextSpan(
-                                                                    text: '16 Khaled st,Asyut,Egypt',
-                                                                    style: TextStyle(
-                                                                      color: Color(0xFF442B72),
-                                                                      fontSize: 12,
-                                                                      fontFamily: 'Poppins-Light',
-                                                                      fontWeight: FontWeight.w400,
-                                                                      height: 1.33,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
+                                                            // FutureBuilder(
+                                                            //   future: _firestore.collection('parent').doc(sharedpref!.getString('id')).get(),
+                                                            //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                            //     if (snapshot.hasError) {
+                                                            //       print('Error: ${snapshot.error}');
+                                                            //       return Text('Something went wrong');
+                                                            //     }
+                                                            //
+                                                            //     if (snapshot.connectionState == ConnectionState.done) {
+                                                            //       if (snapshot.data?.data() == null) {
+                                                            //         print('No data available');
+                                                            //         return Text(
+                                                            //           'No data available',
+                                                            //           style: TextStyle(
+                                                            //             color: Color(0xff442B72),
+                                                            //             fontSize: 12,
+                                                            //             fontFamily: 'Poppins-Regular',
+                                                            //             fontWeight: FontWeight.w400,
+                                                            //           ),
+                                                            //         );
+                                                            //       }
+                                                            //
+                                                            //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                                            //
+                                                            //       print('Data: $data');
+                                                            //       if (data.containsKey('address')) {
+                                                            //         print('Address: ${data['address']}');
+                                                            //         return Text(
+                                                            //           '${data['address']}',
+                                                            //           style: TextStyle(
+                                                            //             color: Color(0xff442B72),
+                                                            //             fontSize: 12,
+                                                            //             fontFamily: 'Poppins-Regular',
+                                                            //             fontWeight: FontWeight.w400,
+                                                            //           ),
+                                                            //         );
+                                                            //       } else {
+                                                            //         print('No address field found in data');
+                                                            //         return Text(
+                                                            //           'No address field found in data',
+                                                            //           style: TextStyle(
+                                                            //             color: Color(0xff442B72),
+                                                            //             fontSize: 12,
+                                                            //             fontFamily: 'Poppins-Regular',
+                                                            //             fontWeight: FontWeight.w400,
+                                                            //           ),
+                                                            //         );
+                                                            //       }
+                                                            //     }
+                                                            //     print('Loading...');
+                                                            //     return CircularProgressIndicator();
+                                                            //   },
+                                                            // ),                                                        // Text.rich(
+                                                            //   TextSpan(
+                                                            //     children: [
+                                                            //       TextSpan(
+                                                            //         text: 'Address: '.tr,
+                                                            //         style: TextStyle(
+                                                            //           color: Color(0xFF919191),
+                                                            //           fontSize: 12,
+                                                            //           fontFamily: 'Poppins-Light',
+                                                            //           fontWeight: FontWeight.w400,
+                                                            //           height: 1.33,
+                                                            //         ),
+                                                            //       ),
+                                                            //
+                                                            //       TextSpan(
+                                                            //         text: '16 Khaled st,Asyut,Egypt',
+                                                            //         style: TextStyle(
+                                                            //           color: Color(0xFF442B72),
+                                                            //           fontSize: 12,
+                                                            //           fontFamily: 'Poppins-Light',
+                                                            //           fontWeight: FontWeight.w400,
+                                                            //           height: 1.33,
+                                                            //         ),
+                                                            //       ),
+                                                            //     ],
+                                                            //   ),
+                                                            // ),
                                                           ],
                                                         )
                                                       ],
