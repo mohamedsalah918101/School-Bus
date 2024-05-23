@@ -208,14 +208,14 @@ class _SchoolDataState extends State<SchoolData> {
         backgroundColor: const Color(0xFFFFFFFF),
         body: LayoutBuilder(builder: (context, constrains) {
           return SingleChildScrollView(
-            reverse: true,
+            //reverse: true,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 5,
-                ),
+                // const SizedBox(
+                //   height: 5,
+                // ),
                 // Padding(
                 //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 //   child: InkWell(onTap: (){},
@@ -1096,9 +1096,9 @@ class _SchoolDataState extends State<SchoolData> {
                               ),
                             ) ,
 
-                            const SizedBox(
-                              height: 60,
-                            ),
+                            // const SizedBox(
+                            //   height: 60,
+                            // ),
 
 
                           ],

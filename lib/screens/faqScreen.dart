@@ -72,91 +72,93 @@ class _FAQScreenState extends State<FAQScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        endDrawer: HomeDrawer(),
-        key: _scaffoldKey,
-        appBar:PreferredSize(
-    child: Container(
-    decoration: BoxDecoration(
-        boxShadow: [
-        BoxShadow(
-        color:  Color(0x3F000000),
-    blurRadius: 12,
-    offset: Offset(-1, 4),
-    spreadRadius: 0,
-    )
-    ]),
-    child: AppBar(
-    toolbarHeight: 70,
-    centerTitle: true,
-    shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.vertical(
-    bottom: Radius.circular(16.49),
-    ),
-    ),
-    elevation: 0.0,
-    leading: InkWell(
-    onTap: (){
-    Navigator.of(context).pop();
-    },
-    child: const Icon(
-    Icons.arrow_back_ios_new_rounded,
-    size: 23,
-    color: Color(0xff442B72),
-    ),
+    return SafeArea(
+      child: Scaffold(
+          endDrawer: HomeDrawer(),
+          key: _scaffoldKey,
+          appBar:PreferredSize(
+      child: Container(
+      decoration: BoxDecoration(
+          boxShadow: [
+          BoxShadow(
+          color:  Color(0x3F000000),
+      blurRadius: 12,
+      offset: Offset(-1, 4),
+      spreadRadius: 0,
+      )
+      ]),
+      child: AppBar(
+      toolbarHeight: 70,
+      centerTitle: true,
+      shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+      bottom: Radius.circular(16.49),
+      ),
+      ),
+      elevation: 0.0,
+      leading: InkWell(
+      onTap: (){
+      Navigator.of(context).pop();
+      },
+      child: const Icon(
+      Icons.arrow_back_ios_new_rounded,
+      size: 23,
+      color: Color(0xff442B72),
+      ),
 
-    ),
-    actions: [
-    Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-    child:
-    InkWell(
-    onTap: (){
-    _scaffoldKey.currentState!.openEndDrawer();
-    },
-    child: const Icon(
-    Icons.menu_rounded,
-    color: Color(0xff442B72),
-    size: 35,
-    ),
-    ),
-    ),
-    ],
-    title: Text('FAQ'.tr ,
-    style: const TextStyle(
-    color: Color(0xFF993D9A),
-    fontSize: 17,
-    fontFamily: 'Poppins-Bold',
-    fontWeight: FontWeight.w700,
-    height: 1,
-    ),),
-    backgroundColor:  Color(0xffF8F8F8),
-    surfaceTintColor: Colors.transparent,
-    ),
-    ),
-    preferredSize: Size.fromHeight(70),
-    ),
-        //Custom().customAppBar(context, 'FAQ'),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              ListView.separated(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(8),
-                itemCount: quotes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return _buildExpandableTile(quotes[index]);
-                },
-                separatorBuilder: (BuildContext context, int index) =>
-                const Divider(),
-              ),
-              const SizedBox(
-                height: 85,
-              )
-            ],
-          ),
-        ));
+      ),
+      actions: [
+      Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child:
+      InkWell(
+      onTap: (){
+      _scaffoldKey.currentState!.openEndDrawer();
+      },
+      child: const Icon(
+      Icons.menu_rounded,
+      color: Color(0xff442B72),
+      size: 35,
+      ),
+      ),
+      ),
+      ],
+      title: Text('FAQ'.tr ,
+      style: const TextStyle(
+      color: Color(0xFF993D9A),
+      fontSize: 17,
+      fontFamily: 'Poppins-Bold',
+      fontWeight: FontWeight.w700,
+      height: 1,
+      ),),
+      backgroundColor:  Color(0xffF8F8F8),
+      surfaceTintColor: Colors.transparent,
+      ),
+      ),
+      preferredSize: Size.fromHeight(70),
+      ),
+          //Custom().customAppBar(context, 'FAQ'),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(8),
+                  itemCount: quotes.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildExpandableTile(quotes[index]);
+                  },
+                  separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(),
+                ),
+                const SizedBox(
+                  height: 85,
+                )
+              ],
+            ),
+          )),
+    );
   }
 
   Widget _buildExpandableTile(Map item) {

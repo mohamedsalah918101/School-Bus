@@ -69,6 +69,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
   //edite function
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
+  String docidedite='';
   editAddSupervisor() async {
     print('editAddParent called');
 
@@ -85,7 +86,9 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
             'phoneNumber': _phonenumber.text,
             'email': _email.text,
             'name':  _name.text,
+
           });
+          docidedite:Supervisor.doc(widget.docid);
 
           print('document updated successfully');
 
@@ -511,42 +514,73 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                   // Otp pageلسه معملتهاش ودا الكود اللى بيودينى عليها
                                   child: ElevatedSimpleButton(
                                     txt: "Save".tr,
-                                    onPress: (){
-                                      setState(() {
-                                        if (_name.text.isEmpty) {
-                                          nameerror = false;
-                                        } else {
-                                          nameerror = true;
-                                        }
-                                        if (_phonenumber.text.isEmpty) {
-                                          phoneerror = false;
-                                        } else {
-                                          phoneerror = true;
-                                        }
-                                        // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                                        // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
-                                      });
-                                      if(nameerror
-                                          // ! _nameController.text.isEmpty
-                                          &&
-                                          //! _phoneNumberController.text.isEmpty
-                                          _phonenumber.text.length == 11&& phoneerror){
-                                        editAddSupervisor();
-                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+                                    // onPress: (){
+                                    //   setState(() {
+                                    //     if (_name.text.isEmpty) {
+                                    //       nameerror = false;
+                                    //     } else {
+                                    //       nameerror = true;
+                                    //     }
+                                    //     if (_phonenumber.text.isEmpty) {
+                                    //       phoneerror = false;
+                                    //     } else {
+                                    //       phoneerror = true;
+                                    //     }
+                                    //     // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                                    //     // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                    //   });
+                                    //   if(nameerror
+                                    //       // ! _nameController.text.isEmpty
+                                    //       &&
+                                    //       //! _phoneNumberController.text.isEmpty
+                                    //       _phonenumber.text.length == 13&& phoneerror){
+                                    //     editAddSupervisor();
+                                    //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+                                    //
+                                    //   }
+                                    //   else{
+                                    //     SnackBar(content: Text('Please,enter valid number'));
+                                    //   }
+                                    //
+// new
+          onPress: ()async
+           {
 
-                                      }
-                                      else{
-                                        SnackBar(content: Text('Please,enter valid number'));
-                                      }
+          setState(() {
+          if (_name.text.isEmpty) {
+          nameerror = false;
+          } else {
+          nameerror = true;
+          }
+          if (_phonenumber.text.isEmpty) {
+          phoneerror = false;
+          } else {
+          phoneerror = true;
+          }
+          // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+          // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+          });
+          if(nameerror
+          // ! _nameController.text.isEmpty
+          &&
+          //! _phoneNumberController.text.isEmpty
+          _phonenumber.text.length == 13 && phoneerror){
+          editAddSupervisor();
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
 
-
+          }
+          else{
+          SnackBar(content: Text('Please,enter valid number'));
+          }
+          //   _addDataToFirestore();
+          },
                                       // Navigator.push(
                                       //     context ,
                                       //     MaterialPageRoute(
                                       //         builder: (context) =>  HomeScreen(),
                                       //         maintainState: false)
                                       // );
-                                    },
+
                                     width: constrains.maxWidth /1.2,
                                     hight: 48,
                                     color: const Color(0xFF442B72),
@@ -561,7 +595,15 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                               ) ,
                               SizedBox(height: 30),
                               GestureDetector(
-                                onTap: (){
+                                onTap: ()async{
+                                  var res = await createDynamicLink(true,docidedite,_phonenumber.text,'supervisor');
+                                  if (res == "success") {
+                                    showSnackBarFun(
+                                        context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
+                                  } else {
+                                    showSnackBarFun(
+                                        context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+                                  }
                                 //  createDynamicLink(true,docid,_phonenumber.text,'supervisor');
                                 },
                                   child: Text("Resend invitation".tr,style:TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily:"Poppins-Regular"),)),
@@ -747,6 +789,45 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
       ),
     );
   }
+showSnackBarFun(context,msg,color,photo) {
+  SnackBar snackBar = SnackBar(
+
+    // content: const Text('Invitation sent successfully',
+    //     style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color: Color(0xff442B72))
+    // ),
+    content: Row(
+      children: [
+        // Add your image here
+        Padding(
+          padding: const EdgeInsets.only(left: 50),
+          child: Image.asset(
+            photo,
+            // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
+            width: 30, // Adjust width as needed
+            height: 30, // Adjust height as needed
+          ),
+        ),
+        SizedBox(width: 10), // Add some space between the image and the text
+        Text(
+          msg,
+          style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),
+        ),
+      ],
+    ),
+    backgroundColor: Color(0xffFFFFFF),
+    duration: Duration(seconds: 2),
+
+    dismissDirection: DismissDirection.up,
+    behavior: SnackBarBehavior.floating,
+    margin: EdgeInsets.only(
+        bottom: MediaQuery.of(context).size.height - 165,
+        left: 10,
+        right: 10),
+    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
 }
 
 
