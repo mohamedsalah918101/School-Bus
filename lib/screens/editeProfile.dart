@@ -48,6 +48,50 @@ class EditeProfile extends StatefulWidget {
 }
 
 class _EditeProfileState extends State<EditeProfile> {
+
+ // fun edite photo in db
+  editPhotoProfile() async {
+    print('editprofile called');
+
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+
+        try {
+          print('updating document...');
+          print(imageUrlprofile);
+//profile.doc(widget.docid)
+          await FirebaseFirestore.instance
+              .collection('schooldata')
+              .doc(sharedpref!.getString('id'))
+              .update({
+
+            'photo': imageUrlprofile ?? '',
+
+          });
+
+          print('document updated successfully');
+
+          setState(() {
+            // Trigger a rebuild of the widget tree if necessary
+          });
+        } catch (e) {
+          print('Error updating document: $e');
+          // Handle specific error cases here
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
+
+
+
+
   final _firestore = FirebaseFirestore.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _nameEnglish = TextEditingController();
@@ -137,6 +181,7 @@ class _EditeProfileState extends State<EditeProfile> {
             'address': _Address.text,
             'coordinatorName': _coordinatorName.text,
             'supportNumber': _supportNumber.text,
+           // 'photo': imageUrlprofile ??'',
           });
 
           print('document updated successfully');
@@ -314,145 +359,259 @@ class _EditeProfileState extends State<EditeProfile> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Stack(
-                  //     children: [
-                  //
-                  //       Center(
-                  //         child: Padding(
-                  //           padding: const EdgeInsets.only(top: 20),
-                  //           //this part od code photo doesnot change when choose other image
-                  //           child:_selectedImageEditeProfile != null
-                  //               ? Image.file(
-                  //             _selectedImageEditeProfile!,  // Display the uploaded image
-                  //             width: 83,  // Set width as per your preference
-                  //             height: 78.5,  // Set height as per your preference
-                  //             fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                  //           ):
-                  //           GestureDetector(
-                  //             onTap: ()async {
-                  //                await _pickEditeImageProfileFromGallery();
-                  //             },
-                  //             child: CircleAvatar(
-                  //               backgroundColor: Colors.white, // Set background color to white
-                  //               radius:50, // Set the radius according to your preference
-                  //               child: Image.asset(
-                  //                 'assets/imgs/school/Ellipse 2 (2).png',
-                  //                 fit: BoxFit.cover,
-                  //                 width: 100, // Set width of the image
-                  //                 height: 100, // Set height of the image
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       Center(
-                  //         child: Padding(
-                  //           padding: const EdgeInsets.only(top: 95,left: 55),
-                  //           child: Container(
-                  //             decoration: BoxDecoration(
-                  //                 shape: BoxShape.circle,
-                  //                 border: Border.all(width: 3,color: Color(0xff432B72))
-                  //             ),
-                  //             child: CircleAvatar(
-                  //               backgroundColor: Colors.white,
-                  //               // Set background color to white
-                  //               radius:10, // Set the radius according to your preference
-                  //               child: GestureDetector(
-                  //                 onTap: (){
-                  //                   changePhotoDialog(context);
-                  //               //    _pickEditeProfileImageFromGallery();
-                  //                 },
-                  //                 child: Image.asset(
-                  //                   'assets/imgs/school/edite.png',
-                  //                   fit: BoxFit.cover,
-                  //                   width: 15, // Set width of the image
-                  //                   height: 15, // Set height of the image
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ]
-                  // ),
+                 //old stack
+                 //  Stack(
+                 //    children: [
+                 //      Center(
+                 //        child: Padding(
+                 //          padding: const EdgeInsets.only(top: 20),
+                 //          child: FutureBuilder<String>(
+                 //            future: _getImageUrl(),
+                 //            builder: (BuildContext context,
+                 //                AsyncSnapshot<String> snapshot) {
+                 //              if (snapshot.connectionState ==
+                 //                  ConnectionState.waiting) {
+                 //                return CircularProgressIndicator();
+                 //              }
+                 //
+                 //              if (snapshot.hasError) {
+                 //                return Text('Error: ${snapshot.error}');
+                 //              }
+                 //
+                 //              if (!snapshot.hasData || snapshot.data == null) {
+                 //                return GestureDetector(
+                 //                  onTap: () async {
+                 //                    await _pickEditeImageProfileFromGallery();
+                 //                  },
+                 //                  child: CircleAvatar(
+                 //                    backgroundColor: Colors.white,
+                 //                    radius: 50,
+                 //                    child: Image.asset(
+                 //                      'assets/imgs/school/Ellipse 2 (2).png',
+                 //                      fit: BoxFit.cover,
+                 //                      width: 100,
+                 //                      height: 100,
+                 //                    ),
+                 //                  ),
+                 //                );
+                 //              }
+                 //
+                 //              return Image.network(
+                 //                snapshot.data!,
+                 //                width: 83,
+                 //                height: 78.5,
+                 //                fit: BoxFit.cover,
+                 //              );
+                 //            },
+                 //          ),
+                 //        ),
+                 //      ),
+                 //      Center(
+                 //        child: Padding(
+                 //          padding: const EdgeInsets.only(top: 95, left: 55),
+                 //          child: Container(
+                 //            decoration: BoxDecoration(
+                 //              shape: BoxShape.circle,
+                 //              border: Border.all(
+                 //                  width: 3, color: Color(0xff432B72)),
+                 //            ),
+                 //            child: CircleAvatar(
+                 //              backgroundColor: Colors.white,
+                 //              radius: 10,
+                 //              child: GestureDetector(
+                 //                onTap: () {
+                 //                  changePhotoDialog(context);
+                 //                },
+                 //                child: Image.asset(
+                 //                  'assets/imgs/school/edite.png',
+                 //                  fit: BoxFit.cover,
+                 //                  width: 15,
+                 //                  height: 15,
+                 //                ),
+                 //              ),
+                 //            ),
+                 //          ),
+                 //        ),
+                 //      ),
+                 //    ],
+                 //  ),
                   Stack(
                     children: [
                       Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: FutureBuilder<String>(
-                            future: _getImageUrl(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<String> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              }
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child:
+                                _selectedImageEditeProfile != null
+                                    ? Image.file(
+                                  _selectedImageEditeProfile!,  // Display the uploaded image
+                                  width: 83,  // Set width as per your preference
+                                  height: 78.5,  // Set height as per your preference
+                                  fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                ) :
+                                CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 50,
+                                  child: FutureBuilder<DocumentSnapshot>(
+                                    future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                      if (snapshot.hasError) {
+                                        return Icon(
+                                          Icons.error,
+                                          color: Colors.red,
+                                          size: 50,
+                                        ); // Display error icon if fetch fails
+                                      }
 
-                              if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              }
+                                      if (snapshot.connectionState == ConnectionState.done) {
+                                        Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
 
-                              if (!snapshot.hasData || snapshot.data == null) {
-                                return GestureDetector(
-                                  onTap: () async {
-                                    await _pickEditeImageProfileFromGallery();
-                                  },
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    radius: 50,
-                                    child: Image.asset(
-                                      'assets/imgs/school/Ellipse 2 (2).png',
-                                      fit: BoxFit.cover,
-                                      width: 100,
-                                      height: 100,
-                                    ),
+                                        // Check if data contains photo URL
+                                        if (data != null && data.containsKey('photo')) {
+                                          return Image.network(
+                                            data['photo'],
+                                            fit: BoxFit.fill,
+                                            width: 90,
+                                            height: 90,
+                                          );
+                                        } else {
+                                          return Image.asset(
+                                            'assets/imgs/school/Ellipse 2 (2).png', // Default image if photo URL is missing
+                                            fit: BoxFit.cover,
+                                            width: 100,
+                                            height: 100,
+                                          );
+                                        }
+                                      }
+
+                                      return CircularProgressIndicator(); // Display loading indicator while fetching data
+                                    },
                                   ),
-                                );
-                              }
-
-                              return Image.network(
-                                snapshot.data!,
-                                width: 83,
-                                height: 78.5,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 95, left: 55),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  width: 3, color: Color(0xff432B72)),
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 10,
-                              child: GestureDetector(
-                                onTap: () {
-                                  changePhotoDialog(context);
-                                },
-                                child: Image.asset(
-                                  'assets/imgs/school/edite.png',
-                                  fit: BoxFit.cover,
-                                  width: 15,
-                                  height: 15,
                                 ),
                               ),
                             ),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 95, left: 55),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(width: 3, color: Color(0xff432B72)),
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 10,
+                                    child:
+                                    GestureDetector(
+                                      onTap: (){
+                                        changePhotoDialogProfile(context);
+                                        // _pickProfileImageFromGallery();
+                                      },
+                                      child: Image.asset(
+                                        'assets/imgs/school/edite.png',
+                                        fit: BoxFit.cover,
+                                        width: 15,
+                                        height: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Center(
+                      //   child: Stack(
+                      //     children: [
+                      //       Center(
+                      //         child: Padding(
+                      //           padding: const EdgeInsets.only(top: 20),
+                      //           child: CircleAvatar(
+                      //             backgroundColor: Colors.white,
+                      //             radius: 50,
+                      //             child: Image.asset(
+                      //               'assets/imgs/school/Ellipse 2 (2).png',
+                      //               fit: BoxFit.cover,
+                      //               width: 100,
+                      //               height: 100,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Center(
+                      //         child: Padding(
+                      //           padding: const EdgeInsets.only(top: 95, left: 55),
+                      //           child: GestureDetector(
+                      //             onTap: (){
+                      //               Dialoge.changePhotoDialog(context);
+                      //             },
+                      //             child: Container(
+                      //
+                      //               decoration: BoxDecoration(
+                      //                 shape: BoxShape.circle,
+                      //                 border: Border.all(width: 3, color: Color(0xff432B72)),
+                      //               ),
+                      //               child: CircleAvatar(
+                      //                 backgroundColor: Colors.white,
+                      //                 radius: 10,
+                      //
+                      //                 child: Image.asset(
+                      //                   'assets/imgs/school/edite.png',
+                      //                   fit: BoxFit.cover,
+                      //                   width: 15,
+                      //                   height: 15,
+                      //
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      Positioned(
+                        top:15,
+                        right: 5,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
+
+                          },
+
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              side: BorderSide(color: Color(0xff432B72)),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Image.asset("assets/imgs/school/icons8_edit_1 1 (1).png",width: 17,height: 17,),
+                              // Transform(
+                              //   alignment: Alignment.center,
+                              //   transform: Matrix4.rotationY(math.pi),
+                              //   child:
+                              //   Icon(Icons.edit_outlined, color: Color(0xFF442B72), size: 20),
+                              // ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Edit',
+                                style: TextStyle(color: Color(0xff432B72), fontSize: 16, fontFamily: "Poppins-Regular"),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
 
-                  // Center(child: Text("Salam School",style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"),)
-                  // ),
                   SizedBox(
                     height: 20,
                   ),
@@ -1426,6 +1585,101 @@ class _EditeProfileState extends State<EditeProfile> {
                       hight: 45,
                       onPress: () {
                         Navigator.pop(context);
+                      },
+                      color: const Color(0xFF442B72),
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )),
+    );
+  }
+
+  changePhotoDialogProfile(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30,),
+          ),
+          child: Container(
+            height: 280,
+            width: 450,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+
+
+                      const Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Change profile picture',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF771F98),
+                            fontSize: 19,
+                            fontFamily: 'Poppins-Medium',
+                            fontWeight: FontWeight.w600,
+                            height: 1.23,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: GestureDetector(
+                          onTap: (){
+                            _pickEditeImageProfileFromGallery();
+                          },
+                          child: CircleAvatar(
+                              backgroundColor:Color(0xffE2E1EE),
+                              child: Image.asset("assets/imgs/school/Vectorphoto.png",width: 21,height: 16,)),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: const Text(
+                          'Select profile picture',
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 15,
+                            fontFamily: 'Poppins-Bold',
+                            fontWeight: FontWeight.w400,
+                            height: 3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: ElevatedSimpleButton(
+                      txt: 'Save',
+                      width: 250,
+                      hight: 45,
+                      onPress: () {
+                        //editPhotoProfile();
+                        Navigator.pop(context);
+
                       },
                       color: const Color(0xFF442B72),
                       fontSize: 16,

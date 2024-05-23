@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/screens/busesScreen.dart';
 import 'package:school_account/screens/editeSupervisor.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
@@ -40,7 +41,25 @@ class SupervisorScreen extends StatefulWidget {
 class SupervisorScreenSate extends State<SupervisorScreen> {
 
 
- bool isdelete= false;
+  String busNumber = '';
+  Future<void> getBusNumber(String busId) async {
+    DocumentSnapshot busDocument = await FirebaseFirestore.instance
+        .collection('busdata')
+        .doc(busId)
+        .get();
+
+    if (busDocument.exists) {
+      setState(() {
+        busNumber = busDocument['busnumber'];
+        print('BUSSS $busNumber');
+      });
+    } else {
+      print('Bus document does not exist for bus_id: $busId');
+    }
+  }
+
+
+  bool isdelete= false;
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController = TextEditingController();
   int? _selectedOption = 1;
@@ -60,6 +79,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   //         .snapshots();
   //   });
   // }
+
   //call phone
   void _makePhoneCall(String phoneNumber) async {
     var mobileCall = 'tel:$phoneNumber';
@@ -136,6 +156,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   @override
   void initState() {
     super.initState();
+
    // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
     // responsible
   getData();
@@ -576,6 +597,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                         //data.length,
                                         //itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
+                                          //print(data[index]['bus_id']);
+                                          getBusNumber(data[index]['bus_id']);
 
                                           // String supervisorId = data[index]['bus_id']; // Access the ID
                                           //
@@ -1024,15 +1047,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               ),
                                                               SizedBox(width: 10),
                                                               Text(
-                                                                'Bus: 1234  ى ر س',
+                                                                'Bus: $busNumber',
+                                                                //'Bus: 1 2 3 ى س ج',
                                                                // data[index]['bus_id'],
-
-
                                                                 style: TextStyle(
                                                                   fontSize: 16,
                                                                   color: Color(0xFF442B72),
                                                                 ),
                                                               ),
+
                                                             ],
                                                           )
                                                     // ListTile(
