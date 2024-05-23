@@ -41,7 +41,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   final _nameController = TextEditingController();
   bool nameError = true;
   bool phoneError = true;
-  bool emailError = true;
+  // bool emailError = true;
   File ? _selectedImage;
   String? imageUrl;
   File? file ;
@@ -50,33 +50,74 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
   // List<ChildDataItem> children = [];
 
-  Future _pickImageFromGallery() async{
-    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage ==null) return;
+  Future<void> _pickImageFromGallery() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? returnedImage = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (returnedImage == null) {
+      print('No image selected');
+      return;
+    }
+
+    File imageFile = File(returnedImage.path);
+
+    if (!imageFile.existsSync()) {
+      print('The selected image file does not exist');
+      return;
+    }
+
     setState(() {
-      _selectedImage=File(returnedImage.path);
+      _selectedImage = imageFile;
     });
 
-    //Get a reference to storage root
+    // Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images_supervisor');
-    Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
-    try {
-      //Store the file
-      await referenceImageToUpload.putFile(File(returnedImage.path));
-      //Success: get the download URL
-      imageUrl = await referenceImageToUpload.getDownloadURL();
-      print('Image uploaded successfully. URL: $imageUrl');
-      setState(() {
+    Reference referenceDirImages = referenceRoot.child('images_supervisor');
+    Reference referenceImageToUpload = referenceDirImages.child('profile_supervisor');
 
-      });
-      return imageUrl;
+    try {
+      // Store the file
+      UploadTask uploadTask = referenceImageToUpload.putFile(imageFile);
+
+      // Get the download URL
+      TaskSnapshot taskSnapshot = await uploadTask;
+      imageUrl = await taskSnapshot.ref.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+
+      setState(() {});
     } catch (error) {
       print('Error uploading image: $error');
-      return '';
-      //Some error occurred
     }
   }
+
+
+  // Future _pickImageFromGallery() async{
+  //   final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if(returnedImage ==null) return;
+  //   setState(() {
+  //     _selectedImage=File(returnedImage.path);
+  //   });
+  //
+  //   //Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = FirebaseStorage.instance.ref().child('images_supervisor');
+  //   Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
+  //   try {
+  //     //Store the file
+  //     await referenceImageToUpload.putFile(File(returnedImage.path));
+  //     //Success: get the download URL
+  //     imageUrl = await referenceImageToUpload.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $imageUrl');
+  //     setState(() {
+  //
+  //     });
+  //     return imageUrl;
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //     return '';
+  //     //Some error occurred
+  //   }
+  // }
 
   editAddSupervisor() async {
     print('editAddParent called');
@@ -224,41 +265,47 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                             //       backgroundImage: NetworkImage( '$imageUrl',),
                             //       radius: 50.5,)
                             // ),
-                            FutureBuilder(
-                              future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                if (snapshot.hasError) {
-                                  return Text('Something went wrong');
-                                }
+                            GestureDetector(
+                              onTap: (){
+                                print('object');
+                                _pickImageFromGallery();
+                              },
+                              child: FutureBuilder(
+                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
 
-                                if (snapshot.connectionState == ConnectionState.done) {
-                                  if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                                    return Text(
-                                      'No data available',
-                                      style: TextStyle(
-                                        color: Color(0xff442B72),
-                                        fontSize: 12,
-                                        fontFamily: 'Poppins-Regular',
-                                        fontWeight: FontWeight.w400,
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                                      return Text(
+                                        'No data available',
+                                        style: TextStyle(
+                                          color: Color(0xff442B72),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Regular',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      );
+                                    }
+
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    String? busphoto = data['busphoto'] as String?;
+                                    String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
+                                    return CircleAvatar(
+                                      radius: 52.5,
+                                      backgroundColor: Color(0xff442B72),
+                                      child: CircleAvatar(
+                                        backgroundImage: NetworkImage(imageUrl),
+                                        radius: 50.5,
                                       ),
                                     );
                                   }
 
-                                  Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                  String? busphoto = data['busphoto'] as String?;
-                                  String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
-                                  return CircleAvatar(
-                                    radius: 52.5,
-                                    backgroundColor: Color(0xff442B72),
-                                    child: CircleAvatar(
-                                      backgroundImage: NetworkImage(imageUrl),
-                                      radius: 50.5,
-                                    ),
-                                  );
-                                }
-
-                                return CircularProgressIndicator();
-                              },
+                                  return CircularProgressIndicator();
+                                },
+                              ),
                             ),
                             (sharedpref?.getString('lang') == 'ar')?
                             Positioned(
@@ -574,13 +621,13 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                       ),
                     ),
                   ),
-                  emailError ? Container(): Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    child: Text(
-                      "Please enter your email".tr,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
+                  // emailError ? Container(): Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                  //   child: Text(
+                  //     "Please enter your email".tr,
+                  //     style: TextStyle(color: Colors.red),
+                  //   ),
+                  // ),
                   SizedBox(
                     height: 35,
                   ),
@@ -613,18 +660,20 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
 
                             });
                           }
-                          if (_emailController.text.length < 1) {
-                            emailError = false;
-                            setState(() {
-
-                            });
-                          } else if (_emailController.text.length > 0) {
-                            emailError = true;
-                            setState(() {
-
-                            });
-                          }
-                          if( nameError && emailError && phoneError){
+                          // if (_emailController.text.length < 1) {
+                          //   emailError = false;
+                          //   setState(() {
+                          //
+                          //   });
+                          // } else if (_emailController.text.length > 0) {
+                          //   emailError = true;
+                          //   setState(() {
+                          //
+                          //   });
+                          // }
+                          if( nameError &&
+                              // emailError &&
+                              phoneError){
                             editAddSupervisor();
                             DataSavedSnackBar(context, 'Data saved successfully');
                             Navigator.pop(context , true);

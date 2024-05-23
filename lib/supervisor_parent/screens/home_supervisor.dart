@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:school_account/Functions/functions.dart';
+import 'package:school_account/classes/loading.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
@@ -48,6 +49,12 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   @override
   Widget build(BuildContext context) {
     print('invite'+sharedpref!.getInt('invit').toString());
+
+    if (data.isEmpty) {
+      return Center(
+        child: Loading(),
+      );
+    }
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -102,7 +109,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                 ),
                               );
                             }
-                            return CircularProgressIndicator();
+                            return Container();
+                              // CircularProgressIndicator();
                           },
                         ),
 
@@ -175,7 +183,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                      );
                                    }
 
-                                   return CircularProgressIndicator();
+                                   return Container();
                                  },
                                ),
                                SizedBox(height: 3,),
@@ -211,7 +219,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                      );
                                    }
 
-                                   return CircularProgressIndicator();
+                                   return Container();
                                  },
                                ),
                              ],
@@ -312,7 +320,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 300,
+                                    height: 318, //300
                                     width: double.infinity,
                                     child: ListView.builder(
                                       shrinkWrap: true,
@@ -322,15 +330,19 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                       // data.length,
                                       itemBuilder: (BuildContext context, int index) {
                                         List children = data[index]['children'];
+                                        String address = data[index]['address'];
+                                        List<String> words = address.split(' ');
+                                        String firstLine = words.take(3).join(' ');
+                                        String secondLine = words.skip(3).join(' ');
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)
                                             for (var child in children)
                                               SizedBox(
                                                 width: double.infinity,
-                                                height:  92,
+                                                height:  98, //92
                                                 child: Card(
-                                                  elevation: 8,
+                                                  elevation: 5,
                                                   color: Colors.white,
                                                   surfaceTintColor: Colors.transparent,
                                                   shape: RoundedRectangleBorder(
@@ -407,22 +419,91 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                                       fontSize: 12,
                                                                       fontFamily: 'Poppins-Light',
                                                                       fontWeight: FontWeight.w400,
-                                                                      height: 1.33,
+                                                                      // height: 1.33,
                                                                     ),
                                                                   ),
+
                                                                   TextSpan(
-                                                                    text: '16 Khaled st,Asyut,Egypt',
+                                                                    text: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
+                                                                    // text: data[index]['address'].length > 20 ?
+                                                                    // '${data[index]['address'].substring(0, 20)}\n${data[index]['address'].substring(20)}'
+                                                                    //     : data[index]['address'],
+                                                                    // '${data[index]['address'] }',
                                                                     style: TextStyle(
                                                                       color: Color(0xFF442B72),
                                                                       fontSize: 12,
                                                                       fontFamily: 'Poppins-Light',
                                                                       fontWeight: FontWeight.w400,
-                                                                      height: 1.33,
+                                                                      // height: 1.33,
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
                                                             ),
+                                                            // FutureBuilder(
+                                                            //   future: _firestore.collection('parent').doc(sharedpref!.getString('id')).get(),
+                                                            //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                            //     if (snapshot.hasError) {
+                                                            //       return Text('Something went wrong');
+                                                            //     }
+                                                            //
+                                                            //     if (snapshot.connectionState == ConnectionState.done) {
+                                                            //       if (snapshot.data?.data() == null) {
+                                                            //         return Text(
+                                                            //           'No data available',
+                                                            //           style: TextStyle(
+                                                            //             color: Color(0xff442B72),
+                                                            //             fontSize: 12,
+                                                            //             fontFamily: 'Poppins-Regular',
+                                                            //             fontWeight: FontWeight.w400,
+                                                            //           ),
+                                                            //         );
+                                                            //       }
+                                                            //
+                                                            //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                                            //
+                                                            //       sharedpref?.getString('lang') == 'en';
+                                                            //       return Text(
+                                                            //         '${data[index]['grade'] }',
+                                                            //         style: TextStyle(
+                                                            //           color: Color(0xff442B72),
+                                                            //           fontSize: 15,
+                                                            //           fontFamily: 'Poppins-Bold',
+                                                            //           fontWeight: FontWeight.w700,
+                                                            //         ),
+                                                            //       );
+                                                            //     }
+                                                            //     return CircularProgressIndicator();
+                                                            //   },
+                                                            // ),
+
+                                                                                                                // Text.rich(
+                                                            //   TextSpan(
+                                                            //     children: [
+                                                            //       TextSpan(
+                                                            //         text: 'Address: '.tr,
+                                                            //         style: TextStyle(
+                                                            //           color: Color(0xFF919191),
+                                                            //           fontSize: 12,
+                                                            //           fontFamily: 'Poppins-Light',
+                                                            //           fontWeight: FontWeight.w400,
+                                                            //           height: 1.33,
+                                                            //         ),
+                                                            //       ),
+                                                            //
+                                                            //       TextSpan(
+                                                            //         text: '16 Khaled st,Asyut,Egypt',
+                                                            //         style: TextStyle(
+                                                            //           color: Color(0xFF442B72),
+                                                            //           fontSize: 12,
+                                                            //           fontFamily: 'Poppins-Light',
+                                                            //           fontWeight: FontWeight.w400,
+                                                            //           height: 1.33,
+                                                            //         ),
+                                                            //       ),
+                                                            //     ],
+                                                            //   ),
+                                                            // ),
                                                           ],
                                                         )
                                                       ],

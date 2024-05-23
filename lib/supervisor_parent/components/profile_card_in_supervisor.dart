@@ -82,7 +82,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                         );
                     }
 
-                    return CircularProgressIndicator();
+                    return Container();
                   },
                 ),
                 // Image.asset(
@@ -130,7 +130,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                           );
                         }
 
-                        return CircularProgressIndicator();
+                        return Container();
                       },
                     ),
                     FutureBuilder(
@@ -165,7 +165,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                           );
                         }
 
-                        return CircularProgressIndicator();
+                        return Container();
                       },
                     ),
                   ],

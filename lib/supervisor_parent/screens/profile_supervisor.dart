@@ -188,7 +188,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                             children: [
                               GestureDetector(
                                 onTap: (){
-                                  // _pickImageFromGallery();
+                                  _pickImageFromGallery();
                                   print('object');
                                 },
                                 child:FutureBuilder(
@@ -225,7 +225,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                         );
                                     }
 
-                                    return CircularProgressIndicator();
+                                    return Container();
                                   },
                                 ),
 
@@ -412,7 +412,11 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                                       fontFamily: 'Poppins-Regular',
                                                       width: 278,
                                                       hight: 48,
-                                                      onPress: (){},
+                                                      onPress: (){
+                                                        Navigator.of(context).pop();
+                                                        // _pickImageFromGallery();
+
+                                                      },
                                                       color: Color(0xff442B72),
                                                       fontSize: 16)
                                                 ],
@@ -451,11 +455,16 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                           if (data.isNotEmpty) {
                             Navigator.push(context, MaterialPageRoute(builder: (context) =>
                                 EditProfileSupervisorScreen(
+                                  // docid: data[index].id,
+                                  // oldNumber: data[index].get('phoneNumber'),
+                                  // oldName: data[index].get('name'),
+                                  // oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
+                                  // oldType: data[index].get('typeOfParent'),
                                     docid: data[0].id,
                                     oldName: data[0].get('name'),
                                     oldNumber: data[0].get('phoneNumber'),
                                     oldEmail: data[0].get('email'),
-                                    oldPhoto: data[0].get('busphoto')
+                                    oldPhoto: data[0].get('busphoto'),
                                   // Image.asset( 'assets/images/Ellipse 1.png', ),
                                 )
                             )).then((value) {
@@ -542,7 +551,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                         );
                       }
 
-                      return CircularProgressIndicator();
+                      return Container();
                     },
                   ),
                 ),
@@ -623,7 +632,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                             );
                                           }
 
-                                          return CircularProgressIndicator();
+                                          return Container();
                                         },
                                       ),
                                     ],
@@ -706,7 +715,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                             );
                                           }
 
-                                          return CircularProgressIndicator();
+                                          return Container();
                                         },
                                       ),
 
