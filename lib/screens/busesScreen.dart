@@ -114,6 +114,7 @@ void _editBusDocument(String documentId, String imagedriver, String namedriver, 
       setState(() {
         // Update UI by removing the deleted document from the data list
         data.removeWhere((document) => document.id == documentId);
+        filteredData = List.from(data);
       });
       // ScaffoldMessenger.of(context).showSnackBar(
       //   showSnackBarFun(context),
@@ -238,71 +239,71 @@ final _firestore = FirebaseFirestore.instance;
               children: [
                 Column(
                   children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: InkWell(onTap: (){},
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Align(
+                              alignment: AlignmentDirectional.topStart,
+                              child: InkWell(
+                                // onTap: ()=>exit(0),
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                  // Navigate back to the previous page
+                                  Navigator.pop(context);
+
+                                },
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  size: 26,
+                                  color: Color(0xff442B72),
+                                ),
+                              ),
+                            ),
+                           // SizedBox(width: 20,),
+                            Expanded(
+                              child: Center(
+                                child: Align( alignment: AlignmentDirectional.center,
+                                  child: Text(
+                                    "Buses".tr,
+                                    style: TextStyle(
+                                      color: Color(0xFF993D9A),
+                                      fontSize: 20,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      //height: 0.64,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(onTap: (){
+                              Scaffold.of(context).openEndDrawer();
+                            },
+                              child: Align(
+                                alignment: AlignmentDirectional.topEnd,
+                                child: const Icon(
+                                  Icons.menu_rounded,
+                                  size: 40,
+                                  color: Color(0xff442B72),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Expanded(
                       child: SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: InkWell(onTap: (){},
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Align(
-                                    alignment: AlignmentDirectional.topStart,
-                                    child: InkWell(
-                                      // onTap: ()=>exit(0),
-                                      onTap: () {
-                                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                        // Navigate back to the previous page
-                                        Navigator.pop(context);
 
-                                      },
-                                      child: const Icon(
-                                        Icons.arrow_back_ios_new_rounded,
-                                        size: 26,
-                                        color: Color(0xff442B72),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 20,),
-                                  Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        "Buses".tr,
-                                        style: TextStyle(
-                                          color: Color(0xFF993D9A),
-                                          fontSize: 20,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                         height: 0.64,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                                    child: InkWell(onTap: (){
-                                      Scaffold.of(context).openEndDrawer();
-                                    },
-                                      child: Align(
-                                        alignment: AlignmentDirectional.topEnd,
-                                        child: const Icon(
-                                          Icons.menu_rounded,
-                                          size: 40,
-                                          color: Color(0xff442B72),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
 
                           const SizedBox(
                             height: 20,
