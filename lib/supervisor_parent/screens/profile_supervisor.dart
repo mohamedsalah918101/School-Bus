@@ -225,7 +225,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                         );
                                     }
 
-                                    return CircularProgressIndicator();
+                                    return Container();
                                   },
                                 ),
 
@@ -455,11 +455,16 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                           if (data.isNotEmpty) {
                             Navigator.push(context, MaterialPageRoute(builder: (context) =>
                                 EditProfileSupervisorScreen(
+                                  // docid: data[index].id,
+                                  // oldNumber: data[index].get('phoneNumber'),
+                                  // oldName: data[index].get('name'),
+                                  // oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
+                                  // oldType: data[index].get('typeOfParent'),
                                     docid: data[0].id,
                                     oldName: data[0].get('name'),
                                     oldNumber: data[0].get('phoneNumber'),
                                     oldEmail: data[0].get('email'),
-                                    oldPhoto: data[0].get('busphoto')
+                                    oldPhoto: data[0].get('busphoto'),
                                   // Image.asset( 'assets/images/Ellipse 1.png', ),
                                 )
                             )).then((value) {
@@ -546,7 +551,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                         );
                       }
 
-                      return CircularProgressIndicator();
+                      return Container();
                     },
                   ),
                 ),
@@ -627,7 +632,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                             );
                                           }
 
-                                          return CircularProgressIndicator();
+                                          return Container();
                                         },
                                       ),
                                     ],
@@ -710,7 +715,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                                             );
                                           }
 
-                                          return CircularProgressIndicator();
+                                          return Container();
                                         },
                                       ),
 

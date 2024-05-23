@@ -155,51 +155,11 @@ class _ParentsViewState extends State<ParentsView> {
         endDrawer: SupervisorDrawer(),
         body: Stack(
           children: [
-            (sharedpref?.getString('lang') == 'ar')
-                ? Positioned(
-                    bottom: 20,
-                    left: 25,
-                    child: FloatingActionButton(
-                      shape: const CircleBorder(),
-                      onPressed: () {
-                        print('object');
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddParents()));
-                      },
-                      backgroundColor: Color(0xFF442B72),
-                      child: Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 35,
-                      ),
-                    ),
-                  )
-                : Positioned(
-                    bottom: 20,
-                    right: 25,
-                    child: FloatingActionButton(
-                      shape: const CircleBorder(),
-                      onPressed: () {
-                        print('object');
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddParents()));
-                      },
-                      backgroundColor: Color(0xFF442B72),
-                      child: Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 35,
-                      ),
-                    ),
-                  ),
+
             Column(
               children: [
                 SizedBox(
-                  height: 20,
+                  height: 35,
                 ),
                 Container(
                   child: Row(
@@ -499,10 +459,11 @@ class _ParentsViewState extends State<ParentsView> {
                                                 fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF432B72),)),],)),],
                                         onSelected: (String value) {
                                           if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                              EditAddParents(docid: data[index].id,
+                                              EditAddParents(
+                                                docid: data[index].id,
                                                 oldNumber: data[index].get('phoneNumber'),
                                                 oldName: data[index].get('name'),
-                                                oldNumberOfChildren: data[index].get('numberOfChildren'),
+                                                oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
                                                 oldType: data[index].get('typeOfParent'),
                                                 // oldNameController: data[index].childrenData[index]['grade'],
                                                 // oldGradeOfChild: ['l;']
@@ -690,6 +651,50 @@ class _ParentsViewState extends State<ParentsView> {
                   ),
                 ),
               ],
+            ),
+            (sharedpref?.getString('lang') == 'ar')
+                ? Positioned(
+              bottom: 20,
+              left: 25,
+              child: FloatingActionButton(
+                shape: const CircleBorder(),
+                onPressed: () {
+                  print('object');
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddParents()));
+                },
+                backgroundColor: Color(0xFF442B72),
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 35,
+                ),
+              ),
+            )
+                : Positioned(
+              bottom: 20,
+              right: 25,
+              child: FloatingActionButton(
+                shape: const CircleBorder(),
+                onPressed: () {
+                  setState(() {
+
+                  });
+                  print('object');
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddParents()));
+                },
+                backgroundColor: Color(0xFF442B72),
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 35,
+                ),
+              ),
             ),
           ],
         ),

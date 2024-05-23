@@ -39,6 +39,8 @@ class SupervisorScreen extends StatefulWidget {
 
 class SupervisorScreenSate extends State<SupervisorScreen> {
 
+
+
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController = TextEditingController();
   int? _selectedOption = 1;
@@ -91,6 +93,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
       filteredData = List.from(data);
     });
   }
+
+  //fun get bus number
+  Future<DocumentSnapshot> getOtherData(String busId) async {
+    return await FirebaseFirestore.instance.collection('busdata').doc(busId).get();
+  }
+
+
+
+
   void _deleteSupervisorDocument(String documentId) {
     FirebaseFirestore.instance
         .collection('supervisor')
@@ -562,6 +573,16 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                         itemCount: data.length,
                                         //itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
+
+                                          // String supervisorId = data[index]['bus_id']; // Access the ID
+                                          //
+                                          // Future<String> getBusName() async {
+                                          //   DocumentReference docRef = FirebaseFirestore.instance.collection('busdata').doc(supervisorId);
+                                          //   DocumentSnapshot docSnapshot = await docRef.get();
+                                          //   return docSnapshot['busnumber']; // Access the bus name
+                                          // }
+
+
                                           String supervisorPhoneNumber = filteredData[index]['phoneNumber'];
                                           int state =data[index]['state']; // Assuming 'state' is the field from Firestore
 
@@ -793,6 +814,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                             ),
                                             tileColor: Colors.white,
                                             onTap: () {
+
                                               showModalBottomSheet(
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius: BorderRadius.vertical(
@@ -983,6 +1005,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                   fontWeight:
                                                                   FontWeight.bold)),
                                                           SizedBox(height: 10),
+
+                                                          // old bus
                                                           Row(
                                                             children: [
                                                               Container(
@@ -996,7 +1020,9 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               SizedBox(width: 10),
                                                               Text(
                                                                 'Bus: 1234  ى ر س',
-                                                                //data[index]['bus_id']
+                                                               // data[index]['bus_id'],
+
+
                                                                 style: TextStyle(
                                                                   fontSize: 16,
                                                                   color: Color(0xFF442B72),
@@ -1004,6 +1030,19 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               ),
                                                             ],
                                                           )
+                                                    // ListTile(
+                                                    //   title: Text(data[index]['name']), // Assuming 'name' in supervisor
+                                                    //   subtitle: FutureBuilder<String>(
+                                                    //     future: getBusName(),
+                                                    //     builder: (context, snapshot) {
+                                                    //       if (snapshot.hasData) {
+                                                    //         return Text(snapshot.data!);
+                                                    //       } else {
+                                                    //         return Text('Loading...');
+                                                    //       }
+                                                    //     },
+                                                    //   ),
+                                                    // ),
                                                         ],
                                                       ),
                                                     ),
@@ -1023,31 +1062,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                             ],
                           ),
                         ),
-                        //Floating button add old
-                        // Align(
-                        //   alignment: AlignmentDirectional.bottomEnd,
-                        //   child: Padding(
-                        //     padding: const EdgeInsets.only(right: 20),
-                        //     child: Column(
-                        //       children: [
-                        //         FloatingActionButton(
-                        //           onPressed: () {
-                        //             Navigator.push(
-                        //                 context,
-                        //                 MaterialPageRoute(
-                        //                     builder: (context) => SendInvitation()));
-                        //           },
-                        //           backgroundColor: Color(0xFF442B72),
-                        //           child: Icon(
-                        //             Icons.add,
-                        //             color: Colors.white,
-                        //             size: 35,
-                        //           ),
-                        //         )
-                        //       ],
-                        //     ),
-                        //   ),
-                        // )
+
                       ],
                     ),
                   ),

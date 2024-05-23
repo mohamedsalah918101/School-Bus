@@ -41,7 +41,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   final _nameController = TextEditingController();
   bool nameError = true;
   bool phoneError = true;
-  bool emailError = true;
+  // bool emailError = true;
   File ? _selectedImage;
   String? imageUrl;
   File? file ;
@@ -621,13 +621,13 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                       ),
                     ),
                   ),
-                  emailError ? Container(): Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    child: Text(
-                      "Please enter your email".tr,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
+                  // emailError ? Container(): Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                  //   child: Text(
+                  //     "Please enter your email".tr,
+                  //     style: TextStyle(color: Colors.red),
+                  //   ),
+                  // ),
                   SizedBox(
                     height: 35,
                   ),
@@ -660,17 +660,17 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
 
                             });
                           }
-                          if (_emailController.text.length < 1) {
-                            emailError = false;
-                            setState(() {
-
-                            });
-                          } else if (_emailController.text.length > 0) {
-                            emailError = true;
-                            setState(() {
-
-                            });
-                          }
+                          // if (_emailController.text.length < 1) {
+                          //   emailError = false;
+                          //   setState(() {
+                          //
+                          //   });
+                          // } else if (_emailController.text.length > 0) {
+                          //   emailError = true;
+                          //   setState(() {
+                          //
+                          //   });
+                          // }
                           if( nameError &&
                               // emailError &&
                               phoneError){

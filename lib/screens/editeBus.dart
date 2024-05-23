@@ -194,7 +194,7 @@ class _EditeBusState extends State<EditeBus> {
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 0) // Example condition
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
         .get();
 
     // data.addAll(querySnapshot.docs);
@@ -856,8 +856,9 @@ class _EditeBusState extends State<EditeBus> {
                               //   ),
                               // ),
                               Container(
-                                child:
-                                DropdownCheckbox(
+                                child:DropdownCheckboxEditeBus
+                                //DropdownCheckbox
+                                  (
                                     controller: _supervisorController,
                                     items:
                                     items
@@ -1184,6 +1185,7 @@ class _EditeBusState extends State<EditeBus> {
                         width: 120,
                         hight: 38,
                         onPress: () => {
+
                         Navigator.pop(context),
                           showSnackBarDeleteFun(context),
                         }

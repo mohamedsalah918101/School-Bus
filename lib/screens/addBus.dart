@@ -95,7 +95,7 @@ class _AddBusState extends State<AddBus> {
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 0) // Example condition
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
         .get();
 
    // data.addAll(querySnapshot.docs);
@@ -170,7 +170,7 @@ class _AddBusState extends State<AddBus> {
       print('Data added with document ID: ${docRef.id}');
       List.generate(
         selectedItems.length,
-            (index) {
+            (index) {return
           FirebaseFirestore.instance
               .collection('supervisor')
               .doc(selectedItems[index].docID)

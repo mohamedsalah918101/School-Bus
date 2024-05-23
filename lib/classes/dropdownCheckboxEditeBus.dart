@@ -1,16 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../Functions/functions.dart';
 import 'dropdowncheckboxitem.dart';
 
 class DropdownCheckboxEditeBus extends StatefulWidget {
   final List<DropdownCheckboxItem> items;
-  DropdownCheckboxEditeBus({required this.items});
+  final TextEditingController controller;
+  DropdownCheckboxEditeBus({required this.items, required this.controller});
   @override
   _DropdownCheckboxEditeBusState createState() => _DropdownCheckboxEditeBusState();
 }
 class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
   bool isDropdownOpened = false;
+  String selectedNames='Supervisor';
+  TextEditingController _supervisorController = TextEditingController();
+  @override
+  void initState() {
+    if(selectedItems.isNotEmpty){
+      if(selectedItems.length == 2){
+        selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+      }else {
+        selectedNames = selectedItems[0].label;
+      }
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +52,7 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Supervisor',style: TextStyle(color: Color(0xFF442B72),),),
+                    Text(selectedNames,style: TextStyle(color: Color(0xFF442B72),),),
                     Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
                     // Icon(Icons.arrow_drop_down),
                   ],
@@ -87,8 +102,36 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
                           value: item.isChecked,
                           onChanged: (value) {
                             setState(() {
-                              item.isChecked = value!;
+                              if (value!) {
+                                print('checkdataaa');
+                                if(selectedItems.length < 2){
+                                  selectedItems.add(item); // Add to selected items list
+                                  item.isChecked = value;
+                                  if(selectedItems.length == 2){
+                                    selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+                                  }else{
+                                    selectedNames =selectedItems[0].label;
+
+                                  }
+                                }
+
+
+                              } else {
+                                //  selectedItems.remove(item);
+                                selectedItems.removeWhere((items) => items.docID == item.docID);
+
+
+                                item.isChecked = false;
+
+                                // Clear text field value when unselecting
+                                selectedNames =selectedItems[0].label;
+                                //selectedItems.remove(item); // Remove from selected items list
+                                // _supervisorController.clear();
+                              }
                             });
+                            // setState(() {
+                            //   item.isChecked = value!;
+                            // });
                           },
                         ),
                       );

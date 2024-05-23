@@ -45,54 +45,48 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                   height: 35,
                 ),
                 Container(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.of(context).pop();
-                          },
-                          child:  Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 0.0),
-                            child: Image.asset(
-                              (sharedpref?.getString('lang') == 'ar')?
-                              'assets/images/Layer 1.png':
-                              'assets/images/fi-rr-angle-left.png',
-                              width: 20,
-                              height: 22,),
+                  child:  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 17.0),
+                          child: Image.asset(
+                            (sharedpref?.getString('lang') == 'ar')
+                                ? 'assets/images/Layer 1.png'
+                                : 'assets/images/fi-rr-angle-left.png',
+                            width: 20,
+                            height: 22,
                           ),
                         ),
-                        Text(
-                          'Students'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF993D9A),
-                            fontSize: 16,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            height: 1,
+                      ),
+                      Text(
+                        'Students'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF993D9A),
+                          fontSize: 16,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                          height: 1,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _scaffoldKey.currentState!.openEndDrawer();
+                        },
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: const Icon(
+                            Icons.menu_rounded,
+                            color: Color(0xff442B72),
+                            size: 35,
                           ),
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                _scaffoldKey.currentState!.openEndDrawer();
-                              },
-                              icon: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                                child: const Icon(
-                                  Icons.menu_rounded,
-                                  color: Color(0xff442B72),
-                                  size: 35,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -111,7 +105,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 height: 15,
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                                padding: const EdgeInsets.only(left: 17.0),
                                 child: SizedBox(
                                   width: 318,
                                   height: 42,

@@ -20,74 +20,12 @@ class _YourBusState extends State<YourBus> {
   List<QueryDocumentSnapshot> data = [];
   final _firestore = FirebaseFirestore.instance;
 
-  Future<void> getDataForBus() async {
-    try {
-      // Retrieve supervisor ID from shared preferences
-      String? supervisorId = sharedpref?.getString('id');
-      if (supervisorId == null || supervisorId.isEmpty) {
-        // If the supervisorId is null or empty, log a message and return
-        print('Supervisor ID is null or empty');
-        return;
-      }
-      print('Retrieved Supervisor ID: $supervisorId');
-
-      // Get the 'phoneNumber' field from the 'supervisor' collection
-      DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
-          .collection('supervisor')
-          .doc(supervisorId)
-          .get();
-
-      if (supervisorDoc.exists) {
-        // Retrieve the 'name' field from the 'supervisor' document
-        String supervisorName = supervisorDoc.get('name');
-        print('Retrieved Supervisor Name: $supervisorName');
-
-        // Now query the 'busdata' collection where the 'supervisors.name' field matches
-        QuerySnapshot busDataQuery = await FirebaseFirestore.instance
-            .collection('busdata')
-            .where('namedriver', isEqualTo: supervisorName)
-            .get();
-
-        if (busDataQuery.docs.isNotEmpty) {
-          // If there are matching documents, clear the 'data' list and add the new documents
-          setState(() {
-            data.clear();
-            data.addAll(busDataQuery.docs);
-          });
-          print('Bus data fetched successfully');
-
-          // Iterate through the documents in the 'busdata' collection
-          for (var busDoc in busDataQuery.docs) {
-            // Access the 'test' subcollection
-            QuerySnapshot testSubcollection = await busDoc.reference.collection('supervisors').get();
-
-            // Iterate through the documents in the 'test' subcollection
-            for (var testDoc in testSubcollection.docs) {
-              // Retrieve the 'name' field from the 'test' subcollection
-              String testName = testDoc.get('name');
-              print('Test Name: $testName');
-            }
-          }
-        } else {
-          // If there are no matching documents, log a message
-          print('No matching bus data found');
-        }
-      } else {
-        // If the supervisor document does not exist, log a message
-        print('Supervisor document does not exist');
-      }
-    } catch (e) {
-      // If any errors occur, log the error message
-      print('Error fetching data: $e');
-    }
-  }
-
-
   // Future<void> getDataForBus() async {
   //   try {
   //     // Retrieve supervisor ID from shared preferences
   //     String? supervisorId = sharedpref?.getString('id');
   //     if (supervisorId == null || supervisorId.isEmpty) {
+  //       // If the supervisorId is null or empty, log a message and return
   //       print('Supervisor ID is null or empty');
   //       return;
   //     }
@@ -100,31 +38,74 @@ class _YourBusState extends State<YourBus> {
   //         .get();
   //
   //     if (supervisorDoc.exists) {
-  //       String supervisorPhoneNumber = supervisorDoc.get('name');
-  //       print('Retrieved Supervisor Phone Number: $supervisorPhoneNumber');
+  //       // Retrieve the 'name' field from the 'supervisor' document
+  //       String supervisorName = supervisorDoc.get('name');
+  //       print('Retrieved Supervisor Name: $supervisorName');
   //
-  //       // Now query the 'busdata' collection where the 'phonedriver' field matches
+  //       // Now query the 'busdata' collection where the 'supervisors.name' field matches
   //       QuerySnapshot busDataQuery = await FirebaseFirestore.instance
   //           .collection('busdata')
-  //           .where('name', isEqualTo: supervisorPhoneNumber)
+  //           .where('namedriver', isEqualTo: supervisorName)
   //           .get();
   //
   //       if (busDataQuery.docs.isNotEmpty) {
+  //         // If there are matching documents, clear the 'data' list and add the new documents
   //         setState(() {
   //           data.clear();
   //           data.addAll(busDataQuery.docs);
   //         });
   //         print('Bus data fetched successfully');
+  //
+  //         // Iterate through the documents in the 'busdata' collection
+  //         for (var busDoc in busDataQuery.docs) {
+  //           // Access the 'test' subcollection
+  //           QuerySnapshot testSubcollection = await busDoc.reference.collection('supervisors').get();
+  //
+  //           // Iterate through the documents in the 'test' subcollection
+  //           for (var testDoc in testSubcollection.docs) {
+  //             // Retrieve the 'name' field from the 'test' subcollection
+  //             String testName = testDoc.get('name');
+  //             print('Test Name: $testName');
+  //           }
+  //         }
   //       } else {
+  //         // If there are no matching documents, log a message
   //         print('No matching bus data found');
   //       }
   //     } else {
+  //       // If the supervisor document does not exist, log a message
   //       print('Supervisor document does not exist');
   //     }
   //   } catch (e) {
+  //     // If any errors occur, log the error message
   //     print('Error fetching data: $e');
   //   }
   // }
+
+
+  Future<void> getDataForBus() async {
+    // الحصول على bus_id من مجموعة supervisor
+    DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+        .collection('supervisor')
+        .doc(sharedpref?.getString('id'))
+        .get();
+
+    if (supervisorDoc.exists) {
+      String busId = supervisorDoc['bus_id'];
+
+      // استخدام bus_id للحصول على الوثائق من مجموعة busdata
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('busdata')
+          .where(FieldPath.documentId, isEqualTo: busId)
+          .get();
+
+      setState(() {
+        data.addAll(querySnapshot.docs);
+      });
+    } else {
+      print('Supervisor document does not exist');
+    }
+  }
 
 
 
