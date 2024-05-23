@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:school_account/model/ParentModel.dart';
+import 'package:school_account/model/SupervisorsModel.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
@@ -34,15 +36,35 @@ class HomeParentState extends State<HomeParent> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   // List<ChildDataItem> children = [];
   // late Function() onTapMenu;
-  List<QueryDocumentSnapshot> data = [];
+  List<ParentModel> childrenData = [];
   getData()async{
     try {
       DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
       if (documentSnapshot.exists) {
-        // documentSnapshot.data().forEach((key, value) {
-        //   dataWidgets.add(Text('$key: $value'));
-        // });
-      } else {
+      List<dynamic> children =  documentSnapshot.get('children');
+      for(int i =0; i<children.length ;i++){
+        DocumentSnapshot busSnapshot = await _firestore.collection('busdata').doc(children[i]['bus_id']).get();
+        if (busSnapshot.exists) {
+          List<dynamic> supervisors =  busSnapshot.get('supervisors');
+          List<SupervisorsModel> supervisorsData =[];
+          String busNumber='';
+          busNumber =  busSnapshot.get('busnumber');
+
+          for(int x =0; x<supervisors.length ;x++){
+          supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id']));
+          }
+          childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: busNumber,supervisors: supervisorsData));
+
+        }else{
+          childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: '',supervisors: []));
+
+        }
+
+      }
+      setState(() {
+
+      });
+       } else {
         print("Document does not exist");
         return null;
       }
@@ -50,6 +72,12 @@ class HomeParentState extends State<HomeParent> {
       print("Error getting document: $e");
       return null;
     }
+  }
+  @override
+  void initState() {
+    getData();
+    super.initState();
+
   }
   @override
   Widget build(BuildContext context) {
@@ -163,12 +191,12 @@ class HomeParentState extends State<HomeParent> {
                           child:  ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            itemCount: 2,
+                            itemCount: childrenData.length,
                             itemBuilder: (BuildContext context, int index) {
                               return
                                 Column(
                                   children: [
-                                    ChildCard(),
+                                    ChildCard(childrenData[index]),
                                     SizedBox(height: 15,)
                                   ],
                                 );

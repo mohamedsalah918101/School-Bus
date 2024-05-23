@@ -30,6 +30,7 @@ import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/sendInvitationScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import '../Functions/functions.dart';
 import '../classes/dropdownRadiobutton.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -57,14 +58,7 @@ class BusScreen extends StatefulWidget{
 class BusScreenSate extends State<BusScreen> {
   //fun to make call
 
-  void _makePhoneCall(String phoneNumber) async {
-    var mobileCall = 'tel:$phoneNumber';
-    if (await canLaunchUrlString(mobileCall)) {
-      await launchUrlString(mobileCall);
-    } else {
-      throw 'Could not launch $mobileCall';
-    }
-  }
+
   List<QueryDocumentSnapshot> filteredData = [];
   List<QueryDocumentSnapshot<Object?>> filteredQuerySnapshots = [];
 
@@ -946,7 +940,7 @@ final _firestore = FirebaseFirestore.instance;
                                                                                   .centerRight,
                                                                               child: GestureDetector(
                                                                                 onTap: ()async{
-                                                                                  _makePhoneCall(supervisorPhoneNumber);
+                                                                                  makePhoneCall(supervisorPhoneNumber);
                                                                                   //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
                                                                                   //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
                                                                                 },

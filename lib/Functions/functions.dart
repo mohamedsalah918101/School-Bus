@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
@@ -278,5 +279,13 @@ Future<bool> checkUpdateSupervisor(String phoneNumber) async {
 
     print('Error: $error');
     return false;
+  }
+}
+void makePhoneCall(String phoneNumber) async {
+  var mobileCall = 'tel:$phoneNumber';
+  if (await canLaunchUrlString(mobileCall)) {
+    await launchUrlString(mobileCall);
+  } else {
+    throw 'Could not launch $mobileCall';
   }
 }
