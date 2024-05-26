@@ -465,7 +465,9 @@ class _ParentsViewState extends State<ParentsView> {
                                                 oldName: data[index].get('name'),
                                                 oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
                                                 oldType: data[index].get('typeOfParent'),
-                                                // oldNameController: data[index].childrenData[index]['grade'],
+                                                oldNameOfChild: 'test',
+                                                oldGradeOfChild: 'test',
+                                                // oldNameOfChild: data[index].childrenData[index]['grade'],
                                                 // oldGradeOfChild: ['l;']
                                                 // oldGradeOfChild: data[index]['childern'].get('grade'),
                                               )),);

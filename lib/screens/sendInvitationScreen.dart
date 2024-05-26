@@ -63,7 +63,7 @@ class _SendInvitationState extends State<SendInvitation> {
         'phoneNumber': enteredPhoneNumber,
         'state':0,
         'invite':1,
-        'busphoto':'',
+        'busphoto': ' ',
       };
       print('phonenum');
       print( _phoneNumberController.text);

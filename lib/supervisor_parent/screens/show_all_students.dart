@@ -105,9 +105,9 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 height: 15,
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 17.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 17.0),
                                 child: SizedBox(
-                                  width: 318,
+                                  // width: 318,
                                   height: 42,
                                   child: TextField(
                                     decoration: InputDecoration(

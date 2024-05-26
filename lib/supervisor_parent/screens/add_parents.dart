@@ -84,6 +84,7 @@ class _AddParentsState extends State<AddParents> {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': enteredPhoneNumber,
+      'address': '',
       'children': childrenData,
       'state': 0,
       'invite': 0,
@@ -394,7 +395,7 @@ class _AddParentsState extends State<AddParents> {
                             child: Stack(
                               children: [
                                 Container(
-                                  width: 277,
+                                  // width: 300,
                                   height: 40,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(7),
@@ -405,7 +406,7 @@ class _AddParentsState extends State<AddParents> {
                                     ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       InkWell(
                                         onTap: () {
@@ -423,8 +424,7 @@ class _AddParentsState extends State<AddParents> {
                                                 });
                                               },
                                               child: Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: <Widget>[
                                                   GestureDetector(
                                                     onTap: () {
@@ -464,7 +464,8 @@ class _AddParentsState extends State<AddParents> {
                                                     child: Container(
                                                       child: Padding(
                                                         padding:
-                                                        const EdgeInsets.all(14.0),
+                                                        const EdgeInsets.only(top: 14.0 , bottom: 14, left: 30,
+                                                            right:0),
                                                         child: Image.asset(
                                                           'assets/images/Vectorbottom (12).png',
                                                         ),
@@ -546,26 +547,6 @@ class _AddParentsState extends State<AddParents> {
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
-                          // selectedValue == null || selectedValue.isEmpty
-                          //     ? Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 48),
-                          //   child: Text(
-                          //     "Please enter your type".tr,
-                          //     style: TextStyle(color: Colors.red),
-                          //   ),
-                          // )
-                          //     : Container(),
-                          // typeOfParentError?
-                          // selectedValue!.isEmpty?
-                          // Container():
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 48),
-                          //   child: Text(
-                          //     "Please enter your type".tr,
-                          //     style: TextStyle(color: Colors.red),
-                          //   ),
-                          // ):
-                          //     Container(),
                           SizedBox(
                             height: 11,
                           ),
@@ -604,12 +585,14 @@ class _AddParentsState extends State<AddParents> {
                             height: 13,
                           ),
                           Padding(
-                            padding: EdgeInsets.only(left: 44.0),
+                            padding: EdgeInsets.symmetric(horizontal: 42.0),
                             child: SizedBox(
-                              width: 277,
+                              // width: 277,
                               height: 40,
                               child: TextFormField(
                                   controller: _nameController,
+
+                                  // cursorRadius: Radius.circular(300),
                                   style: TextStyle(
                                     color: Color(0xFF442B72),
                                   ),
@@ -617,6 +600,7 @@ class _AddParentsState extends State<AddParents> {
                                   textDirection: (sharedpref?.getString('lang') == 'ar')
                                       ? TextDirection.rtl
                                       : TextDirection.ltr,
+                                  // selectionHeightStyle: 20,
                                   autofocus: true,
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.text,
@@ -631,8 +615,8 @@ class _AddParentsState extends State<AddParents> {
                                     filled: true,
                                     contentPadding:
                                     (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.fromLTRB(166, 0, 17, 40)
-                                        : EdgeInsets.fromLTRB(17, 0, 0, 40),
+                                        ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+                                        : EdgeInsets.fromLTRB(17, 0, 0, 10),
                                     hintText: 'Please enter your name'.tr,
                                     floatingLabelBehavior: FloatingLabelBehavior.never,
                                     hintStyle: const TextStyle(
@@ -712,9 +696,9 @@ class _AddParentsState extends State<AddParents> {
                             height: 13,
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 44.0),
+                            padding: EdgeInsets.symmetric(horizontal: 42.0),
                             child: SizedBox(
-                              width: 277,
+                              // width: 277,
                               height: 65,
                               child: IntlPhoneField(
                                 textInputAction: TextInputAction.next,
@@ -845,9 +829,9 @@ class _AddParentsState extends State<AddParents> {
                             height: 13,
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 44.0),
+                            padding: EdgeInsets.symmetric(horizontal: 42.0),
                             child: SizedBox(
-                              width: 277,
+                              // width: 277,
                               height: 40,
                               child: TextFormField(
                                 onChanged: (val) {
@@ -890,8 +874,8 @@ class _AddParentsState extends State<AddParents> {
                                   filled: true,
                                   contentPadding:
                                   (sharedpref?.getString('lang') == 'ar')
-                                      ? EdgeInsets.fromLTRB(166, 0, 17, 40)
-                                      : EdgeInsets.fromLTRB(17, 0, 0, 40),
+                                      ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+                                      : EdgeInsets.fromLTRB(17, 0, 0, 10),
                                   hintText: 'Please enter your number children'.tr,
                                   floatingLabelBehavior: FloatingLabelBehavior.never,
                                   hintStyle: const TextStyle(
@@ -1189,7 +1173,7 @@ class _AddParentsState extends State<AddParents> {
                                                                   'lang') ==
                                                                   'ar')
                                                                   ? EdgeInsets.fromLTRB(
-                                                                  0, 0, 17, 20)
+                                                                  0, 0, 17, 10)
                                                                   : EdgeInsets.fromLTRB(
                                                                   17, 0, 0, 10),
                                                               hintText:
@@ -1358,7 +1342,7 @@ class _AddParentsState extends State<AddParents> {
                                                                   'lang') ==
                                                                   'ar')
                                                                   ? EdgeInsets.fromLTRB(
-                                                                  0, 0, 17, 15)
+                                                                  0, 0, 17, 10)
                                                                   : EdgeInsets.fromLTRB(
                                                                   17, 0, 0, 10),
                                                               hintText:

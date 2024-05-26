@@ -334,6 +334,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                         List<String> words = address.split(' ');
                                         String firstLine = words.take(3).join(' ');
                                         String secondLine = words.skip(3).join(' ');
+                                        if(data.isEmpty){
+                                           Container(); }
+                                        else
                                         return Column(
                                           children: [
                                             // for (int i = startIndex; i < childern.length; i++)
@@ -369,9 +372,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                           children: [
                                                             Text(
                                                               // '${childern[i]['name']}',
-
                                                               '${child['name']}',
-
                                                               style: TextStyle(
                                                                 color: Color(0xff442B72),
                                                                 fontSize: 15,
@@ -382,7 +383,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                             ),
                                                             // Text('${data[index]['childern']?[0]['name'] }',
                                                             // Text('${data[index]['childern']?[0-3]['name'] }',
-
                                                             Text.rich(
                                                               TextSpan(
                                                                 children: [
@@ -425,9 +425,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
                                                                   TextSpan(
                                                                     text: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
-                                                                    // text: data[index]['address'].length > 20 ?
-                                                                    // '${data[index]['address'].substring(0, 20)}\n${data[index]['address'].substring(20)}'
-                                                                    //     : data[index]['address'],
                                                                     // '${data[index]['address'] }',
                                                                     style: TextStyle(
                                                                       color: Color(0xFF442B72),
