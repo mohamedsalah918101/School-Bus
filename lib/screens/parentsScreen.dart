@@ -95,58 +95,53 @@ class ParentsScreenSate extends State<ParentsScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: InkWell(onTap: (){},
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Align(
-                              alignment: AlignmentDirectional.topStart,
-                              child: InkWell(
-                                // onTap: ()=>exit(0),
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                  // Navigate back to the previous page
-                                  Navigator.pop(context);
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Align(
+                            alignment: AlignmentDirectional.topStart,
+                            child: GestureDetector(
+                              // onTap: ()=>exit(0),
+                              onTap: () {
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                // Navigate back to the previous page
+                                Navigator.pop(context);
 
-                                },
-                                child: const Icon(
-                                  Icons.arrow_back_ios_new_rounded,
-                                  size: 23,
-                                  color: Color(0xff442B72),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 20,),
-                            Expanded(
-                              child: Center(
-                                child: Text(
-                                  "Parents".tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF993D9A),
-                                    fontSize: 20,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 0.64,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                              child: InkWell(onTap: (){
-                                Scaffold.of(context).openEndDrawer();
                               },
-                                child: Align(
-                                  alignment: AlignmentDirectional.topEnd,
-                                  child: const Icon(
-                                    Icons.menu_rounded,
-                                    size: 40,
-                                    color: Color(0xff442B72),
-                                  ),
+                              child: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 23,
+                                color: Color(0xff442B72),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20,),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                "Parents".tr,
+                                style: TextStyle(
+                                  color: Color(0xFF993D9A),
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins-Bold',
+                                  fontWeight: FontWeight.w700,
+                                 // height: 0.64,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          GestureDetector(onTap: (){
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                            child: Align(
+                              alignment: AlignmentDirectional.topEnd,
+                              child: const Icon(
+                                Icons.menu_rounded,
+                                size: 40,
+                                color: Color(0xff442B72),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 

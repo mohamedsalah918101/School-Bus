@@ -11,6 +11,7 @@ import 'package:school_account/screens/editeProfile.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import '../components/custom_app_bar.dart';
 import '../components/dialogs.dart';
+import '../components/elevated_simple_button.dart';
 import '../components/home_drawer.dart';
 import '../main.dart';
 import 'busesScreen.dart';
@@ -27,12 +28,58 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
+  // fun edite photo in db
+  editPhotoProfile() async {
+    print('editprofile called');
+
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+
+        try {
+          print('updating document...');
+          print(profileimageUrl);
+//profile.doc(widget.docid)
+          await FirebaseFirestore.instance
+              .collection('schooldata')
+              .doc(sharedpref!.getString('id'))
+              .update({
+
+            'photo': profileimageUrl ?? '',
+
+          });
+
+          print('document updated successfully');
+
+          setState(() {
+            // Trigger a rebuild of the widget tree if necessary
+          });
+        } catch (e) {
+          print('Error updating document: $e');
+          // Handle specific error cases here
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
+
+
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> formState = GlobalKey<FormState>();
   final _firestore = FirebaseFirestore.instance;
   bool isEditingProfile = false;
   List<QueryDocumentSnapshot> data = [];
   File ? _selectedImageProfile;
   String? profileimageUrl;
+
   Future _pickProfileImageFromGallery() async{
     final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
     if(returnedImage ==null) return;
@@ -247,144 +294,150 @@ class _ProfileScreenState extends State<ProfileScreen> {
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Row(
-                  //   children: [
-                  //
-                  //     Center(
-                  //       child: Stack(
-                  //         children: [
-                  //
-                  //           Center(
-                  //             child: Padding(
-                  //               padding: const EdgeInsets.only(top: 20),
-                  //               child: CircleAvatar(
-                  //                 backgroundColor: Colors.white, // Set background color to white
-                  //                 radius:50, // Set the radius according to your preference
-                  //                 child: Image.asset(
-                  //                   'assets/imgs/school/Ellipse 2 (2).png',
-                  //                   fit: BoxFit.cover,
-                  //                   width: 100, // Set width of the image
-                  //                   height: 100, // Set height of the image
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Center(
-                  //             child: Padding(
-                  //               padding: const EdgeInsets.only(top: 95,left: 55),
-                  //               child: Container(
-                  //                 decoration: BoxDecoration(
-                  //                   shape: BoxShape.circle,
-                  //                   border: Border.all(width: 3,color: Color(0xff432B72))
-                  //                 ),
-                  //                 child: CircleAvatar(
-                  //                   backgroundColor: Colors.white,
-                  //                   // Set background color to white
-                  //                   radius:10, // Set the radius according to your preference
-                  //                   child: Image.asset(
-                  //                     'assets/imgs/school/edite.png',
-                  //                     fit: BoxFit.cover,
-                  //                     width: 15, // Set width of the image
-                  //                     height: 15, // Set height of the image
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ]
-                  //       ),
-                  //     ),
-                  //     SizedBox(width: 55,),
-                  //     ElevatedButton(
-                  //       onPressed: () {
-                  //         Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
-                  //       },
-                  //       style: ElevatedButton.styleFrom(
-                  //         primary: Colors.white,
-                  //         //elevation: 4, // Change the elevation to adjust the shadow
-                  //         shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(8.0),
-                  //             side: BorderSide(color: Color(0xff432B72))
-                  //
-                  //         ),
-                  //       ),
-                  //       child: Row(
-                  //         mainAxisSize: MainAxisSize.min,
-                  //         children: <Widget>[
-                  //           // Icon(Icons.,color: Color(0xff432B72),),
-                  //           Transform(
-                  //               alignment: Alignment.center,
-                  //               transform: Matrix4.rotationY(math.pi),
-                  //               child: Icon(Icons.edit_outlined, color: Color(0xFF442B72),size: 20,)
-                  //           ),
-                  //           SizedBox(width: 8), // Adjust the spacing between icon and text
-                  //           Text('Edite',style: TextStyle(color: Color(0xff432B72),fontSize: 16,fontFamily: "Poppins-Regular"),), // Replace 'Button Text' with your desired text
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  //
-                  Stack(
-                    children: [
-                      Center(
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: 50,
-                                  child: FutureBuilder<DocumentSnapshot>(
-                                    future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                      if (snapshot.hasError) {
-                                        return Icon(
-                                          Icons.error,
-                                          color: Colors.red,
-                                          size: 50,
-                                        ); // Display error icon if fetch fails
-                                      }
-
-                                      if (snapshot.connectionState == ConnectionState.done) {
-                                        Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                                        // Check if data contains photo URL
-                                        if (data != null && data.containsKey('photo')) {
-                                          return Image.network(
-                                            data['photo'],
-                                            fit: BoxFit.fill,
-                                            width: 90,
-                                            height: 90,
-                                          );
-                                        } else {
-                                          return Image.asset(
-                                            'assets/imgs/school/Ellipse 2 (2).png', // Default image if photo URL is missing
-                                            fit: BoxFit.cover,
-                                            width: 100,
-                                            height: 100,
-                                          );
+              child: Form(
+                key: formState,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Row(
+                    //   children: [
+                    //
+                    //     Center(
+                    //       child: Stack(
+                    //         children: [
+                    //
+                    //           Center(
+                    //             child: Padding(
+                    //               padding: const EdgeInsets.only(top: 20),
+                    //               child: CircleAvatar(
+                    //                 backgroundColor: Colors.white, // Set background color to white
+                    //                 radius:50, // Set the radius according to your preference
+                    //                 child: Image.asset(
+                    //                   'assets/imgs/school/Ellipse 2 (2).png',
+                    //                   fit: BoxFit.cover,
+                    //                   width: 100, // Set width of the image
+                    //                   height: 100, // Set height of the image
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //           Center(
+                    //             child: Padding(
+                    //               padding: const EdgeInsets.only(top: 95,left: 55),
+                    //               child: Container(
+                    //                 decoration: BoxDecoration(
+                    //                   shape: BoxShape.circle,
+                    //                   border: Border.all(width: 3,color: Color(0xff432B72))
+                    //                 ),
+                    //                 child: CircleAvatar(
+                    //                   backgroundColor: Colors.white,
+                    //                   // Set background color to white
+                    //                   radius:10, // Set the radius according to your preference
+                    //                   child: Image.asset(
+                    //                     'assets/imgs/school/edite.png',
+                    //                     fit: BoxFit.cover,
+                    //                     width: 15, // Set width of the image
+                    //                     height: 15, // Set height of the image
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ]
+                    //       ),
+                    //     ),
+                    //     SizedBox(width: 55,),
+                    //     ElevatedButton(
+                    //       onPressed: () {
+                    //         Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
+                    //       },
+                    //       style: ElevatedButton.styleFrom(
+                    //         primary: Colors.white,
+                    //         //elevation: 4, // Change the elevation to adjust the shadow
+                    //         shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(8.0),
+                    //             side: BorderSide(color: Color(0xff432B72))
+                    //
+                    //         ),
+                    //       ),
+                    //       child: Row(
+                    //         mainAxisSize: MainAxisSize.min,
+                    //         children: <Widget>[
+                    //           // Icon(Icons.,color: Color(0xff432B72),),
+                    //           Transform(
+                    //               alignment: Alignment.center,
+                    //               transform: Matrix4.rotationY(math.pi),
+                    //               child: Icon(Icons.edit_outlined, color: Color(0xFF442B72),size: 20,)
+                    //           ),
+                    //           SizedBox(width: 8), // Adjust the spacing between icon and text
+                    //           Text('Edite',style: TextStyle(color: Color(0xff432B72),fontSize: 16,fontFamily: "Poppins-Regular"),), // Replace 'Button Text' with your desired text
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    //
+                    Stack(
+                      children: [
+                        Center(
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child:
+                                  _selectedImageProfile != null
+                                      ? Image.file(
+                                    _selectedImageProfile!,  // Display the uploaded image
+                                    width: 83,  // Set width as per your preference
+                                    height: 78.5,  // Set height as per your preference
+                                    fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                  ) :
+                                  CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 50,
+                                    child: FutureBuilder<DocumentSnapshot>(
+                                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                        if (snapshot.hasError) {
+                                          return Icon(
+                                            Icons.error,
+                                            color: Colors.red,
+                                            size: 50,
+                                          ); // Display error icon if fetch fails
                                         }
-                                      }
 
-                                      return CircularProgressIndicator(); // Display loading indicator while fetching data
-                                    },
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
+
+                                          // Check if data contains photo URL
+                                          if (data != null && data.containsKey('photo')) {
+                                            return Image.network(
+                                              data['photo'],
+                                              fit: BoxFit.fill,
+                                              width: 90,
+                                              height: 90,
+                                            );
+                                          } else {
+                                            return Image.asset(
+                                              'assets/images/school (2) 1.png', // Default image if photo URL is missing
+                                              fit: BoxFit.cover,
+                                              width: 100,
+                                              height: 100,
+                                            );
+                                          }
+                                        }
+
+                                        return CircularProgressIndicator(); // Display loading indicator while fetching data
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 95, left: 55),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Dialoge.changePhotoDialog(context); // Open photo change dialog on tap
-                                  },
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 95, left: 55),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
@@ -394,42 +447,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       backgroundColor: Colors.white,
                                       radius: 10,
                                       child:
-                                      // GestureDetector(
-                                      //   onTap:()async {
-                                      //     await _pickProfileImageFromGallery();}  , // Call function when tapped
-                                      //   child:
-                                      //   _selectedImageProfile != null
-                                      //       ? Image.file(
-                                      //     _selectedImageProfile!,  // Display the uploaded image
-                                      //     width: 83,  // Set width as per your preference
-                                      //     height: 78.5,  // Set height as per your preference
-                                      //     fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                                      //   )
-                                      //       :
-                                      //   Container(
-                                      //
-                                      //     width: 65, // Adjust size as needed
-                                      //     height: 65,
-                                      //     decoration: BoxDecoration(
-                                      //       shape: BoxShape.circle,
-                                      //
-                                      //       border: Border.all(
-                                      //         color: Color(0xffCCCCCC), // Adjust border color
-                                      //         width: 2, // Adjust border width
-                                      //       ),
-                                      //     ),
-                                      //     child: Align(alignment: Alignment.bottomCenter,
-                                      //       child: CircleAvatar(radius: 20,
-                                      //
-                                      //         backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
-                                      //         ,backgroundColor: Colors.white,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // ),
                                       GestureDetector(
                                         onTap: (){
-                                          _pickProfileImageFromGallery();
+                                          changePhotoDialogProfile(context);
+                                         // _pickProfileImageFromGallery();
                                         },
                                         child: Image.asset(
                                           'assets/imgs/school/edite.png',
@@ -442,408 +463,408 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Center(
-                      //   child: Stack(
-                      //     children: [
-                      //       Center(
-                      //         child: Padding(
-                      //           padding: const EdgeInsets.only(top: 20),
-                      //           child: CircleAvatar(
-                      //             backgroundColor: Colors.white,
-                      //             radius: 50,
-                      //             child: Image.asset(
-                      //               'assets/imgs/school/Ellipse 2 (2).png',
-                      //               fit: BoxFit.cover,
-                      //               width: 100,
-                      //               height: 100,
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //       Center(
-                      //         child: Padding(
-                      //           padding: const EdgeInsets.only(top: 95, left: 55),
-                      //           child: GestureDetector(
-                      //             onTap: (){
-                      //               Dialoge.changePhotoDialog(context);
-                      //             },
-                      //             child: Container(
-                      //
-                      //               decoration: BoxDecoration(
-                      //                 shape: BoxShape.circle,
-                      //                 border: Border.all(width: 3, color: Color(0xff432B72)),
-                      //               ),
-                      //               child: CircleAvatar(
-                      //                 backgroundColor: Colors.white,
-                      //                 radius: 10,
-                      //
-                      //                 child: Image.asset(
-                      //                   'assets/imgs/school/edite.png',
-                      //                   fit: BoxFit.cover,
-                      //                   width: 15,
-                      //                   height: 15,
-                      //
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      Positioned(
-                        top:15,
-                        right: 5,
-                        child: ElevatedButton(
-                           onPressed: () {
-                             Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
-
-                           },
-
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              side: BorderSide(color: Color(0xff432B72)),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Image.asset("assets/imgs/school/icons8_edit_1 1 (1).png",width: 17,height: 17,),
-                              // Transform(
-                              //   alignment: Alignment.center,
-                              //   transform: Matrix4.rotationY(math.pi),
-                              //   child:
-                              //   Icon(Icons.edit_outlined, color: Color(0xFF442B72), size: 20),
-                              // ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Edit',
-                                style: TextStyle(color: Color(0xff432B72), fontSize: 16, fontFamily: "Poppins-Regular"),
-                              ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                 //func get data
-                  FutureBuilder(
-                    future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Something went wrong');
-                      }
 
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                        return Center(
-                          child: Text(
-                            data['nameEnglish'],
-                            style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"
+                        // Center(
+                        //   child: Stack(
+                        //     children: [
+                        //       Center(
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.only(top: 20),
+                        //           child: CircleAvatar(
+                        //             backgroundColor: Colors.white,
+                        //             radius: 50,
+                        //             child: Image.asset(
+                        //               'assets/imgs/school/Ellipse 2 (2).png',
+                        //               fit: BoxFit.cover,
+                        //               width: 100,
+                        //               height: 100,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Center(
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.only(top: 95, left: 55),
+                        //           child: GestureDetector(
+                        //             onTap: (){
+                        //               Dialoge.changePhotoDialog(context);
+                        //             },
+                        //             child: Container(
+                        //
+                        //               decoration: BoxDecoration(
+                        //                 shape: BoxShape.circle,
+                        //                 border: Border.all(width: 3, color: Color(0xff432B72)),
+                        //               ),
+                        //               child: CircleAvatar(
+                        //                 backgroundColor: Colors.white,
+                        //                 radius: 10,
+                        //
+                        //                 child: Image.asset(
+                        //                   'assets/imgs/school/edite.png',
+                        //                   fit: BoxFit.cover,
+                        //                   width: 15,
+                        //                   height: 15,
+                        //
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        Positioned(
+                          top:15,
+                          right: 5,
+                          child: ElevatedButton(
+                             onPressed: () {
+                               Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
+
+                             },
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                side: BorderSide(color: Color(0xff432B72)),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Image.asset("assets/imgs/school/icons8_edit_1 1 (1).png",width: 17,height: 17,),
+                                // Transform(
+                                //   alignment: Alignment.center,
+                                //   transform: Matrix4.rotationY(math.pi),
+                                //   child:
+                                //   Icon(Icons.edit_outlined, color: Color(0xFF442B72), size: 20),
+                                // ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Edit',
+                                  style: TextStyle(color: Color(0xff432B72), fontSize: 16, fontFamily: "Poppins-Regular"),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      }
+                        ),
+                      ],
+                    ),
+                   //func get data
+                    FutureBuilder(
+                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Something went wrong');
+                        }
 
-                      return CircularProgressIndicator();
-                    },
-                  ),
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                          return Center(
+                            child: Text(
+                              data['nameEnglish'],
+                              style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"
+                              ),
+                            ),
+                          );
+                        }
 
-                 // old code
-                  // Center(child: Text("Salam School",style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"),)
-                  // ),
-                  SizedBox(height: 20,),
-                  Text("School information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
-                      color: Color(0xff771F98)),),
-                  SizedBox(height: 15,),
+                        return CircularProgressIndicator();
+                      },
+                    ),
 
-                  ListTile(
-                    contentPadding: EdgeInsets.zero, // Remove default padding
+                   // old code
+                    // Center(child: Text("Salam School",style: TextStyle(color: Color(0xff432B72),fontSize: 20,fontFamily: "Poppins-SemiBold"),)
+                    // ),
+                    SizedBox(height: 20,),
+                    Text("School information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
+                        color: Color(0xff771F98)),),
+                    SizedBox(height: 15,),
+
+                    ListTile(
+                      contentPadding: EdgeInsets.zero, // Remove default padding
+                        title: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
+                              SizedBox(width: 8), // add some space between the leading and title
+                              Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                            ],
+                          ),
+                        ),
+
+                      subtitle: FutureBuilder<DocumentSnapshot>(
+                        future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong'); // Display error message if fetch fails
+                          }
+
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            // Once data is retrieved
+                            Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
+
+                            // Check if data is available and contains the desired subtitle field
+                            if (data != null && data.containsKey('nameEnglish')) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                child: Text(
+                                  data['nameEnglish'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF442B72),
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('Name of school not found'); // Handle missing data scenario
+                            }
+                          }
+
+                          return SizedBox(); // Placeholder for subtitle while loading
+                        },
+                      ),
+                    ),
+             // old listtile
+                    // ListTile(
+                    //   contentPadding: EdgeInsets.zero, // remove default padding
+                    //   title: Align(
+                    //     alignment: Alignment.centerLeft,
+                    //     child: Row(
+                    //       children: [
+                    //         Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
+                    //         SizedBox(width: 8), // add some space between the leading and title
+                    //         Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                    //       ],
+                    //     ),
+                    //   ),
+                    //
+                    //   subtitle: Padding(
+                    //     padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 10),
+                    //     child: Text("Salam School",style: TextStyle(fontSize: 12,color: Color(0xFF442B72 ),fontFamily: "Poppins"),),
+                    //   ),
+                    // ),
+                    SizedBox(height: 20,),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero, // Remove default padding
                       title: Align(
                         alignment: Alignment.centerLeft,
                         child: Row(
                           children: [
                             Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
                             SizedBox(width: 8), // add some space between the leading and title
-                            Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                            Text('School name in Arabic'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
                           ],
                         ),
                       ),
 
-                    subtitle: FutureBuilder<DocumentSnapshot>(
-                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong'); // Display error message if fetch fails
-                        }
-
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          // Once data is retrieved
-                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                          // Check if data is available and contains the desired subtitle field
-                          if (data != null && data.containsKey('nameEnglish')) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                              child: Text(
-                                data['nameEnglish'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF442B72),
-                                  fontFamily: "Poppins",
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Text('Name of school not found'); // Handle missing data scenario
+                      subtitle: FutureBuilder<DocumentSnapshot>(
+                        future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong'); // Display error message if fetch fails
                           }
-                        }
 
-                        return SizedBox(); // Placeholder for subtitle while loading
-                      },
-                    ),
-                  ),
-             // old listtile
-                  // ListTile(
-                  //   contentPadding: EdgeInsets.zero, // remove default padding
-                  //   title: Align(
-                  //     alignment: Alignment.centerLeft,
-                  //     child: Row(
-                  //       children: [
-                  //         Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
-                  //         SizedBox(width: 8), // add some space between the leading and title
-                  //         Text('School name in English'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                  //       ],
-                  //     ),
-                  //   ),
-                  //
-                  //   subtitle: Padding(
-                  //     padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 10),
-                  //     child: Text("Salam School",style: TextStyle(fontSize: 12,color: Color(0xFF442B72 ),fontFamily: "Poppins"),),
-                  //   ),
-                  // ),
-                  SizedBox(height: 20,),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero, // Remove default padding
-                    title: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
-                          SizedBox(width: 8), // add some space between the leading and title
-                          Text('School name in Arabic'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                        ],
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            // Once data is retrieved
+                            Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
+
+                            // Check if data is available and contains the desired subtitle field
+                            if (data != null && data.containsKey('nameArabic')) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                child: Text(
+                                  data['nameArabic'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF442B72),
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('Name of school not found'); // Handle missing data scenario
+                            }
+                          }
+
+                          return SizedBox(); // Placeholder for subtitle while loading
+                        },
                       ),
                     ),
 
-                    subtitle: FutureBuilder<DocumentSnapshot>(
-                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong'); // Display error message if fetch fails
-                        }
+                    SizedBox(height: 20,),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero, // Remove default padding
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
+                            SizedBox(width: 8), // add some space between the leading and title
+                            Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                          ],
+                        ),
+                      ),
 
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          // Once data is retrieved
-                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                          // Check if data is available and contains the desired subtitle field
-                          if (data != null && data.containsKey('nameArabic')) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                              child: Text(
-                                data['nameArabic'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF442B72),
-                                  fontFamily: "Poppins",
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Text('Name of school not found'); // Handle missing data scenario
+                      subtitle: FutureBuilder<DocumentSnapshot>(
+                        future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong'); // Display error message if fetch fails
                           }
-                        }
 
-                        return SizedBox(); // Placeholder for subtitle while loading
-                      },
-                    ),
-                  ),
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            // Once data is retrieved
+                            Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
 
-                  SizedBox(height: 20,),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero, // Remove default padding
-                    title: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
-                          SizedBox(width: 8), // add some space between the leading and title
-                          Text('Address'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                        ],
+                            // Check if data is available and contains the desired subtitle field
+                            if (data != null && data.containsKey('address')) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                child: Text(
+                                  data['address'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF442B72),
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('Address of school not found'); // Handle missing data scenario
+                            }
+                          }
+
+                          return SizedBox(); // Placeholder for subtitle while loading
+                        },
                       ),
                     ),
 
-                    subtitle: FutureBuilder<DocumentSnapshot>(
-                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong'); // Display error message if fetch fails
-                        }
+                    SizedBox(height: 10,),
+                    Text("Personal information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
+                        color: Color(0xff771F98)),),
+                    SizedBox(height: 15,),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero, // Remove default padding
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
+                            SizedBox(width: 8), // add some space between the leading and title
+                            Text('Coordinator Name'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                          ],
+                        ),
+                      ),
 
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          // Once data is retrieved
-                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                          // Check if data is available and contains the desired subtitle field
-                          if (data != null && data.containsKey('address')) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                              child: Text(
-                                data['address'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF442B72),
-                                  fontFamily: "Poppins",
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Text('Address of school not found'); // Handle missing data scenario
+                      subtitle: FutureBuilder<DocumentSnapshot>(
+                        future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong'); // Display error message if fetch fails
                           }
-                        }
 
-                        return SizedBox(); // Placeholder for subtitle while loading
-                      },
-                    ),
-                  ),
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            // Once data is retrieved
+                            Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
 
-                  SizedBox(height: 10,),
-                  Text("Personal information",style: TextStyle(fontSize: 19,fontFamily: "Poppins-Bold",
-                      color: Color(0xff771F98)),),
-                  SizedBox(height: 15,),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero, // Remove default padding
-                    title: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
-                          SizedBox(width: 8), // add some space between the leading and title
-                          Text('Coordinator Name'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                        ],
+                            // Check if data is available and contains the desired subtitle field
+                            if (data != null && data.containsKey('coordinatorName')) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                child: Text(
+                                  data['coordinatorName'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF442B72),
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('Name of school not found'); // Handle missing data scenario
+                            }
+                          }
+
+                          return SizedBox(); // Placeholder for subtitle while loading
+                        },
                       ),
                     ),
 
-                    subtitle: FutureBuilder<DocumentSnapshot>(
-                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong'); // Display error message if fetch fails
-                        }
+                    SizedBox(height: 20,),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero, // Remove default padding
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
+                            SizedBox(width: 8), // add some space between the leading and title
+                            Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                          ],
+                        ),
+                      ),
 
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          // Once data is retrieved
-                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                          // Check if data is available and contains the desired subtitle field
-                          if (data != null && data.containsKey('coordinatorName')) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                              child: Text(
-                                data['coordinatorName'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF442B72),
-                                  fontFamily: "Poppins",
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Text('Name of school not found'); // Handle missing data scenario
+                      subtitle: FutureBuilder<DocumentSnapshot>(
+                        future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong'); // Display error message if fetch fails
                           }
-                        }
 
-                        return SizedBox(); // Placeholder for subtitle while loading
-                      },
-                    ),
-                  ),
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            // Once data is retrieved
+                            Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
 
-                  SizedBox(height: 20,),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero, // Remove default padding
-                    title: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Image.asset('assets/imgs/school/Vector (7).png',width: 22,height: 22,),
-                          SizedBox(width: 8), // add some space between the leading and title
-                          Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                        ],
+                            // Check if data is available and contains the desired subtitle field
+                            if (data != null && data.containsKey('supportNumber')) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                child: Text(
+                                  data['supportNumber'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF442B72),
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('Name of school not found'); // Handle missing data scenario
+                            }
+                          }
+
+                          return SizedBox(); // Placeholder for subtitle while loading
+                        },
                       ),
                     ),
-
-                    subtitle: FutureBuilder<DocumentSnapshot>(
-                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong'); // Display error message if fetch fails
-                        }
-
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          // Once data is retrieved
-                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                          // Check if data is available and contains the desired subtitle field
-                          if (data != null && data.containsKey('supportNumber')) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                              child: Text(
-                                data['supportNumber'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF442B72),
-                                  fontFamily: "Poppins",
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Text('Name of school not found'); // Handle missing data scenario
-                          }
-                        }
-
-                        return SizedBox(); // Placeholder for subtitle while loading
-                      },
-                    ),
-                  ),
-                  //old listile
-                  // ListTile(
-                  //   contentPadding: EdgeInsets.zero, // remove default padding
-                  //   title: Align(
-                  //     alignment: Alignment.centerLeft,
-                  //     child: Row(
-                  //       children: [
-                  //         Image.asset('assets/imgs/school/Vector24.png',width: 18,height: 18,),
-                  //         SizedBox(width: 8), // add some space between the leading and title
-                  //         Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                  //       ],
-                  //     ),
-                  //   ),
-                  //
-                  //   subtitle: Padding(
-                  //     padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 10),
-                  //     child: Text("01028765006",style: TextStyle(fontSize: 12,color: Color(0xFF442B72 ),fontFamily: "Poppins"),),
-                  //   ),
-                  // ),
-                ],
+                    //old listile
+                    // ListTile(
+                    //   contentPadding: EdgeInsets.zero, // remove default padding
+                    //   title: Align(
+                    //     alignment: Alignment.centerLeft,
+                    //     child: Row(
+                    //       children: [
+                    //         Image.asset('assets/imgs/school/Vector24.png',width: 18,height: 18,),
+                    //         SizedBox(width: 8), // add some space between the leading and title
+                    //         Text('Support Number'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 15,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                    //       ],
+                    //     ),
+                    //   ),
+                    //
+                    //   subtitle: Padding(
+                    //     padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 10),
+                    //     child: Text("01028765006",style: TextStyle(fontSize: 12,color: Color(0xFF442B72 ),fontFamily: "Poppins"),),
+                    //   ),
+                    // ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1009,6 +1030,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+   changePhotoDialogProfile(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30,),
+          ),
+          child: Container(
+            height: 280,
+            width: 450,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+
+
+                      const Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Change profile picture',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF771F98),
+                            fontSize: 19,
+                            fontFamily: 'Poppins-Medium',
+                            fontWeight: FontWeight.w600,
+                            height: 1.23,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: GestureDetector(
+                          onTap: (){
+                            _pickProfileImageFromGallery();
+                          },
+                          child: CircleAvatar(
+                              backgroundColor:Color(0xffE2E1EE),
+                              child: Image.asset("assets/imgs/school/Vectorphoto.png",width: 21,height: 16,)),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: const Text(
+                          'Select profile picture',
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 15,
+                            fontFamily: 'Poppins-Bold',
+                            fontWeight: FontWeight.w400,
+                            height: 3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: ElevatedSimpleButton(
+                      txt: 'Save',
+                      width: 250,
+                      hight: 45,
+                      onPress: () {
+                        editPhotoProfile();
+                        Navigator.pop(context);
+
+                      },
+                      color: const Color(0xFF442B72),
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )),
     );
   }
 }

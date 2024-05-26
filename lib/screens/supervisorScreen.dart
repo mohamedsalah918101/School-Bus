@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/screens/busesScreen.dart';
 import 'package:school_account/screens/editeSupervisor.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
@@ -40,7 +41,25 @@ class SupervisorScreen extends StatefulWidget {
 class SupervisorScreenSate extends State<SupervisorScreen> {
 
 
- bool isdelete= false;
+  String busNumber = '';
+  Future<void> getBusNumber(String busId) async {
+    DocumentSnapshot busDocument = await FirebaseFirestore.instance
+        .collection('busdata')
+        .doc(busId)
+        .get();
+
+    if (busDocument.exists) {
+      setState(() {
+        busNumber = busDocument['busnumber'];
+        print('BUSSS $busNumber');
+      });
+    } else {
+      print('Bus document does not exist for bus_id: $busId');
+    }
+  }
+
+
+  bool isdelete= false;
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController = TextEditingController();
   int? _selectedOption = 1;
@@ -60,6 +79,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   //         .snapshots();
   //   });
   // }
+
   //call phone
   void _makePhoneCall(String phoneNumber) async {
     var mobileCall = 'tel:$phoneNumber';
@@ -136,6 +156,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   @override
   void initState() {
     super.initState();
+
    // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
     // responsible
   getData();
@@ -167,7 +188,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
     setState(() {
-      data = supervisorData.docs;
+      filteredData = supervisorData.docs;
       isFiltered = true;
     });
   }
@@ -180,7 +201,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
     setState(() {
-      data = supervisorData.docs;
+      filteredData = supervisorData.docs;
       isFiltered = true;
     });
   }
@@ -193,7 +214,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
     setState(() {
-      data = supervisorData.docs;
+      filteredData = supervisorData.docs;
       isFiltered = true;
     });
   }
@@ -234,65 +255,62 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Align(
-                          alignment: AlignmentDirectional.topStart,
-                          child: InkWell(
-                            // onTap: ()=>exit(0),
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              // Navigate back to the previous page
-                              // Navigator.pop(context);
-                              Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
-                            },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: AlignmentDirectional.topStart,
+                        child: InkWell(
+                          // onTap: ()=>exit(0),
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                                .hideCurrentSnackBar();
+                            // Navigate back to the previous page
+                            // Navigator.pop(context);
+                            Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
+                          },
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 26,
+                            color: Color(0xff442B72),
+                          ),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: Center(
+                          child: Align(alignment: AlignmentDirectional.center,
+                            child: Text(
+                              "Supervisors".tr,
+                              style: TextStyle(
+                                color: Color(0xFF993D9A),
+                                fontSize: 25,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                // height: 0.99,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      InkWell(
+                        onTap: () {
+                          Scaffold.of(context).openEndDrawer();
+                        },
+                        child: Align(
+                          alignment: AlignmentDirectional.topEnd,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 5),
                             child: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 26,
+                              Icons.menu_rounded,
+                              size: 40,
                               color: Color(0xff442B72),
                             ),
                           ),
                         ),
-
-                        Expanded(
-                          child: Center(
-                            child: Align(alignment: AlignmentDirectional.center,
-                              child: Text(
-                                "Supervisors".tr,
-                                style: TextStyle(
-                                  color: Color(0xFF993D9A),
-                                  fontSize: 25,
-                                  fontFamily: 'Poppins-Bold',
-                                  fontWeight: FontWeight.w700,
-                                  // height: 0.99,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        InkWell(
-                          onTap: () {
-                            Scaffold.of(context).openEndDrawer();
-                          },
-                          child: Align(
-                            alignment: AlignmentDirectional.topEnd,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child: const Icon(
-                                Icons.menu_rounded,
-                                size: 40,
-                                color: Color(0xff442B72),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -576,6 +594,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                         //data.length,
                                         //itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
+                                          //print(data[index]['bus_id']);
+                                        //  getBusNumber(data[index]['bus_id']);
 
                                           // String supervisorId = data[index]['bus_id']; // Access the ID
                                           //
@@ -1024,15 +1044,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               ),
                                                               SizedBox(width: 10),
                                                               Text(
-                                                                'Bus: 1234  ى ر س',
+                                                                'Bus: $busNumber',
+                                                                //'Bus: 1 2 3 ى س ج',
                                                                // data[index]['bus_id'],
-
-
                                                                 style: TextStyle(
                                                                   fontSize: 16,
                                                                   color: Color(0xFF442B72),
                                                                 ),
                                                               ),
+
                                                             ],
                                                           )
                                                     // ListTile(
@@ -1088,6 +1108,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
             )
           ]);
         }),
+
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Padding(
           padding: const EdgeInsets.all(2.0),
@@ -1116,6 +1137,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
               topRight: Radius.circular(25),
             ),
             child: BottomAppBar(
+              // padding: EdgeInsets.symmetric(vertical: 3),
+              // height: 60,
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
               shape: const AutomaticNotchedShape( RoundedRectangleBorder(
