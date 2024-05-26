@@ -47,7 +47,8 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
   bool timeout = false;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  bool _phoneNumberEntered = false;
+  String txt="Didn't receive the OTP".tr;
   // Function to start the timer
   void startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
@@ -248,17 +249,26 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                 child:
                                     //start
                                     PinCodeTextField(
+                                      onChanged: (val){
+                                        if(_phoneNumberEntered){
+                                        _phoneNumberEntered =false;
+                                        txt="Didn't receive the OTP".tr;
+
+                                        setState(() {
+
+                                        });}
+                                      },
                                   controller: _pinCodeController,
-                                  textStyle: const TextStyle(
+                                  textStyle:  TextStyle(
                                     fontSize: 24,
-                                    fontFamily: 'Inter-SemiBold',
+                                    fontFamily: 'Inter-SemiBold',color: _phoneNumberEntered ?  Colors.red:Color(0xff8198A5)
                                   ),
                                   hintCharacter: '0',
-                                  hintStyle: const TextStyle(
+                                  hintStyle:  TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 24,
                                       fontFamily: 'Inter-SemiBold',
-                                      color: Color(0xff8198A5)),
+                                      color: _phoneNumberEntered ?  Colors.red:Color(0xff8198A5)),
                                   appContext: context,
                                   length: 6,
                                   blinkWhenObscuring: true,
@@ -268,9 +278,9 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       fieldHeight: 50,
                                       fieldWidth: 40,
                                       activeFillColor: Colors.white,
-                                      inactiveColor: const Color(0xff8198A5),
-                                      selectedColor: const Color(0xff001D4A),
-                                      activeColor: const Color(0xff8198A5),
+                                      inactiveColor: _phoneNumberEntered ? Colors.red: Color(0xff8198A5),
+                                      selectedColor:  _phoneNumberEntered ?Colors.red: Color(0xff001D4A),
+                                      activeColor: _phoneNumberEntered ? Colors.red: Color(0xff8198A5),
                                       selectedFillColor: Colors.white),
                                   cursorColor: const Color(0xff001D4A),
                                   animationDuration:
@@ -281,6 +291,7 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                 //end
                               ),
                             ),
+
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Padding(
@@ -300,9 +311,9 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                           ),
                                           children: [
                                             TextSpan(
-                                              text: "Didn't receive the OTP".tr,
+                                              text: txt,
                                               style: TextStyle(
-                                                  color: Color(0xff263238)),
+                                                  color:  _phoneNumberEntered ?  Colors.red:Color(0xff263238)),
                                             ),
                                             TextSpan(
                                               text: " Resend OTP?".tr,
@@ -397,6 +408,8 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       //erifyPhoneNumber(enteredPhoneNumber);
                                       //my code
                                       try {
+                                        _phoneNumberEntered =false;
+                                        txt="Didn't receive the OTP".tr;
                                         PhoneAuthCredential credential =
                                             PhoneAuthProvider.credential(
                                           verificationId: verificationId,
@@ -454,11 +467,11 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       } catch (e) {
                                         setState(() {
                                           _isLoading = false;
+                                          _phoneNumberEntered =true;
+                                          txt="Invalid OTP".tr;
+
                                         });
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                                content:
-                                                    Text('Invalid code.')));
+
 
                                       }
 

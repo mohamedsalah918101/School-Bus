@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
@@ -26,6 +27,7 @@ class ParentsCard extends StatefulWidget {
 
 class _ParentsCardState extends State<ParentsCard> {
    int? updatedDataLength ;
+   final _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -105,12 +107,25 @@ class _ParentsCardState extends State<ParentsCard> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap:(){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) =>
-                                  AddParents()),);
-                          },
+                          onTap:() async{
+                            String busID = '';
+                            DocumentSnapshot documentSnapshot = await _firestore
+                                .collection('supervisor')
+                                .doc(sharedpref!.getString('id'))
+                                .get();
+                            if (documentSnapshot.exists) {
+                              busID = documentSnapshot.data().toString().contains('bus_id') ?  documentSnapshot.get('bus_id') :'';
+                            }
+                            if(busID == ''){
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('This supervisor hadn\'t added to bus yet.'),
+                              ));
+                            }else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>
+                                    AddParents()),);
+                            }  },
                           child: Image.asset('assets/images/icons8_add_1 1 (1).png',
                             width: 30,
                             height: 30,),

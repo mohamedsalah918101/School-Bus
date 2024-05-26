@@ -78,7 +78,7 @@ class _ChildCardState extends State<ChildCard> {
                               height: 5,
                             ),
                             Text(
-                              widget.childrenData!.class_name!,
+                              'Class: '.tr+widget.childrenData!.class_name!,
                               style:
                               Theme.of(context).textTheme.headline6!.copyWith(
                                 color: Color(0xFF919191),
@@ -204,7 +204,7 @@ class _ChildCardState extends State<ChildCard> {
                     ),
                   ),
                 ),
-                widget.childrenData!.supervisors!.length == 1 ? Row(
+                widget.childrenData!.supervisors!.length == 1 && widget.childrenData!.supervisors!.length >0 ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -246,7 +246,7 @@ class _ChildCardState extends State<ChildCard> {
                    ),
 
                   ],
-                ): Padding(
+                ):  widget.childrenData!.supervisors!.length >0 ?Padding(
                   padding: const EdgeInsets.only(right: 10.0,left: 10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -276,7 +276,7 @@ class _ChildCardState extends State<ChildCard> {
                                   height: 5,
                                 ),                        SizedBox(width: media.width * .02),
                                 Text(
-                                  widget.childrenData!.supervisors![0].name!,
+                                  widget.childrenData!.supervisors!.length >0? widget.childrenData!.supervisors![0].name!:'',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontFamily: 'Poppins-Poppins-Light',
@@ -346,7 +346,7 @@ class _ChildCardState extends State<ChildCard> {
                                 ),
                                 SizedBox(width: media.width * .02),
                                 Text(
-                                  widget.childrenData!.supervisors![1].name!,
+                                  widget.childrenData!.supervisors!.length >0 ? widget.childrenData!.supervisors![1].name!:'',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontFamily: 'Poppins-Poppins-Light',
@@ -388,7 +388,7 @@ class _ChildCardState extends State<ChildCard> {
                       ),
                     ],
                   ),
-                ),
+                ):Container(),
                 SizedBox(
                   height: 4,
                 ),

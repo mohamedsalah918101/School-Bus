@@ -33,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
   String enteredPhoneNumber = '';
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
   bool _isLoading = false;
+  String phoneError='';
 
   String phoneNumber = '';
   MyLocalController ControllerLang = Get.find();
@@ -417,7 +418,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
                                             child: Text(
-                                              'Please enter your phone number'.tr,
+                                              phoneError,
                                               style: TextStyle(color: Colors.red),
 
                                             ),
@@ -466,11 +467,25 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
 
                                               onPress: () async{
 
-    if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
-    ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+                                                if(_phoneNumberController.text.length == 0){
+                                                  setState(() {
+                                                    phoneError ='Please enter your phone number'.tr;
+                                                    _phoneNumberEntered =false;
+                                                  });
+                                                  // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+
+                                                }else if(_phoneNumberController.text.length < 10){
+      setState(() {
+        phoneError ='Please enter valid phone number'.tr;
+
+        _phoneNumberEntered =false;
+      });
+    // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
 
     }else{
-                                                if (_validatePhoneNumber())  {
+      _phoneNumberEntered =true;
+
+      if (_validatePhoneNumber())  {
                                                   setState(() {
                                                     _isLoading = true;
 

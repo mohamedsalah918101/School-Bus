@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/children_card.dart';
@@ -11,6 +12,8 @@ import 'package:school_account/supervisor_parent/screens/home_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/supervisor_screen.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
+import '../../model/ParentModel.dart';
+import '../../model/SupervisorsModel.dart';
 import '../components/bus_component.dart';
 import '../components/child_card.dart';
 import '../components/main_bottom_bar.dart';
@@ -33,8 +36,51 @@ class children extends StatefulWidget {
 class _childrenState extends State<children> {
   // List<ChildDataItem> children = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _firestore = FirebaseFirestore.instance;
 
+  List<ParentModel> childrenData = [];
+  getData()async{
+    try {
+      DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
+      if (documentSnapshot.exists) {
+        List<dynamic> children =  documentSnapshot.get('children');
+        for(int i =0; i<children.length ;i++){
+          DocumentSnapshot busSnapshot = await _firestore.collection('busdata').doc(children[i]['bus_id']).get();
+          if (busSnapshot.exists) {
+            List<dynamic> supervisors =  busSnapshot.get('supervisors');
+            List<SupervisorsModel> supervisorsData =[];
+            String busNumber='';
+            busNumber =  busSnapshot.get('busnumber');
 
+            for(int x =0; x<supervisors.length ;x++){
+              supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id']));
+            }
+            childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: busNumber,supervisors: supervisorsData));
+
+          }else{
+            childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: '',supervisors: []));
+
+          }
+
+        }
+        setState(() {
+
+        });
+      } else {
+        print("Document does not exist");
+        return null;
+      }
+    } catch (e) {
+      print("Error getting document: $e");
+      return null;
+    }
+  }
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,12 +149,12 @@ class _childrenState extends State<children> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 2,
+                      itemCount: childrenData.length,
                       itemBuilder: (BuildContext context, int index) {
                         return
                           Column(
                             children: [
-                              ChildrenCard(),
+                              ChildrenCard(childrenData[index]),
                               SizedBox(height: 20,)
                             ],
                           );
