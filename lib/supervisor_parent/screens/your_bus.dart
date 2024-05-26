@@ -18,73 +18,15 @@ class YourBus extends StatefulWidget {
 
 class _YourBusState extends State<YourBus> {
   List<QueryDocumentSnapshot> data = [];
-  final _firestore = FirebaseFirestore.instance;
-
-  // Future<void> getDataForBus() async {
-  //   try {
-  //     // Retrieve supervisor ID from shared preferences
-  //     String? supervisorId = sharedpref?.getString('id');
-  //     if (supervisorId == null || supervisorId.isEmpty) {
-  //       // If the supervisorId is null or empty, log a message and return
-  //       print('Supervisor ID is null or empty');
-  //       return;
-  //     }
-  //     print('Retrieved Supervisor ID: $supervisorId');
-  //
-  //     // Get the 'phoneNumber' field from the 'supervisor' collection
-  //     DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
-  //         .collection('supervisor')
-  //         .doc(supervisorId)
-  //         .get();
-  //
-  //     if (supervisorDoc.exists) {
-  //       // Retrieve the 'name' field from the 'supervisor' document
-  //       String supervisorName = supervisorDoc.get('name');
-  //       print('Retrieved Supervisor Name: $supervisorName');
-  //
-  //       // Now query the 'busdata' collection where the 'supervisors.name' field matches
-  //       QuerySnapshot busDataQuery = await FirebaseFirestore.instance
-  //           .collection('busdata')
-  //           .where('namedriver', isEqualTo: supervisorName)
-  //           .get();
-  //
-  //       if (busDataQuery.docs.isNotEmpty) {
-  //         // If there are matching documents, clear the 'data' list and add the new documents
-  //         setState(() {
-  //           data.clear();
-  //           data.addAll(busDataQuery.docs);
-  //         });
-  //         print('Bus data fetched successfully');
-  //
-  //         // Iterate through the documents in the 'busdata' collection
-  //         for (var busDoc in busDataQuery.docs) {
-  //           // Access the 'test' subcollection
-  //           QuerySnapshot testSubcollection = await busDoc.reference.collection('supervisors').get();
-  //
-  //           // Iterate through the documents in the 'test' subcollection
-  //           for (var testDoc in testSubcollection.docs) {
-  //             // Retrieve the 'name' field from the 'test' subcollection
-  //             String testName = testDoc.get('name');
-  //             print('Test Name: $testName');
-  //           }
-  //         }
-  //       } else {
-  //         // If there are no matching documents, log a message
-  //         print('No matching bus data found');
-  //       }
-  //     } else {
-  //       // If the supervisor document does not exist, log a message
-  //       print('Supervisor document does not exist');
-  //     }
-  //   } catch (e) {
-  //     // If any errors occur, log the error message
-  //     print('Error fetching data: $e');
-  //   }
-  // }
+  String _namedriverText = ' ';
+  String _photodriver = ' ';
+  String _photobus = ' ';
+  String _phonedriver = ' ';
+  String _busnumber = ' ';
+  String _secondsupervisor = ' ';
 
 
   Future<void> getDataForBus() async {
-    // الحصول على bus_id من مجموعة supervisor
     DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
         .collection('supervisor')
         .doc(sharedpref?.getString('id'))
@@ -93,21 +35,33 @@ class _YourBusState extends State<YourBus> {
     if (supervisorDoc.exists) {
       String busId = supervisorDoc['bus_id'];
 
-      // استخدام bus_id للحصول على الوثائق من مجموعة busdata
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('busdata')
           .where(FieldPath.documentId, isEqualTo: busId)
           .get();
 
-      setState(() {
-        data.addAll(querySnapshot.docs);
-      });
+      if (querySnapshot.docs.isNotEmpty) {
+        String namedriver = querySnapshot.docs.first['namedriver'];
+        String photodriver = querySnapshot.docs.first['imagedriver'];
+        String photobus = querySnapshot.docs.first['busphoto'];
+        String phonedriver = querySnapshot.docs.first['phonedriver'];
+        String busnumber = querySnapshot.docs.first['busnumber'];
+        String secondsupervisor = querySnapshot.docs.first['name'];
+        setState(() {
+          _namedriverText = namedriver;
+          _photodriver = photodriver;
+          _photobus = photobus ;
+          _phonedriver = phonedriver;
+          _busnumber = busnumber;
+          _secondsupervisor = secondsupervisor;
+        });
+      } else {
+        print('No bus data found');
+      }
     } else {
       print('Supervisor document does not exist');
     }
   }
-
-
 
   @override
   void initState() {
@@ -184,9 +138,16 @@ class _YourBusState extends State<YourBus> {
                       padding:  EdgeInsets.symmetric(horizontal: 31.0),
                       child: Row(
                         children: [
-                          Image.asset('assets/images/Ellipse 1.png',
-                            width: 50,
-                            height: 50,),
+
+                          CircleAvatar(
+                            backgroundImage: NetworkImage( _photodriver ?? 'no data'),
+                            radius: 25.5,
+                          ),
+                          // NetworkImage(
+                          //   _photodriver ?? 'no data',
+                          //   // 'assets/images/Ellipse 1.png',
+                          //   width: 50,
+                          //   height: 50,),
                           SizedBox(width: 10,),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 12.0),
@@ -217,60 +178,14 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child:
-
-                            FutureBuilder<DocumentSnapshot>(
-                              future: FirebaseFirestore.instance
-                                  .collection('busdata')
-                                  .doc(sharedpref?.getString('id'))
-                                  .get(),
-                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                if (snapshot.hasError) {
-                                  print('Error: ${snapshot.error}');
-                                  return Center(child: Text('Something went wrong'));
-                                }
-
-                                if (snapshot.connectionState == ConnectionState.done) {
-                                  if (snapshot.data == null || !snapshot.data!.exists) {
-                                    print('No data found for document ID: ${sharedpref?.getString('id')}');
-                                    return Text(
-                                      'No data available',
-                                      style: TextStyle(
-                                        color: Color(0xff442B72),
-                                        fontSize: 12,
-                                        fontFamily: 'Poppins-Regular',
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    );
-                                  }
-
-                                  Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                  print('Data retrieved: $data');
-                                  return Text(
-                                    '${'Welcome, '+data['namedriver']}',
-                                    style: TextStyle(
-                                      color: Color(0xff442B72),
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  );
-                                }
-
-                                return CircularProgressIndicator();
-                              },
-                            ),
-
-
-                            // Text(
-                            //
-                            //   '${'Welcome, '+data[0]['namedriver'].toString()}',
-                            //   style: TextStyle(
-                            //     color: Color(0xFF442B72),
-                            //     fontSize: 12,
-                            //     fontFamily: 'Poppins-Light',
-                            //     fontWeight: FontWeight.w400,
-                            //   ),),
+                            child: Text(
+                              _namedriverText ?? 'no data',
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 12,
+                                fontFamily: 'Poppins-Light',
+                                fontWeight: FontWeight.w400,
+                              ),),
                           ),
                           SizedBox(height: 20,),
                           Text('Driver Number'.tr,
@@ -283,7 +198,8 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child: Text('0128362511',
+                            child: Text(
+                                _phonedriver ?? 'no data',
                               style: TextStyle(
                                 color: Color(0xFF442B72),
                                 fontSize: 12,
@@ -304,17 +220,30 @@ class _YourBusState extends State<YourBus> {
                             padding: const EdgeInsets.only(left: 3.0),
                             child: Row(
                               children: [
-                                Image.asset('assets/images/Frame 151.png',
-                                  width: 82,
-                                  height: 80,),
+                                // Image.network(_photobus ,
+                                // width: 82,
+                                // height: 80,),
+                                // Image.asset('assets/images/Frame 151.png',
+                                //   width: 82,
+                                //   height: 80,),
                                 SizedBox(width: 10,),
-                                Image.asset('assets/images/Frame 151.png',
-                                  width: 82,
-                                  height: 80,),
+                                // Image.network(_photobus ,
+                                //   width: 82,
+                                //   height: 80,),
                                 SizedBox(width: 10,),
-                                Image.asset('assets/images/Frame 151.png',
-                                  width: 82,
-                                  height: 80,)
+                            CircleAvatar(
+                              radius: 31,
+                              backgroundColor: Color(0xff442B72),
+                              child: CircleAvatar(
+                                backgroundImage:
+                                NetworkImage( _photobus),
+                                radius: 31,
+                              ),
+                            ),
+
+                                // Image.network(_photobus ,
+                                //   width: 82,
+                                //   height: 80,),
                               ],
                             ),
                           ),
@@ -329,7 +258,7 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 0.0),
-                            child: Text(" 1458 ى ر س ",
+                            child: Text(_busnumber,
                               textDirection: _getTextDirection(" 1458ى ر س "),
                               style: TextStyle(
                                 color: Color(0xFF442B72),
@@ -349,7 +278,7 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 3.0),
-                            child: Text('Mariam Atef',
+                            child: Text(_secondsupervisor,
                               style: TextStyle(
                                 color: Color(0xFF442B72),
                                 fontSize: 12,

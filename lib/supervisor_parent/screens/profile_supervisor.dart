@@ -29,38 +29,148 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
   File ? _selectedImage;
   String? imageUrl;
   File? file ;
+  final formState = GlobalKey<FormState>();
+
+  // Future<void> _pickImageFromGallery() async {
+  //   final ImagePicker _picker = ImagePicker();
+  //   final XFile? returnedImage = await _picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (returnedImage == null) {
+  //     print('No image selected');
+  //     return;
+  //   }
+  //
+  //   File imageFile = File(returnedImage.path);
+  //
+  //   if (!imageFile.existsSync()) {
+  //     print('The selected image file does not exist');
+  //     return;
+  //   }
+  //
+  //   setState(() {
+  //     _selectedImage = imageFile;
+  //   });
+  //
+  //   // Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = referenceRoot.child('images');
+  //   Reference referenceImageToUpload = referenceDirImages.child('name');
+  //
+  //   try {
+  //     // Store the file
+  //     UploadTask uploadTask = referenceImageToUpload.putFile(imageFile);
+  //
+  //     // Get the download URL
+  //     TaskSnapshot taskSnapshot = await uploadTask;
+  //     imageUrl = await taskSnapshot.ref.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $imageUrl');
+  //
+  //     setState(() {});
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //     // Retry upload on failure
+  //     try {
+  //       print('Retrying upload...');
+  //       UploadTask retryUploadTask = referenceImageToUpload.putFile(imageFile);
+  //       TaskSnapshot retryTaskSnapshot = await retryUploadTask;
+  //       imageUrl = await retryTaskSnapshot.ref.getDownloadURL();
+  //       print('Image uploaded successfully on retry. URL: $imageUrl');
+  //
+  //       setState(() {});
+  //     } catch (retryError) {
+  //       print('Retry failed: $retryError');
+  //     }
+  //   }
+  // }
+
+  Future<void> _pickImageFromGallery() async {
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) return;
+
+    setState(() {
+      _selectedImage = File(returnedImage.path);
+    });
+
+    // Get a reference to storage root
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = referenceRoot.child('images');
+    Reference referenceImageToUpload = referenceDirImages.child('name'); // استخدم اسم مناسب أو مولد تلقائيًا
+
+    try {
+      // Store the file
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      // Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+      // Update Firestore with the new image URL
+      await editProfile();
+    } catch (error) {
+      print('Error uploading image: $error');
+    }
+  }
+
+  editProfile() async {
+    print('editprofile called');
+
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+
+        try {
+          print('updating document...');
+          await FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString('id')).update({
+            'busphoto': imageUrl,
+          });
+
+          print('document updated successfully');
+
+          setState(() {
+            // Trigger a rebuild of the widget tree if necessary
+          });
+        } catch (e) {
+          print('Error updating document: $e');
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
 
 
   //function choose photo from gallery
-  Future _pickImageFromGallery() async{
-    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage ==null) return;
-    setState(() {
-      _selectedImage=File(returnedImage.path);
-    });
-
-    //Get a reference to storage root
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
-    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
-    Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
-
-
-
-    //Handle errors/success
-    try {
-      //Store the file
-      await referenceImageToUpload.putFile(File(returnedImage.path));
-      //Success: get the download URL
-      imageUrl = await referenceImageToUpload.getDownloadURL();
-      print('Image uploaded successfully. URL: $imageUrl');
-      return imageUrl;
-    } catch (error) {
-      print('Error uploading image: $error');
-      return '';
-      //Some error occurred
-    }
-  }
+  // Future _pickImageFromGallery() async{
+  //   final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if(returnedImage ==null) return;
+  //   setState(() {
+  //     _selectedImage=File(returnedImage.path);
+  //   });
+  //
+  //   //Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
+  //   // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+  //   Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
+  //
+  //
+  //
+  //   //Handle errors/success
+  //   try {
+  //     //Store the file
+  //     await referenceImageToUpload.putFile(File(returnedImage.path));
+  //     //Success: get the download URL
+  //     imageUrl = await referenceImageToUpload.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $imageUrl');
+  //     return imageUrl;
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //     return '';
+  //     //Some error occurred
+  //   }
+  // }
 
   getData() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
@@ -69,6 +179,10 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
       data = querySnapshot.docs;
     });
   }
+
+
+
+
 
   @override
   void initState() {
@@ -99,7 +213,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
     return Scaffold(
         backgroundColor: Colors.white,
         endDrawer: SupervisorDrawer(),
-        key: _scaffoldKey,
+        key: formState,
         appBar: PreferredSize(
           child: Container(
             decoration: BoxDecoration(boxShadow: [
@@ -455,16 +569,11 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                           if (data.isNotEmpty) {
                             Navigator.push(context, MaterialPageRoute(builder: (context) =>
                                 EditProfileSupervisorScreen(
-                                  // docid: data[index].id,
-                                  // oldNumber: data[index].get('phoneNumber'),
-                                  // oldName: data[index].get('name'),
-                                  // oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
-                                  // oldType: data[index].get('typeOfParent'),
-                                    docid: data[0].id,
-                                    oldName: data[0].get('name'),
-                                    oldNumber: data[0].get('phoneNumber'),
-                                    oldEmail: data[0].get('email'),
-                                    oldPhoto: data[0].get('busphoto'),
+                                  //   docid: data[0].id,
+                                  //   oldName: data[0].get('name'),
+                                  //   oldNumber: data[0].get('phoneNumber'),
+                                  //   oldEmail: data[0].get('email'),
+                                  //   oldPhoto: data[0].get('busphoto'),
                                   // Image.asset( 'assets/images/Ellipse 1.png', ),
                                 )
                             )).then((value) {
