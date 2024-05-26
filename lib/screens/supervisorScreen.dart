@@ -188,7 +188,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
     setState(() {
-      data = supervisorData.docs;
+      filteredData = supervisorData.docs;
       isFiltered = true;
     });
   }
@@ -201,7 +201,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
     setState(() {
-      data = supervisorData.docs;
+      filteredData = supervisorData.docs;
       isFiltered = true;
     });
   }
@@ -214,7 +214,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
     setState(() {
-      data = supervisorData.docs;
+      filteredData = supervisorData.docs;
       isFiltered = true;
     });
   }
@@ -255,65 +255,62 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Align(
-                          alignment: AlignmentDirectional.topStart,
-                          child: InkWell(
-                            // onTap: ()=>exit(0),
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              // Navigate back to the previous page
-                              // Navigator.pop(context);
-                              Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
-                            },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: AlignmentDirectional.topStart,
+                        child: InkWell(
+                          // onTap: ()=>exit(0),
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                                .hideCurrentSnackBar();
+                            // Navigate back to the previous page
+                            // Navigator.pop(context);
+                            Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
+                          },
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 26,
+                            color: Color(0xff442B72),
+                          ),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: Center(
+                          child: Align(alignment: AlignmentDirectional.center,
+                            child: Text(
+                              "Supervisors".tr,
+                              style: TextStyle(
+                                color: Color(0xFF993D9A),
+                                fontSize: 25,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                // height: 0.99,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      InkWell(
+                        onTap: () {
+                          Scaffold.of(context).openEndDrawer();
+                        },
+                        child: Align(
+                          alignment: AlignmentDirectional.topEnd,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 5),
                             child: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 26,
+                              Icons.menu_rounded,
+                              size: 40,
                               color: Color(0xff442B72),
                             ),
                           ),
                         ),
-
-                        Expanded(
-                          child: Center(
-                            child: Align(alignment: AlignmentDirectional.center,
-                              child: Text(
-                                "Supervisors".tr,
-                                style: TextStyle(
-                                  color: Color(0xFF993D9A),
-                                  fontSize: 25,
-                                  fontFamily: 'Poppins-Bold',
-                                  fontWeight: FontWeight.w700,
-                                  // height: 0.99,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        InkWell(
-                          onTap: () {
-                            Scaffold.of(context).openEndDrawer();
-                          },
-                          child: Align(
-                            alignment: AlignmentDirectional.topEnd,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child: const Icon(
-                                Icons.menu_rounded,
-                                size: 40,
-                                color: Color(0xff442B72),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -598,7 +595,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                         //itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
                                           //print(data[index]['bus_id']);
-                                          getBusNumber(data[index]['bus_id']);
+                                        //  getBusNumber(data[index]['bus_id']);
 
                                           // String supervisorId = data[index]['bus_id']; // Access the ID
                                           //
@@ -1111,6 +1108,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
             )
           ]);
         }),
+
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Padding(
           padding: const EdgeInsets.all(2.0),
@@ -1139,6 +1137,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
               topRight: Radius.circular(25),
             ),
             child: BottomAppBar(
+              // padding: EdgeInsets.symmetric(vertical: 3),
+              // height: 60,
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
               shape: const AutomaticNotchedShape( RoundedRectangleBorder(

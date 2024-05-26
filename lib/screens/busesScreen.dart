@@ -309,9 +309,7 @@ final _firestore = FirebaseFirestore.instance;
                             height: 20,
                           ),
 
-                          SizedBox(
-                            height: 20,
-                          ),
+
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 5.0),
                             child: Stack(
@@ -653,7 +651,7 @@ final _firestore = FirebaseFirestore.instance;
                                                           ),
                                                         ),
                                                         icon: Padding(
-                                                          padding: const EdgeInsets.only(left: 10),
+                                                          padding: const EdgeInsets.only(left: 12),
                                                           child: Icon(Icons.more_vert,
                                                               size: 30, color: Color(0xFF442B72)),
                                                         ),

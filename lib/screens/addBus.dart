@@ -244,831 +244,837 @@ class _AddBusState extends State<AddBus> {
           backgroundColor: const Color(0xFFFFFFFF),
           endDrawer: HomeDrawer(),
           body: LayoutBuilder(builder: (context, constrains) {
-            return SingleChildScrollView(
-              reverse: true,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: InkWell(onTap: (){},
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional.topStart,
-                            child: InkWell(
-                              // onTap: ()=>exit(0),
-                              onTap: () {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                // Navigate back to the previous page
-                                Navigator.pop(context);
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 15,
+                ),
+                Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: AlignmentDirectional.topStart,
+                      child: InkWell(
+                        // onTap: ()=>exit(0),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          // Navigate back to the previous page
+                          Navigator.pop(context);
 
-                              },
-                              child: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 23,
-                                color: Color(0xff442B72),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 20,),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                "Buses".tr,
-                                style: TextStyle(
-                                  color: Color(0xFF993D9A),
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins-Bold',
-                                  fontWeight: FontWeight.bold,
-                                  height: 0.64,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: InkWell(onTap: (){
-                              Scaffold.of(context).openEndDrawer();
-                            },
-                              child: Align(
-                                alignment: AlignmentDirectional.topEnd,
-                                child: const Icon(
-                                  Icons.menu_rounded,
-                                  size: 40,
-                                  color: Color(0xff442B72),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 23,
+                          color: Color(0xff442B72),
+                        ),
                       ),
                     ),
-                  ),
+                    SizedBox(width: 20,),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          "Buses".tr,
+                          style: TextStyle(
+                            color: Color(0xFF993D9A),
+                            fontSize: 16,
+                            fontFamily: 'Poppins-Bold',
+                            fontWeight: FontWeight.bold,
+                            height: 0.64,
+                          ),
+                        ),
+                      ),
+                    ),
 
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Stack(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: InkWell(onTap: (){
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                        child: Align(
+                          alignment: AlignmentDirectional.topEnd,
+                          child: const Icon(
+                            Icons.menu_rounded,
+                            size: 40,
+                            color: Color(0xff442B72),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    //reverse: true,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
+
+
+                        // const SizedBox(
+                        //   height: 10,
+                        // ),
+
+                        SizedBox(
+                          height: 20,
+                        ),
                         Padding(
-                          padding: const EdgeInsets.only(top:5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Stack(
                             children: [
 
-                              Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 12),
-                                        // child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
-                                        // CircleAvatar( radius:30, // Set the radius of the circle
-                                        //   backgroundImage: AssetImage('assets/imgs/school/Frame 154.png'),
-                                        // ),
-                                        child: Stack(children: [
-                                          GestureDetector(
-                                            onTap:()async {
-                  await _pickImageFromGallery();}  , // Call function when tapped
-                    child: _selectedImagedriver != null
-                        ? Image.file(
-                      _selectedImagedriver!,  // Display the uploaded image
-                      width: 83,  // Set width as per your preference
-                      height: 78.5,  // Set height as per your preference
-                      fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                    )
-                                           :
-                    Container(
+                              Padding(
+                                padding: const EdgeInsets.only(top:5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
 
-                                              width: 65, // Adjust size as needed
-                                              height: 65,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 12),
+                                              // child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
+                                              // CircleAvatar( radius:30, // Set the radius of the circle
+                                              //   backgroundImage: AssetImage('assets/imgs/school/Frame 154.png'),
+                                              // ),
+                                              child: Stack(children: [
+                                                GestureDetector(
+                                                  onTap:()async {
+                        await _pickImageFromGallery();}  , // Call function when tapped
+                          child: _selectedImagedriver != null
+                              ? Image.file(
+                            _selectedImagedriver!,  // Display the uploaded image
+                            width: 83,  // Set width as per your preference
+                            height: 78.5,  // Set height as per your preference
+                            fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                          )
+                                                 :
+                          Container(
 
-                                                border: Border.all(
-                                                  color: Color(0xffCCCCCC), // Adjust border color
-                                                  width: 2, // Adjust border width
-                                                ),
-                                              ),
-                                              child: Align(alignment: Alignment.bottomCenter,
-                                                child: CircleAvatar(radius: 20,
+                                                    width: 65, // Adjust size as needed
+                                                    height: 65,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
 
-                                                backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
-                                                  ,backgroundColor: Colors.white,
-                                                ),
-                                              ),
-                                            ),
+                                                      border: Border.all(
+                                                        color: Color(0xffCCCCCC), // Adjust border color
+                                                        width: 2, // Adjust border width
+                                                      ),
+                                                    ),
+                                                    child: Align(alignment: Alignment.bottomCenter,
+                                                      child: CircleAvatar(radius: 20,
 
-                                          ),
-                                          Positioned(
-
-                                              child: Container(
-                                                  width: 20, // Adjust size as needed
-                                                  height: 20,
-                                                  decoration: BoxDecoration(
-
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                      color: Color(0xffCCCCCC), // Adjust border color
-                                                      width: 2, // Adjust border width
+                                                      backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
+                                                        ,backgroundColor: Colors.white,
+                                                      ),
                                                     ),
                                                   ),
-                                                  child: Image.asset("assets/imgs/school/image-editing 1 1.png",width:11,height: 11,)),
-                                            bottom: -10,
-                                            left: 80,
 
-                                          )
-                                        ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal:15,vertical: 0 ),
-                                        child: Align(
-                                          alignment: AlignmentDirectional.topStart,
-                                          child:
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(text:"Driver photo",style: TextStyle(color: Color(0xff442B72),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold' )),
-                                                  TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
-                                                ]
+                                                ),
+                                                Positioned(
+
+                                                    child: Container(
+                                                        width: 20, // Adjust size as needed
+                                                        height: 20,
+                                                        decoration: BoxDecoration(
+
+                                                          shape: BoxShape.circle,
+                                                          border: Border.all(
+                                                            color: Color(0xffCCCCCC), // Adjust border color
+                                                            width: 2, // Adjust border width
+                                                          ),
+                                                        ),
+                                                        child: Image.asset("assets/imgs/school/image-editing 1 1.png",width:11,height: 11,)),
+                                                  bottom: -10,
+                                                  left: 80,
+
+                                                )
+                                              ],
                                               ),
                                             ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal:15,vertical: 0 ),
+                                              child: Align(
+                                                alignment: AlignmentDirectional.topStart,
+                                                child:
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(text:"Driver photo",style: TextStyle(color: Color(0xff442B72),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold' )),
+                                                        TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
+                                                      ]
+                                                    ),
+                                                  ),
+
+                                              ),
+                                            ),
+                                            //error message on null photo
+                                            // if (_selectedImage == null)
+                                            //   Padding(
+                                            //     padding: const EdgeInsets.only(left: 12, top: 4),
+                                            //     child: Text(
+                                            //       "Please select a photo",
+                                            //       style: TextStyle(color: Colors.red),
+                                            //     ),
+                                            //   ),
+
+                                          ],
 
                                         ),
-                                      ),
-                                      //error message on null photo
-                                      // if (_selectedImage == null)
-                                      //   Padding(
-                                      //     padding: const EdgeInsets.only(left: 12, top: 4),
-                                      //     child: Text(
-                                      //       "Please select a photo",
-                                      //       style: TextStyle(color: Colors.red),
-                                      //     ),
-                                      //   ),
-
-                                    ],
-
-                                  ),
-                                  driverphotoerror?Container(): Padding(
-                                    padding: const EdgeInsets.only(left: 32),
-                                    child: Align( alignment: AlignmentDirectional.topStart,
-                                      child: Text(
-                                        "Please enter driver photo".tr,
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              // Padding(
-
-                              const SizedBox(
-                                height: 20,
-                              ),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
-                                child: Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child:
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        //color: Colors.black, // Setting default text color to black
-                                        fontSize: 15,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: "Driver Name".tr,
-                                          style: TextStyle(color: Color(0xFF442B72)),
-                                        ),
-                                        TextSpan(
-                                          text: " *".tr,
-                                          style: TextStyle(color: Color(0xFFAD1519)),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Text(
-                                  //   'Driver Name'.tr,
-                                  //   style: TextStyle(
-                                  //     color: Color(0xFF442B72),
-                                  //     fontSize: 15,
-                                  //     fontFamily: 'Poppins-Bold',
-                                  //     fontWeight: FontWeight.w700,
-                                  //     height: 1.07,
-                                  //   ),
-                                  // ),
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                              Container(
-                                width: constrains.maxWidth / 1.3,
-                                height: 40,
-                                child: TextFormField(
-                                 controller: _driverName,
-                                  focusNode: _driverNameFocus,
-                                  cursorColor: const Color(0xFF442B72),
-                                  style: TextStyle(color: Color(0xFF442B72)),
-                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                  onFieldSubmitted: (value) {
-                                    // move to the next field when the user presses the "Done" button
-                                    FocusScope.of(context).requestFocus(_driverNumberFocus);
-                                  },
-                                  //textDirection: TextDirection.ltr,
-                                  scrollPadding: const EdgeInsets.symmetric(
-                                      vertical: 40),
-                                  decoration:  InputDecoration(
-                                   // errorText: _validateDriverName ? "Please Enter Name" : null,
-                                    alignLabelWithHint: true,
-                                    counterText: "",
-                                    fillColor: const Color(0xFFF1F1F1),
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.fromLTRB(
-                                        8, 30, 10, 5),
-                                    hintText:"Your Name".tr,
-                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0xFFC2C2C2),
-                                      fontSize: 12,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.33,
-                                    ),
-                                    enabledBorder: myInputBorder(),
-                                    // focusedBorder: myFocusBorder(),
-                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                    focusedBorder: myFocusBorder(),
-                                  ),
-                                  // onFieldSubmitted: (value) {
-                                  //   // move to the next field when the user presses the "Done" button
-                                  //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                  // },
-                                ),
-                              ),
-                              namedrivererror?Container(): Padding(
-                                padding: const EdgeInsets.only(left: 32),
-                                child: Align( alignment: AlignmentDirectional.topStart,
-                                  child: Text(
-                                    "Please enter your name".tr,
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ),
-                              // TextFormFieldCustom(
-                              //   width: constrains.maxWidth / 1.3,
-                              //   hintTxt: 'Your Name'.tr,
-                              // ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0),
-                                child: Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child:
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        //color: Colors.black, // Setting default text color to black
-                                        fontSize: 15,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: "Driver Number".tr,
-                                          style: TextStyle(color: Color(0xFF442B72)),
-                                        ),
-                                        TextSpan(
-                                          text: " *".tr,
-                                          style: TextStyle(color: Color(0xFFAD1519)),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                              Container(
-                                width: constrains.maxWidth / 1.3,
-                                height: 38,
-                                child: TextFormField(
-                                  controller: _driverNumber,
-                                  focusNode: _driverNumberFocus,
-                                  onFieldSubmitted: (value) {
-                                    // move to the next field when the user presses the "Done" button
-                                    FocusScope.of(context).requestFocus(_busNumberFocus);
-                                  },
-                                  style: TextStyle(color: Color(0xFF442B72)),
-                                  // controller: _namesupervisor,
-                                  cursorColor: const Color(0xFF442B72),
-                                  //textDirection: TextDirection.ltr,
-                                  scrollPadding: const EdgeInsets.symmetric(
-                                      vertical: 40),
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 11,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
-                                    LengthLimitingTextInputFormatter(11), // Limit the length programmatically
-                                  ],
-                                  decoration:  InputDecoration(
-                                    //errorText: _validateDriverNumber ? "Please Enter Phone Number" : null,
-                                    // labelText: 'Shady Ayman'.tr,
-                                    hintText:'Your Number'.tr ,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0xFFC2C2C2),
-                                      fontSize: 12,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.33,
-                                    ),
-                                    alignLabelWithHint: true,
-                                    counterText: "",
-                                    fillColor: const Color(0xFFF1F1F1),
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.fromLTRB(
-                                        8,20, 10, 5),
-                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                    enabledBorder: myInputBorder(),
-                                    focusedBorder: myFocusBorder(),
-                                  ),
-
-                                ),
-                              ),
-                              drivernumbererror?Container(): Padding(
-                                padding: const EdgeInsets.only(left: 32),
-                                child: Align( alignment: AlignmentDirectional.topStart,
-                                  child: Text(
-                                    "Please enter phone number".tr,
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ),
-                              // TextFormFieldCustom(
-                              //   width: constrains.maxWidth / 1.3,
-                              //   hintTxt: 'Your Number'.tr,
-                              // ),
-                              const SizedBox(
-                                height: 25,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
-                                child: Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child: Text(
-                                    'Bus Photos'.tr,
-                                    style: TextStyle(
-                                      color: Color(0xFF442B72),
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.07,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // textform field without icon location
-                              // TextFormFieldCustom(
-                              //   width: constrains.maxWidth / 1.2,
-                              //   hintTxt: ''.tr,
-                              //
-                              //
-                              // ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Align(alignment: AlignmentDirectional.center,
-                                child:
-                                GestureDetector(
-                                  onTap:()async {
-                                    await _pickBusImageFromGallery();}  , // Call function when tapped
-                                  child: _selectedImagebus != null
-                                      ? Image.file(
-                                    _selectedImagebus!,  // Display the uploaded image
-                                    width: 275,  // Set width as per your preference
-                                    height: 75,  // Set height as per your preference
-                                    fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                                  )
-                                      : FDottedLine(
-                                    color: Color(0xFF442B72),
-                                    strokeWidth: 0.8,
-                                    dottedLength: 10,
-                                    space: 5.0,
-                                    corner: FDottedLineCorner.all(6.0),
-
-                                    // Child widget
-                                    child: Container(
-                                      width: 275,
-                                      height: 75,
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 80),
-                                            child: Image.asset("assets/imgs/school/icons8_image_document_1 1.png",width: 24,height: 24,),
-                                          ),
-                                          SizedBox(width: 10,),
-                                          Text(
-                                            "upload image",
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 14,
-                                              fontFamily: 'Poppins-Regular',
+                                        driverphotoerror?Container(): Padding(
+                                          padding: const EdgeInsets.only(left: 32),
+                                          child: Align( alignment: AlignmentDirectional.topStart,
+                                            child: Text(
+                                              "Please enter driver photo".tr,
+                                              style: TextStyle(color: Colors.red),
                                             ),
                                           ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Padding(
 
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      child: Align(
+                                        alignment: AlignmentDirectional.topStart,
+                                        child:
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              //color: Colors.black, // Setting default text color to black
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins-Bold',
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: "Driver Name".tr,
+                                                style: TextStyle(color: Color(0xFF442B72)),
+                                              ),
+                                              TextSpan(
+                                                text: " *".tr,
+                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Text(
+                                        //   'Driver Name'.tr,
+                                        //   style: TextStyle(
+                                        //     color: Color(0xFF442B72),
+                                        //     fontSize: 15,
+                                        //     fontFamily: 'Poppins-Bold',
+                                        //     fontWeight: FontWeight.w700,
+                                        //     height: 1.07,
+                                        //   ),
+                                        // ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Container(
+                                      width: constrains.maxWidth / 1.3,
+                                      height: 40,
+                                      child: TextFormField(
+                                       controller: _driverName,
+                                        focusNode: _driverNameFocus,
+                                        cursorColor: const Color(0xFF442B72),
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                        textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                        onFieldSubmitted: (value) {
+                                          // move to the next field when the user presses the "Done" button
+                                          FocusScope.of(context).requestFocus(_driverNumberFocus);
+                                        },
+                                        //textDirection: TextDirection.ltr,
+                                        scrollPadding: const EdgeInsets.symmetric(
+                                            vertical: 40),
+                                        decoration:  InputDecoration(
+                                         // errorText: _validateDriverName ? "Please Enter Name" : null,
+                                          alignLabelWithHint: true,
+                                          counterText: "",
+                                          fillColor: const Color(0xFFF1F1F1),
+                                          filled: true,
+                                          contentPadding: const EdgeInsets.fromLTRB(
+                                              8, 30, 10, 5),
+                                          hintText:"Your Name".tr,
+                                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                          hintStyle: const TextStyle(
+                                            color: Color(0xFFC2C2C2),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Bold',
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.33,
+                                          ),
+                                          enabledBorder: myInputBorder(),
+                                          // focusedBorder: myFocusBorder(),
+                                          // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                          focusedBorder: myFocusBorder(),
+                                        ),
+                                        // onFieldSubmitted: (value) {
+                                        //   // move to the next field when the user presses the "Done" button
+                                        //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                        // },
+                                      ),
+                                    ),
+                                    namedrivererror?Container(): Padding(
+                                      padding: const EdgeInsets.only(left: 32),
+                                      child: Align( alignment: AlignmentDirectional.topStart,
+                                        child: Text(
+                                          "Please enter your name".tr,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ),
+                                    // TextFormFieldCustom(
+                                    //   width: constrains.maxWidth / 1.3,
+                                    //   hintTxt: 'Your Name'.tr,
+                                    // ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0),
+                                      child: Align(
+                                        alignment: AlignmentDirectional.topStart,
+                                        child:
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              //color: Colors.black, // Setting default text color to black
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins-Bold',
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: "Driver Number".tr,
+                                                style: TextStyle(color: Color(0xFF442B72)),
+                                              ),
+                                              TextSpan(
+                                                text: " *".tr,
+                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Container(
+                                      width: constrains.maxWidth / 1.3,
+                                      height: 38,
+                                      child: TextFormField(
+                                        controller: _driverNumber,
+                                        focusNode: _driverNumberFocus,
+                                        onFieldSubmitted: (value) {
+                                          // move to the next field when the user presses the "Done" button
+                                          FocusScope.of(context).requestFocus(_busNumberFocus);
+                                        },
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                        // controller: _namesupervisor,
+                                        cursorColor: const Color(0xFF442B72),
+                                        //textDirection: TextDirection.ltr,
+                                        scrollPadding: const EdgeInsets.symmetric(
+                                            vertical: 40),
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 11,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                          LengthLimitingTextInputFormatter(11), // Limit the length programmatically
                                         ],
+                                        decoration:  InputDecoration(
+                                          //errorText: _validateDriverNumber ? "Please Enter Phone Number" : null,
+                                          // labelText: 'Shady Ayman'.tr,
+                                          hintText:'Your Number'.tr ,
+                                          hintStyle: const TextStyle(
+                                            color: Color(0xFFC2C2C2),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Bold',
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.33,
+                                          ),
+                                          alignLabelWithHint: true,
+                                          counterText: "",
+                                          fillColor: const Color(0xFFF1F1F1),
+                                          filled: true,
+                                          contentPadding: const EdgeInsets.fromLTRB(
+                                              8,20, 10, 5),
+                                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                          enabledBorder: myInputBorder(),
+                                          focusedBorder: myFocusBorder(),
+                                        ),
+
                                       ),
                                     ),
-                                  ),
-
-                                ),
-                                // Container(
-                                //   width: 290, // Adjust width as needed
-                                //   height: 75, // Adjust height as needed
-                                //   decoration: BoxDecoration(
-                                //     // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
-                                //     image: DecorationImage(
-                                //       image: AssetImage('assets/imgs/school/Frame 136.png'), // Provide the path to your image
-                                //       fit: BoxFit.fill, // Adjust the fit as needed
-                                //     ),
-                                //   ),
-                                // ),
-                              ),
-                              // Container(
-                              //   width: constrains.maxWidth / 1.2,
-                              //   height: 45,
-                              //   child: TextFormField(
-                              //     cursorColor: const Color(0xFF442B72),
-                              //     style: TextStyle(color: Color(0xFF442B72)),
-                              //     //textDirection: TextDirection.ltr,
-                              //     scrollPadding: const EdgeInsets.symmetric(
-                              //         vertical: 40),
-                              //     decoration:  InputDecoration(
-                              //       //suffixIcon: Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
-                              //       alignLabelWithHint: true,
-                              //       counterText: "",
-                              //       fillColor: const Color(0xFFF1F1F1),
-                              //       filled: true,
-                              //       contentPadding: const EdgeInsets.fromLTRB(
-                              //           8, 30, 10, 5),
-                              //       //  hintText:"".tr,
-                              //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              //       hintStyle: const TextStyle(
-                              //         color: Color(0xFFC2C2C2),
-                              //         fontSize: 12,
-                              //         fontFamily: 'Inter-Bold',
-                              //         fontWeight: FontWeight.w700,
-                              //         height: 1.33,
-                              //       ),
-                              //       enabledBorder: myInputBorder(),
-                              //       focusedBorder: myFocusBorder(),
-                              //
-                              //     ),
-                              //   ),
-                              // ),
-
-
-                              const SizedBox(
-                                height: 25,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
-                                child: Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child:
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        //color: Colors.black, // Setting default text color to black
-                                        fontSize: 15,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700,
+                                    drivernumbererror?Container(): Padding(
+                                      padding: const EdgeInsets.only(left: 32),
+                                      child: Align( alignment: AlignmentDirectional.topStart,
+                                        child: Text(
+                                          "Please enter phone number".tr,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
                                       ),
-                                      children: [
-                                        TextSpan(
-                                          text: "Bus Number".tr,
-                                          style: TextStyle(color: Color(0xFF442B72)),
-                                        ),
-                                        TextSpan(
-                                          text: " *".tr,
-                                          style: TextStyle(color: Color(0xFFAD1519)),
-                                        ),
-                                      ],
                                     ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                              Container(
-                                width: constrains.maxWidth / 1.3,
-                                height: 40,
-                                child: TextFormField(
-                                  controller: _busNumber,
-                                  focusNode: _busNumberFocus,
-                                  cursorColor: const Color(0xFF442B72),
-                                  style: TextStyle(color: Color(0xFF442B72)),
-                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                  onFieldSubmitted: (value) {
-                                    // move to the next field when the user presses the "Done" button
-                                  //  FocusScope.of(context).requestFocus(_driverNumberFocus);
-                                  },
-                                  //textDirection: TextDirection.ltr,
-                                  scrollPadding: const EdgeInsets.symmetric(
-                                      vertical: 40),
-                                  decoration:  InputDecoration(
-                                    //errorText: _validateBusNumber ? "Please Enter Bus Number" : null,
-                                    alignLabelWithHint: true,
-                                    counterText: "",
-                                    fillColor: const Color(0xFFF1F1F1),
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.fromLTRB(
-                                        8, 30, 10, 5),
-                                    hintText:"Your Number".tr,
-                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                    hintStyle: const TextStyle(
-                                      color: Color(0xFFC2C2C2),
-                                      fontSize: 12,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.33,
+                                    // TextFormFieldCustom(
+                                    //   width: constrains.maxWidth / 1.3,
+                                    //   hintTxt: 'Your Number'.tr,
+                                    // ),
+                                    const SizedBox(
+                                      height: 25,
                                     ),
-                                    enabledBorder: myInputBorder(),
-                                    // focusedBorder: myFocusBorder(),
-                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                    focusedBorder: myFocusBorder(),
-                                  ),
-                                  // onFieldSubmitted: (value) {
-                                  //   // move to the next field when the user presses the "Done" button
-                                  //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                  // },
-                                ),
-                              ),
-                              busnumbererror?Container(): Padding(
-                                padding: const EdgeInsets.only(left: 32),
-                                child: Align( alignment: AlignmentDirectional.topStart,
-                                  child: Text(
-                                    "Please enter bus number".tr,
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ),
-                              // TextFormFieldCustom(
-                              //   width: constrains.maxWidth / 1.3,
-                              //   hintTxt: "Your Number".tr,
-                              // ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
-                                child: Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child:
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        //color: Colors.black, // Setting default text color to black
-                                        fontSize: 15,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      child: Align(
+                                        alignment: AlignmentDirectional.topStart,
+                                        child: Text(
+                                          'Bus Photos'.tr,
+                                          style: TextStyle(
+                                            color: Color(0xFF442B72),
+                                            fontSize: 15,
+                                            fontFamily: 'Poppins-Bold',
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.07,
+                                          ),
+                                        ),
                                       ),
-                                      children: [
-                                        TextSpan(
-                                          text: "Supervisor".tr,
-                                          style: TextStyle(color: Color(0xFF442B72)),
-                                        ),
-                                        TextSpan(
-                                          text: " *".tr,
-                                          style: TextStyle(color: Color(0xFFAD1519)),
-                                        ),
-                                      ],
                                     ),
-                                  ),
+                                    // textform field without icon location
+                                    // TextFormFieldCustom(
+                                    //   width: constrains.maxWidth / 1.2,
+                                    //   hintTxt: ''.tr,
+                                    //
+                                    //
+                                    // ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    Align(alignment: AlignmentDirectional.center,
+                                      child:
+                                      GestureDetector(
+                                        onTap:()async {
+                                          await _pickBusImageFromGallery();}  , // Call function when tapped
+                                        child: _selectedImagebus != null
+                                            ? Image.file(
+                                          _selectedImagebus!,  // Display the uploaded image
+                                          width: 275,  // Set width as per your preference
+                                          height: 75,  // Set height as per your preference
+                                          fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                        )
+                                            : FDottedLine(
+                                          color: Color(0xFF442B72),
+                                          strokeWidth: 0.8,
+                                          dottedLength: 10,
+                                          space: 5.0,
+                                          corner: FDottedLineCorner.all(6.0),
+
+                                          // Child widget
+                                          child: Container(
+                                            width: 275,
+                                            height: 75,
+                                            alignment: Alignment.center,
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 80),
+                                                  child: Image.asset("assets/imgs/school/icons8_image_document_1 1.png",width: 24,height: 24,),
+                                                ),
+                                                SizedBox(width: 10,),
+                                                Text(
+                                                  "upload image",
+                                                  style: TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                    fontSize: 14,
+                                                    fontFamily: 'Poppins-Regular',
+                                                  ),
+                                                ),
+
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                      ),
+                                      // Container(
+                                      //   width: 290, // Adjust width as needed
+                                      //   height: 75, // Adjust height as needed
+                                      //   decoration: BoxDecoration(
+                                      //     // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
+                                      //     image: DecorationImage(
+                                      //       image: AssetImage('assets/imgs/school/Frame 136.png'), // Provide the path to your image
+                                      //       fit: BoxFit.fill, // Adjust the fit as needed
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                    ),
+                                    // Container(
+                                    //   width: constrains.maxWidth / 1.2,
+                                    //   height: 45,
+                                    //   child: TextFormField(
+                                    //     cursorColor: const Color(0xFF442B72),
+                                    //     style: TextStyle(color: Color(0xFF442B72)),
+                                    //     //textDirection: TextDirection.ltr,
+                                    //     scrollPadding: const EdgeInsets.symmetric(
+                                    //         vertical: 40),
+                                    //     decoration:  InputDecoration(
+                                    //       //suffixIcon: Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
+                                    //       alignLabelWithHint: true,
+                                    //       counterText: "",
+                                    //       fillColor: const Color(0xFFF1F1F1),
+                                    //       filled: true,
+                                    //       contentPadding: const EdgeInsets.fromLTRB(
+                                    //           8, 30, 10, 5),
+                                    //       //  hintText:"".tr,
+                                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    //       hintStyle: const TextStyle(
+                                    //         color: Color(0xFFC2C2C2),
+                                    //         fontSize: 12,
+                                    //         fontFamily: 'Inter-Bold',
+                                    //         fontWeight: FontWeight.w700,
+                                    //         height: 1.33,
+                                    //       ),
+                                    //       enabledBorder: myInputBorder(),
+                                    //       focusedBorder: myFocusBorder(),
+                                    //
+                                    //     ),
+                                    //   ),
+                                    // ),
+
+
+                                    const SizedBox(
+                                      height: 25,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      child: Align(
+                                        alignment: AlignmentDirectional.topStart,
+                                        child:
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              //color: Colors.black, // Setting default text color to black
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins-Bold',
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: "Bus Number".tr,
+                                                style: TextStyle(color: Color(0xFF442B72)),
+                                              ),
+                                              TextSpan(
+                                                text: " *".tr,
+                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Container(
+                                      width: constrains.maxWidth / 1.3,
+                                      height: 40,
+                                      child: TextFormField(
+                                        controller: _busNumber,
+                                        focusNode: _busNumberFocus,
+                                        cursorColor: const Color(0xFF442B72),
+                                        style: TextStyle(color: Color(0xFF442B72)),
+                                        textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                        onFieldSubmitted: (value) {
+                                          // move to the next field when the user presses the "Done" button
+                                        //  FocusScope.of(context).requestFocus(_driverNumberFocus);
+                                        },
+                                        //textDirection: TextDirection.ltr,
+                                        scrollPadding: const EdgeInsets.symmetric(
+                                            vertical: 40),
+                                        decoration:  InputDecoration(
+                                          //errorText: _validateBusNumber ? "Please Enter Bus Number" : null,
+                                          alignLabelWithHint: true,
+                                          counterText: "",
+                                          fillColor: const Color(0xFFF1F1F1),
+                                          filled: true,
+                                          contentPadding: const EdgeInsets.fromLTRB(
+                                              8, 30, 10, 5),
+                                          hintText:"Your Number".tr,
+                                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                          hintStyle: const TextStyle(
+                                            color: Color(0xFFC2C2C2),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Bold',
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.33,
+                                          ),
+                                          enabledBorder: myInputBorder(),
+                                          // focusedBorder: myFocusBorder(),
+                                          // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                          focusedBorder: myFocusBorder(),
+                                        ),
+                                        // onFieldSubmitted: (value) {
+                                        //   // move to the next field when the user presses the "Done" button
+                                        //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                        // },
+                                      ),
+                                    ),
+                                    busnumbererror?Container(): Padding(
+                                      padding: const EdgeInsets.only(left: 32),
+                                      child: Align( alignment: AlignmentDirectional.topStart,
+                                        child: Text(
+                                          "Please enter bus number".tr,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ),
+                                    // TextFormFieldCustom(
+                                    //   width: constrains.maxWidth / 1.3,
+                                    //   hintTxt: "Your Number".tr,
+                                    // ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      child: Align(
+                                        alignment: AlignmentDirectional.topStart,
+                                        child:
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              //color: Colors.black, // Setting default text color to black
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins-Bold',
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: "Supervisor".tr,
+                                                style: TextStyle(color: Color(0xFF442B72)),
+                                              ),
+                                              TextSpan(
+                                                text: " *".tr,
+                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // TextFormFieldCustom(
+                                    //   width: constrains.maxWidth / 1.3,
+                                    //   hintTxt: "Supervisor".tr,
+                                    // ),
+                                    SizedBox(height: 15,),
+
+                                    // Container(
+                                    //   width: constrains.maxWidth / 1.3,
+                                    //   height: 45,
+                                    //   child: TextFormField(
+                                    //     cursorColor: const Color(0xFF442B72),
+                                    //     style: TextStyle(color: Color(0xFF442B72)),
+                                    //     //textDirection: TextDirection.ltr,
+                                    //     scrollPadding: const EdgeInsets.symmetric(
+                                    //         vertical: 40),
+                                    //     decoration:  InputDecoration(
+                                    //       suffixIcon:
+                                    //       //Image.asset("assets/imgs/school/Vector (5).png"),
+                                    //       Icon(Icons.keyboard_arrow_down,color: Color(0xFF442B72),size: 40,),
+                                    //       alignLabelWithHint: true,
+                                    //       counterText: "",
+                                    //       fillColor: const Color(0xFFF1F1F1),
+                                    //       filled: true,
+                                    //       contentPadding: const EdgeInsets.fromLTRB(
+                                    //           8, 30, 10, 5),
+                                    //         hintText:"Supervisor".tr,
+                                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    //       hintStyle: const TextStyle(
+                                    //         color: Color(0xFFC2C2C2),
+                                    //         fontSize: 12,
+                                    //         fontFamily: 'Inter-Bold',
+                                    //         fontWeight: FontWeight.w700,
+                                    //         height: 1.33,
+                                    //       ),
+                                    //       enabledBorder: myInputBorder(),
+                                    //       focusedBorder: myFocusBorder(),
+                                    //
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    // old container
+                          // Container(
+                          //   width: MediaQuery.of(context).size.width / 1.3,
+                          //   height: 45,
+                          //   child: DropdownButtonFormField<String>(
+                          //     value: _selectedSupervisor,
+                          //     onChanged: (String? newValue) {
+                          //       setState(() {
+                          //         _selectedSupervisor = newValue;
+                          //       });
+                          //     },
+                          //     items: _supervisors.map((String supervisor) {
+                          //       return DropdownMenuItem<String>(
+                          //         value: supervisor,
+                          //         child: Text(supervisor),
+                          //       );
+                          //     }
+                          //     ).toList(),
+                          //     decoration: InputDecoration(
+                          //       // suffixIcon: Icon(
+                          //       //   Icons.keyboard_arrow_down,
+                          //       //   color: Color(0xFF442B72),
+                          //       //   size: 40,
+                          //       // ),
+                          //       alignLabelWithHint: true,
+                          //       counterText: "",
+                          //       fillColor: const Color(0xFFF1F1F1),
+                          //       filled: true,
+                          //       contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
+                          //       hintText: "Supervisor",
+                          //       floatingLabelBehavior: FloatingLabelBehavior.never,
+                          //       hintStyle: const TextStyle(
+                          //         color: Color(0xFFC2C2C2),
+                          //         fontSize: 12,
+                          //         fontFamily: 'Inter-Bold',
+                          //         fontWeight: FontWeight.w700,
+                          //         height: 1.33,
+                          //       ),
+                          //       enabledBorder: OutlineInputBorder(
+                          //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
+                          //       ),
+                          //       focusedBorder: OutlineInputBorder(
+                          //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
+                          //       ),
+                          //     ),
+                          //
+                          //   ),
+                          // ),
+                                    Container(
+                                      child:
+                                      DropdownCheckbox(
+                                          controller: _supervisorController,
+                                      items:
+                                        items
+                                       ),),
+
+                                    // supervisorerror?Container(): Padding(
+                                    //   padding: const EdgeInsets.only(left: 32),
+                                    //   child: Align( alignment: AlignmentDirectional.topStart,
+                                    //     child: Text(
+                                    //       "Please choose supervisor".tr,
+                                    //       style: TextStyle(color: Colors.red),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    //end empty code
+                                    // DropdownButtonFormField(value:null,items: [], onChanged: (value){}),
+                                    // DropdownButton<String>(
+                                    //   hint: Text('Select an option'),
+                                    //   items: [],
+                                    //   onChanged: (value) {
+                                    //     // Handle the dropdown value change
+                                    //   },
+                                    // ),
+                                    SizedBox(
+                                      height: 60,
+                                    ),
+
+                                    SizedBox(
+                                      width: constrains.maxWidth / 1.3,
+                                      child: Center(
+                                        child: ElevatedSimpleButton(
+                                          txt: "Add".tr,
+
+                                          onPress: (){
+                                            setState(() {
+                                              // _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
+                                              // _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
+                                              // _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
+
+                                              if (_driverName.text.isEmpty) {
+                                                namedrivererror = false;
+                                              } else {
+                                                namedrivererror = true;
+                                              }
+                                              if (_driverNumber.text.isEmpty) {
+                                                drivernumbererror = false;
+                                              } else {
+                                                drivernumbererror = true;
+                                              }
+                                              if (_busNumber.text.isEmpty) {
+                                                busnumbererror = false;
+                                              } else {
+                                                busnumbererror = true;
+                                              }
+                                              if (_supervisorController.text.isEmpty) {
+                                                supervisorerror = false;
+                                              } else {
+                                                supervisorerror = true;
+                                              }
+                                              if (_selectedImagedriver == null) {
+                                                driverphotoerror = false;
+                                              } else {
+                                                driverphotoerror = true;
+                                              }
+                                            });
+                                            if (_driverNumber.text.length ==11 && namedrivererror && drivernumbererror
+                                              // ! _driverNumber.text.isEmpty
+                                                && busnumbererror
+                                                //&& supervisorerror
+                                                && _selectedImagedriver != null && driverphotoerror && items != null
+                                                //_selectedImage != null && _selectedImagebus != null
+                                                ){
+
+                                              _addDataToFirestore();
+                                              Navigator.push(
+                                                  context ,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>  BusScreen(),
+                                                      maintainState: false));
+                                            }else{
+                                              SnackBar(content: Text('Please,enter valid number'));
+
+                                            }
+
+                                          },
+                                          width: constrains.maxWidth /1.2,
+                                          hight: 48,
+                                          color: const Color(0xFF442B72),
+                                          fontSize: 16,
+
+
+                                        ),
+                                        // end of comment
+                                      ),
+                                    ) ,
+
+                                    const SizedBox(
+                                      height: 40,
+                                    ),
+
+
+                                  ],
                                 ),
-                              ),
-                              // TextFormFieldCustom(
-                              //   width: constrains.maxWidth / 1.3,
-                              //   hintTxt: "Supervisor".tr,
-                              // ),
-                              SizedBox(height: 15,),
-
-                              // Container(
-                              //   width: constrains.maxWidth / 1.3,
-                              //   height: 45,
-                              //   child: TextFormField(
-                              //     cursorColor: const Color(0xFF442B72),
-                              //     style: TextStyle(color: Color(0xFF442B72)),
-                              //     //textDirection: TextDirection.ltr,
-                              //     scrollPadding: const EdgeInsets.symmetric(
-                              //         vertical: 40),
-                              //     decoration:  InputDecoration(
-                              //       suffixIcon:
-                              //       //Image.asset("assets/imgs/school/Vector (5).png"),
-                              //       Icon(Icons.keyboard_arrow_down,color: Color(0xFF442B72),size: 40,),
-                              //       alignLabelWithHint: true,
-                              //       counterText: "",
-                              //       fillColor: const Color(0xFFF1F1F1),
-                              //       filled: true,
-                              //       contentPadding: const EdgeInsets.fromLTRB(
-                              //           8, 30, 10, 5),
-                              //         hintText:"Supervisor".tr,
-                              //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              //       hintStyle: const TextStyle(
-                              //         color: Color(0xFFC2C2C2),
-                              //         fontSize: 12,
-                              //         fontFamily: 'Inter-Bold',
-                              //         fontWeight: FontWeight.w700,
-                              //         height: 1.33,
-                              //       ),
-                              //       enabledBorder: myInputBorder(),
-                              //       focusedBorder: myFocusBorder(),
-                              //
-                              //     ),
-                              //   ),
-                              // ),
-                              // old container
-                    // Container(
-                    //   width: MediaQuery.of(context).size.width / 1.3,
-                    //   height: 45,
-                    //   child: DropdownButtonFormField<String>(
-                    //     value: _selectedSupervisor,
-                    //     onChanged: (String? newValue) {
-                    //       setState(() {
-                    //         _selectedSupervisor = newValue;
-                    //       });
-                    //     },
-                    //     items: _supervisors.map((String supervisor) {
-                    //       return DropdownMenuItem<String>(
-                    //         value: supervisor,
-                    //         child: Text(supervisor),
-                    //       );
-                    //     }
-                    //     ).toList(),
-                    //     decoration: InputDecoration(
-                    //       // suffixIcon: Icon(
-                    //       //   Icons.keyboard_arrow_down,
-                    //       //   color: Color(0xFF442B72),
-                    //       //   size: 40,
-                    //       // ),
-                    //       alignLabelWithHint: true,
-                    //       counterText: "",
-                    //       fillColor: const Color(0xFFF1F1F1),
-                    //       filled: true,
-                    //       contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
-                    //       hintText: "Supervisor",
-                    //       floatingLabelBehavior: FloatingLabelBehavior.never,
-                    //       hintStyle: const TextStyle(
-                    //         color: Color(0xFFC2C2C2),
-                    //         fontSize: 12,
-                    //         fontFamily: 'Inter-Bold',
-                    //         fontWeight: FontWeight.w700,
-                    //         height: 1.33,
-                    //       ),
-                    //       enabledBorder: OutlineInputBorder(
-                    //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
-                    //       ),
-                    //       focusedBorder: OutlineInputBorder(
-                    //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
-                    //       ),
-                    //     ),
-                    //
-                    //   ),
-                    // ),
-                              Container(
-                                child:
-                                DropdownCheckbox(
-                                    controller: _supervisorController,
-                                items:
-                                  items
-                                 ),),
-
-                              // supervisorerror?Container(): Padding(
-                              //   padding: const EdgeInsets.only(left: 32),
-                              //   child: Align( alignment: AlignmentDirectional.topStart,
-                              //     child: Text(
-                              //       "Please choose supervisor".tr,
-                              //       style: TextStyle(color: Colors.red),
-                              //     ),
-                              //   ),
-                              // ),
-                              //end empty code
-                              // DropdownButtonFormField(value:null,items: [], onChanged: (value){}),
-                              // DropdownButton<String>(
-                              //   hint: Text('Select an option'),
-                              //   items: [],
-                              //   onChanged: (value) {
-                              //     // Handle the dropdown value change
-                              //   },
-                              // ),
-                              SizedBox(
-                                height: 60,
-                              ),
-
-                              SizedBox(
-                                width: constrains.maxWidth / 1.3,
-                                child: Center(
-                                  child: ElevatedSimpleButton(
-                                    txt: "Add".tr,
-
-                                    onPress: (){
-                                      setState(() {
-                                        // _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
-                                        // _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
-                                        // _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
-
-                                        if (_driverName.text.isEmpty) {
-                                          namedrivererror = false;
-                                        } else {
-                                          namedrivererror = true;
-                                        }
-                                        if (_driverNumber.text.isEmpty) {
-                                          drivernumbererror = false;
-                                        } else {
-                                          drivernumbererror = true;
-                                        }
-                                        if (_busNumber.text.isEmpty) {
-                                          busnumbererror = false;
-                                        } else {
-                                          busnumbererror = true;
-                                        }
-                                        if (_supervisorController.text.isEmpty) {
-                                          supervisorerror = false;
-                                        } else {
-                                          supervisorerror = true;
-                                        }
-                                        if (_selectedImagedriver == null) {
-                                          driverphotoerror = false;
-                                        } else {
-                                          driverphotoerror = true;
-                                        }
-                                      });
-                                      if (_driverNumber.text.length ==11 && namedrivererror && drivernumbererror
-                                        // ! _driverNumber.text.isEmpty
-                                          && busnumbererror
-                                          //&& supervisorerror
-                                          && _selectedImagedriver != null && driverphotoerror
-                                          //_selectedImage != null && _selectedImagebus != null
-                                          ){
-
-                                        _addDataToFirestore();
-                                        Navigator.push(
-                                            context ,
-                                            MaterialPageRoute(
-                                                builder: (context) =>  BusScreen(),
-                                                maintainState: false));
-                                      }else{
-                                        SnackBar(content: Text('Please,enter valid number'));
-
-                                      }
-
-                                    },
-                                    width: constrains.maxWidth /1.2,
-                                    hight: 48,
-                                    color: const Color(0xFF442B72),
-                                    fontSize: 16,
-
-
-                                  ),
-                                  // end of comment
-                                ),
-                              ) ,
-
-                              const SizedBox(
-                                height: 40,
-                              ),
-
-
+                              )
                             ],
                           ),
-                        )
+                        ),
+                        // const SizedBox(
+                        //   height: 20,
+                        // ),
+                        Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)),
                       ],
                     ),
                   ),
-                  // const SizedBox(
-                  //   height: 20,
-                  // ),
-                  Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)),
-                ],
-              ),
+                ),
+              ],
             );
           }
           ),
