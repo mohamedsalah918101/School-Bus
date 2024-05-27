@@ -457,7 +457,7 @@ class _AddParentsState extends State<AddParents> {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': _phoneNumberController.text,
-      'childern': childrenData,
+      'children': childrenData,
       'state': 0,
       'invite': 1
       // 'gender': gender
