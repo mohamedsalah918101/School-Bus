@@ -47,11 +47,49 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                     MaterialPageRoute(builder: (context) => ProfileSupervisorScreen()),
                   );
                 },
-                child: Image.asset(
-                  'assets/images/Ellipse 16.png',
-                  width: 62,
-                  height: 62,
+                child: FutureBuilder(
+                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Something went wrong');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.data?.data() == null) {
+                        return Text(
+                          'No data available',
+                          style: TextStyle(
+                            color: Color(0xff442B72),
+                            fontSize: 12,
+                            fontFamily: 'Poppins-Regular',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        );
+                      }
+
+                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                      sharedpref?.getString('lang') == 'en';
+                      return
+                        CircleAvatar(
+                          radius: 30.5,
+                          backgroundColor: Color(0xff442B72),
+                          child: CircleAvatar(
+                            backgroundImage:
+                            NetworkImage('${data['busphoto'] }'),
+                            radius: 30.5,
+                          ),
+                        );
+                    }
+
+                    return Container();
+                  },
                 ),
+                // Image.asset(
+                //   'assets/images/Ellipse 16.png',
+                //   width: 62,
+                //   height: 62,
+                // ),
               ),
               SizedBox(width: 18),
               Expanded(
@@ -92,7 +130,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                           );
                         }
 
-                        return CircularProgressIndicator();
+                        return Container();
                       },
                     ),
                     FutureBuilder(
@@ -127,7 +165,7 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                           );
                         }
 
-                        return CircularProgressIndicator();
+                        return Container();
                       },
                     ),
                   ],

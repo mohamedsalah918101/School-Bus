@@ -7,6 +7,7 @@
 
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,6 +15,9 @@ import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 
 
 import 'package:permission_handler/permission_handler.dart';
+
+import '../../main.dart';
+import 'home_parent.dart';
 
 class MapParentScreen extends StatefulWidget {
   MapParentScreen({Key? key, this.address}) : super(key: key);
@@ -60,32 +64,15 @@ class MapParentScreenState extends State<MapParentScreen>
   }
 
   onTapPickHere(selectedPlace) async {
-    Navigator.pop(context, selectedPlace!.formattedAddress!+"/"+selectedPlace!.geometry.location.lat.toString()+","+selectedPlace!.geometry.location.lng.toString());
-    // print(selectedPlace!.geometry.location.lat.toString()+"--"+selectedPlace!.geometry.location.lng.toString());
-    //
-    // print(selectedPlace!.url!);
+    await  FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).update(
+        {'address': selectedPlace!.formattedAddress!,'lat':selectedPlace!.geometry.location.lat.toString(),'lng':selectedPlace!.geometry.location.lng.toString()});
+    sharedpref!.setInt('address',1);
 
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeParent()));
 
-    // var addressUpdateLocationResponse = await AddressRepository().getAddressUpdateLocationResponse(
-    //     widget.address.id,
-    //     selectedPlace.geometry.location.lat,
-    //     selectedPlace.geometry.location.lng
-    // );
-    //
-    // if (addressUpdateLocationResponse.result == false) {
-    //   ToastComponent.showDialog(addressUpdateLocationResponse.message, context,
-    //       gravity: Toast.center, duration: Toast.lengthLong);
-    //   return;
-    // }
-    //
-    // ToastComponent.showDialog(addressUpdateLocationResponse.message, context,
-    //     gravity: Toast.center, duration: Toast.lengthLong);
 
   }
-  // void setPermissions() async{
-  //   Map<PermissionGroup, PermissionStatus> permissions =
-  //   await PermissionHandler().requestPermissions([PermissionGroup.location]);
-  // }
+
 
   @override
   Widget build(BuildContext context) {

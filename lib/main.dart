@@ -1,4 +1,5 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/controller/local.dart';
@@ -9,6 +10,7 @@ import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'Functions/notifications.dart';
 import 'controller/local_controller.dart';
 
 SharedPreferences? sharedpref;
@@ -28,21 +30,26 @@ void main()async {
     ),
   );
   sharedpref = await SharedPreferences.getInstance();
+  var token = await FirebaseMessaging.instance.getToken();
+  var fcm = token.toString();
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  @pragma('vm:entry-point')
+  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    // If you're going to use other Firebase services in the background, such as Firestore,
+    // make sure you call `initializeApp` before using other Firebase services.
+    await Firebase.initializeApp();
 
-//   final prefs = await SharedPreferences.getInstance();
-//
-// // Retrieve the stored values
-//   final name = prefs.getString('name');
-//   final phoneNumber = prefs.getString('phoneNumber');
-  // if (name != null && phoneNumber != null) {
-  //   // Use the retrieved values
-  //   print('Name: $name');
-  //   print('Phone Number: $phoneNumber');
-  //
-  // } else {
-  //   // Handle case where values are not found
-  //   print('Name or Phone Number not found in SharedPreferences');
-  // }
+  }
+  initMessaging();
+
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget{

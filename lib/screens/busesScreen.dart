@@ -30,6 +30,7 @@ import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/sendInvitationScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import '../Functions/functions.dart';
 import '../classes/dropdownRadiobutton.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -57,14 +58,7 @@ class BusScreen extends StatefulWidget{
 class BusScreenSate extends State<BusScreen> {
   //fun to make call
 
-  void _makePhoneCall(String phoneNumber) async {
-    var mobileCall = 'tel:$phoneNumber';
-    if (await canLaunchUrlString(mobileCall)) {
-      await launchUrlString(mobileCall);
-    } else {
-      throw 'Could not launch $mobileCall';
-    }
-  }
+
   List<QueryDocumentSnapshot> filteredData = [];
   List<QueryDocumentSnapshot<Object?>> filteredQuerySnapshots = [];
 
@@ -83,7 +77,13 @@ getData()async{
     //filteredData = List.from(data);
   });
 }
-void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ) {
+void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ,List<dynamic>supervisors) {
+ List<DropdownCheckboxItem>allSupervisors=[];
+ for(int i=0;i<supervisors.length;i++){
+   allSupervisors.add(DropdownCheckboxItem(label: supervisors[i]['name'],phone: supervisors[i]['phone'],docID: supervisors[i]['id']));
+ }
+ selectedItems.clear();
+ selectedItems=allSupervisors;
   Navigator.push(
     context,
     MaterialPageRoute(
@@ -93,7 +93,7 @@ void _editBusDocument(String documentId, String imagedriver, String namedriver, 
           olddrivername:namedriver,
           olddriverphone:driverphone,
          oldphotobus:photobus,
-          olddnumberbus:numberbus
+          olddnumberbus:numberbus, allSupervisors: allSupervisors,
       ),
     ),
   );
@@ -108,6 +108,7 @@ void _editBusDocument(String documentId, String imagedriver, String namedriver, 
       setState(() {
         // Update UI by removing the deleted document from the data list
         data.removeWhere((document) => document.id == documentId);
+        filteredData = List.from(data);
       });
       // ScaffoldMessenger.of(context).showSnackBar(
       //   showSnackBarFun(context),
@@ -232,71 +233,71 @@ final _firestore = FirebaseFirestore.instance;
               children: [
                 Column(
                   children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: InkWell(onTap: (){},
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Align(
+                              alignment: AlignmentDirectional.topStart,
+                              child: InkWell(
+                                // onTap: ()=>exit(0),
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                  // Navigate back to the previous page
+                                  Navigator.pop(context);
+
+                                },
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  size: 26,
+                                  color: Color(0xff442B72),
+                                ),
+                              ),
+                            ),
+                           // SizedBox(width: 20,),
+                            Expanded(
+                              child: Center(
+                                child: Align( alignment: AlignmentDirectional.center,
+                                  child: Text(
+                                    "Buses".tr,
+                                    style: TextStyle(
+                                      color: Color(0xFF993D9A),
+                                      fontSize: 20,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      //height: 0.64,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(onTap: (){
+                              Scaffold.of(context).openEndDrawer();
+                            },
+                              child: Align(
+                                alignment: AlignmentDirectional.topEnd,
+                                child: const Icon(
+                                  Icons.menu_rounded,
+                                  size: 40,
+                                  color: Color(0xff442B72),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Expanded(
                       child: SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: InkWell(onTap: (){},
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Align(
-                                    alignment: AlignmentDirectional.topStart,
-                                    child: InkWell(
-                                      // onTap: ()=>exit(0),
-                                      onTap: () {
-                                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                        // Navigate back to the previous page
-                                        Navigator.pop(context);
 
-                                      },
-                                      child: const Icon(
-                                        Icons.arrow_back_ios_new_rounded,
-                                        size: 26,
-                                        color: Color(0xff442B72),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 20,),
-                                  Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        "Buses".tr,
-                                        style: TextStyle(
-                                          color: Color(0xFF993D9A),
-                                          fontSize: 20,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                         height: 0.64,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                                    child: InkWell(onTap: (){
-                                      Scaffold.of(context).openEndDrawer();
-                                    },
-                                      child: Align(
-                                        alignment: AlignmentDirectional.topEnd,
-                                        child: const Icon(
-                                          Icons.menu_rounded,
-                                          size: 40,
-                                          color: Color(0xff442B72),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
 
                           const SizedBox(
                             height: 20,
@@ -574,8 +575,12 @@ final _firestore = FirebaseFirestore.instance;
                                         height: 500,
                                         child: ListView.builder(
                                           // shrinkWrap: true,
-                                            itemCount: filteredData.length,
+                                            //itemCount: filteredData.length,
+                                          //itemCount: data.length,
+                                            itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' ?  filteredData.length : data.length,
                                             itemBuilder: (context, index) {
+
+
                                               String supervisorPhoneNumber = filteredData[index]['phonedriver'];
                                               // to change image depended on filter if filter with bus number show image of bus & if filter with driver name image of driver appear
                                               String imageUrl = selectedFilter == 'Bus Number'
@@ -657,12 +662,14 @@ final _firestore = FirebaseFirestore.instance;
                                                                 setState(() {
                                                                   isEditingBus = true;
                                                                   _editBusDocument(
-                                                                    data[index].id,
-                                                                    data[index]['busnumber'],
-                                                                    data[index]['busphoto'],
-                                                                    data[index]['imagedriver'],
-                                                                    data[index]['namedriver'],
-                                                                    data[index]['phonedriver'],
+                                                                      data[index].id,
+                                                                      data[index]['imagedriver'],
+                                                                      data[index]['namedriver'],
+                                                                      data[index]['phonedriver'],
+                                                                      data[index]['busphoto'],
+                                                                      data[index]['busnumber'],
+                                                                      data[index]['supervisors']
+
                                                                   );
                                                                   // _editSupervisorDocument(
                                                                   //   data[index].id,
@@ -731,30 +738,38 @@ final _firestore = FirebaseFirestore.instance;
                                                         onSelected: (String value) {
                                                           // Handle selection here
                                                           if (value == 'edit') {
+                                                         //   print('daaaata'+data[index]['supervisors'].toString());
+
                                                             // Handle edit action
                                                             setState(() {
                                                               isEditingBus = true;
                                                               _editBusDocument(
                                                                 data[index].id,
-                                                                data[index]['busnumber'],
-                                                                data[index]['busphoto'],
                                                                 data[index]['imagedriver'],
                                                                 data[index]['namedriver'],
                                                                 data[index]['phonedriver'],
+                                                                data[index]['busphoto'],
+                                                                data[index]['busnumber'],
+                                                                data[index]['supervisors']
+
+
                                                               );
                                                             });
-
                                                             // Navigator.pushReplacement(
                                                             //     context,
                                                             //     MaterialPageRoute(
                                                             //         builder: (context) =>
                                                             //             EditeSupervisor()));
                                                           } else if (value == 'delete') {
-                                                            deletePhotoDialog(context);
+                                                            //deletePhotoDialog(context);
                                                             //وقفت delete function علشان لما بسمح بيعمل error
 
-                                                           // _deletebusDocument(data[index].id);
-
+                                                          //  _deletebusDocument(data[index].id);
+                                                            if (index < filteredData.length) {
+                                                              _deletebusDocument(filteredData[index].id);
+                                                            } else {
+                                                              print('Invalid index: $index');
+                                                            }
                                                             // setState(() {
                                                             //
                                                             //   //showSnackBarFun(context);
@@ -764,6 +779,11 @@ final _firestore = FirebaseFirestore.instance;
                                                       ),
                                                       tileColor: Colors.white,
                                                       onTap: (){
+
+                                                        List<DropdownCheckboxItem>allSupervisors=[];
+                                                        for(int i=0;i<data[index]['supervisors'].length;i++){
+                                                          allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
+                                                        }
                                                         showModalBottomSheet(
                                                           shape: RoundedRectangleBorder(
                                                             borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -849,12 +869,25 @@ final _firestore = FirebaseFirestore.instance;
                                                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                       children: [
                                                                         SizedBox(
-                                                                            width: 80,
-                                                                            height: 80,
-                                                                            child: Image.network('${data[index]['busphoto']}',
-                                                                              fit: BoxFit.scaleDown,
-                                                                            )
-                                                                        )
+                                                                          width: 80,
+                                                                          height: 80,
+                                                                          child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                              ? Image.network(
+                                                                            data[index]['busphoto'],
+                                                                            fit: BoxFit.scaleDown,
+                                                                          )
+                                                                              : Image.asset(
+                                                                            'assets/imgs/school/ph_bus-light (1).png',
+                                                                            fit: BoxFit.scaleDown,
+                                                                          ),
+                                                                        ),
+                                                                        // SizedBox(
+                                                                        //     width: 80,
+                                                                        //     height: 80,
+                                                                        //     child: Image.network('${data[index]['busphoto']}',
+                                                                        //       fit: BoxFit.scaleDown,
+                                                                        //     )
+                                                                        // )
 
                                                                         // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
                                                                         // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
@@ -865,12 +898,25 @@ final _firestore = FirebaseFirestore.instance;
                                                                     Row(
                                                                       children: [
 
-                                                                        Align(
-                                                                          alignment: Alignment.centerLeft,
-                                                                          child: CircleAvatar(
-                                                                            radius: 35,
-                                                                            backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
-
+                                                                        // Align(
+                                                                        //   alignment: Alignment.centerLeft,
+                                                                        //   child: CircleAvatar(
+                                                                        //     radius: 35,
+                                                                        //     backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
+                                                                        //
+                                                                        //   ),
+                                                                        // ),
+                                                                        SizedBox(
+                                                                          width: 80,
+                                                                          height: 80,
+                                                                          child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
+                                                                              ? Image.network(
+                                                                            data[index]['imagedriver'],
+                                                                            fit: BoxFit.scaleDown,
+                                                                          )
+                                                                              : Image.asset(
+                                                                            'assets/imgs/school/empty_supervisor.png',
+                                                                            fit: BoxFit.scaleDown,
                                                                           ),
                                                                         ),
                                                                         SizedBox(width: 20,),
@@ -895,7 +941,7 @@ final _firestore = FirebaseFirestore.instance;
                                                                                   .centerRight,
                                                                               child: GestureDetector(
                                                                                 onTap: ()async{
-                                                                                  _makePhoneCall(supervisorPhoneNumber);
+                                                                                  makePhoneCall(supervisorPhoneNumber);
                                                                                   //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
                                                                                   //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
                                                                                 },
@@ -931,6 +977,8 @@ final _firestore = FirebaseFirestore.instance;
                                                                     SizedBox(height: 30),
                                                                     Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
                                                                     SizedBox(height: 10),
+
+
                                                                     Padding(
                                                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                       child: Row(
@@ -944,6 +992,8 @@ final _firestore = FirebaseFirestore.instance;
                                                                             ),
                                                                           ),
                                                                           SizedBox(width: 10),
+
+
                                                                           Text(
                                                                             'Ahmed Atef',
                                                                             style: TextStyle(
@@ -1007,17 +1057,7 @@ final _firestore = FirebaseFirestore.instance;
                                                 );
 
                                             }),
-                                        // child: Column(
-                                        //   children: [
-                                        //     ListTile(
-                                        //       leading: Image.asset('assets/imgs/school/buses.png'),
-                                        //       title: Text('${data[index]['busnumber'] }',style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                                        //       subtitle: Text("Driver name : Ahmed Atef",style:
-                                        //       TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                        //       trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-                                        //     ),
-                                        //   ],
-                                        // ),
+
                                       ),
 
                                       SizedBox(height: 40,),

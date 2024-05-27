@@ -48,27 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
     return isValid;
   }
-  // Future<void> verifyPhoneNumber(String phoneNumber) async {
-  //   await _auth.verifyPhoneNumber(
-  //     phoneNumber: phoneNumber,
-  //     verificationCompleted: (PhoneAuthCredential credential) async {
-  //       // Auto-retrieve verification code
-  //       await _auth.signInWithCredential(credential);
-  //       Navigator.push(context,MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: phoneNumber)) );
-  //     },
-  //     verificationFailed: (FirebaseAuthException e) {
-  //       // Verification failed
-  //     },
-  //     codeSent: (String verificationId, int? resendToken) async {
-  //       // Save the verification ID for future use
-  //       String smsCode = 'xxxxxx'; // Code input by the user
-  //
-  //       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen(verificationId: verificationId)));
-  //     },
-  //     codeAutoRetrievalTimeout: (String verificationId) {},
-  //     timeout: Duration(seconds: 60),
-  //   );
-  // }
+
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
@@ -138,27 +118,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isPhoneExiting = false;
 String typeAccount='';
 
-  // Future<bool> checkIfNumberExists() async {
-  //   print(_phoneNumberController.text+'hhh');
-  //   CollectionReference supervisorCollection = FirebaseFirestore.instance.collection(typeAccount);
-  //   Query queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: _phoneNumberController.text);
-  //   try {
-  //     setState(() {
-  //       _isLoading = false;
-  //
-  //     });
-  //     QuerySnapshot snapshot = await queryOfNumber.get();
-  //     print(snapshot.docs.toString()+'dataaa');
-  //     return snapshot.size > 0;
-  //   } catch (error) {
-  //     setState(() {
-  //       _isLoading = false;
-  //
-  //     });
-  //     print('Error: $error');
-  //     return false;
-  //   }
-  // }
 
   bool _validatename() {
     //return _name.text.isNotEmpty;
@@ -433,26 +392,7 @@ String typeAccount='';
                                           //   borderRadius: BorderRadius.circular(10.0),
                                           // ),
                                           child:
-                                          // SizedBox(
-                                          //   width: constrains.maxWidth / 1.4,
-                                          //   height: 50,
-                                          //   child: IntlPhoneField(
-                                          //     decoration: InputDecoration(
-                                          //       hintText: 'Phone Number'.tr,
-                                          //       hintStyle: TextStyle(color: Colors.grey),
-                                          //       border: OutlineInputBorder(
-                                          //         borderRadius: BorderRadius.circular(10.0),
-                                          //         borderSide: BorderSide(color: Color(0xFFFFC53E)), // Change border color here
-                                          //       ),
-                                          //       contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-                                          //
-                                          //     ),
-                                          //     initialCountryCode: 'EG', // Set initial country code if needed
-                                          //     onChanged: (phone) {
-                                          //       // Handle phone number changes
-                                          //     },
-                                          //   ),
-                                          // ),
+
                                           SizedBox(
                                             width: constrains.maxWidth / 1.4,
 
@@ -549,63 +489,7 @@ String typeAccount='';
                                                         },
 
                                                       ),
-                                                      // child: IntlPhoneField(
-                                                      //   controller: _phoneNumberController,
-                                                      //   focusNode: _phoneNumberFocusNode,
-                                                      //     dropdownIconPosition:IconPosition.trailing,
-                                                      //     invalidNumberMessage:" ",
-                                                      //
-                                                      //
-                                                      //   style: TextStyle(color: Color(0xFF442B72),height: 2),
-                                                      //     dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
-                                                      //     cursorColor:Color(0xFF442B72) ,
-                                                      //  cursorHeight: 25,
-                                                      //  // showCountryFlag:false,
-                                                      //   autovalidateMode: AutovalidateMode.disabled,
-                                                      //
-                                                      //   decoration: InputDecoration(
-                                                      //
-                                                      //     fillColor: Color(0xffF1F1F1),
-                                                      //     filled: true,
-                                                      //
-                                                      //     hintText: 'Phone Number'.tr,
-                                                      //     hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
-                                                      //     border: OutlineInputBorder(
-                                                      //       borderRadius: BorderRadius.circular(10.0),
-                                                      //       borderSide: BorderSide(color: Color(0xFFFFC53E)), // Change border color here
-                                                      //     ),
-                                                      //     // focusedErrorBorder: OutlineInputBorder(
-                                                      //     //   borderRadius: BorderRadius.all(Radius.circular(7)),
-                                                      //     //   borderSide: BorderSide(
-                                                      //     //     color: Color(0xFFFFC53E),
-                                                      //     //     width: 0.5,
-                                                      //     //   ),
-                                                      //     // ),
-                                                      //     enabledBorder: OutlineInputBorder(
-                                                      //       borderRadius: BorderRadius.all(Radius.circular(7)),
-                                                      //       borderSide: BorderSide(
-                                                      //         color: Color(0xFFFFC53E),
-                                                      //         width: 0.5,
-                                                      //       ),
-                                                      //     ),
-                                                      //     focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
-                                                      //       borderRadius: BorderRadius.circular(10.0),
-                                                      //       borderSide: BorderSide(
-                                                      //         color: Color(0xFFFFC53E),
-                                                      //       ),
-                                                      //     ),
-                                                      //
-                                                      //     contentPadding: EdgeInsets.symmetric(vertical:4.0, horizontal: 16.0),
-                                                      //
-                                                      //   ),
-                                                      //
-                                                      //   initialCountryCode: 'EG', // Set initial country code if needed
-                                                      //   onChanged: (phone) {
-                                                      //     // Handle phone number changes
-                                                      //   },
-                                                      //
-                                                      //
-                                                      // ),
+
                                                     ),
                                                   ),
                                                 ),
@@ -915,6 +799,7 @@ String typeAccount='';
                                               isPhoneExiting = isNumberExits ;
                                             });
                                             if(isNumberExits){
+
                                               ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already exist')));
                                               Navigator.push(
                                                   context,

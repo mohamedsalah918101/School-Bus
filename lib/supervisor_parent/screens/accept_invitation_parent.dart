@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -105,7 +106,9 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                             fontFamily: 'Poppins-Regular',
                             width: 117,
                             hight: 38,
-                            onPress: (){
+                            onPress: () async {
+                              await  FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).update(
+                                  {'invite': 1,'state':1});
                               sharedpref!.setInt('invitstate',1);
                               sharedpref!.setInt('invit',1);
                               Navigator.of(context).push(MaterialPageRoute(

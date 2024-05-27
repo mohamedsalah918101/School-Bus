@@ -4,6 +4,7 @@ import 'package:school_account/supervisor_parent/components/child_data_item.dart
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 
+import '../../main.dart';
 import 'elevated_icon_button.dart';
 
 class BusComponent extends StatelessWidget {
@@ -25,7 +26,7 @@ class BusComponent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nearest to you'.tr,
+            Text( sharedpref!.getInt('invit') == 1 ? ' '.tr:'',
               style: TextStyle(
                 color: Color(0xff442B72),
                   fontSize: 12 ,
@@ -45,7 +46,7 @@ class BusComponent extends StatelessWidget {
                   ),
                   children: [
                     TextSpan(
-                        text: '25 ',
+                        text: '0',
                         style: TextStyle(
                             color: Color(0xFF993D9A)
                         )
@@ -72,7 +73,7 @@ class BusComponent extends StatelessWidget {
                   ),
                   children: [
                     TextSpan(
-                        text: 'Mariam',
+                        text: ' ',
                         style: TextStyle(
                           color: Color(0xFF442B72),
                           fontFamily: 'Poppins-Light',
@@ -80,7 +81,7 @@ class BusComponent extends StatelessWidget {
                         )
                     ),
                     TextSpan(
-                        text: '’s bus'.tr,
+                        text: ' '.tr,
                         style: TextStyle(
                           color: Color(0xFF442B72),
                           fontFamily: 'Poppins-Light',

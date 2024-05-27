@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/decline_invitation_parent.dart';
-import 'package:school_account/supervisor_parent/screens/sign_up.dart';
+import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../screens/loginScreen.dart';
 import '../../screens/signUpScreen.dart';
-import '../screens/login_screen.dart';
 import 'elevated_simple_button.dart';
 
 class Dialoge {
@@ -690,6 +688,7 @@ class Dialoge {
           )),
     );
   }
+
   static logOutDialog(context) {
     showDialog(
       context: context,
@@ -820,6 +819,107 @@ class Dialoge {
           )),
     );
   }
+
+  static CantAddNewParent(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              30,
+            ),
+          ),
+          child: SizedBox(
+            height: 210,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Flexible(
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Image.asset(
+                                'assets/images/Vertical container.png',
+                                width: 27,
+                                height: 27,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Alert'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 18,
+                            fontFamily: 'Poppins-SemiBold',
+                            fontWeight: FontWeight.w600,
+                            height: 1.23,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      'This parent has already been added to this bus by supervisor Ahmed Khaled',
+                      style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Light',
+                        fontWeight: FontWeight.w400,
+                        height: 1.23,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                      ElevatedSimpleButton(
+                        txt: 'Go to parents'.tr,
+                        width: 157,
+                        hight: 38,
+                        onPress: () async {
+                          // await sharedpref!.setInt('invit', 0);
+
+                          // await sharedpref!.setString('id', '');
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) =>  ParentsView()),
+                                  (Route<dynamic> route) => false);
+                        } ,
+                        color: const Color(0xFF442B72),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Regular',
+                      ),
+                ],
+              ),
+            ),
+          )),
+    );
+  }
+
   static DeleteAccount(context) {
     void DeletedAccountSnackBar(context, String message, {Duration? duration}) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1001,6 +1101,7 @@ class Dialoge {
           )),
     );
   }
+
   static DeleteParent(context) {
     void DeleteParentSnackBar(context, String message, {Duration? duration}) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1180,6 +1281,7 @@ class Dialoge {
           )),
     );
   }
+
   static SavedSuccessfuly(context) {
     showDialog(
       context: context,
@@ -1223,6 +1325,7 @@ class Dialoge {
           )),
     );
   }
+
   static DeletedSuccessfuly(context) {
     showDialog(
       context: context,
@@ -1266,6 +1369,7 @@ class Dialoge {
           )),
     );
   }
+
   static declinedInvitationDialog(context) {
     showDialog(
       context: context,
@@ -1359,6 +1463,7 @@ class Dialoge {
           )),
     );
   }
+
   static RemoveChildDialog(context) {
     showDialog(
       context: context,

@@ -11,6 +11,7 @@ import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import '../Functions/functions.dart';
 import '../components/bottom_bar_item.dart';
+import '../components/dialogs.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
@@ -35,7 +36,6 @@ class _SendInvitationState extends State<SendInvitation> {
   String kPickerName='';
   PhoneContact? _phoneContact;
 
-
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
 
   String docid='';
@@ -48,14 +48,19 @@ class _SendInvitationState extends State<SendInvitation> {
   final _nameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
+
+
+  bool nameerror=true;
+  bool phoneerror= true;
   final _firestore = FirebaseFirestore.instance;
+  String enteredPhoneNumber='';
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
       // Define the data to add
       Map<String, dynamic> data = {
         'name': _nameController.text,
         'email': _emailController.text,
-        'phoneNumber': _phoneNumberController.text,
+        'phoneNumber': enteredPhoneNumber,
         'state':0,
         'invite':1,
         'busphoto':'',
@@ -63,14 +68,24 @@ class _SendInvitationState extends State<SendInvitation> {
       print('phonenum');
       print( _phoneNumberController.text);
       // Add the data to the Firestore collection
-      var check =await addSupervisorCheck(_phoneNumberController.text);
+      var check =await addSupervisorCheck(enteredPhoneNumber);
       if(!check) {
-        var res =await checkUpdateSupervisor(_phoneNumberController.text);
+        var res =await checkUpdateSupervisor(enteredPhoneNumber);
         if(!res) {
       await _firestore.collection('supervisor').add(data).then((docRef) {
         docid=docRef.id;
         print('Data added with document ID: ${docRef.id}');
 
+
+//when put this code the invitation doesnot appear when phone number already exists but when add new supervisor the snackbar of faild appear
+//         var res =  createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+//         if (res == "success") {
+//           showSnackBarFun(
+//               context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
+//         } else {
+//           showSnackBarFun(
+//               context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+//         }
         // showSnackBarFun(context);
       }).catchError((error) {
         print('Failed to add data: $error');
@@ -87,7 +102,11 @@ class _SendInvitationState extends State<SendInvitation> {
           _emailController.clear();
         }
 
-      }      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+      }     // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+      else {
+        // Show dialog if the phone number is already added
+        Dialoge.SupervisorAlreadyAdded(context);
+      }
 
   }
  // }
@@ -221,6 +240,11 @@ bool _nameEntered =true;
                                            _phoneContact!.phoneNumber!.number!.isNotEmpty) {
                                          setState(() {
                                            kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                           if (kPickerNumber.startsWith('0')) {
+                                             kPickerNumber = kPickerNumber.substring(1);
+
+                                           }
+                                           kPickerNumber = kPickerNumber.replaceAll(' ', '');
                                            _phoneNumberController.text = kPickerNumber;
                                          });
                                        }
@@ -313,7 +337,7 @@ bool _nameEntered =true;
                             SizedBox(height: 10,),
                             Container(
                               width: constrains.maxWidth / 1.2,
-                              //height: 44,
+                              height: 44,
                               child:
                               TextFormField(
 
@@ -330,7 +354,7 @@ bool _nameEntered =true;
                                 scrollPadding: const EdgeInsets.symmetric(
                                     vertical: 40),
                                 decoration:  InputDecoration(
-                                  errorText: _validateName ? "Please Enter Your Name" : null,
+                                  //errorText: _validateName ? "Please Enter Your Name" : null,
                                   alignLabelWithHint: true,
                                   counterText: "",
                                   fillColor: const Color(0xFFF1F1F1),
@@ -344,7 +368,7 @@ bool _nameEntered =true;
                                     fontSize: 12,
                                     fontFamily: 'Poppins-Bold',
                                     fontWeight: FontWeight.w700,
-                                   // height: 1.33,
+                                    height: 1.33,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -358,6 +382,15 @@ bool _nameEntered =true;
                                   // focusedBorder: myFocusBorder(),
                                   // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
                                   focusedBorder: myFocusBorder(),
+                                ),
+                              ),
+                            ),
+                            nameerror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 30),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter name".tr,
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
                             ),
@@ -466,7 +499,7 @@ bool _nameEntered =true;
                                 style: TextStyle(color: Color(0xFF442B72),height: 1.5),
                                 dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
                                 decoration: InputDecoration(
-                                  errorText: _validatePhone ? "Please Enter Your Phone" : null,
+                                 // errorText: _validatePhone ? "Please Enter Your Phone" : null,
                                   fillColor: Color(0xffF1F1F1),
                                   filled: true,
                                   hintText: 'Phone Number'.tr,
@@ -518,10 +551,20 @@ bool _nameEntered =true;
 
                                 initialCountryCode: 'EG', // Set initial country code if needed
                                 onChanged: (phone) {
+                                  enteredPhoneNumber = phone.completeNumber;
                                   // Update the enteredPhoneNumber variable with the entered phone number
 
                                 },
 
+                              ),
+                            ),
+                            phoneerror?Container(): Padding(
+                              padding: const EdgeInsets.only(left: 30),
+                              child: Align( alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  "Please enter phone number".tr,
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ),
                             ),
                             // Container(
@@ -667,23 +710,36 @@ bool _nameEntered =true;
                                   txt: "Send invitation".tr,
                                  onPress: ()
                                  //async
-                                 {
-                                    // Navigator.push(
-                                    //     context ,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>  HomeScreen(),
-                                    //         maintainState: false)
-                                    // );
+                                 async {
+
                                    setState(() {
-                                     _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                                     _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                     if (_nameController.text.isEmpty) {
+                                       nameerror = false;
+                                     } else {
+                                       nameerror = true;
+                                     }
+                                     if (_phoneNumberController.text.isEmpty) {
+                                       phoneerror = false;
+                                     } else {
+                                       phoneerror = true;
+                                     }
+                                     // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                                     // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                    });
-                                   if(! _nameController.text.isEmpty &&
+                                   if(nameerror
+                                  // ! _nameController.text.isEmpty
+                                       &&
                                        //! _phoneNumberController.text.isEmpty
-                                   _phoneNumberController.text.length == 10){
+                                   _phoneNumberController.text.length == 10 && phoneerror){
                                      _addDataToFirestore();
-                                     createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
-                                     showSnackBarFun(context);
+                                     var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+                                     if (res == "success") {
+                                       showSnackBarFun(
+                                           context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
+                                     } else {
+                                       showSnackBarFun(
+                                           context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+                                     }
                                    }
                                    else{
                                      SnackBar(content: Text('Please,enter valid number'));
@@ -882,7 +938,7 @@ bool _nameEntered =true;
       ),
     );
   }
-  showSnackBarFun(context) {
+  showSnackBarFun(context,msg,color,photo) {
     SnackBar snackBar = SnackBar(
 
       // content: const Text('Invitation sent successfully',
@@ -891,15 +947,19 @@ bool _nameEntered =true;
       content: Row(
         children: [
           // Add your image here
-          Image.asset(
-            'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
-            width: 30, // Adjust width as needed
-            height: 30, // Adjust height as needed
+          Padding(
+            padding: const EdgeInsets.only(left: 50),
+            child: Image.asset(
+              photo,
+              // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
+              width: 30, // Adjust width as needed
+               height: 30, // Adjust height as needed
+            ),
           ),
-          SizedBox(width: 20), // Add some space between the image and the text
+          SizedBox(width: 10), // Add some space between the image and the text
           Text(
-            'Invitation sent successfully',
-            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color: Color(0xff4CAF50)),
+            msg,
+            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),
           ),
         ],
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../Functions/functions.dart';
+import '../screens/addBus.dart';
 import 'dropdowncheckboxitem.dart';
 
 class DropdownCheckbox extends StatefulWidget {
@@ -12,12 +14,24 @@ class DropdownCheckbox extends StatefulWidget {
 }
 class _DropdownCheckboxState extends State<DropdownCheckbox> {
   bool isDropdownOpened = false;
-  List<DropdownCheckboxItem> selectedItems = [];
+  String selectedNames='Supervisor';
   TextEditingController _supervisorController = TextEditingController();
-
+@override
+  void initState() {
+  if(selectedItems.isNotEmpty){
+  if(selectedItems.length == 2){
+    selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+  }else {
+    selectedNames = selectedItems[0].label;
+  }
+  }
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonHideUnderline(
+
+    return
+      DropdownButtonHideUnderline(
       child:
       SizedBox(
         width: 300,
@@ -31,22 +45,7 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                 });
               },
               child:
-                // Container(
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       TextField(
-                //         controller: _supervisorController,
-                //         readOnly: true,
-                //         decoration: InputDecoration(
-                //           labelText: 'Supervisor',
-                //           border: OutlineInputBorder(),
-                //         ),
-                //       ),
-                //       Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
-                //     ],
-                //   ),
-                // )
+
               Container(
 
                 padding: EdgeInsets.all(10),
@@ -59,14 +58,8 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                  // TextField(
-                  // controller: _supervisorController,
-                  // readOnly: true, // Make the text field read-only
-                  // decoration: InputDecoration(
-                  //   labelText: 'Selected Supervisor',
-                  //   border: OutlineInputBorder(),
-                  // ),),
-                    Text('Supervisor',
+
+                    Text(selectedNames,
 
                       style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
                       fontFamily: 'Poppins-Bold',),),
@@ -80,14 +73,7 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
               Align(alignment: AlignmentDirectional.bottomStart,
                 child: Container(
 
-                  // decoration: BoxDecoration(
-                  //
-                  //   border: Border.all(color: Color(0xFF442B72)),
-                  //   borderRadius: BorderRadius.only(
-                  //     bottomLeft: Radius.circular(5.0),
-                  //     bottomRight: Radius.circular(5.0),
-                  //   ),
-                  // ),
+
                   child: Column(
                     children: widget.items.map((item) {
                       return Transform.scale(
@@ -119,20 +105,29 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                           value: item.isChecked,
                           onChanged: (value) {
                             setState(() {
-                              item.isChecked = value!;
-                              if (value) {
-                                // selectedItems.add(item);
-                                // // Clear previously selected items (assuming single selection)
-                                // selectedItems.removeWhere((element) => element != item);
-                                // // Update text field value with selected item's label
-                                // widget.controller.text = item.label;
-                                selectedItems.add(item); // Add to selected items list
-                                //_supervisorController.text = item.label;
-                              // Add to selected items list
+                              if (value!) {
+                                print('checkdataaa');
+                                 if(selectedItems.length < 2){
+                                   selectedItems.add(item); // Add to selected items list
+                                   item.isChecked = value;
+                                   if(selectedItems.length == 2){
+                                     selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+                                   }else{
+                                     selectedNames =selectedItems[0].label;
+
+                                   }
+                                 }
+
+
                               } else {
-                                selectedItems.remove(item);
+                              //  selectedItems.remove(item);
+                                selectedItems.removeWhere((items) => items.docID == item.docID);
+
+
+                                item.isChecked = false;
+
                                 // Clear text field value when unselecting
-                                widget.controller.text = '';
+                                selectedNames =selectedItems[0].label;
                                 //selectedItems.remove(item); // Remove from selected items list
                               // _supervisorController.clear();
                               }

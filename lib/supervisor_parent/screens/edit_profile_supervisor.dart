@@ -41,42 +41,83 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   final _nameController = TextEditingController();
   bool nameError = true;
   bool phoneError = true;
-  bool emailError = true;
+  // bool emailError = true;
   File ? _selectedImage;
   String? imageUrl;
   File? file ;
   GlobalKey<FormState> formState = GlobalKey<FormState>();
+  final _firestore = FirebaseFirestore.instance;
   CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
   // List<ChildDataItem> children = [];
 
-  Future _pickImageFromGallery() async{
-    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage ==null) return;
+  Future<void> _pickImageFromGallery() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? returnedImage = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (returnedImage == null) {
+      print('No image selected');
+      return;
+    }
+
+    File imageFile = File(returnedImage.path);
+
+    if (!imageFile.existsSync()) {
+      print('The selected image file does not exist');
+      return;
+    }
+
     setState(() {
-      _selectedImage=File(returnedImage.path);
+      _selectedImage = imageFile;
     });
 
-    //Get a reference to storage root
+    // Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('images_supervisor');
-    Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
-    try {
-      //Store the file
-      await referenceImageToUpload.putFile(File(returnedImage.path));
-      //Success: get the download URL
-      imageUrl = await referenceImageToUpload.getDownloadURL();
-      print('Image uploaded successfully. URL: $imageUrl');
-      setState(() {
+    Reference referenceDirImages = referenceRoot.child('images_supervisor');
+    Reference referenceImageToUpload = referenceDirImages.child('profile_supervisor');
 
-      });
-      return imageUrl;
+    try {
+      // Store the file
+      UploadTask uploadTask = referenceImageToUpload.putFile(imageFile);
+
+      // Get the download URL
+      TaskSnapshot taskSnapshot = await uploadTask;
+      imageUrl = await taskSnapshot.ref.getDownloadURL();
+      print('Image uploaded successfully. URL: $imageUrl');
+
+      setState(() {});
     } catch (error) {
       print('Error uploading image: $error');
-      return '';
-      //Some error occurred
     }
   }
 
+
+  // Future _pickImageFromGallery() async{
+  //   final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if(returnedImage ==null) return;
+  //   setState(() {
+  //     _selectedImage=File(returnedImage.path);
+  //   });
+  //
+  //   //Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = FirebaseStorage.instance.ref().child('images_supervisor');
+  //   Reference referenceImageToUpload =referenceDirImages.child('profile_supervisor');
+  //   try {
+  //     //Store the file
+  //     await referenceImageToUpload.putFile(File(returnedImage.path));
+  //     //Success: get the download URL
+  //     imageUrl = await referenceImageToUpload.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $imageUrl');
+  //     setState(() {
+  //
+  //     });
+  //     return imageUrl;
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //     return '';
+  //     //Some error occurred
+  //   }
+  // }
 
   editAddSupervisor() async {
     print('editAddParent called');
@@ -95,14 +136,12 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
             'name': _nameController.text,
             'email': _emailController.text,
             'busphoto':imageUrl,
-
-
           });
           print('document updated successfully');
 
           setState(() {
             // _pickImageFromGallery();
-            });
+          });
         } catch (e) {
           print('Error updating document: $e');
         }
@@ -219,17 +258,53 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                         EdgeInsets.only(left: 120.0 ),
                         child: Stack(
                           children: [
+                            // CircleAvatar(
+                            //     radius: 52.5,
+                            //     backgroundColor: Color(0xff442B72),
+                            //     child: CircleAvatar(
+                            //       backgroundImage: NetworkImage( '$imageUrl',),
+                            //       radius: 50.5,)
+                            // ),
                             GestureDetector(
                               onTap: (){
+                                print('object');
                                 _pickImageFromGallery();
-                                print('edit');
                               },
-                              child:  CircleAvatar(
-                                  radius: 52.5,
-                                  backgroundColor: Color(0xff442B72),
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage( '$imageUrl',),
-                                    radius: 50.5,)
+                              child: FutureBuilder(
+                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                                      return Text(
+                                        'No data available',
+                                        style: TextStyle(
+                                          color: Color(0xff442B72),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Regular',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      );
+                                    }
+
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    String? busphoto = data['busphoto'] as String?;
+                                    String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
+                                    return CircleAvatar(
+                                      radius: 52.5,
+                                      backgroundColor: Color(0xff442B72),
+                                      child: CircleAvatar(
+                                        backgroundImage: NetworkImage(imageUrl),
+                                        radius: 50.5,
+                                      ),
+                                    );
+                                  }
+
+                                  return CircularProgressIndicator();
+                                },
                               ),
                             ),
                             (sharedpref?.getString('lang') == 'ar')?
@@ -268,10 +343,16 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                                       width: 2.0,
                                     ),
                                     borderRadius: BorderRadius.all(Radius.circular(50.0),),),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: Image.asset(
-                                      'assets/images/image-editing 1.png' ,),
+                                  child: GestureDetector(
+                                    onTap: (){
+                                      print('test');
+                                      _pickImageFromGallery();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: Image.asset(
+                                        'assets/images/image-editing 1.png' ,),
+                                    ),
                                   )
                               ),
                             ),
@@ -321,7 +402,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                       child: TextFormField(
                         style: TextStyle(
                           color: Color(0xFF442B72),
-                      ),
+                        ),
                         controller: _nameController,
                         cursorColor: const Color(0xFF442B72),
                         textDirection: (sharedpref?.getString('lang') == 'ar') ?
@@ -476,16 +557,16 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40.0),
                     child:
-                      Text(
-                       'Email'.tr,
-                        style: TextStyle(
-                          color: Color(0xFF442B72),
-                          fontSize: 15,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                          height: 1.07,
-                        ),
+                    Text(
+                      'Email'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 15,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                        height: 1.07,
                       ),
+                    ),
                   ) ,
                   SizedBox(height: 10,),
                   Center(
@@ -540,13 +621,13 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                       ),
                     ),
                   ),
-                  emailError ? Container(): Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    child: Text(
-                      "Please enter your email".tr,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
+                  // emailError ? Container(): Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 48),
+                  //   child: Text(
+                  //     "Please enter your email".tr,
+                  //     style: TextStyle(color: Colors.red),
+                  //   ),
+                  // ),
                   SizedBox(
                     height: 35,
                   ),
@@ -579,21 +660,23 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
 
                             });
                           }
-                          if (_emailController.text.length < 1) {
-                            emailError = false;
-                            setState(() {
-
-                            });
-                          } else if (_emailController.text.length > 0) {
-                            emailError = true;
-                            setState(() {
-
-                            });
-                          }
-                          if( nameError && emailError && phoneError){
-                          editAddSupervisor();
-                          DataSavedSnackBar(context, 'Data saved successfully');
-                          Navigator.pop(context , true);
+                          // if (_emailController.text.length < 1) {
+                          //   emailError = false;
+                          //   setState(() {
+                          //
+                          //   });
+                          // } else if (_emailController.text.length > 0) {
+                          //   emailError = true;
+                          //   setState(() {
+                          //
+                          //   });
+                          // }
+                          if( nameError &&
+                              // emailError &&
+                              phoneError){
+                            editAddSupervisor();
+                            DataSavedSnackBar(context, 'Data saved successfully');
+                            Navigator.pop(context , true);
                           }
                         },
                         color: Color(0xFF442B72),

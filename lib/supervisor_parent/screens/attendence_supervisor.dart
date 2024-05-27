@@ -76,14 +76,17 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                         height: 22,),
                     ),
                   ),
-                  Text(
-                    'Attendance'.tr,
-                    style: TextStyle(
-                      color: Color(0xFF993D9A),
-                      fontSize: 16,
-                      fontFamily: 'Poppins-Bold',
-                      fontWeight: FontWeight.w700,
-                      height: 1,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 0.0),//28
+                    child: Text(
+                      'Attendance'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF993D9A),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -91,7 +94,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                       _scaffoldKey.currentState!.openEndDrawer();
                     },
                     icon: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 17.0),
                       child: const Icon(
                         Icons.menu_rounded,
                         color: Color(0xff442B72),
@@ -113,41 +116,46 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25.0),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0),
-                              child: Image.asset('assets/images/Ellipse 2.png',
-                              width: 60,
-                              height: 60,),
-                            ),
-                            SizedBox(width: 10,),
-                            Text.rich(
-                              TextSpan(
-                                children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                  child: Image.asset('assets/images/Ellipse 2.png',
+                                  width: 60,
+                                  height: 60,),
+                                ),
+                                SizedBox(width: 10,),
+                                Text.rich(
                                   TextSpan(
-                                    text: 'El Salam \nSchool'.tr,
-                                    style: TextStyle(
-                                      color: Color(0xFF993D9A),
-                                      fontSize: 20,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                      // height: 1.07,
-                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: 'El Salam \nSchool'.tr,
+                                        style: TextStyle(
+                                          color: Color(0xFF993D9A),
+                                          fontSize: 20,
+                                          fontFamily: 'Poppins-Bold',
+                                          fontWeight: FontWeight.w700,
+                                          // height: 1.07,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '\n.',
+                                        style: TextStyle(
+                                          color: Color(0xffFFC53E),
+                                          fontSize: 20,
+                                          fontFamily: 'Poppins-Light',
+                                          fontWeight: FontWeight.w300,
+                                          height: 1.07,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  TextSpan(
-                                    text: '\n.',
-                                    style: TextStyle(
-                                      color: Color(0xffFFC53E),
-                                      fontSize: 20,
-                                      fontFamily: 'Poppins-Light',
-                                      fontWeight: FontWeight.w300,
-                                      height: 1.07,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                // SizedBox(width: 25,),
+                              ],
                             ),
-                            SizedBox(width: 25,),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 25.0),
                               child: SizedBox(
@@ -157,43 +165,43 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                   style: ElevatedButton.styleFrom(
                                       padding:  EdgeInsets.all(0),
                                       backgroundColor: Color(0xFF442B72),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5)
-                                    )
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(5)
+                                      )
                                   ),
                                   onPressed: () async {
                                     isStarting =
                                     // children.isNotEmpty?
                                     true;
-                                     // no data
+                                    // no data
                                     // : false;
                                     setState(() {
                                     });
-    // // Send a notification
-    // final message = {
-    // 'notification': {
-    // 'title': 'Trip Started',
-    // 'body': 'Your trip has started',
-    // },
-    // 'token': 'your_device_token_here', // replace with the actual device token
-    // };
-    //
-    // try {
-    // await FirebaseMessaging.instance.send(message);
-    // } catch (e) {
-    // print('Error sending notification: $e');
-    // }
-    // },
-    //                                 getToken();
+                                    // // Send a notification
+                                    // final message = {
+                                    // 'notification': {
+                                    // 'title': 'Trip Started',
+                                    // 'body': 'Your trip has started',
+                                    // },
+                                    // 'token': 'your_device_token_here', // replace with the actual device token
+                                    // };
+                                    //
+                                    // try {
+                                    // await FirebaseMessaging.instance.send(message);
+                                    // } catch (e) {
+                                    // print('Error sending notification: $e');
+                                    // }
+                                    // },
+                                    //                                 getToken();
 
                                   },
                                   child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins-SemiBold',
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                    fontSize: 13
-                                  ),),
+                                    style: TextStyle(
+                                        fontFamily: 'Poppins-SemiBold',
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        fontSize: 13
+                                    ),),
                                 ),
                               ),
                             )

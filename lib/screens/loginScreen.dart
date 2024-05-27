@@ -33,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
   String enteredPhoneNumber = '';
   FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
   bool _isLoading = false;
+  String phoneError='';
 
   String phoneNumber = '';
   MyLocalController ControllerLang = Get.find();
@@ -80,51 +81,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
 
     }
   }
-  // sendOtp() async {
-  //   await FirebaseAuth.instance.verifyPhoneNumber(
-  //     phoneNumber: '+2' + userLoginData.read('phoneV'),
-  //     verificationCompleted: (PhoneAuthCredential credential) {},
-  //     verificationFailed: (FirebaseAuthException e) {
-  //       showCustomSnackBar('Can\'t send code', e.toString());
-  //     },
-  //     codeSent: (String verificationId, int? resendToken) {
-  //       verificationID = verificationId;
-  //     },
-  //     codeAutoRetrievalTimeout: (String verificationId) {},
-  //   );
-  // }
-  // checkOtp() async {
-  //   PhoneAuthCredential credential = PhoneAuthProvider.credential(
-  //     verificationId: verificationID!,
-  //     smsCode: otpValue,
-  //   );
-  //   try {
-  //     await FirebaseAuth.instance.signInWithCredential(credential);
-  //     await SignupRepo().verifyPhone();
-  //     userLoginData.write('phoneVerify', true);
-  //     // if (userLoginData.read('isRegistered')) {
-  //     //   Get.offAllNamed(AppRoutes.signIn);
-  //     // } else {
-  //     //   final firebase = FirebaseDatabase.instance.ref();
-  //     //   var authFCM =  FirebaseAuth.instance.currentUser!.uid;
-  //     //   firebase.child('drivers/${authFCM}').update({
-  //     //     'id': '${userLoginData.read('idV')}',
-  //     //     'is_approve': userLoginData.read('isApprove') ? 1 : 0,
-  //     //     'is_active': 0,
-  //     //     'is_available':1,
-  //     //     // 'restaurant_id':res.data['owner_id_v'].toString()!= 'null' ? res.data['owner_id_v'].toString() :0
-  //     //   });
-  //     //   if (!userLoginData.read('isApprove')) {
-  //     //     Get.offAllNamed(AppRoutes.pending);
-  //     //   } else {
-  //     //     Get.offAllNamed(AppRoutes.layout);
-  //     //   }
-  //     // }
-  //     // Navigate to next screen upon successful authentication
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+
   Future<void> verifyPhoneNumber(String phoneNumber) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
@@ -461,7 +418,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
                                             child: Text(
-                                              'Please enter your phone number'.tr,
+                                              phoneError,
                                               style: TextStyle(color: Colors.red),
 
                                             ),
@@ -510,11 +467,25 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
 
                                               onPress: () async{
 
-    if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
-    ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+                                                if(_phoneNumberController.text.length == 0){
+                                                  setState(() {
+                                                    phoneError ='Please enter your phone number'.tr;
+                                                    _phoneNumberEntered =false;
+                                                  });
+                                                  // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+
+                                                }else if(_phoneNumberController.text.length < 10){
+      setState(() {
+        phoneError ='Please enter valid phone number'.tr;
+
+        _phoneNumberEntered =false;
+      });
+    // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
 
     }else{
-                                                if (_validatePhoneNumber())  {
+      _phoneNumberEntered =true;
+
+      if (_validatePhoneNumber())  {
                                                   setState(() {
                                                     _isLoading = true;
 

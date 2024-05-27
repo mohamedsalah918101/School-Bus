@@ -13,10 +13,13 @@ import 'package:school_account/screens/homeScreen.dart';
 import 'package:school_account/screens/schoolData.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
+import '../supervisor_parent/screens/accept_invitation_parent.dart';
+import '../supervisor_parent/screens/accept_invitation_supervisor.dart';
 import '../supervisor_parent/screens/final_invitation_parent.dart';
 import '../supervisor_parent/screens/final_invitation_supervisor.dart';
 import '../supervisor_parent/screens/home_parent.dart';
 import '../supervisor_parent/screens/home_supervisor.dart';
+import '../supervisor_parent/screens/map_parent.dart';
 import '../supervisor_parent/screens/no_invitation.dart';
 //import '../components/main_bottom_bar.dart';
 
@@ -44,7 +47,8 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
   bool timeout = false;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  bool _phoneNumberEntered = false;
+  String txt="Didn't receive the OTP".tr;
   // Function to start the timer
   void startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
@@ -245,17 +249,26 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                 child:
                                     //start
                                     PinCodeTextField(
+                                      onChanged: (val){
+                                        if(_phoneNumberEntered){
+                                        _phoneNumberEntered =false;
+                                        txt="Didn't receive the OTP".tr;
+
+                                        setState(() {
+
+                                        });}
+                                      },
                                   controller: _pinCodeController,
-                                  textStyle: const TextStyle(
+                                  textStyle:  TextStyle(
                                     fontSize: 24,
-                                    fontFamily: 'Inter-SemiBold',
+                                    fontFamily: 'Inter-SemiBold',color: _phoneNumberEntered ?  Colors.red:Color(0xff8198A5)
                                   ),
                                   hintCharacter: '0',
-                                  hintStyle: const TextStyle(
+                                  hintStyle:  TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 24,
                                       fontFamily: 'Inter-SemiBold',
-                                      color: Color(0xff8198A5)),
+                                      color: _phoneNumberEntered ?  Colors.red:Color(0xff8198A5)),
                                   appContext: context,
                                   length: 6,
                                   blinkWhenObscuring: true,
@@ -265,9 +278,9 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       fieldHeight: 50,
                                       fieldWidth: 40,
                                       activeFillColor: Colors.white,
-                                      inactiveColor: const Color(0xff8198A5),
-                                      selectedColor: const Color(0xff001D4A),
-                                      activeColor: const Color(0xff8198A5),
+                                      inactiveColor: _phoneNumberEntered ? Colors.red: Color(0xff8198A5),
+                                      selectedColor:  _phoneNumberEntered ?Colors.red: Color(0xff001D4A),
+                                      activeColor: _phoneNumberEntered ? Colors.red: Color(0xff8198A5),
                                       selectedFillColor: Colors.white),
                                   cursorColor: const Color(0xff001D4A),
                                   animationDuration:
@@ -278,6 +291,7 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                 //end
                               ),
                             ),
+
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Padding(
@@ -297,9 +311,9 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                           ),
                                           children: [
                                             TextSpan(
-                                              text: "Didn't receive the OTP".tr,
+                                              text: txt,
                                               style: TextStyle(
-                                                  color: Color(0xff263238)),
+                                                  color:  _phoneNumberEntered ?  Colors.red:Color(0xff263238)),
                                             ),
                                             TextSpan(
                                               text: " Resend OTP?".tr,
@@ -394,6 +408,8 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                       //erifyPhoneNumber(enteredPhoneNumber);
                                       //my code
                                       try {
+                                        _phoneNumberEntered =false;
+                                        txt="Didn't receive the OTP".tr;
                                         PhoneAuthCredential credential =
                                             PhoneAuthProvider.credential(
                                           verificationId: verificationId,
@@ -408,50 +424,54 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                         Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => sharedpref!
-                                                            .getString('type')
-                                                            .toString() ==
-                                                        'schooldata'
-                                                    ? sharedpref!.getInt(
-                                                                'allData') ==
-                                                            1
-                                                        ? HomeScreen()
-                                                        : SchoolData()
-                                                    : sharedpref!
-                                                                .getString(
-                                                                    'type')
-                                                                .toString() ==
-                                                            'parent'
-                                                        ? sharedpref!.getInt(
-                                                                    'invit') ==
-                                                                1
-                                                            ? sharedpref!.getInt(
-                                                                        'invitstate') ==
-                                                                    1
-                                                                ? HomeParent()
-                                                                : FinalAcceptInvitationParent()
-                                                            : NoInvitation(
-                                                                selectedImage:
-                                                                    3)
-                                                        : sharedpref!.getInt(
-                                                                    'invit') ==
-                                                                1
-                                                            ? sharedpref!.getInt(
-                                                                        'invitstate') ==
-                                                                    1
-                                                                ? HomeForSupervisor()
-                                                                : FinalAcceptInvitationSupervisor()
-                                                            : NoInvitation(
-                                                                selectedImage:
-                                                                    2)));
+                                                builder: (context) => openPage()));
+                                        // Navigator.pushReplacement(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //         builder: (context) => sharedpref!
+                                        //                     .getString('type')
+                                        //                     .toString() ==
+                                        //                 'schooldata'
+                                        //             ? sharedpref!.getInt(
+                                        //                         'allData') ==
+                                        //                     1
+                                        //                 ? HomeScreen()
+                                        //                 : SchoolData()
+                                        //             : sharedpref!
+                                        //                         .getString(
+                                        //                             'type')
+                                        //                         .toString() ==
+                                        //                     'parent'
+                                        //                 ? sharedpref!.getInt(
+                                        //                             'invit') ==
+                                        //                         1
+                                        //                     ? sharedpref!.getInt(
+                                        //                                 'invitstate') ==
+                                        //                             1
+                                        //                         ? HomeParent()
+                                        //                         : FinalAcceptInvitationParent()
+                                        //                     : NoInvitation(
+                                        //                         selectedImage:
+                                        //                             3)
+                                        //                 : sharedpref!.getInt(
+                                        //                             'invit') ==
+                                        //                         1
+                                        //                     ? sharedpref!.getInt(
+                                        //                                 'invitstate') ==
+                                        //                             1
+                                        //                         ? HomeForSupervisor()
+                                        //                         : FinalAcceptInvitationSupervisor()
+                                        //                     : NoInvitation(
+                                        //                         selectedImage:
+                                        //                             2)));
                                       } catch (e) {
                                         setState(() {
                                           _isLoading = false;
+                                          _phoneNumberEntered =true;
+                                          txt="Invalid OTP".tr;
+
                                         });
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                                content:
-                                                    Text('Invalid code.')));
+
 
                                       }
 
@@ -484,5 +504,49 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
             );
           })),
     );
+  }
+  StatefulWidget openPage() {
+    if(sharedpref!.getString('type').toString() == 'schooldata'){
+      if(sharedpref!.getInt('allData') == 1)
+        return HomeScreen();
+      else return SchoolData();
+    }else if(sharedpref!.getString('type').toString() == 'parent'){
+      if( sharedpref!.getInt('invit') == 0 ){
+        if(sharedpref!.getInt('skip') == 1)
+          return HomeParent();
+        else
+          return NoInvitation(selectedImage: 3);
+
+      }else{
+        if(sharedpref!.getInt('invitstate') == 1){
+          if (sharedpref!.getInt('address') == 1)
+            return  HomeParent();
+          else
+            return  MapParentScreen();
+
+
+        }
+        else
+          return  AcceptInvitationParent();
+      }
+    }else{
+      if( sharedpref!.getInt('invit') == 0 ){
+        if(sharedpref!.getInt('skip') == 1)
+          return  HomeForSupervisor();
+        else
+          return   NoInvitation(selectedImage: 2);
+
+      }else{
+        if(sharedpref!.getInt('invitstate') == 1)
+          return   HomeForSupervisor();
+        else
+          return   AcceptInvitationSupervisor();
+      }
+    }
+
+
+
+
+
   }
 }

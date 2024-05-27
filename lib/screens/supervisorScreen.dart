@@ -39,6 +39,8 @@ class SupervisorScreen extends StatefulWidget {
 
 class SupervisorScreenSate extends State<SupervisorScreen> {
 
+
+ bool isdelete= false;
   MyLocalController ControllerLang = Get.find();
   final TextEditingController searchController = TextEditingController();
   int? _selectedOption = 1;
@@ -91,6 +93,15 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
       filteredData = List.from(data);
     });
   }
+
+  //fun get bus number
+  Future<DocumentSnapshot> getOtherData(String busId) async {
+    return await FirebaseFirestore.instance.collection('busdata').doc(busId).get();
+  }
+
+
+
+
   void _deleteSupervisorDocument(String documentId) {
     FirebaseFirestore.instance
         .collection('supervisor')
@@ -100,6 +111,9 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
       setState(() {
         // Update UI by removing the deleted document from the data list
         data.removeWhere((document) => document.id == documentId);
+
+        //new
+        filteredData = List.from(data);
 
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,6 +128,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     // }
     // );
   }
+
+
   //fun sarch
 
 
@@ -213,6 +229,72 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
           return Stack(children: [
             Column(
               children: [
+                const SizedBox(
+                  height: 15,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional.topStart,
+                          child: InkWell(
+                            // onTap: ()=>exit(0),
+                            onTap: () {
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              // Navigate back to the previous page
+                              // Navigator.pop(context);
+                              Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
+                            },
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 26,
+                              color: Color(0xff442B72),
+                            ),
+                          ),
+                        ),
+
+                        Expanded(
+                          child: Center(
+                            child: Align(alignment: AlignmentDirectional.center,
+                              child: Text(
+                                "Supervisors".tr,
+                                style: TextStyle(
+                                  color: Color(0xFF993D9A),
+                                  fontSize: 25,
+                                  fontFamily: 'Poppins-Bold',
+                                  fontWeight: FontWeight.w700,
+                                  // height: 0.99,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        InkWell(
+                          onTap: () {
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                          child: Align(
+                            alignment: AlignmentDirectional.topEnd,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: const Icon(
+                                Icons.menu_rounded,
+                                size: 40,
+                                color: Color(0xff442B72),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                      //physics: BouncingScrollPhysics(),
@@ -220,74 +302,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child: InkWell(
-                                    // onTap: ()=>exit(0),
-                                    onTap: () {
-                                      ScaffoldMessenger.of(context)
-                                          .hideCurrentSnackBar();
-                                      // Navigate back to the previous page
-                                     // Navigator.pop(context);
-                                      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>HomeScreen()));
-                                    },
-                                    child: const Icon(
-                                      Icons.arrow_back_ios_new_rounded,
-                                      size: 26,
-                                      color: Color(0xff442B72),
-                                    ),
-                                  ),
-                                ),
 
-                                Expanded(
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: Text(
-                                        "Supervisors".tr,
-                                        style: TextStyle(
-                                          color: Color(0xFF993D9A),
-                                          fontSize: 25,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                         // height: 0.99,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 12.0),
-                                  child: InkWell(
-                                    onTap: () {
-                                      Scaffold.of(context).openEndDrawer();
-                                    },
-                                    child: Align(
-                                      alignment: AlignmentDirectional.topEnd,
-                                      child: const Icon(
-                                        Icons.menu_rounded,
-                                        size: 40,
-                                        color: Color(0xff442B72),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
 
                         const SizedBox(
                           height: 20,
@@ -415,7 +430,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               DropdownCheckboxItem(
                                                                   label: 'Accepted'),
                                                               DropdownCheckboxItem(
-                                                                  label: 'Rejected'),
+                                                                  label: 'Declined'),
                                                               DropdownCheckboxItem(
                                                                   label: 'Waiting'),
                                                             ],
@@ -429,9 +444,9 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                   selectedValueAccept = 'Accepted';
                                                                   selectedValueDecline = null;
                                                                   selectedValueWaiting = null;
-                                                                } else if (items.first.label == 'Rejected') {
+                                                                } else if (items.first.label == 'Declined') {
                                                                   selectedValueAccept = null;
-                                                                  selectedValueDecline = 'Rejected';
+                                                                  selectedValueDecline = 'Declined';
                                                                   selectedValueWaiting = null;
                                                                 } else if (items.first.label == 'Waiting') {
                                                                   selectedValueAccept = null;
@@ -485,7 +500,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                       Navigator.pop(context);
                                                                       print('2');
                                                                     }else  if (selectedValueDecline != null) {
-                                                                      currentFilter = 'Rejected';
+                                                                      currentFilter = 'Declined';
                                                                       getDataForDeclinedFilter();
                                                                       Navigator.pop(context);
                                                                       print('0');
@@ -557,9 +572,20 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                     SizedBox(
                                       height: 500,
                                       child: ListView.builder(
-                                        //itemCount: data.length,
-                                        itemCount: filteredData.length,
+                                        itemCount: isdelete ? data.length:filteredData.length,
+                                        //data.length,
+                                        //itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
+
+                                          // String supervisorId = data[index]['bus_id']; // Access the ID
+                                          //
+                                          // Future<String> getBusName() async {
+                                          //   DocumentReference docRef = FirebaseFirestore.instance.collection('busdata').doc(supervisorId);
+                                          //   DocumentSnapshot docSnapshot = await docRef.get();
+                                          //   return docSnapshot['busnumber']; // Access the bus name
+                                          // }
+
+
                                           String supervisorPhoneNumber = filteredData[index]['phoneNumber'];
                                           int state =data[index]['state']; // Assuming 'state' is the field from Firestore
 
@@ -569,8 +595,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                           // Determine status color and text based on state
                                           switch (state) {
                                             case 0:
-                                              statusColor = Colors.red; // Rejected (State = 0)
-                                              statusText = 'Rejected';
+                                              statusColor = Colors.red; // Declined (State = 0)
+                                              statusText = 'Declined';
                                               break;
                                             case 1:
                                               statusColor = Colors.yellow; // Waiting (State = 1)
@@ -661,7 +687,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                               ),
                                             ),
                                             subtitle: Text(
-                                              statusText,
+                                            //  '${filteredData[index]['state']}',
+                                             statusText,
                                               style: TextStyle(
                                                 color: statusColor,
                                                 fontSize: 13,
@@ -777,12 +804,14 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                   //         builder: (context) =>
                                                   //             EditeSupervisor()));
                                                 } else if (value == 'delete') {
+                                                  isdelete=true;
                                                   _deleteSupervisorDocument(data[index].id);
                                                   // setState(() {
                                                   //
                                                   //   //showSnackBarFun(context);
                                                   // });
                                                 }
+                                                isdelete=false;
                                               },
                                             ),
                                             shape: RoundedRectangleBorder(
@@ -790,6 +819,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                             ),
                                             tileColor: Colors.white,
                                             onTap: () {
+
                                               showModalBottomSheet(
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius: BorderRadius.vertical(
@@ -870,17 +900,44 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                           ),
                                                           Row(
                                                             children: [
-                                                              Align(
-                                                                alignment:
-                                                                Alignment.centerLeft,
-                                                                child: CircleAvatar(
-                                                                  radius: 35,
-                                                                  backgroundImage:
-                                                                  AssetImage(
-                                                                      'assets/imgs/school/Ellipse 1.png'
-                                                                  ),
+                                                              SizedBox(
+                                                                width: 80,
+                                                                height: 80,
+                                                                child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                    ? Image.network(
+                                                                  data[index]['busphoto'],
+                                                                  fit: BoxFit.scaleDown,
+                                                                )
+                                                                    // :  Container(
+                                                                    // width:30,
+                                                                    // height:20,
+                                                                    // decoration: BoxDecoration(
+                                                                    //   shape: BoxShape.circle,
+                                                                    //   border: Border.all(
+                                                                    //     color: Color(0xffCCCCCC),
+                                                                    //     width: 2.0,
+                                                                    //   ),
+                                                                    // ),
+                                                                    // child: Padding(
+                                                                    //   padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                                    //   child: Image.asset("assets/imgs/school/Vector (16).png",width: 5,height: 5,),
+                                                                    // )),
+                                                               : Image.asset(
+                                                                  'assets/imgs/school/empty_supervisor.png',
+                                                                  fit: BoxFit.scaleDown,
                                                                 ),
                                                               ),
+                                                              // Align(
+                                                              //   alignment:
+                                                              //   Alignment.centerLeft,
+                                                              //   child: CircleAvatar(
+                                                              //     radius: 35,
+                                                              //     backgroundImage:
+                                                              //     AssetImage(
+                                                              //         'assets/imgs/school/Ellipse 1.png'
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
                                                               SizedBox(
                                                                 width: 10,
                                                               ),
@@ -953,6 +1010,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                   fontWeight:
                                                                   FontWeight.bold)),
                                                           SizedBox(height: 10),
+
+                                                          // old bus
                                                           Row(
                                                             children: [
                                                               Container(
@@ -966,6 +1025,9 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               SizedBox(width: 10),
                                                               Text(
                                                                 'Bus: 1234  ى ر س',
+                                                               // data[index]['bus_id'],
+
+
                                                                 style: TextStyle(
                                                                   fontSize: 16,
                                                                   color: Color(0xFF442B72),
@@ -973,6 +1035,19 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                               ),
                                                             ],
                                                           )
+                                                    // ListTile(
+                                                    //   title: Text(data[index]['name']), // Assuming 'name' in supervisor
+                                                    //   subtitle: FutureBuilder<String>(
+                                                    //     future: getBusName(),
+                                                    //     builder: (context, snapshot) {
+                                                    //       if (snapshot.hasData) {
+                                                    //         return Text(snapshot.data!);
+                                                    //       } else {
+                                                    //         return Text('Loading...');
+                                                    //       }
+                                                    //     },
+                                                    //   ),
+                                                    // ),
                                                         ],
                                                       ),
                                                     ),
@@ -992,31 +1067,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                             ],
                           ),
                         ),
-                        //Floating button add old
-                        // Align(
-                        //   alignment: AlignmentDirectional.bottomEnd,
-                        //   child: Padding(
-                        //     padding: const EdgeInsets.only(right: 20),
-                        //     child: Column(
-                        //       children: [
-                        //         FloatingActionButton(
-                        //           onPressed: () {
-                        //             Navigator.push(
-                        //                 context,
-                        //                 MaterialPageRoute(
-                        //                     builder: (context) => SendInvitation()));
-                        //           },
-                        //           backgroundColor: Color(0xFF442B72),
-                        //           child: Icon(
-                        //             Icons.add,
-                        //             color: Colors.white,
-                        //             size: 35,
-                        //           ),
-                        //         )
-                        //       ],
-                        //     ),
-                        //   ),
-                        // )
+
                       ],
                     ),
                   ),

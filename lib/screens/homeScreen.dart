@@ -64,10 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
       _counter++;
     });
   }
+  List<Widget> Parent = [];
   List<QueryDocumentSnapshot> data = [];
 
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:2) .get();
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:0) .get();
     data.addAll(querySnapshot.docs);
     setState(() {
 
@@ -113,669 +114,679 @@ class _HomeScreenState extends State<HomeScreen> {
         endDrawer: HomeDrawer(),
         backgroundColor: const Color(0xFFFFFFFF),
         body: LayoutBuilder(builder: (context, constrains) {
-          return SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child:Padding(
-                          padding: const EdgeInsets.only(left: 60),
-                          child:
-                          FutureBuilder(
-                            future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                              if (snapshot.hasError) {
-                                return Text('Something went wrong');
-                              }
+          return Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child:Padding(
+                        padding: const EdgeInsets.only(left: 60),
+                        child:
+                        FutureBuilder(
+                          future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
 
-                              if (snapshot.connectionState == ConnectionState.done) {
-                                Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                return Text(
-                                  data['nameEnglish'],
-                                  style: TextStyle(
-                                    color: Color(0xFF993D9A),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Poppins-Bold',
-                                  ),
-                                );
-                              }
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                              return Text(
+                                data['nameEnglish'],
+                                style: TextStyle(
+                                  color: Color(0xFF993D9A),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Poppins-Bold',
+                                ),
+                              );
+                            }
 
-                              return CircularProgressIndicator();
-                            },
-                          ),
+                            return CircularProgressIndicator();
+                          },
+                        ),
 
-          // Text(
-          //                   "Salam Language School".tr,
-          //                   style: TextStyle(
-          //                     color: Color(0xFF993D9A),
-          //                     fontSize: 16,
-          //                     fontFamily: 'Poppins-Bold',
-          //                     fontWeight: FontWeight.w700,
-          //                     height: 0.64,
-          //                   ),
-          //                 ),
+                        // Text(
+                        //                   "Salam Language School".tr,
+                        //                   style: TextStyle(
+                        //                     color: Color(0xFF993D9A),
+                        //                     fontSize: 16,
+                        //                     fontFamily: 'Poppins-Bold',
+                        //                     fontWeight: FontWeight.w700,
+                        //                     height: 0.64,
+                        //                   ),
+                        //                 ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15.0),
+                    child: InkWell(onTap: (){
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                      child: Align(
+                        alignment: AlignmentDirectional.topEnd,
+                        child: const Icon(
+                          Icons.menu_rounded,
+                          size: 40,
+                          color: Color(0xff442B72),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: InkWell(onTap: (){
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                        child: Align(
-                          alignment: AlignmentDirectional.topEnd,
-                          child: const Icon(
-                            Icons.menu_rounded,
-                            size: 40,
-                            color: Color(0xff442B72),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // const SizedBox(
-                //   height: 30,
-                // ),
-
-                SizedBox(
-                  height: 50,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Stack(
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      
 
+                      // const SizedBox(
+                      //   height: 30,
+                      // ),
+
+                      SizedBox(
+                        height: 50,
+                      ),
                       Padding(
-                        padding: const EdgeInsets.only(top:5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                        child: Stack(
                           children: [
-                            Container(
 
-                              decoration: BoxDecoration(
-                                  color: Colors.white, // Your desired background color
-                                  borderRadius: BorderRadius.circular(5),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
-                                  ]
-                              ),
-                              child:
+                            Padding(
+                              padding: const EdgeInsets.only(top:5),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
 
-                              // ListTile(
-                              //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              //   leading: GestureDetector(
-                              //       onTap: (){
-                              //         Navigator.push(
-                              //             context ,
-                              //             MaterialPageRoute(
-                              //                 builder: (context) =>  ProfileScreen(),
-                              //                 maintainState: false));
-                              //       },
-                              //       child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
-                              //   //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
-                              //   title: Text(
-                              //     'Salam Language School'.tr,
-                              //     style: TextStyle(
-                              //       color: Color(0xFF442B72),
-                              //       fontSize: 15,
-                              //       fontWeight: FontWeight.bold,
-                              //       fontFamily: 'Poppins-Bold',
-                              //     ),
-                              //   ),
-                              //   subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
-                              //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                              //     tileColor: Colors.white,
-                              // ),
-                              FutureBuilder(
-                                future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text('Something went wrong');
-                                  }
-
-                                  if (snapshot.connectionState == ConnectionState.done) {
-                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                    return ListTile(
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                      leading: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => ProfileScreen(),
-                                              maintainState: false,
-                                            ),
-                                          );
-                                        },
-                                        child:
-                                        data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
-                                          },
-                                        ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
-                                      ),
-                                      title: Text(
-                                        data['nameEnglish'],
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Poppins-Bold',
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        data['address'],
-                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
-                                      ),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                                      tileColor: Colors.white,
-                                    );
-                                  }
-
-                                  return CircularProgressIndicator();
-                                },
-                              )
-                            ),
-                            SizedBox(height: 30,),
-
-                            Container(
-                              width:320,
-                              decoration: const ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                    width: 0.20,
-                                    strokeAlign: BorderSide.strokeAlignCenter,
-                                    color: Color(0xffA79FD9),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Container(
-                                  width: 135,
-                                  height: 129,
-                                  decoration: BoxDecoration(
-                                    color:blendedColor, // Your desired background color
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Align(alignment: AlignmentDirectional.topStart,
-                                    child: Column(
-                                      children: [
-                                        SizedBox(height: 10,),
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                                              child: Image.asset("assets/imgs/school/bus 2.png",width: 50,height: 50,),
-                                            ),
-                                          SizedBox(width: 28,),
-                                            GestureDetector(
-                                              onTap: (){
-                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
-                                              },
-                                              child: Container(width: 30,
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                color:Color(0xff442B72), // Your desired background color
-                                                borderRadius: BorderRadius.circular(15),
-                                              ),child: Icon(Icons.add,color:blendedColor,size: 19,),),
-                                            )
-                                          ],
-                                        ),
-                                        Align(alignment: AlignmentDirectional.bottomStart,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child: Text("Buses",style: TextStyle(fontSize: 16,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
-                                            )),
-                                        Align(alignment: AlignmentDirectional.bottomStart,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child: Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
-                                            )),
-                                        Align(alignment: AlignmentDirectional.bottomEnd,
-                                          child: GestureDetector(
-                                            onTap: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>BusScreen()));
-                                            },
-                                            child: Container(
-                                              width: 57,
-                                              height: 27,
-                                              decoration: BoxDecoration(
-                                                  color: Color(0xff442B72),
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(15),
-                                                bottomRight: Radius.circular(7)),
-
-                                              ),
-                                              child: Align(alignment: AlignmentDirectional.bottomCenter,
-                                                child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
-                                            //     FaIcon(
-                                            //     FontAwesomeIcons.arrowRight,
-                                            //     color: Colors.white,
-                                            //     size: 20,
-                                            // ),
-                                              ),),
-                                          ),
-                                        ),
-
-                                      ],
+                                    decoration: BoxDecoration(
+                                        color: Colors.white, // Your desired background color
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: [
+                                          BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
+                                        ]
                                     ),
-                                  ),
-                                ),
-                                //SizedBox(width: 10,),
-                                Container(
-                                  width: 135,
-                                  height: 129,
-                                  decoration: BoxDecoration(
-                                    color:blendedColorTwo, // Your desired background color
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Align(alignment: AlignmentDirectional.topStart,
-                                    child: Column(
-                                      children: [
-                                        SizedBox(height: 10,),
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                                              child: Image.asset("assets/imgs/school/supervisorH.png",width: 50,height: 50,),
-                                            ),
-                                            SizedBox(width: 28,),
-                                            GestureDetector(
-                                              onTap: (){
-                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>SendInvitation()));
-                                              },
-                                              child: Container(width: 30,
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  color:Color(0xff442B72), // Your desired background color
-                                                  borderRadius: BorderRadius.circular(15),
-                                                ),child: Icon(Icons.add,color:blendedColorTwo,size: 19,),),
-                                            )
-                                          ],
-                                        ),
-                                        Align(alignment: AlignmentDirectional.bottomStart,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child: Text("Supervisors",style: TextStyle(fontSize: 16,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
-                                            )),
-                                        Align(alignment: AlignmentDirectional.bottomStart,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child: Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
-                                            )),
-                                        Align(alignment: AlignmentDirectional.bottomEnd,
-                                          child: GestureDetector(
-                                            onTap: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
-                                            },
-                                            child: Container(
-                                              width: 57,
-                                              height: 27,
-                                              decoration: BoxDecoration(
-                                                color: Color(0xff442B72),
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(15),
-                                                    bottomRight: Radius.circular(7)),
+                                    child:
 
-                                              ),
-                                              child: Align(alignment: AlignmentDirectional.bottomCenter,
-                                                  child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
-                                                //     FaIcon(
-                                                //     FontAwesomeIcons.arrowRight,
-                                                //     color: Colors.white,
-                                                //     size: 20,
-                                                // ),
-                                              ),),
-                                          ),
-                                        ),
+                                    // ListTile(
+                                    //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    //   leading: GestureDetector(
+                                    //       onTap: (){
+                                    //         Navigator.push(
+                                    //             context ,
+                                    //             MaterialPageRoute(
+                                    //                 builder: (context) =>  ProfileScreen(),
+                                    //                 maintainState: false));
+                                    //       },
+                                    //       child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
+                                    //   //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
+                                    //   title: Text(
+                                    //     'Salam Language School'.tr,
+                                    //     style: TextStyle(
+                                    //       color: Color(0xFF442B72),
+                                    //       fontSize: 15,
+                                    //       fontWeight: FontWeight.bold,
+                                    //       fontFamily: 'Poppins-Bold',
+                                    //     ),
+                                    //   ),
+                                    //   subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
+                                    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                    //     tileColor: Colors.white,
+                                    // ),
+                                    FutureBuilder(
+                                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                        if (snapshot.hasError) {
+                                          return Text('Something went wrong');
+                                        }
 
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 30,),
-
-                            Container(
-                              width:320,
-                              decoration: const ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                    width: 0.20,
-                                    strokeAlign: BorderSide.strokeAlignCenter,
-                                    color: Color(0xffA79FD9),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Align(alignment: AlignmentDirectional.centerStart,
-                                      child: Text("Parents",style: TextStyle(color: Color(0xff442B72)
-                                          ,fontSize: 16,fontFamily:"Poppins-SemiBold" ),)),
-                                ),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>ParentsScreen()));
-                                  },
-                                  child: Align(alignment: AlignmentDirectional.centerEnd,
-                                      child: Text("Show all", style: TextStyle(
-                                        fontFamily: "Poppins-Regular",
-                                        fontSize: 15,
-                                        color: Color(0xff442B72),
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: Color(0xff442B72), // Optional: Set color of underline
-                                        decorationStyle: TextDecorationStyle.solid, // Optional: Set style of underline
-                                      ),)),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20,),
-                            // right code
-                            // SizedBox(
-                            //   height: 500,
-                            //   child: ListView.builder(
-                            //      // shrinkWrap: true,
-                            //       itemCount: data.length,
-                            //       itemBuilder: (context, index) {
-                            //         return
-                            //          Column(
-                            //           children: [
-                            //             Row(
-                            //               children: [
-                            //                 Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                            //            SizedBox(width: 10,),
-                            //             Text(
-                            //             '${data[index]['name'] }',
-                            //             style: TextStyle(
-                            //             color: Color(0xFF442B72),
-                            //             fontSize: 15,
-                            //             fontWeight: FontWeight.bold,
-                            //             fontFamily: 'Poppins-SemiBold',
-                            //             ),
-                            //             )
-                            //               ],
-                            //             ),
-                            //         Text(
-                            //         '${data[index]['phoneNumber'] }',
-                            //         style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),)
-                            //
-                            //         ],
-                            //         );
-                            //
-                            //   }),
-                            // ),
-                            SizedBox(
-                              height: 500,
-                              child: ListView.builder(
-                                itemCount: data.length,
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [
-                                      Container(height: 16,),
-                                      Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.white, // Your desired background color
-                                              borderRadius: BorderRadius.circular(10),
-                                              boxShadow: [
-                                                BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                              ]
-                                          ),
-                                        child:
-                                        Column(
-                                          children: [
-                                            ListTile(
-                                              leading:Container(
-                                                width:40,
-                                                  height:40,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                      color: Color(0xffCCCCCC),
-                                                      width: 2.0,
-                                                    ),
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                          return ListTile(
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            leading: GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ProfileScreen(),
+                                                    maintainState: false,
                                                   ),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(top:10,bottom: 3),
-                                                    child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
-                                                  ))
-
-                                              // Image.asset(
-                                              //   'assets/imgs/school/imgparent.png',
-                                              //   width: 40,
-                                              //   height: 40,
-                                              // ),
-                                              ,title: Text(
-                                                '${data[index]['name']}',
-                                                style: TextStyle(
-                                                  color: Color(0xFF442B72),
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Poppins-SemiBold',
-                                                ),
-                                              ),
-                                              subtitle: Text(
-                                                '${data[index]['phoneNumber']}',
-                                                style: TextStyle(
-                                                  color: Color(0xff442B72),
-                                                  fontSize: 14,
-                                                  fontFamily: "Poppins-Regular",
-                                                ),
-                                              ),
-                                              // You can add trailing icons or other widgets here if needed
-                                              // trailing: Icon(Icons.arrow_forward),
-                                              // onTap: () {
-                                              //   // Add onTap functionality if required
-                                              // },
+                                                );
+                                              },
+                                              child:
+                                              data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                                },
+                                              ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
                                             ),
+                                            title: Text(
+                                              data['nameEnglish'],
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Poppins-Bold',
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              data['address'],
+                                              style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                            ),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                            tileColor: Colors.white,
+                                          );
+                                        }
 
+                                        return CircularProgressIndicator();
+                                      },
+                                    )
+                                  ),
+                                  SizedBox(height: 30,),
 
-                                          ],
+                                  Container(
+                                    width:320,
+                                    decoration: const ShapeDecoration(
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                          width: 0.20,
+                                          strokeAlign: BorderSide.strokeAlignCenter,
+                                          color: Color(0xffA79FD9),
                                         ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Container(
+                                        width: 135,
+                                        height: 129,
+                                        decoration: BoxDecoration(
+                                          color:blendedColor, // Your desired background color
+                                          borderRadius: BorderRadius.circular(5),
+                                        ),
+                                        child: Align(alignment: AlignmentDirectional.topStart,
+                                          child: Column(
+                                            children: [
+                                              SizedBox(height: 10,),
+                                              Row(
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Image.asset("assets/imgs/school/bus 2.png",width: 50,height: 50,),
+                                                  ),
+                                                SizedBox(width: 28,),
+                                                  GestureDetector(
+                                                    onTap: (){
+                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
+                                                    },
+                                                    child: Container(width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                      color:Color(0xff442B72), // Your desired background color
+                                                      borderRadius: BorderRadius.circular(15),
+                                                    ),child: Icon(Icons.add,color:blendedColor,size: 19,),),
+                                                  )
+                                                ],
+                                              ),
+                                              Align(alignment: AlignmentDirectional.bottomStart,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: Text("Buses",style: TextStyle(fontSize: 16,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
+                                                  )),
+                                              Align(alignment: AlignmentDirectional.bottomStart,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
+                                                  )),
+                                              Align(alignment: AlignmentDirectional.bottomEnd,
+                                                child: GestureDetector(
+                                                  onTap: (){
+                                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>BusScreen()));
+                                                  },
+                                                  child: Container(
+                                                    width: 57,
+                                                    height: 27,
+                                                    decoration: BoxDecoration(
+                                                        color: Color(0xff442B72),
+                                                      borderRadius: BorderRadius.only(
+                                                          topLeft: Radius.circular(15),
+                                                      bottomRight: Radius.circular(7)),
 
+                                                    ),
+                                                    child: Align(alignment: AlignmentDirectional.bottomCenter,
+                                                      child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
+                                                  //     FaIcon(
+                                                  //     FontAwesomeIcons.arrowRight,
+                                                  //     color: Colors.white,
+                                                  //     size: 20,
+                                                  // ),
+                                                    ),),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      //SizedBox(width: 10,),
+                                      Container(
+                                        width: 135,
+                                        height: 129,
+                                        decoration: BoxDecoration(
+                                          color:blendedColorTwo, // Your desired background color
+                                          borderRadius: BorderRadius.circular(5),
+                                        ),
+                                        child: Align(alignment: AlignmentDirectional.topStart,
+                                          child: Column(
+                                            children: [
+                                              SizedBox(height: 10,),
+                                              Row(
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Image.asset("assets/imgs/school/supervisorH.png",width: 50,height: 50,),
+                                                  ),
+                                                  SizedBox(width: 28,),
+                                                  GestureDetector(
+                                                    onTap: (){
+                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>SendInvitation()));
+                                                    },
+                                                    child: Container(width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                        color:Color(0xff442B72), // Your desired background color
+                                                        borderRadius: BorderRadius.circular(15),
+                                                      ),child: Icon(Icons.add,color:blendedColorTwo,size: 19,),),
+                                                  )
+                                                ],
+                                              ),
+                                              Align(alignment: AlignmentDirectional.bottomStart,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: Text("Supervisors",style: TextStyle(fontSize: 16,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
+                                                  )),
+                                              Align(alignment: AlignmentDirectional.bottomStart,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
+                                                  )),
+                                              Align(alignment: AlignmentDirectional.bottomEnd,
+                                                child: GestureDetector(
+                                                  onTap: (){
+                                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+                                                  },
+                                                  child: Container(
+                                                    width: 57,
+                                                    height: 27,
+                                                    decoration: BoxDecoration(
+                                                      color: Color(0xff442B72),
+                                                      borderRadius: BorderRadius.only(
+                                                          topLeft: Radius.circular(15),
+                                                          bottomRight: Radius.circular(7)),
+
+                                                    ),
+                                                    child: Align(alignment: AlignmentDirectional.bottomCenter,
+                                                        child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
+                                                      //     FaIcon(
+                                                      //     FontAwesomeIcons.arrowRight,
+                                                      //     color: Colors.white,
+                                                      //     size: 20,
+                                                      // ),
+                                                    ),),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ],
-                                  );
-                                },
+                                  ),
+                                  SizedBox(height: 30,),
+
+                                  Container(
+                                    width:320,
+                                    decoration: const ShapeDecoration(
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                          width: 0.20,
+                                          strokeAlign: BorderSide.strokeAlignCenter,
+                                          color: Color(0xffA79FD9),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    height: 30,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Align(alignment: AlignmentDirectional.centerStart,
+                                            child: Text("Parents",style: TextStyle(color: Color(0xff442B72)
+                                                ,fontSize: 16,fontFamily:"Poppins-SemiBold" ),)),
+                                      ),
+                                      GestureDetector(
+                                        onTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>ParentsScreen()));
+                                        },
+                                        child: Align(alignment: AlignmentDirectional.centerEnd,
+                                            child: Text("Show all", style: TextStyle(
+                                              fontFamily: "Poppins-Regular",
+                                              fontSize: 15,
+                                              color: Color(0xff442B72),
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: Color(0xff442B72), // Optional: Set color of underline
+                                              decorationStyle: TextDecorationStyle.solid, // Optional: Set style of underline
+                                            ),)),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 20,),
+                                  // right code
+                                  // SizedBox(
+                                  //   height: 500,
+                                  //   child: ListView.builder(
+                                  //      // shrinkWrap: true,
+                                  //       itemCount: data.length,
+                                  //       itemBuilder: (context, index) {
+                                  //         return
+                                  //          Column(
+                                  //           children: [
+                                  //             Row(
+                                  //               children: [
+                                  //                 Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                                  //            SizedBox(width: 10,),
+                                  //             Text(
+                                  //             '${data[index]['name'] }',
+                                  //             style: TextStyle(
+                                  //             color: Color(0xFF442B72),
+                                  //             fontSize: 15,
+                                  //             fontWeight: FontWeight.bold,
+                                  //             fontFamily: 'Poppins-SemiBold',
+                                  //             ),
+                                  //             )
+                                  //               ],
+                                  //             ),
+                                  //         Text(
+                                  //         '${data[index]['phoneNumber'] }',
+                                  //         style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),)
+                                  //
+                                  //         ],
+                                  //         );
+                                  //
+                                  //   }),
+                                  // ),
+                                  SizedBox(
+                                    height: 400,
+                                    // height: Parent.length*325,
+                                    // width: double.infinity,
+                                    child: ListView.builder(
+                                     physics: NeverScrollableScrollPhysics(),
+                                      itemCount: data.length,
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          children: [
+                                            Container(height: 16,),
+                                            Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white, // Your desired background color
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    boxShadow: [
+                                                      BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                                    ]
+                                                ),
+                                              child:
+                                              Column(
+                                                children: [
+                                                  ListTile(
+                                                    leading:Container(
+                                                      width:40,
+                                                        height:40,
+                                                        decoration: BoxDecoration(
+                                                          shape: BoxShape.circle,
+                                                          border: Border.all(
+                                                            color: Color(0xffCCCCCC),
+                                                            width: 2.0,
+                                                          ),
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                          child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                        ))
+
+                                                    // Image.asset(
+                                                    //   'assets/imgs/school/imgparent.png',
+                                                    //   width: 40,
+                                                    //   height: 40,
+                                                    // ),
+                                                    ,title: Text(
+                                                      '${data[index]['name']}',
+                                                      style: TextStyle(
+                                                        color: Color(0xFF442B72),
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: 'Poppins-SemiBold',
+                                                      ),
+                                                    ),
+                                                    subtitle: Text(
+                                                      '${data[index]['phoneNumber']}',
+                                                      style: TextStyle(
+                                                        color: Color(0xff442B72),
+                                                        fontSize: 14,
+                                                        fontFamily: "Poppins-Regular",
+                                                      ),
+                                                    ),
+                                                    // You can add trailing icons or other widgets here if needed
+                                                    // trailing: Icon(Icons.arrow_forward),
+                                                    // onTap: () {
+                                                    //   // Add onTap functionality if required
+                                                    // },
+                                                  ),
+
+
+                                                ],
+                                              ),
+
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  // FutureBuilder<List<DocumentSnapshot>>(
+                                  //   future: _parentData,
+                                  //   builder: (context, snapshot) {
+                                  //     if (snapshot.connectionState == ConnectionState.waiting) {
+                                  //       return Center(child: CircularProgressIndicator());
+                                  //     }
+                                  //
+                                  //     if (snapshot.hasError) {
+                                  //       return Center(child: Text('Error: ${snapshot.error}'));
+                                  //     }
+                                  //
+                                  //     List<DocumentSnapshot>? parentDocs = snapshot.data;
+                                  //     if (parentDocs == null || parentDocs.isEmpty) {
+                                  //       return Center(child: Text('No data available'));
+                                  //     }
+                                  //
+                                  //     return ListView.builder(
+                                  //       itemCount: parentDocs.length,
+                                  //       itemBuilder: (context, index) {
+                                  //         Map<String, dynamic> data =
+                                  //         parentDocs[index].data() as Map<String, dynamic>;
+                                  //         String name = data['name'] ?? '';
+                                  //         String phoneNumber = data['phoneNumber'] ?? '';
+                                  //
+                                  //         return ListTile(
+                                  //           title: Text(name),
+                                  //           subtitle: Text(phoneNumber),
+                                  //           leading: Icon(Icons.person),
+                                  //         );
+                                  //       },
+                                  //     );
+                                  //   },
+                                  // ),
+                                  // Container(
+                                  //   decoration: BoxDecoration(
+                                  //       color: Colors.white, // Your desired background color
+                                  //       borderRadius: BorderRadius.circular(10),
+                                  //       boxShadow: [
+                                  //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                  //       ]
+                                  //   ),
+                                  //   child:
+                                  //   ListTile(
+                                  //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                                  //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                  //     title: Text(
+                                  //       'Shady Aymen'.tr,
+                                  //       style: TextStyle(
+                                  //         color: Color(0xFF442B72),
+                                  //         fontSize: 15,
+                                  //         fontWeight: FontWeight.bold,
+                                  //         fontFamily: 'Poppins-SemiBold',
+                                  //       ),
+                                  //     ),
+                                  //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
+                                  //   ),
+                                  // ),
+                                  // SizedBox(
+                                  //   height: 20,
+                                  // ),
+                                  // Container(
+                                  //   decoration: BoxDecoration(
+                                  //       color: Colors.white, // Your desired background color
+                                  //       borderRadius: BorderRadius.circular(10),
+                                  //       boxShadow: [
+                                  //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                  //       ]
+                                  //   ),
+                                  //   child:
+                                  //   ListTile(
+                                  //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                                  //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                  //     title: Text(
+                                  //       'Shady Aymen'.tr,
+                                  //       style: TextStyle(
+                                  //         color: Color(0xFF442B72),
+                                  //         fontSize: 15,
+                                  //         fontWeight: FontWeight.bold,
+                                  //         fontFamily: 'Poppins-SemiBold',
+                                  //       ),
+                                  //     ),
+                                  //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
+                                  //   ),
+                                  // ),
+                                  // SizedBox(
+                                  //   height: 20,
+                                  // ),
+                                  // Container(
+                                  //   decoration: BoxDecoration(
+                                  //       color: Colors.white, // Your desired background color
+                                  //       borderRadius: BorderRadius.circular(10),
+                                  //       boxShadow: [
+                                  //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                  //       ]
+                                  //   ),
+                                  //   child:
+                                  //   ListTile(
+                                  //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
+                                  //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                  //     title: Text(
+                                  //       'Shady Aymen'.tr,
+                                  //       style: TextStyle(
+                                  //         color: Color(0xFF442B72),
+                                  //         fontSize: 15,
+                                  //         fontWeight: FontWeight.bold,
+                                  //         fontFamily: 'Poppins-SemiBold',
+                                  //       ),
+                                  //     ),
+                                  //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
+                                  //   ),
+                                  // ),
+                                  SizedBox(
+                                    height:50,
+                                  ),
+                                  // SizedBox(height: 40,),
+                                  // Container( decoration: BoxDecoration(
+                                  //     color: Colors.white, // Your desired background color
+                                  //     borderRadius: BorderRadius.circular(5),
+                                  //     boxShadow: [
+                                  //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                  //     ]
+                                  // ),
+                                  //   child: ListTile(
+                                  //     onTap:(){
+                                  //       Navigator.push(
+                                  //           context ,
+                                  //           MaterialPageRoute(
+                                  //               builder: (context) =>  ParentsScreen(),
+                                  //               maintainState: false));
+                                  //       // _key.currentState!.openDrawer();
+                                  //     } ,
+                                  //     //leading: Image.asset('assets/imgs/school/mdi_account-supervisor-outline (2).png',color: Color(0xFF442B72),width: 24,height: 24,),
+                                  //     //title: Text('Parents'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
+                                  //     title: Padding(
+                                  //       padding: const EdgeInsets.only(left: 4.0), // Adjust the left padding as needed
+                                  //       child: Row(
+                                  //
+                                  //         children: [
+                                  //           Image.asset(
+                                  //             'assets/imgs/school/mdi_account-supervisor-outline (2).png',
+                                  //             color: Color(0xFF442B72),
+                                  //             width: 26,
+                                  //             height: 26,
+                                  //           ),
+                                  //           SizedBox(width: 8), // Add some space between the leading and title
+                                  //           Expanded(
+                                  //             child: Text(
+                                  //               'Parents'.tr,
+                                  //               style: TextStyle(
+                                  //                 color: Color(0xFF442B72),
+                                  //                 fontSize: 15,
+                                  //                 fontWeight: FontWeight.bold,
+                                  //                 fontFamily: 'Poppins-Bold',
+                                  //               ),
+                                  //             ),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // )
+
+
+                                ],
                               ),
-                            ),
-                            // FutureBuilder<List<DocumentSnapshot>>(
-                            //   future: _parentData,
-                            //   builder: (context, snapshot) {
-                            //     if (snapshot.connectionState == ConnectionState.waiting) {
-                            //       return Center(child: CircularProgressIndicator());
-                            //     }
-                            //
-                            //     if (snapshot.hasError) {
-                            //       return Center(child: Text('Error: ${snapshot.error}'));
-                            //     }
-                            //
-                            //     List<DocumentSnapshot>? parentDocs = snapshot.data;
-                            //     if (parentDocs == null || parentDocs.isEmpty) {
-                            //       return Center(child: Text('No data available'));
-                            //     }
-                            //
-                            //     return ListView.builder(
-                            //       itemCount: parentDocs.length,
-                            //       itemBuilder: (context, index) {
-                            //         Map<String, dynamic> data =
-                            //         parentDocs[index].data() as Map<String, dynamic>;
-                            //         String name = data['name'] ?? '';
-                            //         String phoneNumber = data['phoneNumber'] ?? '';
-                            //
-                            //         return ListTile(
-                            //           title: Text(name),
-                            //           subtitle: Text(phoneNumber),
-                            //           leading: Icon(Icons.person),
-                            //         );
-                            //       },
-                            //     );
-                            //   },
-                            // ),
-                            // Container(
-                            //   decoration: BoxDecoration(
-                            //       color: Colors.white, // Your desired background color
-                            //       borderRadius: BorderRadius.circular(10),
-                            //       boxShadow: [
-                            //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                            //       ]
-                            //   ),
-                            //   child:
-                            //   ListTile(
-                            //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                            //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                            //     title: Text(
-                            //       'Shady Aymen'.tr,
-                            //       style: TextStyle(
-                            //         color: Color(0xFF442B72),
-                            //         fontSize: 15,
-                            //         fontWeight: FontWeight.bold,
-                            //         fontFamily: 'Poppins-SemiBold',
-                            //       ),
-                            //     ),
-                            //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
-                            //   ),
-                            // ),
-                            // SizedBox(
-                            //   height: 20,
-                            // ),
-                            // Container(
-                            //   decoration: BoxDecoration(
-                            //       color: Colors.white, // Your desired background color
-                            //       borderRadius: BorderRadius.circular(10),
-                            //       boxShadow: [
-                            //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                            //       ]
-                            //   ),
-                            //   child:
-                            //   ListTile(
-                            //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                            //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                            //     title: Text(
-                            //       'Shady Aymen'.tr,
-                            //       style: TextStyle(
-                            //         color: Color(0xFF442B72),
-                            //         fontSize: 15,
-                            //         fontWeight: FontWeight.bold,
-                            //         fontFamily: 'Poppins-SemiBold',
-                            //       ),
-                            //     ),
-                            //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
-                            //   ),
-                            // ),
-                            // SizedBox(
-                            //   height: 20,
-                            // ),
-                            // Container(
-                            //   decoration: BoxDecoration(
-                            //       color: Colors.white, // Your desired background color
-                            //       borderRadius: BorderRadius.circular(10),
-                            //       boxShadow: [
-                            //         BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                            //       ]
-                            //   ),
-                            //   child:
-                            //   ListTile(
-                            //     leading: Image.asset('assets/imgs/school/imgparent.png',width: 40,height: 40,),
-                            //     //title: Text('Buses'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                            //     title: Text(
-                            //       'Shady Aymen'.tr,
-                            //       style: TextStyle(
-                            //         color: Color(0xFF442B72),
-                            //         fontSize: 15,
-                            //         fontWeight: FontWeight.bold,
-                            //         fontFamily: 'Poppins-SemiBold',
-                            //       ),
-                            //     ),
-                            //     subtitle: Text("01028765006",style: TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily: "Poppins-Regular"),),
-                            //   ),
-                            // ),
-                            SizedBox(
-                              height:50,
-                            ),
-                            // SizedBox(height: 40,),
-                            // Container( decoration: BoxDecoration(
-                            //     color: Colors.white, // Your desired background color
-                            //     borderRadius: BorderRadius.circular(5),
-                            //     boxShadow: [
-                            //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                            //     ]
-                            // ),
-                            //   child: ListTile(
-                            //     onTap:(){
-                            //       Navigator.push(
-                            //           context ,
-                            //           MaterialPageRoute(
-                            //               builder: (context) =>  ParentsScreen(),
-                            //               maintainState: false));
-                            //       // _key.currentState!.openDrawer();
-                            //     } ,
-                            //     //leading: Image.asset('assets/imgs/school/mdi_account-supervisor-outline (2).png',color: Color(0xFF442B72),width: 24,height: 24,),
-                            //     //title: Text('Parents'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)),
-                            //     title: Padding(
-                            //       padding: const EdgeInsets.only(left: 4.0), // Adjust the left padding as needed
-                            //       child: Row(
-                            //
-                            //         children: [
-                            //           Image.asset(
-                            //             'assets/imgs/school/mdi_account-supervisor-outline (2).png',
-                            //             color: Color(0xFF442B72),
-                            //             width: 26,
-                            //             height: 26,
-                            //           ),
-                            //           SizedBox(width: 8), // Add some space between the leading and title
-                            //           Expanded(
-                            //             child: Text(
-                            //               'Parents'.tr,
-                            //               style: TextStyle(
-                            //                 color: Color(0xFF442B72),
-                            //                 fontSize: 15,
-                            //                 fontWeight: FontWeight.bold,
-                            //                 fontFamily: 'Poppins-Bold',
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ),
-                            // )
-
-
+                            )
                           ],
                         ),
-                      )
+                      ),
+                      // const SizedBox(
+                      //   height: 20,
+                      // ),
+
                     ],
                   ),
                 ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
-
-              ],
-            ),
+              ),
+            ],
           );
         }
         ),

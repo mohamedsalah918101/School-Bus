@@ -45,21 +45,22 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                   height: 35,
                 ),
                 Container(
-                  child: Row(
+                  child:  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Navigator.of(context).pop();
                         },
-                        child:  Padding(
+                        child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 17.0),
                           child: Image.asset(
-                            (sharedpref?.getString('lang') == 'ar')?
-                            'assets/images/Layer 1.png':
-                            'assets/images/fi-rr-angle-left.png',
+                            (sharedpref?.getString('lang') == 'ar')
+                                ? 'assets/images/Layer 1.png'
+                                : 'assets/images/fi-rr-angle-left.png',
                             width: 20,
-                            height: 22,),
+                            height: 22,
+                          ),
                         ),
                       ),
                       Text(
@@ -72,22 +73,18 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                           height: 1,
                         ),
                       ),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _scaffoldKey.currentState!.openEndDrawer();
-                            },
-                            icon: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                              child: const Icon(
-                                Icons.menu_rounded,
-                                color: Color(0xff442B72),
-                                size: 35,
-                              ),
-                            ),
+                      IconButton(
+                        onPressed: () {
+                          _scaffoldKey.currentState!.openEndDrawer();
+                        },
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: const Icon(
+                            Icons.menu_rounded,
+                            color: Color(0xff442B72),
+                            size: 35,
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -108,7 +105,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 height: 15,
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                                padding: const EdgeInsets.only(left: 17.0),
                                 child: SizedBox(
                                   width: 318,
                                   height: 42,
