@@ -278,7 +278,8 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 3.0),
-                            child: Text(_secondsupervisor,
+                            child: Text( 'reham',
+                              // _secondsupervisor,
                               style: TextStyle(
                                 color: Color(0xFF442B72),
                                 fontSize: 12,

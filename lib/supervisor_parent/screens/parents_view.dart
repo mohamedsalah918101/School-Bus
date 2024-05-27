@@ -77,7 +77,7 @@ class _ParentsViewState extends State<ParentsView> {
 
   getDataForWaitingFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -90,7 +90,7 @@ class _ParentsViewState extends State<ParentsView> {
 
   getDataForAcceptFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2 ).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -327,7 +327,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                       Navigator.pop(context);
                                                       print('2');
                                                     }else  if (selectedValueDecline != null) {
-                                                      currentFilter = 'Rejected';
+                                                      currentFilter = 'Declined';
                                                       getDataForDeclinedFilter();
                                                       Navigator.pop(context);
                                                       print('0');
@@ -457,17 +457,27 @@ class _ParentsViewState extends State<ParentsView> {
                                               SizedBox(width: 7,),
                                               Text('Delete'.tr, style: TextStyle(fontFamily: 'Poppins-Light',
                                                 fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF432B72),)),],)),],
-                                        onSelected: (String value) {
-                                          if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                        onSelected: (String value) async {
+                                          if (value == 'item1') {
+                                            final _firestore = FirebaseFirestore.instance;
+
+
+                                            DocumentSnapshot parentDoc = await _firestore.collection('parent').doc(data[index].id).get();
+                                            List children = parentDoc.get('children');
+
+                                            String oldNameOfChild = children.isNotEmpty ? children[0]['name'] : '';
+                                            String oldGradeOfChild = children.isNotEmpty ? children[0]['grade'] : '';
+
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) =>
                                               EditAddParents(
                                                 docid: data[index].id,
                                                 oldNumber: data[index].get('phoneNumber'),
                                                 oldName: data[index].get('name'),
                                                 oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
                                                 oldType: data[index].get('typeOfParent'),
-                                                oldNameOfChild: 'test',
-                                                oldGradeOfChild: 'test',
-                                                // oldNameOfChild: data[index].childrenData[index]['grade'],
+                                                oldNameOfChild: oldNameOfChild,
+                                                oldGradeOfChild: oldGradeOfChild,
+                                                // oldNameOfChild: data[index]['children'][index]['name'],
                                                 // oldGradeOfChild: ['l;']
                                                 // oldGradeOfChild: data[index]['childern'].get('grade'),
                                               )),);

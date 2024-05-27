@@ -97,7 +97,7 @@ class _EditAddParentsState extends State<EditAddParents> {
             'typeOfParent': selectedValue,
             'name': _nameController.text,
             'numberOfChildren': _numberOfChildrenController.text,
-            'children': childrenData, // إضافة بيانات الأطفال هنا
+            'children': childrenData,
           });
 
           print('document updated successfully');
@@ -119,387 +119,24 @@ class _EditAddParentsState extends State<EditAddParents> {
     super.initState();
     selectedValue = widget.oldType!;
     _nameController.text = widget.oldName!;
-    _phoneNumberController.text = widget.oldNumber!;
+    _phoneNumberController.text = widget.oldNumber.substring(3)!;
     _numberOfChildrenController.text = widget.oldNumberOfChildren!;
-    nameChildController.text = widget.oldNameOfChild!;
-    gradeController.text = widget.oldGradeOfChild!;
+    nameController.text = widget.oldNameOfChild;
+    gradeController.text = widget.oldGradeOfChild;
+    // List<TextEditingController> nameChildControllers =
+    // List.generate(widget.oldNameOfChild.length, (index) => TextEditingController());
 
-    // nameController.text= widget.oldNameController!;
-    // nameController.text = widget.oldNameOfChild!;
-    // List<String> grades = widget.oldGradeOfChild!;
-    // gradeControllers = grades.map((grade) => TextEditingController(text: grade)).toList();
+// Set the text of each TextEditingController with the corresponding child name
+//     for (int i = 0; i < widget.oldNameOfChild.length; i++) {
+//       nameChildControllers[i].text = widget.oldNameOfChild[i];
+//     }
+//     gradeController.text = widget.oldGradeOfChild!;
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];
 
   final nameChildController = TextEditingController();
-  // final gradeController = TextEditingController();
-  // List<Map<String, dynamic>> genderSelection = [];
-
-
-  // void addChild() {
-  //   setState(() {
-  //     String input = _numberOfChildrenController.text;
-  //     // List<Map<String, bool>> genderSelection = [];
-  //
-  //     int count = int.tryParse(input) ?? 0;
-  //     NumberOfChildren.clear();
-  //     nameChildControllers.clear();
-  //     gradeControllers.clear();
-  //     genderSelection.clear();
-  //
-  //     for (int i = 0; i < count; i++) {
-  //       bool isFemale = false;
-  //       bool isMale = false;
-  //       genderSelection.add({'isFemale': isFemale, 'isMale': isMale});
-  //
-  //
-  //       TextEditingController nameController = TextEditingController();
-  //       TextEditingController gradeController = TextEditingController();
-  //
-  //       nameChildControllers.add(nameController);
-  //       gradeControllers.add(gradeController);
-  //       NumberOfChildren.add(SizedBox(
-  //           width: double.infinity,
-  //           height: 310,
-  //           child: Column(
-  //               children: [
-  //                 Container(
-  //                     decoration: BoxDecoration(
-  //                       color: Color(0xff771F98).withOpacity(0.03),
-  //                       borderRadius: BorderRadius.circular(14),
-  //                     ),
-  //                     child: Column(
-  //                       mainAxisAlignment: MainAxisAlignment.start,
-  //                       crossAxisAlignment: CrossAxisAlignment.start,
-  //                       children: [
-  //                         SizedBox(
-  //                           height: 10,
-  //                         ),
-  //                         Padding(
-  //                           padding: (sharedpref?.getString('lang') == 'ar')?
-  //                           EdgeInsets.only(right: 12.0):
-  //                           EdgeInsets.only(left: 12.0),
-  //                           child: Text.rich(
-  //                             TextSpan(
-  //                               children: [
-  //                                 TextSpan(
-  //                                   text: 'Child '.tr,
-  //                                   style: TextStyle(
-  //                                     color: Color(0xff771F98),
-  //                                     fontSize: 16,
-  //                                     fontFamily: 'Poppins-Bold',
-  //                                     fontWeight: FontWeight.w700,
-  //                                   ),
-  //                                 ),
-  //                                 TextSpan(
-  //                                   text: '${i + 1}' ,
-  //                                   style: TextStyle(
-  //                                     color: Color(0xff771F98),
-  //                                     fontSize: 16,
-  //                                     fontFamily: 'Poppins-Bold',
-  //                                     fontWeight: FontWeight.w700,
-  //                                   ),
-  //                                 ),
-  //                               ],
-  //                             ),
-  //                           ),
-  //                         ) ,
-  //                         SizedBox(height: 8,),
-  //                         Padding(
-  //                           padding: (sharedpref?.getString('lang') == 'ar')?
-  //                           EdgeInsets.only(right: 18.0):
-  //                           EdgeInsets.only(left: 18.0),
-  //                           child: Text.rich(
-  //                             TextSpan(
-  //                               children: [
-  //                                 TextSpan(
-  //                                   text: 'Name'.tr,
-  //                                   style: TextStyle(
-  //                                     color: Color(0xFF442B72),
-  //                                     fontSize: 15,
-  //                                     fontFamily: 'Poppins-Bold',
-  //                                     fontWeight: FontWeight.w700,
-  //                                     height: 1.07,
-  //                                   ),
-  //                                 ),
-  //                                 TextSpan(
-  //                                   text: ' *',
-  //                                   style: TextStyle(
-  //                                     color: Colors.red,
-  //                                     fontSize: 15,
-  //                                     fontFamily: 'Poppins-Bold',
-  //                                     fontWeight: FontWeight.w700,
-  //                                     height: 1.07,
-  //                                   ),
-  //                                 ),
-  //                               ],
-  //                             ),
-  //                           ),
-  //                         ) ,
-  //                         SizedBox(height: 8,),
-  //                         Padding(
-  //                           padding:
-  //                           EdgeInsets.symmetric(horizontal: 18.0),
-  //                           child: SizedBox(
-  //                             // width: 277,
-  //                             height: 38,
-  //                             child: TextFormField(
-  //                               controller: nameController,
-  //                               style: TextStyle(
-  //                                 color: Color(0xFF442B72),
-  //                                 fontSize: 12,
-  //                                 fontFamily: 'Poppins-Light',
-  //                                 fontWeight: FontWeight.w400,
-  //                                 height: 1.33,
-  //                               ),
-  //                               cursorColor: const Color(0xFF442B72),
-  //                               textDirection: (sharedpref?.getString('lang') == 'ar') ?
-  //                               TextDirection.rtl:
-  //                               TextDirection.ltr,
-  //                               // autofocus: true,
-  //                               textInputAction: TextInputAction.next,
-  //                               keyboardType: TextInputType.text,
-  //                               textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-  //                               TextAlign.right :
-  //                               TextAlign.left ,
-  //                               scrollPadding:  EdgeInsets.symmetric(
-  //                                   vertical: 30),
-  //                               decoration:  InputDecoration(
-  //                                 alignLabelWithHint: true,
-  //                                 counterText: "",
-  //                                 fillColor: const Color(0xFFF1F1F1),
-  //                                 filled: true,
-  //                                 contentPadding:
-  //                                 (sharedpref?.getString('lang') == 'ar') ?
-  //                                 EdgeInsets.fromLTRB(0, 0, 17, 20):
-  //                                 EdgeInsets.fromLTRB(17, 0, 0, 10),
-  //                                 hintText:'Please enter your child name'.tr,
-  //                                 floatingLabelBehavior:  FloatingLabelBehavior.never,
-  //                                 hintStyle: const TextStyle(
-  //                                   color: Color(0xFF9E9E9E),
-  //                                   fontSize: 12,
-  //                                   fontFamily: 'Poppins-Bold',
-  //                                   fontWeight: FontWeight.w700,
-  //                                   height: 1.33,
-  //                                 ),
-  //                                 focusedBorder: OutlineInputBorder(
-  //                                   borderRadius: BorderRadius.all(Radius.circular(7)),
-  //                                   borderSide: BorderSide(
-  //                                     color: Color(0xFFFFC53E),
-  //                                     width: 0.5,
-  //                                   ),),
-  //                                 enabledBorder: OutlineInputBorder(
-  //                                   borderRadius: BorderRadius.all(Radius.circular(7)),
-  //                                   borderSide: BorderSide(
-  //                                     color: Color(0xFFFFC53E),
-  //                                     width: 0.5,
-  //                                   ),
-  //                                 ),
-  //                                 // enabledBorder: myInputBorder(),
-  //                                 // focusedBorder: myFocusBorder(),
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         // nameChildeError? Container():Padding(
-  //                         //   padding: const EdgeInsets.symmetric(horizontal: 20),
-  //                         //   child: Text(
-  //                         //     "Please enter your child name".tr,
-  //                         //     style: TextStyle(color: Colors.red),
-  //                         //   ),
-  //                         // ),
-  //                         SizedBox(height: 12,),
-  //                         Padding(
-  //                           padding: (sharedpref?.getString('lang') == 'ar')?
-  //                           EdgeInsets.only(right: 18.0):
-  //                           EdgeInsets.only(left: 18.0),
-  //                           child: Text.rich(
-  //                             TextSpan(
-  //                               children: [
-  //                                 TextSpan(
-  //                                   text: 'Grade'.tr,
-  //                                   style: TextStyle(
-  //                                     color: Color(0xFF442B72),
-  //                                     fontSize: 15,
-  //                                     fontFamily: 'Poppins-Bold',
-  //                                     fontWeight: FontWeight.w700,
-  //                                     height: 1.07,
-  //                                   ),
-  //                                 ),
-  //                                 TextSpan(
-  //                                   text: ' *',
-  //                                   style: TextStyle(
-  //                                     color: Colors.red,
-  //                                     fontSize: 15,
-  //                                     fontFamily: 'Poppins-Bold',
-  //                                     fontWeight: FontWeight.w700,
-  //                                     height: 1.07,
-  //                                   ),
-  //                                 ),
-  //                               ],
-  //                             ),
-  //                           ),
-  //                         ) ,
-  //                         SizedBox(height: 8,),
-  //                         Padding(
-  //                           padding:
-  //                           EdgeInsets.symmetric(horizontal: 18.0),
-  //                           child: SizedBox(
-  //                             // width: 277,
-  //                             height: 38,
-  //                             child: TextFormField(
-  //                               controller: gradeControllers[i],
-  //                               style: TextStyle(color: Color(0xFF442B72),
-  //                                 fontSize: 12,
-  //                                 fontFamily: 'Poppins-Light',
-  //                                 fontWeight: FontWeight.w400,
-  //                                 height: 1.33, ),
-  //                               cursorColor: const Color(0xFF442B72),
-  //                               textDirection: (sharedpref?.getString('lang') == 'ar') ?
-  //                               TextDirection.rtl:
-  //                               TextDirection.ltr,
-  //                               // autofocus: true,
-  //                               textInputAction: TextInputAction.done,
-  //                               keyboardType: TextInputType.number,
-  //                               inputFormatters: <TextInputFormatter>[
-  //                                 FilteringTextInputFormatter.digitsOnly],
-  //                               textAlign:  (sharedpref?.getString('lang') == 'ar') ?
-  //                               TextAlign.right :
-  //                               TextAlign.left ,
-  //                               scrollPadding:  EdgeInsets.symmetric(
-  //                                   vertical: 30),
-  //                               decoration:  InputDecoration(
-  //                                 alignLabelWithHint: true,
-  //                                 counterText: "",
-  //                                 fillColor: const Color(0xFFF1F1F1),
-  //                                 filled: true,
-  //                                 contentPadding:
-  //                                 (sharedpref?.getString('lang') == 'ar') ?
-  //                                 EdgeInsets.fromLTRB(0, 0, 17, 15):
-  //                                 EdgeInsets.fromLTRB(17, 0, 0, 10),
-  //                                 hintText:'Please enter your child grade'.tr,
-  //                                 floatingLabelBehavior:  FloatingLabelBehavior.never,
-  //                                 hintStyle: const TextStyle(
-  //                                   color: Color(0xFF9E9E9E),
-  //                                   fontSize: 12,
-  //                                   fontFamily: 'Poppins-Bold',
-  //                                   fontWeight: FontWeight.w700,
-  //                                   height: 1.33,
-  //                                 ),
-  //                                 focusedBorder: OutlineInputBorder(
-  //                                   borderRadius: BorderRadius.all(Radius.circular(7)),
-  //                                   borderSide: BorderSide(
-  //                                     color: Color(0xFFFFC53E),
-  //                                     width: 0.5,
-  //                                   ),),
-  //                                 enabledBorder: OutlineInputBorder(
-  //                                   borderRadius: BorderRadius.all(Radius.circular(7)),
-  //                                   borderSide: BorderSide(
-  //                                     color: Color(0xFFFFC53E),
-  //                                     width: 0.5,
-  //                                   ),
-  //                                 ),
-  //                                 // enabledBorder: myInputBorder(),
-  //                                 // focusedBorder: myFocusBorder(),
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         // GradeError?Container(): Padding(
-  //                         //   padding: const EdgeInsets.symmetric(horizontal: 20),
-  //                         //   child: Text(
-  //                         //     "Please enter your child grade".tr,
-  //                         //     style: TextStyle(color: Colors.red),
-  //                         //   ),
-  //                         // ),
-  //                         SizedBox(height: 12,),
-  //                         Padding(
-  //                             padding: (sharedpref?.getString('lang') == 'ar')?
-  //                             EdgeInsets.only(right: 18.0):
-  //                             EdgeInsets.only(left: 18.0),
-  //                             child: Text(
-  //                               'Gender'.tr,
-  //                               style: TextStyle(
-  //                                 color: Color(0xFF442B72),
-  //                                 fontSize: 15,
-  //                                 fontFamily: 'Poppins-Bold',
-  //                                 fontWeight: FontWeight.w700,
-  //                                 height: 1.07,
-  //                               ),)
-  //                         ) ,
-  //                         // SizedBox(height: 12,),
-  //                         Padding(
-  //                             padding: (sharedpref?.getString('lang') == 'ar') ?
-  //                             EdgeInsets.only(right: 15.0):
-  //                             EdgeInsets.only(left: 15.0),
-  //                             child:  Row(
-  //                                 children: [
-  //                                   Row(
-  //                                     children: [
-  //                                       Radio<bool>(
-  //                                         value: true,
-  //                                         groupValue: genderSelection[i]['isFemale'],
-  //                                         onChanged: (value) {
-  //                                           setState(() {
-  //                                             genderSelection[i]['isFemale'] = value!;
-  //                                             genderSelection[i]['isMale'] = !value;
-  //                                           });
-  //                                         },
-  //                                         fillColor: MaterialStateProperty.resolveWith((states) {
-  //                                           if (states.contains(MaterialState.selected)) {
-  //                                             return Color(0xff442B72);
-  //                                           }
-  //                                           return Color(0xff442B72);
-  //                                         }),
-  //                                         activeColor: Color(0xff442B72), // Set the color of the selected radio button
-  //                                       ),
-  //                                       Text(
-  //                                         "Female".tr ,
-  //                                         style: TextStyle(
-  //                                           fontSize: 15 ,
-  //                                           fontFamily: 'Poppins-Regular',
-  //                                           fontWeight: FontWeight.w500 ,
-  //                                           color: Color(0xff442B72),),
-  //                                       ),
-  //                                       SizedBox(
-  //                                         width: 50, //115
-  //                                       ),
-  //                                       Radio<bool>(
-  //                                         fillColor: MaterialStateProperty.resolveWith((states) {
-  //                                           if (states.contains(MaterialState.selected)) {
-  //                                             return Color(0xff442B72);
-  //                                           }
-  //                                           return Color(0xff442B72);
-  //                                         }),
-  //                                         value: true,
-  //                                         groupValue: genderSelection[i]['isMale'],
-  //                                         onChanged: (value) {
-  //                                           setState(() {
-  //                                             genderSelection[i]['isMale'] = value!;
-  //                                             genderSelection[i]['isFemale'] = !value;
-  //                                           });
-  //                                         },
-  //                                         activeColor: Color(0xff442B72),
-  //                                       ),
-  //                                       Text("Male".tr,
-  //                                         style: TextStyle(
-  //                                           fontSize: 15 ,
-  //                                           fontFamily: 'Poppins-Regular',
-  //                                           fontWeight: FontWeight.w500 ,
-  //                                           color: Color(0xff442B72),),),
-  //                                     ],
-  //                                   ),
-  //                                   SizedBox(height: 10,)
-  //                                 ])),
-  //                       ],
-  //                     ))]))
-  //       );
-  //     }
-  //     setState(() {});
-  //   });
-  // }
 
 
   @override
@@ -1045,9 +682,10 @@ class _EditAddParentsState extends State<EditAddParents> {
                                 initialCountryCode: 'EG',
                                 // Set initial country code if needed
                                 onChanged: (phone) {
-                                  enteredPhoneNumber = phone.completeNumber;
+                                    enteredPhoneNumber = phone.completeNumber;
+                                  setState(() {
 
-                                  // Update the enteredPhoneNumber variable with the entered phone number
+                                  });
                                 },
                               ),
                             ),
@@ -1121,6 +759,9 @@ class _EditAddParentsState extends State<EditAddParents> {
                               height: 40,
                               child: TextFormField(
                                 onChanged: (val) {
+                                  setState(() {
+
+                                  });
                                   String input = _numberOfChildrenController.text;
                                   count = int.tryParse(input) ?? 0;
                                   // count = count - nameChildControllers.length;
@@ -1130,7 +771,6 @@ class _EditAddParentsState extends State<EditAddParents> {
                                     TextEditingController();
                                     TextEditingController gradeController =
                                     TextEditingController();
-
                                     nameChildControllers.add(nameController);
                                     gradeControllers.add(gradeController);
                                   }
@@ -1221,21 +861,13 @@ class _EditAddParentsState extends State<EditAddParents> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  // onTap: (){
-                                  //   setState(() {
-                                  //     // modifyText();
-                                  //     addChild();
-                                  //     NumberOfChildrenCard = !NumberOfChildrenCard;
-                                  //   });
                                     onTap: () {
-                                      // modifyText();
-                                      //addChild();
-
-                                      //     NumberOfChildrenCard = !NumberOfChildrenCard;
-                                      if (visible)
+                                      if (visible){
                                         visible = false;
+                                      print('done1');}
                                       else
                                         visible = true;
+                                      print('done222');
                                       setState(() {});
                                     },
                                     child: NumberOfChildrenCard
