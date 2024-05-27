@@ -29,28 +29,34 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
   final _firestore = FirebaseFirestore.instance;
+  bool dataLoading=false;
 
   getData()async{
+    setState(() {
+      dataLoading =true;
+
+    });
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
     data.addAll(querySnapshot.docs);
     setState(() {
+      dataLoading =false;
+
     });
   }
 
   @override
   void initState() {
+
     getData();
     super.initState();
-    setState(() {
 
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     print('invite'+sharedpref!.getInt('invit').toString());
 
-    if (data.isEmpty) {
+    if (dataLoading) {
       return Center(
         child: Loading(),
       );
