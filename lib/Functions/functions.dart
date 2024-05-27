@@ -288,4 +288,5 @@ void makePhoneCall(String phoneNumber) async {
   } else {
     throw 'Could not launch $mobileCall';
   }
+
 }
