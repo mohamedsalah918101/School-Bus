@@ -21,8 +21,11 @@ import '../components/main_bottom_bar.dart';
 import '../components/supervisor_card.dart';
 import 'notification_parent.dart';
 class StudentScreen extends StatefulWidget {
+  // final Map<String, dynamic> parentData;
+
   StudentScreen({
-    Key? key,
+    Key? key,  required String docid, required oldNumber, required oldName, required String oldNumberOfChildren, required oldType,
+    // required this.parentData,
   }) : super(key: key);
 
   @override
@@ -104,6 +107,10 @@ class _StudentScreen extends State<StudentScreen> {
                             fontWeight: FontWeight.w700,
                           ),),
                       ),
+
+
+                      // Text('Gender: ${childData['gender']}'),
+
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
                         child: ListView.builder(
@@ -113,7 +120,7 @@ class _StudentScreen extends State<StudentScreen> {
                           itemBuilder: (BuildContext context, int index) {
                             return Column(
                               children: [
-                                StudentCardInStudent(),
+                                StudentCardInStudent(childData: {},),
                                 SizedBox(height:10),
                               ],
                             );

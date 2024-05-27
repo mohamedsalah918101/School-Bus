@@ -9,7 +9,10 @@ import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'elevated_simple_button.dart';
 
 class StudentCardInStudent extends StatefulWidget {
-  StudentCardInStudent({super.key, });
+  final Map<String, dynamic> childData;
+
+  StudentCardInStudent({super.key,
+    required this.childData, });
 
   @override
   State<StudentCardInStudent> createState() => _StudentCardInStudentState();
@@ -56,6 +59,7 @@ class _StudentCardInStudentState extends State<StudentCardInStudent> {
                         Padding(
                           padding: const EdgeInsets.only(top: 0.0),
                           child: Text(
+                            // 'Gender: ${childData['gender']}',
                             'Shady Ayman',
                             style: TextStyle(
                               color: Color(0xff442B72),
