@@ -607,7 +607,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
 
                                           String supervisorPhoneNumber = filteredData[index]['phoneNumber'];
-                                          int state =data[index]['state']; // Assuming 'state' is the field from Firestore
+                                          int state =filteredData[index]['state']; // Assuming 'state' is the field from Firestore
 
                                           Color statusColor;
                                           String statusText;
