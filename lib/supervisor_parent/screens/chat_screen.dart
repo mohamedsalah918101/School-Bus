@@ -23,10 +23,12 @@ class ChatScreen extends StatefulWidget {
 
   final String receiverName;
   final String receiverPhone;
+  final String receiverId;
 
   ChatScreen({
     required this.receiverPhone,
     required this.receiverName,
+    required this.receiverId,
   });
 
   @override
@@ -332,7 +334,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: _fireStore.collection("msg")
                       .where('sender', isEqualTo: currentUserEmail)
-                      .where('receiver', isEqualTo: widget.receiverPhone)
+                      .where('receiver', isEqualTo: widget.receiverId)
                       .orderBy("time").snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -510,7 +512,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
                           _fireStore.collection("msg").add({
                             "sender": currentUserEmail,
-                            "receiver":  widget.receiverPhone,
+                            "receiver":  widget.receiverId,
                             "txt": msgText.text.toString(),
                             "time":formattedTime
                             // DateTime.now(),

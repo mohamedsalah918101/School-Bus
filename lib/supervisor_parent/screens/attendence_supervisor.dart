@@ -404,6 +404,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                                                         ChatScreen(
                                                                           receiverName: data[index]['name'],
                                                                           receiverPhone: data[index]['phoneNumber'],
+                                                                          receiverId : data[index].id,
                                                                         )));
                                                               },
                                                             ),
