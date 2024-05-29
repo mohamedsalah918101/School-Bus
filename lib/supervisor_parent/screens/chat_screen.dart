@@ -39,7 +39,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController msgText = TextEditingController();
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
-  final String? currentUserEmail = sharedpref?.getString('id'); // replace with actual user email
+  final String? currentUserID = sharedpref?.getString('id'); // replace with actual user email
   String previousSender = '';
   UserStatusService _userStatusService = UserStatusService();
   bool sending = true;
@@ -150,23 +150,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  // Future<void> _initializeRecorder() async {
-  //   _recorder = FlutterSoundRecorder();
-  //
-  //   final status = await Permission.microphone.request();
-  //   if (status != PermissionStatus.granted) {
-  //     throw RecordingPermissionException("Microphone permission not granted");
-  //   }
-  //
-  //   print("Before opening recorder: Recorder is null? ${_recorder == null}");
-  //   try {
-  //     await _recorder?.openRecorder();
-  //     print("Recorder opened successfully");
-  //   } catch (e) {
-  //     print("Failed to open recorder: $e");
-  //   }
-  //   print("After opening recorder: Recorder is null? ${_recorder == null}");
-  // }
+
 
   Future initRecorder() async {
     final status = await Permission.microphone.request();
@@ -191,11 +175,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
 
   void _scrollToBottom() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      }
-    });
+     // if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent+5);
+     // }
+
   }
 
 
@@ -246,21 +229,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             ),
           ],
       title:
-      // StreamBuilder<DocumentSnapshot>(
-      //   stream: _fireStore.collection('msg').doc(widget.receiverId).snapshots(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.connectionState == ConnectionState.waiting) {
-      //       return CircularProgressIndicator();
-      //     }
-      //     if (snapshot.hasError) {
-      //       return Text('Error: ${snapshot.error}');
-      //     }
-      //     if (!snapshot.hasData || !snapshot.data!.exists) {
-      //       return Text('Document does not exist');
-      //     }
-      //     var data = snapshot.data!.data() as Map<String, dynamic>?; // Explicit cast
-      //     String status = data?['status'] ?? 'Offline';
-      //     return
             Padding(
               padding: const EdgeInsets.only(right: 0.0),
               child: Row(
@@ -333,20 +301,22 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 padding: const EdgeInsets.only(left: 24.0, bottom: 5, right: 24, top: 5),
                 child: StreamBuilder<QuerySnapshot>(
                   stream: _fireStore.collection("msg")
-                      .where('sender', isEqualTo: currentUserEmail)
-                      .where('receiver', isEqualTo: widget.receiverId)
                       .orderBy("time").snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       WidgetsBinding.instance!.addPostFrameCallback((_) {
-                        _scrollToBottom();});
+                        _scrollToBottom();
+
+                      print('ssssssssss');});
                       List<Widget> allMessages = [];
                       var responseMessages = snapshot.data!.docs;
                       for (var i = 0; i < responseMessages.length; i++) {
-                        String txt = responseMessages[i].get('txt');
+    if (responseMessages[i].get('sender') == currentUserID || responseMessages[i].get('receiver') == currentUserID) {
+
+    String txt = responseMessages[i].get('txt');
                         String sender = responseMessages[i].get('sender');
                         allMessages.add(
-                          sender == currentUserEmail
+                          sender == currentUserID
                               ? SenderMessageItem(
                             messageContent: txt,
                             time: responseMessages[i].get('time').toString(),
@@ -359,12 +329,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         if (i > 0) {
                           previousSender = responseMessages[i - 1].get('sender');
                         }
-                      }
+                      }}
                       return ListView(
                         controller: _scrollController,
                         reverse: false,
                         children: allMessages,
                       );
+
                     } else {
                       return Center(
                         child: CircularProgressIndicator(),
@@ -508,10 +479,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                             sending = true;
                           //  sending = !sending
                           });
-                          String formattedTime = DateFormat('HH:mm').format(DateTime.now());
+                          String formattedTime = DateFormat('HH:mm:ss').format(DateTime.now());
 
                           _fireStore.collection("msg").add({
-                            "sender": currentUserEmail,
+                            "sender": currentUserID,
                             "receiver":  widget.receiverId,
                             "txt": msgText.text.toString(),
                             "time":formattedTime

@@ -40,7 +40,7 @@ class SenderMessageItem extends StatelessWidget {
             height: 9,
           ),
           Container(
-            width: 60,
+            width: 80,
             height: 25,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6.5),

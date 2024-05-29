@@ -234,9 +234,10 @@ class _ChildCardState extends State<ChildCard> {
                          padding: const EdgeInsets.only(right: 12.0),
                          child: GestureDetector(
                            onTap: () {
-                             // Navigator.of(context).push(
-                             //     MaterialPageRoute(builder: (context) =>
-                             //         ChatScreen()));
+                             Navigator.of(context).push(
+                                 MaterialPageRoute(builder: (context) =>
+                                     ChatScreen(receiverPhone: widget.childrenData!.supervisors![0].phone!, receiverName: widget.childrenData!.supervisors![0].name!,
+                                       receiverId: widget.childrenData!.supervisors![0].id!,)));
                              },
                            child: Image.asset('assets/images/icons8_chat 1.png' ,
                              width: 26,
@@ -305,9 +306,10 @@ class _ChildCardState extends State<ChildCard> {
                                 padding: const EdgeInsets.only(right: 12.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Navigator.of(context).push(
-                                    //     MaterialPageRoute(builder: (context) =>
-                                    //         ChatScreen()));
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) =>
+                                            ChatScreen(receiverPhone: widget.childrenData!.supervisors![0].phone!, receiverName: widget.childrenData!.supervisors![0].name!,
+                                              receiverId: widget.childrenData!.supervisors![0].id!,)));
                                     },
                                   child: Image.asset('assets/images/icons8_chat 1.png' ,
                                     width: 26,
@@ -376,9 +378,10 @@ class _ChildCardState extends State<ChildCard> {
                                 padding: const EdgeInsets.only(right: 12.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Navigator.of(context).push(
-                                    //     MaterialPageRoute(builder: (context) =>
-                                    //         ChatScreen()));
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) =>
+                                            ChatScreen(receiverPhone: widget.childrenData!.supervisors![1].phone!, receiverName: widget.childrenData!.supervisors![1].name!,
+                                              receiverId: widget.childrenData!.supervisors![1].id!,)));
                                     },
                                   child: Image.asset('assets/images/icons8_chat 1.png' ,
                                     width: 26,

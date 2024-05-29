@@ -256,7 +256,6 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                           width: double.infinity,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
                             itemCount: data.length,
                             itemBuilder: (BuildContext context, int index) {
                               List children = data[index]['children'];
