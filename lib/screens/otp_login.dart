@@ -261,7 +261,7 @@ class _OtpScreenLoginState extends State<OtpScreenLogin> {
                                   controller: _pinCodeController,
                                   textStyle:  TextStyle(
                                     fontSize: 24,
-                                    fontFamily: 'Inter-SemiBold',color: _phoneNumberEntered ?  Colors.red:Color(0xff8198A5)
+                                    fontFamily: 'Inter-SemiBold',color: _phoneNumberEntered ?  Colors.red:Color(0xff001D4A)
                                   ),
                                   hintCharacter: '0',
                                   hintStyle:  TextStyle(

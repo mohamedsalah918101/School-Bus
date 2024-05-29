@@ -30,7 +30,6 @@ import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/sendInvitationScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import '../Functions/functions.dart';
 import '../classes/dropdownRadiobutton.dart';
 import '../classes/dropdowncheckboxitem.dart';
 import '../components/bottom_bar_item.dart';
@@ -58,46 +57,53 @@ class BusScreen extends StatefulWidget{
 class BusScreenSate extends State<BusScreen> {
   //fun to make call
 
-
+  void _makePhoneCall(String phoneNumber) async {
+    var mobileCall = 'tel:$phoneNumber';
+    if (await canLaunchUrlString(mobileCall)) {
+      await launchUrlString(mobileCall);
+    } else {
+      throw 'Could not launch $mobileCall';
+    }
+  }
   List<QueryDocumentSnapshot> filteredData = [];
   List<QueryDocumentSnapshot<Object?>> filteredQuerySnapshots = [];
 
   List data=[];
-getData()async{
-  QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
-  data.addAll(querySnapshot.docs);
-  setState(() {
-    data = querySnapshot.docs;
-    // Initialize filteredData with a copy of data
-    filteredData = List.from(data);
+  getData()async{
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+      data = querySnapshot.docs;
+      // Initialize filteredData with a copy of data
+      filteredData = List.from(data);
 
-    // Cast filteredData to List<QueryDocumentSnapshot<Object?>>
-    filteredQuerySnapshots =
-        filteredData.cast<QueryDocumentSnapshot<Object?>>();
-    //filteredData = List.from(data);
-  });
-}
-void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ,List<dynamic>supervisors) {
- List<DropdownCheckboxItem>allSupervisors=[];
- for(int i=0;i<supervisors.length;i++){
-   allSupervisors.add(DropdownCheckboxItem(label: supervisors[i]['name'],phone: supervisors[i]['phone'],docID: supervisors[i]['id']));
- }
- selectedItems.clear();
- selectedItems=allSupervisors;
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => EditeBus(
-        docid: documentId,
-        oldphotodriver: imagedriver,
+      // Cast filteredData to List<QueryDocumentSnapshot<Object?>>
+      filteredQuerySnapshots =
+          filteredData.cast<QueryDocumentSnapshot<Object?>>();
+      //filteredData = List.from(data);
+    });
+  }
+  void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ,List<dynamic>supervisors) {
+    List<DropdownCheckboxItem>allSupervisors=[];
+    for(int i=0;i<supervisors.length;i++){
+      allSupervisors.add(DropdownCheckboxItem(label: supervisors[i]['name'],phone: supervisors[i]['phone'],docID: supervisors[i]['id']));
+    }
+    selectedItems.clear();
+    selectedItems=allSupervisors;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditeBus(
+          docid: documentId,
+          oldphotodriver: imagedriver,
           olddrivername:namedriver,
           olddriverphone:driverphone,
-         oldphotobus:photobus,
+          oldphotobus:photobus,
           olddnumberbus:numberbus, allSupervisors: allSupervisors,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 //fun delete bus
   void _deletebusDocument(String documentId) {
     FirebaseFirestore.instance
@@ -183,7 +189,7 @@ void _editBusDocument(String documentId, String imagedriver, String namedriver, 
   int _counter = 0;
   // هنا تقوم بتعريف الحالة
   bool _isButtonDisabled= true;
-final _firestore = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
   //هنا بتعريق الدالة التي ستفوم بعمل الزيادة
   void _incrementCounter() {
     setState(() {
@@ -238,887 +244,893 @@ final _firestore = FirebaseFirestore.instance;
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: InkWell(onTap: (){},
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Align(
-                              alignment: AlignmentDirectional.topStart,
-                              child: InkWell(
-                                // onTap: ()=>exit(0),
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                  // Navigate back to the previous page
-                                  Navigator.pop(context);
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Align(
+                            alignment: AlignmentDirectional.topStart,
+                            child: InkWell(
+                              // onTap: ()=>exit(0),
+                              onTap: () {
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                // Navigate back to the previous page
+                                Navigator.pop(context);
 
-                                },
-                                child: const Icon(
-                                  Icons.arrow_back_ios_new_rounded,
-                                  size: 26,
-                                  color: Color(0xff442B72),
-                                ),
+                              },
+                              child: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 26,
+                                color: Color(0xff442B72),
                               ),
                             ),
-                           // SizedBox(width: 20,),
-                            Expanded(
-                              child: Center(
-                                child: Align( alignment: AlignmentDirectional.center,
-                                  child: Text(
-                                    "Buses".tr,
-                                    style: TextStyle(
-                                      color: Color(0xFF993D9A),
-                                      fontSize: 20,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                      //height: 0.64,
-                                    ),
+                          ),
+                          // SizedBox(width: 20,),
+                          Expanded(
+                            child: Center(
+                              child: Align( alignment: AlignmentDirectional.center,
+                                child: Text(
+                                  "Buses".tr,
+                                  style: TextStyle(
+                                    color: Color(0xFF993D9A),
+                                    fontSize: 20,
+                                    fontFamily: 'Poppins-Bold',
+                                    fontWeight: FontWeight.w700,
+                                    //height: 0.64,
                                   ),
                                 ),
                               ),
                             ),
-                            InkWell(onTap: (){
-                              Scaffold.of(context).openEndDrawer();
-                            },
-                              child: Align(
-                                alignment: AlignmentDirectional.topEnd,
-                                child: const Icon(
-                                  Icons.menu_rounded,
-                                  size: 40,
-                                  color: Color(0xff442B72),
-                                ),
+                          ),
+                          InkWell(onTap: (){
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                            child: Align(
+                              alignment: AlignmentDirectional.topEnd,
+                              child: const Icon(
+                                Icons.menu_rounded,
+                                size: 40,
+                                color: Color(0xff442B72),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     Expanded(
                       child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
 
 
-                          const SizedBox(
-                            height: 20,
-                          ),
+                            const SizedBox(
+                              height: 20,
+                            ),
 
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Stack(
-                              children: [
 
-                                Padding(
-                                  padding: const EdgeInsets.only(top:5),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 1),
-                                        child:
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                //width: constrains.maxWidth / 1.0,
-                                                height: 50,
-                                                child: Theme(
-                                                  data: ThemeData(
-                                                    textSelectionTheme: TextSelectionThemeData(
-                                                      cursorColor: Color(0xFF442B72),
-                                                      // Set the desired cursor color here
-                                                    ),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child: SearchBar(
-                                                      leading: Padding(
-                                                        padding: const EdgeInsets.only(left: 4.0),
-                                                        child: Image.asset("assets/imgs/school/icons8_search 1.png",width: 22,height: 22,),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Stack(
+                                children: [
+
+                                  Padding(
+                                    padding: const EdgeInsets.only(top:5),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 1),
+                                          child:
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  //width: constrains.maxWidth / 1.0,
+                                                  height: 50,
+                                                  child: Theme(
+                                                    data: ThemeData(
+                                                      textSelectionTheme: TextSelectionThemeData(
+                                                        cursorColor: Color(0xFF442B72),
+                                                        // Set the desired cursor color here
                                                       ),
-                                                      //Icon(Icons.search,color: Color(0xFFC2C2C2),),
-                                                      controller: searchController,
-                                                      textStyle:MaterialStateProperty.all<TextStyle?>(TextStyle(color: Color(0xFF442B72),)) ,
-                                                      hintText: "Search Name".tr,
-                                                      onChanged: (query) {
-                                                        setState(() {
-                                                          filteredData = data.where((item) {
-                                                            if (selectedFilter == 'Bus Number') {
-                                                              // Filter by bus number
-                                                              String busNumber = item['busnumber'] as String;
-                                                              return busNumber.toLowerCase().contains(query.toLowerCase());
-                                                            } else if (selectedFilter == 'Driver Name') {
-                                                              // Filter by driver name
-                                                              String driverName = item['namedriver'] as String;
-                                                              return driverName.toLowerCase().contains(query.toLowerCase());
-                                                            }
-                                                            return false; // Default case
-                                                          }).toList().cast<QueryDocumentSnapshot<Object?>>();
-                                                        });
-                                                        // setState(() {
-                                                        //   filteredData = data.where((item) {
-                                                        //     if (selectedFilter == 'Bus Number') {
-                                                        //       // Filter by bus number
-                                                        //       return item['busnumber'].toString().toLowerCase().contains(query.toLowerCase());
-                                                        //     } else if (selectedFilter == 'Driver Name') {
-                                                        //       // Filter by driver name
-                                                        //       return item['namedriver'].toString().toLowerCase().contains(query.toLowerCase());
-                                                        //     }
-                                                        //     return false; // Default case
-                                                        //   }).toList();
-                                                        // });
-                                                      },
-                                                      hintStyle: MaterialStateProperty.all<TextStyle?>(TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold')) ,
-                                                      backgroundColor: MaterialStateProperty.all<Color?>(Color(0xFFF1F1F1)),
-                                                      elevation: MaterialStateProperty.all<double?>(0.0),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(left: 10),
+                                                      child: SearchBar(
+                                                        leading: Padding(
+                                                          padding: const EdgeInsets.only(left: 4.0),
+                                                          child: Image.asset("assets/imgs/school/icons8_search 1.png",width: 22,height: 22,),
+                                                        ),
+                                                        //Icon(Icons.search,color: Color(0xFFC2C2C2),),
+                                                        controller: searchController,
+                                                        textStyle:MaterialStateProperty.all<TextStyle?>(TextStyle(color: Color(0xFF442B72),)) ,
+                                                        hintText: "Search Name".tr,
+                                                        onChanged: (query) {
+                                                          setState(() {
+                                                            filteredData = data.where((item) {
+                                                              if (selectedFilter == 'Bus Number') {
+                                                                // Filter by bus number
+                                                                String busNumber = item['busnumber'] as String;
+                                                                return busNumber.toLowerCase().contains(query.toLowerCase());
+                                                              } else if (selectedFilter == 'Driver Name') {
+                                                                // Filter by driver name
+                                                                String driverName = item['namedriver'] as String;
+                                                                return driverName.toLowerCase().contains(query.toLowerCase());
+                                                              }
+                                                              return false; // Default case
+                                                            }).toList().cast<QueryDocumentSnapshot<Object?>>();
+                                                          });
+                                                          // setState(() {
+                                                          //   filteredData = data.where((item) {
+                                                          //     if (selectedFilter == 'Bus Number') {
+                                                          //       // Filter by bus number
+                                                          //       return item['busnumber'].toString().toLowerCase().contains(query.toLowerCase());
+                                                          //     } else if (selectedFilter == 'Driver Name') {
+                                                          //       // Filter by driver name
+                                                          //       return item['namedriver'].toString().toLowerCase().contains(query.toLowerCase());
+                                                          //     }
+                                                          //     return false; // Default case
+                                                          //   }).toList();
+                                                          // });
+                                                        },
+                                                        hintStyle: MaterialStateProperty.all<TextStyle?>(TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold')) ,
+                                                        backgroundColor: MaterialStateProperty.all<Color?>(Color(0xFFF1F1F1)),
+                                                        elevation: MaterialStateProperty.all<double?>(0.0),
 
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              width:15,
-                                            ),
-                                            // Image(image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
-                                            // width: 27.62,
-                                            // height: 21.6,),
-                                            PopupMenuButton<String>(
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(right: 15),
-                                                child: Image(
-                                                  image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
-                                                  width: 29,
-                                                  height: 29,
-                                                  color: Color(0xFF442B72), // Optionally, you can set the color of the image
-                                                ),
+                                              SizedBox(
+                                                width:15,
                                               ),
-                                              // icon: FaIcon(
-                                              //   FontAwesomeIcons.sliders,
-                                              //   size: 20, // Adjust the size as needed
-                                              //   color: Color(0xFF442B72), // Set the color of the icon
-                                              // ),
-                                              itemBuilder: (BuildContext context) {
-                                                return [
-                                                  PopupMenuItem<String>(
-                                                    value: 'custom',
-                                                    child:
-                                                    Column(
-                                                      children: [
-                                                        Container(
-                                                          child:  DropdownRadiobutton(
-                                                            items: [
-                                                              DropdownCheckboxItem(label: 'Bus Number'),
-                                                              DropdownCheckboxItem(label: 'Driver Name'),
-                                                              DropdownCheckboxItem(label: 'Supervisor'),
-                                                            ],
-                                                            selectedItems: selectedItems,
-                                                            onSelectionChanged: (items) {
-                                                              setState(() {
-                                                                selectedItems = items;
-                                                                selectedItems = items;
-                                                                if (items.first.label == 'Bus Number') {
-                                                                  selectedValueAccept = 'Bus Number';
-                                                                  selectedValueDecline = null;
-                                                                  selectedValueWaiting = null;
-                                                                } else if (items.first.label == 'Driver Name') {
-                                                                  selectedValueAccept = null;
-                                                                  selectedValueDecline = 'Driver Name';
-                                                                  selectedValueWaiting = null;
-                                                                } else if (items.first.label == 'Supervisor') {
-                                                                  selectedValueAccept = null;
-                                                                  selectedValueDecline = null;
-                                                                  selectedValueWaiting = 'Supervisor';
-                                                                }
-                                                              });
-                                                            },
+                                              // Image(image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
+                                              // width: 27.62,
+                                              // height: 21.6,),
+                                              PopupMenuButton<String>(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(right: 15),
+                                                  child: Image(
+                                                    image: AssetImage("assets/imgs/school/icons8_slider 2.png"),
+                                                    width: 29,
+                                                    height: 29,
+                                                    color: Color(0xFF442B72), // Optionally, you can set the color of the image
+                                                  ),
+                                                ),
+                                                // icon: FaIcon(
+                                                //   FontAwesomeIcons.sliders,
+                                                //   size: 20, // Adjust the size as needed
+                                                //   color: Color(0xFF442B72), // Set the color of the icon
+                                                // ),
+                                                itemBuilder: (BuildContext context) {
+                                                  return [
+                                                    PopupMenuItem<String>(
+                                                      value: 'custom',
+                                                      child:
+                                                      Column(
+                                                        children: [
+                                                          Container(
+                                                            child:  DropdownRadiobutton(
+                                                              items: [
+                                                                DropdownCheckboxItem(label: 'Bus Number'),
+                                                                DropdownCheckboxItem(label: 'Driver Name'),
+                                                                DropdownCheckboxItem(label: 'Supervisor'),
+                                                              ],
+                                                              selectedItems: selectedItems,
+                                                              onSelectionChanged: (items) {
+                                                                setState(() {
+                                                                  selectedItems = items;
+                                                                  selectedItems = items;
+                                                                  if (items.first.label == 'Bus Number') {
+                                                                    selectedValueAccept = 'Bus Number';
+                                                                    selectedValueDecline = null;
+                                                                    selectedValueWaiting = null;
+                                                                  } else if (items.first.label == 'Driver Name') {
+                                                                    selectedValueAccept = null;
+                                                                    selectedValueDecline = 'Driver Name';
+                                                                    selectedValueWaiting = null;
+                                                                  } else if (items.first.label == 'Supervisor') {
+                                                                    selectedValueAccept = null;
+                                                                    selectedValueDecline = null;
+                                                                    selectedValueWaiting = 'Supervisor';
+                                                                  }
+                                                                });
+                                                              },
+                                                            ),
                                                           ),
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            SizedBox(
-                                                              width:100,
-                                                              child: ElevatedButton(
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              SizedBox(
+                                                                width:100,
+                                                                child: ElevatedButton(
 
-                                                                onPressed: () {
-                                                                  // Handle cancel action
-                                                                  Navigator.pop(context);
-                                                                },
-                                                                style: ButtonStyle(
-                                                                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF442B72)),
-                                                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                                    RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
+                                                                  onPressed: () {
+                                                                    // Handle cancel action
+                                                                    Navigator.pop(context);
+                                                                  },
+                                                                  style: ButtonStyle(
+                                                                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF442B72)),
+                                                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                                      RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
+                                                                      ),
                                                                     ),
                                                                   ),
+                                                                  child: GestureDetector(
+                                                                      onTap:(){
+                                                                        if (selectedValueAccept != null) {
+                                                                          currentFilter = 'Bus Number';
+                                                                          selectedFilter = 'Bus Number';
+                                                                          getDataForBusNumberFilter();
+                                                                          Navigator.pop(context);
+                                                                          print('2');
+                                                                        }else  if (selectedValueDecline != null) {
+                                                                          currentFilter = 'Driver Name';
+                                                                          selectedFilter = 'Driver Name';
+                                                                          getDataForDriverNameFilter();
+                                                                          Navigator.pop(context);
+                                                                          print('0');
+                                                                        }else  if (selectedValueWaiting != null) {
+                                                                          currentFilter = 'Supervisor';
+                                                                          getDataForSupervisorFilter();
+                                                                          Navigator.pop(context);
+                                                                          print('1');
+                                                                        }
+                                                                      },
+                                                                      child: Text('Apply',style: TextStyle(fontSize:18),)
+
+                                                                  ),
                                                                 ),
+                                                              ),
+                                                              SizedBox(width: 3,),
+                                                              Padding(
+                                                                padding: const EdgeInsets.all(5.0),
                                                                 child: GestureDetector(
-                                                                  onTap:(){
-                                                                    if (selectedValueAccept != null) {
-                                                                      currentFilter = 'Bus Number';
-                                                                      selectedFilter = 'Bus Number';
-                                                                      getDataForBusNumberFilter();
+                                                                    onTap: (){
                                                                       Navigator.pop(context);
-                                                                      print('2');
-                                                                    }else  if (selectedValueDecline != null) {
-                                                                      currentFilter = 'Driver Name';
-                                                                      selectedFilter = 'Driver Name';
-                                                                      getDataForDriverNameFilter();
-                                                                      Navigator.pop(context);
-                                                                      print('0');
-                                                                    }else  if (selectedValueWaiting != null) {
-                                                                      currentFilter = 'Supervisor';
-                                                                      getDataForSupervisorFilter();
-                                                                      Navigator.pop(context);
-                                                                      print('1');
-                                                                    }
-                                                },
-                                                                    child: Text('Apply',style: TextStyle(fontSize:18),)
-
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(width: 3,),
-                                                            Padding(
-                                                              padding: const EdgeInsets.all(5.0),
-                                                              child: GestureDetector(
-                                                                  onTap: (){
-                                                                    Navigator.pop(context);
-                                                                  },child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),)),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ];
-                                              },
-                                            ),
-
-
-                                          ],
-                                        ),
-                                      ),
-
-
-
-                                      //),
-                                      SizedBox(
-                                        height: 40,
-                                      ),
-                                      //Container(
-                                      // decoration: BoxDecoration(
-                                      //     color: Colors.white, // Your desired background color
-                                      //     borderRadius: BorderRadius.circular(5),
-                                      //     boxShadow: [
-                                      //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
-                                      //     ]
-                                      // ),
-                                      //child:
-                                      //function get data
-                                      // FutureBuilder(
-                                      //   future: _firestore.collection('busdata').doc('UzrcI6MfSYP1mbGY2Ci3').get(),
-                                      //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                      //     if (snapshot.hasError) {
-                                      //       return Text('Something went wrong');
-                                      //     }
-                                      //
-                                      //     if (snapshot.connectionState == ConnectionState.done) {
-                                      //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                      //       return ListTile(
-                                      //         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                      //         leading: GestureDetector(
-                                      //           onTap: () {
-                                      //             Navigator.push(
-                                      //               context,
-                                      //               MaterialPageRoute(
-                                      //                 builder: (context) => ProfileScreen(),
-                                      //                 maintainState: false,
-                                      //               ),
-                                      //             );
-                                      //           },
-                                      //           child: Image.network(data['busphoto'], width: 61, height: 61,
-                                      //             errorBuilder: (context, error, stackTrace) {
-                                      //               return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
-                                      //             },),
-                                      //         ),
-                                      //         title: Text(
-                                      //           data['busnumber'],
-                                      //           style: TextStyle(
-                                      //             color: Color(0xFF442B72),
-                                      //             fontSize: 15,
-                                      //             fontWeight: FontWeight.bold,
-                                      //             fontFamily: 'Poppins-Bold',
-                                      //           ),
-                                      //         ),
-                                      //         subtitle: Text("Driver Name : "+
-                                      //           data['namedriver'],
-                                      //           style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
-                                      //         ),
-                                      //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                                      //           trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                      //         //tileColor: Colors.white,
-                                      //
-                                      //       ),);
-                                      //     }
-                                      //
-                                      //     return CircularProgressIndicator();
-                                      //   },
-                                      // ),
-                                      // show data from firestore بس مش كامله
-                                      SizedBox(
-                                        height: 500,
-                                        child: ListView.builder(
-                                          // shrinkWrap: true,
-                                            //itemCount: filteredData.length,
-                                          //itemCount: data.length,
-                                            itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' ?  filteredData.length : data.length,
-                                            itemBuilder: (context, index) {
-
-
-                                              String supervisorPhoneNumber = filteredData[index]['phonedriver'];
-                                              // to change image depended on filter if filter with bus number show image of bus & if filter with driver name image of driver appear
-                                              String imageUrl = selectedFilter == 'Bus Number'
-                                                  ? filteredData[index]['busphoto'] // Use busphoto for Bus Number filter
-                                                  : filteredData[index]['imagedriver'];
-                                              // Determine the fallback image asset based on the selected filter
-                                              String defaultImageAsset = selectedFilter == 'Bus Number'
-                                                  ? 'assets/imgs/school/bus 2.png' // Default image for Bus Number filter
-                                                  : 'assets/imgs/school/empty_supervisor.png'; // Default image for Driver Name filter
-                                              return
-                                                Column(
-                                                  children: [
-                                                    ListTile(
-                                                      leading:imageUrl.isNotEmpty
-                                                          ? Image.network(
-                                                        imageUrl,
-                                                        width: 61,
-                                                        height: 61,
-                                                        errorBuilder: (context, error, stackTrace) {
-                                                          // Display a default image if loading fails
-                                                          return Image.asset(
-                                                            defaultImageAsset,
-                                                            width: 61,
-                                                            height: 61,
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                          : Image.asset(
-                                                        defaultImageAsset,
-                                                        width: 61,
-                                                        height: 61,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                      // Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
-                                                      //               errorBuilder: (context, error, stackTrace) {
-                                                      //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
-                                                      //               },),
-                                                      title: Text(
-                                                        selectedFilter == 'Bus Number' ? '${filteredData[index]['busnumber']}' : '${filteredData[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
-
-                                                        //'${data[index]['busnumber'] }',
-                                                        style: TextStyle(
-                                                          color: Color(0xFF442B72),
-                                                          fontSize: 17,
-                                                          fontWeight: FontWeight.bold,
-                                                          fontFamily: 'Poppins-Bold',
-                                                        ),
-                                                        ),
-                                                      subtitle: Text(
-                                                        selectedFilter == 'Bus Number' ?'Driver Name : ${filteredData[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
-                                                        //"Driver Name : "+data[index]['namedriver'],
-                                                        style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
-                                                      ),
-                                                        trailing:
-                                                      PopupMenuButton<String>(
-                                                        enabled: !isEditingBus,
-
-                                                        shape: RoundedRectangleBorder(
-
-                                                          borderRadius: BorderRadius.all(
-                                                            Radius.circular(10.0),
-                                                          ),
-                                                        ),
-                                                        icon: Padding(
-                                                          padding: const EdgeInsets.only(left: 10),
-                                                          child: Icon(Icons.more_vert,
-                                                              size: 30, color: Color(0xFF442B72)),
-                                                        ),
-                                                        itemBuilder: (BuildContext context) =>
-                                                        <PopupMenuEntry<String>>[
-                                                          PopupMenuItem<String>(
-                                                            value: 'edit',
-                                                            child: GestureDetector(
-                                                              onTap: () {
-                                                                ScaffoldMessenger.of(context)
-                                                                    .hideCurrentSnackBar();
-                                                                setState(() {
-                                                                  isEditingBus = true;
-                                                                  _editBusDocument(
-                                                                      data[index].id,
-                                                                      data[index]['imagedriver'],
-                                                                      data[index]['namedriver'],
-                                                                      data[index]['phonedriver'],
-                                                                      data[index]['busphoto'],
-                                                                      data[index]['busnumber'],
-                                                                      data[index]['supervisors']
-
-                                                                  );
-                                                                  // _editSupervisorDocument(
-                                                                  //   data[index].id,
-                                                                  //   data[index]['name'],
-                                                                  //   data[index]['phoneNumber'],
-                                                                  //   data[index]['email'],
-                                                                  // );
-                                                                });
-                                                                // Navigator.pushReplacement(
-                                                                //     context,
-                                                                //     MaterialPageRoute(
-                                                                //         builder: (context) =>
-                                                                //             EditeSupervisor())
-                                                                // );
-                                                              },
-                                                              child: SizedBox(
-                                                                height: 20,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
-                                                                    // Transform(
-                                                                    //     alignment: Alignment.center,
-                                                                    //     transform:
-                                                                    //         Matrix4.rotationY(math.pi),
-                                                                    //     child:
-                                                                    //     Icon(
-                                                                    //       Icons.edit_outlined,
-                                                                    //       color: Color(0xFF442B72),
-                                                                    //       size: 17,
-                                                                    //     )
-                                                                    // ),
-                                                                    SizedBox(width: 10),
-                                                                    Text('Edit',
-                                                                        style: TextStyle(
-                                                                            color: Color(0xFF442B72),
-                                                                            fontSize: 17)),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          PopupMenuItem<String>(
-                                                            value: 'delete',
-                                                            child: SizedBox(
-                                                              height: 20,
-                                                              child: Row(
-                                                                children: [
-                                                                  Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
-                                                                  // Icon(
-                                                                  //   Icons.delete_outline_outlined,
-                                                                  //   color: Color(0xFF442B72),
-                                                                  //   size: 17,
-                                                                  // ),
-                                                                  SizedBox(width: 10),
-                                                                  Text(
-                                                                    'Delete',
-                                                                    style: TextStyle(
-                                                                        color: Color(0xFF442B72),
-                                                                        fontSize: 17),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ),
+                                                                    },child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),)),
+                                                              )
+                                                            ],
                                                           ),
                                                         ],
-                                                        onSelected: (String value) {
-                                                          // Handle selection here
-                                                          if (value == 'edit') {
-                                                         //   print('daaaata'+data[index]['supervisors'].toString());
-
-                                                            // Handle edit action
-                                                            setState(() {
-                                                              isEditingBus = true;
-                                                              _editBusDocument(
-                                                                data[index].id,
-                                                                data[index]['imagedriver'],
-                                                                data[index]['namedriver'],
-                                                                data[index]['phonedriver'],
-                                                                data[index]['busphoto'],
-                                                                data[index]['busnumber'],
-                                                                data[index]['supervisors']
-
-
-                                                              );
-                                                            });
-                                                            // Navigator.pushReplacement(
-                                                            //     context,
-                                                            //     MaterialPageRoute(
-                                                            //         builder: (context) =>
-                                                            //             EditeSupervisor()));
-                                                          } else if (value == 'delete') {
-                                                            //deletePhotoDialog(context);
-                                                            //وقفت delete function علشان لما بسمح بيعمل error
-
-                                                          //  _deletebusDocument(data[index].id);
-                                                            if (index < filteredData.length) {
-                                                              _deletebusDocument(filteredData[index].id);
-                                                            } else {
-                                                              print('Invalid index: $index');
-                                                            }
-                                                            // setState(() {
-                                                            //
-                                                            //   //showSnackBarFun(context);
-                                                            // });
-                                                          }
-                                                        },
                                                       ),
-                                                      tileColor: Colors.white,
-                                                      onTap: (){
+                                                    ),
+                                                  ];
+                                                },
+                                              ),
 
-                                                        List<DropdownCheckboxItem>allSupervisors=[];
-                                                        for(int i=0;i<data[index]['supervisors'].length;i++){
-                                                          allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
-                                                        }
-                                                        showModalBottomSheet(
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
-                                                          ),
-                                                          context: context,
-                                                          builder: (BuildContext context) {
-                                                            return Container(
-                                                              padding: EdgeInsets.all(20),
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.white,
-                                                                borderRadius: BorderRadius.only(
-                                                                  topLeft: Radius.circular(40), // Rounded top left corner
-                                                                  topRight: Radius.circular(40), // Rounded top right corner
+
+                                            ],
+                                          ),
+                                        ),
+
+
+
+                                        //),
+                                        SizedBox(
+                                          height: 40,
+                                        ),
+                                        //Container(
+                                        // decoration: BoxDecoration(
+                                        //     color: Colors.white, // Your desired background color
+                                        //     borderRadius: BorderRadius.circular(5),
+                                        //     boxShadow: [
+                                        //       BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                                        //     ]
+                                        // ),
+                                        //child:
+                                        //function get data
+                                        // FutureBuilder(
+                                        //   future: _firestore.collection('busdata').doc('UzrcI6MfSYP1mbGY2Ci3').get(),
+                                        //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                        //     if (snapshot.hasError) {
+                                        //       return Text('Something went wrong');
+                                        //     }
+                                        //
+                                        //     if (snapshot.connectionState == ConnectionState.done) {
+                                        //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                        //       return ListTile(
+                                        //         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        //         leading: GestureDetector(
+                                        //           onTap: () {
+                                        //             Navigator.push(
+                                        //               context,
+                                        //               MaterialPageRoute(
+                                        //                 builder: (context) => ProfileScreen(),
+                                        //                 maintainState: false,
+                                        //               ),
+                                        //             );
+                                        //           },
+                                        //           child: Image.network(data['busphoto'], width: 61, height: 61,
+                                        //             errorBuilder: (context, error, stackTrace) {
+                                        //               return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                        //             },),
+                                        //         ),
+                                        //         title: Text(
+                                        //           data['busnumber'],
+                                        //           style: TextStyle(
+                                        //             color: Color(0xFF442B72),
+                                        //             fontSize: 15,
+                                        //             fontWeight: FontWeight.bold,
+                                        //             fontFamily: 'Poppins-Bold',
+                                        //           ),
+                                        //         ),
+                                        //         subtitle: Text("Driver Name : "+
+                                        //           data['namedriver'],
+                                        //           style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                        //         ),
+                                        //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                        //           trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
+                                        //         //tileColor: Colors.white,
+                                        //
+                                        //       ),);
+                                        //     }
+                                        //
+                                        //     return CircularProgressIndicator();
+                                        //   },
+                                        // ),
+                                        // show data from firestore بس مش كامله
+                                        Column(
+                                          children: [
+                                            if (filteredData.isEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 30),
+                                                child: Text('No data available', style: TextStyle(color: Colors.grey)),
+                                              ),
+                                            if(filteredData.isNotEmpty)
+                                              SizedBox(
+                                                height: 500,
+                                                child: ListView.builder(
+                                                  // shrinkWrap: true,
+                                                  //itemCount: filteredData.length,
+                                                  //itemCount: data.length,
+                                                    itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' ?  filteredData.length : data.length,
+                                                    itemBuilder: (context, index) {
+
+
+                                                      String supervisorPhoneNumber = filteredData[index]['phonedriver'];
+                                                      // to change image depended on filter if filter with bus number show image of bus & if filter with driver name image of driver appear
+                                                      String imageUrl = selectedFilter == 'Bus Number'
+                                                          ? filteredData[index]['busphoto'] // Use busphoto for Bus Number filter
+                                                          : filteredData[index]['imagedriver'];
+                                                      // Determine the fallback image asset based on the selected filter
+                                                      String defaultImageAsset = selectedFilter == 'Bus Number'
+                                                          ? 'assets/imgs/school/bus 2.png' // Default image for Bus Number filter
+                                                          : 'assets/imgs/school/empty_supervisor.png'; // Default image for Driver Name filter
+                                                      return
+                                                        Column(
+                                                          children: [
+                                                            ListTile(
+                                                              leading:imageUrl.isNotEmpty
+                                                                  ? Image.network(
+                                                                imageUrl,
+                                                                width: 61,
+                                                                height: 61,
+                                                                errorBuilder: (context, error, stackTrace) {
+                                                                  // Display a default image if loading fails
+                                                                  return Image.asset(
+                                                                    defaultImageAsset,
+                                                                    width: 61,
+                                                                    height: 61,
+                                                                    fit: BoxFit.cover,
+                                                                  );
+                                                                },
+                                                                fit: BoxFit.cover,
+                                                              )
+                                                                  : Image.asset(
+                                                                defaultImageAsset,
+                                                                width: 61,
+                                                                height: 61,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                              // Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
+                                                              //               errorBuilder: (context, error, stackTrace) {
+                                                              //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
+                                                              //               },),
+                                                              title: Text(
+                                                                selectedFilter == 'Bus Number' ? '${filteredData[index]['busnumber']}' : '${filteredData[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
+
+                                                                //'${data[index]['busnumber'] }',
+                                                                style: TextStyle(
+                                                                  color: Color(0xFF442B72),
+                                                                  fontSize: 17,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontFamily: 'Poppins-Bold',
                                                                 ),
                                                               ),
-                                                              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6), // Decreased height
-                                                              child: Padding(
-                                                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                                child: Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                  children: [
-                                                                    Row(
-                                                                      children: [
-                                                                        Text('Bus', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                                        Expanded(
-                                                                          child: Align(
-                                                                            alignment: Alignment.centerRight,
-                                                                            child: Container(
-                                                                              decoration: BoxDecoration(
-                                                                                shape: BoxShape.circle,
-                                                                                color: Colors.white,
-                                                                                border: Border.all(
-                                                                                  color: Color(0xFF442B72),
-                                                                                  width: 1,
-                                                                                ),
-                                                                              ),
-                                                                              child: GestureDetector(
-                                                                                onTap: () {
-                                                                                  Navigator.of(context).pop();
-                                                                                },
-                                                                                child: Padding(
-                                                                                  padding: const EdgeInsets.all(4.0),
-                                                                                  child: FaIcon(
-                                                                                    FontAwesomeIcons.times,
-                                                                                    color: Color(0xFF442B72),
-                                                                                    size: 18,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
+                                                              subtitle: Text(
+                                                                selectedFilter == 'Bus Number' ?'Driver Name : ${filteredData[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
+                                                                //"Driver Name : "+data[index]['namedriver'],
+                                                                style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
+                                                              ),
+                                                              trailing:
+                                                              PopupMenuButton<String>(
+                                                                enabled: !isEditingBus,
 
-                                                                    SizedBox(height: 10,),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                shape: RoundedRectangleBorder(
+
+                                                                  borderRadius: BorderRadius.all(
+                                                                    Radius.circular(10.0),
+                                                                  ),
+                                                                ),
+                                                                icon: Padding(
+                                                                  padding: const EdgeInsets.only(left: 12),
+                                                                  child: Icon(Icons.more_vert,
+                                                                      size: 30, color: Color(0xFF442B72)),
+                                                                ),
+                                                                itemBuilder: (BuildContext context) =>
+                                                                <PopupMenuEntry<String>>[
+                                                                  PopupMenuItem<String>(
+                                                                    value: 'edit',
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .hideCurrentSnackBar();
+                                                                        setState(() {
+                                                                          isEditingBus = true;
+                                                                          _editBusDocument(
+                                                                              data[index].id,
+                                                                              data[index]['imagedriver'],
+                                                                              data[index]['namedriver'],
+                                                                              data[index]['phonedriver'],
+                                                                              data[index]['busphoto'],
+                                                                              data[index]['busnumber'],
+                                                                              data[index]['supervisors']
+
+                                                                          );
+                                                                          // _editSupervisorDocument(
+                                                                          //   data[index].id,
+                                                                          //   data[index]['name'],
+                                                                          //   data[index]['phoneNumber'],
+                                                                          //   data[index]['email'],
+                                                                          // );
+                                                                        });
+                                                                        // Navigator.pushReplacement(
+                                                                        //     context,
+                                                                        //     MaterialPageRoute(
+                                                                        //         builder: (context) =>
+                                                                        //             EditeSupervisor())
+                                                                        // );
+                                                                      },
+                                                                      child: SizedBox(
+                                                                        height: 20,
+                                                                        child: Row(
+                                                                          children: [
+                                                                            Image.asset("assets/imgs/school/icons8_edit 1.png",width: 16,height: 16,),
+                                                                            // Transform(
+                                                                            //     alignment: Alignment.center,
+                                                                            //     transform:
+                                                                            //         Matrix4.rotationY(math.pi),
+                                                                            //     child:
+                                                                            //     Icon(
+                                                                            //       Icons.edit_outlined,
+                                                                            //       color: Color(0xFF442B72),
+                                                                            //       size: 17,
+                                                                            //     )
+                                                                            // ),
+                                                                            SizedBox(width: 10),
+                                                                            Text('Edit',
+                                                                                style: TextStyle(
+                                                                                    color: Color(0xFF442B72),
+                                                                                    fontSize: 17)),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  PopupMenuItem<String>(
+                                                                    value: 'delete',
+                                                                    child: SizedBox(
+                                                                      height: 20,
                                                                       child: Row(
                                                                         children: [
-                                                                          Container(
-                                                                            width: 7,
-                                                                            height: 7,
-                                                                            decoration: BoxDecoration(
-                                                                              shape: BoxShape.circle,
-                                                                              color: Color(0xFF442B72),
-                                                                            ),
-                                                                          ),
+                                                                          Image.asset("assets/imgs/school/icons8_Delete 1 (1).png",width: 17,height: 17,),
+                                                                          // Icon(
+                                                                          //   Icons.delete_outline_outlined,
+                                                                          //   color: Color(0xFF442B72),
+                                                                          //   size: 17,
+                                                                          // ),
                                                                           SizedBox(width: 10),
                                                                           Text(
-                                                                            'Bus: ${data[index]['busnumber']}',
+                                                                            'Delete',
                                                                             style: TextStyle(
-                                                                                fontSize: 14,
                                                                                 color: Color(0xFF442B72),
-                                                                                fontFamily: "Poppins-Regular"
-                                                                            ),
-                                                                          ),
+                                                                                fontSize: 17),
+                                                                          )
                                                                         ],
                                                                       ),
                                                                     ),
-                                                                    SizedBox(height:25,),
-                                                                    Row(
-                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                          width: 80,
-                                                                          height: 80,
-                                                                          child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
-                                                                              ? Image.network(
-                                                                            data[index]['busphoto'],
-                                                                            fit: BoxFit.scaleDown,
-                                                                          )
-                                                                              : Image.asset(
-                                                                            'assets/imgs/school/ph_bus-light (1).png',
-                                                                            fit: BoxFit.scaleDown,
-                                                                          ),
-                                                                        ),
-                                                                        // SizedBox(
-                                                                        //     width: 80,
-                                                                        //     height: 80,
-                                                                        //     child: Image.network('${data[index]['busphoto']}',
-                                                                        //       fit: BoxFit.scaleDown,
-                                                                        //     )
-                                                                        // )
+                                                                  ),
+                                                                ],
+                                                                onSelected: (String value) {
+                                                                  // Handle selection here
+                                                                  if (value == 'edit') {
+                                                                    //   print('daaaata'+data[index]['supervisors'].toString());
 
-                                                                        // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
-                                                                        // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
-                                                                      ],),
-                                                                    SizedBox(height: 25,),
-                                                                    Text("Driver", style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                                    SizedBox(height: 10,),
-                                                                    Row(
-                                                                      children: [
+                                                                    // Handle edit action
+                                                                    setState(() {
+                                                                      isEditingBus = true;
+                                                                      _editBusDocument(
+                                                                          data[index].id,
+                                                                          data[index]['imagedriver'],
+                                                                          data[index]['namedriver'],
+                                                                          data[index]['phonedriver'],
+                                                                          data[index]['busphoto'],
+                                                                          data[index]['busnumber'],
+                                                                          data[index]['supervisors']
 
-                                                                        // Align(
-                                                                        //   alignment: Alignment.centerLeft,
-                                                                        //   child: CircleAvatar(
-                                                                        //     radius: 35,
-                                                                        //     backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
-                                                                        //
-                                                                        //   ),
-                                                                        // ),
-                                                                        SizedBox(
-                                                                          width: 80,
-                                                                          height: 80,
-                                                                          child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
-                                                                              ? Image.network(
-                                                                            data[index]['imagedriver'],
-                                                                            fit: BoxFit.scaleDown,
-                                                                          )
-                                                                              : Image.asset(
-                                                                            'assets/imgs/school/empty_supervisor.png',
-                                                                            fit: BoxFit.scaleDown,
-                                                                          ),
+
+                                                                      );
+                                                                    });
+                                                                    // Navigator.pushReplacement(
+                                                                    //     context,
+                                                                    //     MaterialPageRoute(
+                                                                    //         builder: (context) =>
+                                                                    //             EditeSupervisor()));
+                                                                  } else if (value == 'delete') {
+                                                                    //deletePhotoDialog(context);
+                                                                    //وقفت delete function علشان لما بسمح بيعمل error
+
+                                                                    //  _deletebusDocument(data[index].id);
+                                                                    if (index < filteredData.length) {
+                                                                      _deletebusDocument(filteredData[index].id);
+                                                                    } else {
+                                                                      print('Invalid index: $index');
+                                                                    }
+                                                                    // setState(() {
+                                                                    //
+                                                                    //   //showSnackBarFun(context);
+                                                                    // });
+                                                                  }
+                                                                },
+                                                              ),
+                                                              tileColor: Colors.white,
+                                                              onTap: (){
+
+                                                                List<DropdownCheckboxItem>allSupervisors=[];
+                                                                for(int i=0;i<data[index]['supervisors'].length;i++){
+                                                                  allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
+                                                                }
+                                                                showModalBottomSheet(
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
+                                                                  ),
+                                                                  context: context,
+                                                                  builder: (BuildContext context) {
+                                                                    return Container(
+                                                                      padding: EdgeInsets.all(20),
+                                                                      decoration: BoxDecoration(
+                                                                        color: Colors.white,
+                                                                        borderRadius: BorderRadius.only(
+                                                                          topLeft: Radius.circular(40), // Rounded top left corner
+                                                                          topRight: Radius.circular(40), // Rounded top right corner
                                                                         ),
-                                                                        SizedBox(width: 20,),
-                                                                        Column(
+                                                                      ),
+                                                                      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6), // Decreased height
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                        child: Column(
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                                           children: [
-                                                                            Text('${data[index]['namedriver']}', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
+                                                                            Row(
+                                                                              children: [
+                                                                                Text('Bus', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
+                                                                                Expanded(
+                                                                                  child: Align(
+                                                                                    alignment: Alignment.centerRight,
+                                                                                    child: Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        shape: BoxShape.circle,
+                                                                                        color: Colors.white,
+                                                                                        border: Border.all(
+                                                                                          color: Color(0xFF442B72),
+                                                                                          width: 1,
+                                                                                        ),
+                                                                                      ),
+                                                                                      child: GestureDetector(
+                                                                                        onTap: () {
+                                                                                          Navigator.of(context).pop();
+                                                                                        },
+                                                                                        child: Padding(
+                                                                                          padding: const EdgeInsets.all(4.0),
+                                                                                          child: FaIcon(
+                                                                                            FontAwesomeIcons.times,
+                                                                                            color: Color(0xFF442B72),
+                                                                                            size: 18,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+
                                                                             SizedBox(height: 10,),
-                                                                            Text('${data[index]['phonedriver']}', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  Container(
+                                                                                    width: 7,
+                                                                                    height: 7,
+                                                                                    decoration: BoxDecoration(
+                                                                                      shape: BoxShape.circle,
+                                                                                      color: Color(0xFF442B72),
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(width: 10),
+                                                                                  Text(
+                                                                                    'Bus: ${data[index]['busnumber']}',
+                                                                                    style: TextStyle(
+                                                                                        fontSize: 14,
+                                                                                        color: Color(0xFF442B72),
+                                                                                        fontFamily: "Poppins-Regular"
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(height:25,),
+                                                                            Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                              children: [
+                                                                                SizedBox(
+                                                                                  width: 80,
+                                                                                  height: 80,
+                                                                                  child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                                      ? Image.network(
+                                                                                    data[index]['busphoto'],
+                                                                                    fit: BoxFit.scaleDown,
+                                                                                  )
+                                                                                      : Image.asset(
+                                                                                    'assets/imgs/school/ph_bus-light (1).png',
+                                                                                    fit: BoxFit.scaleDown,
+                                                                                  ),
+                                                                                ),
+                                                                                // SizedBox(
+                                                                                //     width: 80,
+                                                                                //     height: 80,
+                                                                                //     child: Image.network('${data[index]['busphoto']}',
+                                                                                //       fit: BoxFit.scaleDown,
+                                                                                //     )
+                                                                                // )
+
+                                                                                // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
+                                                                                // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
+                                                                              ],),
+                                                                            SizedBox(height: 25,),
+                                                                            Text("Driver", style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
+                                                                            SizedBox(height: 10,),
+                                                                            Row(
+                                                                              children: [
+
+                                                                                // Align(
+                                                                                //   alignment: Alignment.centerLeft,
+                                                                                //   child: CircleAvatar(
+                                                                                //     radius: 35,
+                                                                                //     backgroundImage: AssetImage('assets/imgs/school/Ellipse 1.png'),
+                                                                                //
+                                                                                //   ),
+                                                                                // ),
+                                                                                SizedBox(
+                                                                                  width: 80,
+                                                                                  height: 80,
+                                                                                  child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
+                                                                                      ? Image.network(
+                                                                                    data[index]['imagedriver'],
+                                                                                    fit: BoxFit.scaleDown,
+                                                                                  )
+                                                                                      : Image.asset(
+                                                                                    'assets/imgs/school/empty_supervisor.png',
+                                                                                    fit: BoxFit.scaleDown,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(width: 20,),
+                                                                                Column(
+                                                                                  children: [
+                                                                                    Text('${data[index]['namedriver']}', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
+                                                                                    SizedBox(height: 10,),
+                                                                                    Text('${data[index]['phonedriver']}', style: TextStyle(color: Color(0xff442B72), fontSize: 15)),
+
+                                                                                  ],
+                                                                                ),
+                                                                                //SizedBox(width: 110,),
+                                                                                Padding(
+                                                                                  padding:
+                                                                                  const EdgeInsets.only(
+                                                                                      left:80),
+                                                                                  child: Material(
+                                                                                    elevation: 3,
+                                                                                    shape: CircleBorder(),
+                                                                                    child: Align(
+                                                                                      alignment: Alignment
+                                                                                          .centerRight,
+                                                                                      child: GestureDetector(
+                                                                                        onTap: ()async{
+                                                                                          _makePhoneCall(supervisorPhoneNumber);
+                                                                                          //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                          //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                        },
+                                                                                        // onTap: () async {
+                                                                                        //   try {
+                                                                                        //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                        //   } catch (e) {
+                                                                                        //     print('Error making phone call: $e');
+                                                                                        //     // Handle error gracefully (e.g., show a snackbar or alert)
+                                                                                        //   }
+                                                                                        // },
+                                                                                        child: CircleAvatar(
+                                                                                          backgroundColor:
+                                                                                          Colors.white,
+                                                                                          child:Transform.scale(
+                                                                                              scaleX: -1,
+                                                                                              child:  FaIcon(
+                                                                                                FontAwesomeIcons
+                                                                                                    .phone,
+                                                                                                color: Color(
+                                                                                                    0xFF442B72),
+                                                                                                size: 26,
+                                                                                              )),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+
+
+                                                                              ],
+                                                                            ),
+                                                                            SizedBox(height: 30),
+                                                                            Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
+                                                                            SizedBox(height: 10),
+
+
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  Container(
+                                                                                    width: 7,
+                                                                                    height: 7,
+                                                                                    decoration: BoxDecoration(
+                                                                                      shape: BoxShape.circle,
+                                                                                      color: Color(0xFF442B72),
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(width: 10),
+
+
+                                                                                  Text(
+                                                                                    'Ahmed Atef',
+                                                                                    style: TextStyle(
+                                                                                        fontSize: 14,
+                                                                                        color: Color(0xFF442B72),
+                                                                                        fontFamily: "Poppins-Regular"
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  Container(
+                                                                                    width: 7,
+                                                                                    height: 7,
+                                                                                    decoration: BoxDecoration(
+                                                                                      shape: BoxShape.circle,
+                                                                                      color: Color(0xFF442B72),
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(width: 10),
+                                                                                  Text(
+                                                                                    'Kariem atif',
+                                                                                    style: TextStyle(
+                                                                                        fontSize: 14,
+                                                                                        color: Color(0xFF442B72),
+                                                                                        fontFamily: "Poppins-Regular"
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
 
                                                                           ],
                                                                         ),
-                                                                        //SizedBox(width: 110,),
-                                                                        Padding(
-                                                                          padding:
-                                                                          const EdgeInsets.only(
-                                                                              left:80),
-                                                                          child: Material(
-                                                                            elevation: 3,
-                                                                            shape: CircleBorder(),
-                                                                            child: Align(
-                                                                              alignment: Alignment
-                                                                                  .centerRight,
-                                                                              child: GestureDetector(
-                                                                                onTap: ()async{
-                                                                                  makePhoneCall(supervisorPhoneNumber);
-                                                                                  //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                                  //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                                },
-                                                                                // onTap: () async {
-                                                                                //   try {
-                                                                                //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                                //   } catch (e) {
-                                                                                //     print('Error making phone call: $e');
-                                                                                //     // Handle error gracefully (e.g., show a snackbar or alert)
-                                                                                //   }
-                                                                                // },
-                                                                                child: CircleAvatar(
-                                                                                  backgroundColor:
-                                                                                  Colors.white,
-                                                                                  child:Transform.scale(
-                                                                                      scaleX: -1,
-                                                                                      child:  FaIcon(
-                                                                                        FontAwesomeIcons
-                                                                                            .phone,
-                                                                                        color: Color(
-                                                                                            0xFF442B72),
-                                                                                        size: 26,
-                                                                                      )),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-
-
-                                                                      ],
-                                                                    ),
-                                                                    SizedBox(height: 30),
-                                                                    Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                                    SizedBox(height: 10),
-
-
-                                                                    Padding(
-                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                                      child: Row(
-                                                                        children: [
-                                                                          Container(
-                                                                            width: 7,
-                                                                            height: 7,
-                                                                            decoration: BoxDecoration(
-                                                                              shape: BoxShape.circle,
-                                                                              color: Color(0xFF442B72),
-                                                                            ),
-                                                                          ),
-                                                                          SizedBox(width: 10),
-
-
-                                                                          Text(
-                                                                            'Ahmed Atef',
-                                                                            style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                color: Color(0xFF442B72),
-                                                                                fontFamily: "Poppins-Regular"
-                                                                            ),
-                                                                          ),
-                                                                        ],
                                                                       ),
-                                                                    ),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                                      child: Row(
-                                                                        children: [
-                                                                          Container(
-                                                                            width: 7,
-                                                                            height: 7,
-                                                                            decoration: BoxDecoration(
-                                                                              shape: BoxShape.circle,
-                                                                              color: Color(0xFF442B72),
-                                                                            ),
-                                                                          ),
-                                                                          SizedBox(width: 10),
-                                                                          Text(
-                                                                            'Kariem atif',
-                                                                            style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                color: Color(0xFF442B72),
-                                                                                fontFamily: "Poppins-Regular"
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
+                                                                    );
+                                                                  },
+                                                                );
 
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
+
+
+                                                              },
+
+                                                            ),
+
+                                                            // SizedBox(width: 10,),
+                                                            // Padding(
+                                                            //   padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                            //   child:
+                                                            // ),
+
+                                                            SizedBox(
+                                                              height: 20,
+                                                            )
+
+                                                          ],
                                                         );
 
+                                                    }),
 
+                                              ),
+                                          ],
+                                        ),
 
-                                                      },
+                                        SizedBox(height: 40,),
 
-                                                    ),
-
-                                                        // SizedBox(width: 10,),
-                                                        // Padding(
-                                                        //   padding: const EdgeInsets.symmetric(horizontal: 5),
-                                                        //   child:
-                                                        // ),
-
-                                                    SizedBox(
-                                                      height: 20,
-                                                    )
-
-                                                  ],
-                                                );
-
-                                            }),
-
-                                      ),
-
-                                      SizedBox(height: 40,),
-
-                                      // ListTile(
-                                      //   leading: Container(
-                                      //     width: 60,
-                                      //
-                                      //     //child: Image.asset('assets/imgs/school/fruits.jpeg'),
-                                      //     decoration: BoxDecoration(
-                                      //       image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
-                                      //       //color: Colors.white,
-                                      //       shape: BoxShape.circle,
-                                      //     ),
-                                      //   ),
-                                      //   title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
-                                      //   ),
-                                      //   subtitle: Text("Driver name : Ahmed Atef",style:
-                                      //   TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
-                                      //
-                                      //   trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
-                                      //
-                                      //   ),
-                                      //
-                                      // ),
-                                     // SizedBox(height: 40,),
+                                        // ListTile(
+                                        //   leading: Container(
+                                        //     width: 60,
+                                        //
+                                        //     //child: Image.asset('assets/imgs/school/fruits.jpeg'),
+                                        //     decoration: BoxDecoration(
+                                        //       image: DecorationImage(image:AssetImage("assets/imgs/school/buses.png"),fit: BoxFit.cover),
+                                        //       //color: Colors.white,
+                                        //       shape: BoxShape.circle,
+                                        //     ),
+                                        //   ),
+                                        //   title: Text('1458 ى ر س'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 17,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',)
+                                        //   ),
+                                        //   subtitle: Text("Driver name : Ahmed Atef",style:
+                                        //   TextStyle(color: Color(0xff771F98),fontSize: 11,fontFamily: "Poppins-Regular"),),
+                                        //
+                                        //   trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),
+                                        //
+                                        //   ),
+                                        //
+                                        // ),
+                                        // SizedBox(height: 40,),
 
 
 
 
 
 
-                                    ],
-                                  ),
-                                )
-                              ],
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          //Floating button add
-                          // SizedBox(
-                          //   height: 140,
-                          // ),
+                            //Floating button add
+                            // SizedBox(
+                            //   height: 140,
+                            // ),
 
 
-                        ],
+                          ],
+                        ),
                       ),
-              ),
                     ),
                   ],
                 ),Positioned(bottom: 20,right: 8,
-                child: Padding(
-                  padding: const EdgeInsets.only(right:35),
-                  child: Column(children: [
-                    FloatingActionButton(onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
-                    },
-                      backgroundColor: Color(0xFF442B72),
-                      child: Icon(Icons.add,color: Colors.white,size: 35,),)
-                  ],),
-                ),
-              )
+                  child: Padding(
+                    padding: const EdgeInsets.only(right:20),
+                    child: Column(children: [
+                      FloatingActionButton(onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
+                      },
+                        backgroundColor: Color(0xFF442B72),
+                        child: Icon(Icons.add,color: Colors.white,size: 35,),)
+                    ],),
+                  ),
+                )
               ]);
         }
         ),
@@ -1133,7 +1145,7 @@ final _firestore = FirebaseFirestore.instance;
             child: FloatingActionButton(
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
-               // Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+                // Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
               child: Image.asset(
                 'assets/imgs/school/busbottombar.png',
@@ -1383,7 +1395,7 @@ final _firestore = FirebaseFirestore.instance;
                         width: 120,
                         hight: 38,
                         onPress: () => {
-                      //_deletebusDocument(documentId)
+                          //_deletebusDocument(documentId)
                         }
 
                         // Navigator.of(context).pushAndRemoveUntil(
@@ -1416,7 +1428,6 @@ final _firestore = FirebaseFirestore.instance;
   }
 
 }
-
 
 
 

@@ -234,9 +234,10 @@ class _ChildCardState extends State<ChildCard> {
                          padding: const EdgeInsets.only(right: 12.0),
                          child: GestureDetector(
                            onTap: () {
-                             Navigator.of(context).push(
-                                 MaterialPageRoute(builder: (context) =>
-                                     ChatScreen()));},
+                             // Navigator.of(context).push(
+                             //     MaterialPageRoute(builder: (context) =>
+                             //         ChatScreen()));
+                             },
                            child: Image.asset('assets/images/icons8_chat 1.png' ,
                              width: 26,
                              height: 26,),
@@ -304,9 +305,10 @@ class _ChildCardState extends State<ChildCard> {
                                 padding: const EdgeInsets.only(right: 12.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) =>
-                                            ChatScreen()));},
+                                    // Navigator.of(context).push(
+                                    //     MaterialPageRoute(builder: (context) =>
+                                    //         ChatScreen()));
+                                    },
                                   child: Image.asset('assets/images/icons8_chat 1.png' ,
                                     width: 26,
                                     height: 26,),
@@ -374,9 +376,10 @@ class _ChildCardState extends State<ChildCard> {
                                 padding: const EdgeInsets.only(right: 12.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) =>
-                                            ChatScreen()));},
+                                    // Navigator.of(context).push(
+                                    //     MaterialPageRoute(builder: (context) =>
+                                    //         ChatScreen()));
+                                    },
                                   child: Image.asset('assets/images/icons8_chat 1.png' ,
                                     width: 26,
                                     height: 26,),

@@ -500,7 +500,8 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                                   _isLoading = false;
 
                                                 });
-                                                ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('This phone not exist.')));
+                                                existDialoge();
+                                             //   ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('This phone not exist.')));
 
                                               }
 
@@ -591,6 +592,135 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
           })),
     );
   }
+  void existDialoge() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              30,
+            ),
+          ),
+          child: SizedBox(
+            height: 182,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Flexible(
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Image.asset(
+                                'assets/images/Vertical container.png',
+                                width: 27,
+                                height: 27,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Sign up'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 18,
+                            fontFamily: 'Poppins-SemiBold',
+                            fontWeight: FontWeight.w600,
+                            height: 1.23,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Don\'t have an account yet'.tr,
+                    style: TextStyle(
+                      color: Color(0xFF442B72),
+                      fontSize: 16,
+                      fontFamily: 'Poppins-Light',
+                      fontWeight: FontWeight.w400,
+                      height: 1.23,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+
+                          backgroundColor: Color(0xFF442B72),
+                          surfaceTintColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: Color(0xFF442B72),
+                              ),
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                        ),
+                        child: SizedBox(
+                          height: 38,
+                          width: 120,
+                          child: Center(
+                            child: Text(
+                                'Sign up'.tr,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins-Regular',
+                                    fontWeight: FontWeight.w500 ,
+                                    fontSize: 16)
+                            ),
+                          ),
+                        ), onPressed: () {
+                          Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                // children.isNotEmpty?
+                                SignUpScreen(
+
+                                )
+                              //no data
+                              // : NoInvitation( selectedImage: selectedImage)
+                            ));
+                      },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )),
+    );
+
+
+  }
+
 }
 
 

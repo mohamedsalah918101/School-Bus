@@ -17,14 +17,8 @@ import 'package:school_account/supervisor_parent/screens/student_screen.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 
 class HomeForSupervisor extends StatefulWidget {
-  final String? docid;
-  final String? oldName;
-  final String? oldType;
-  final String? oldNumber;
-  // final String oldNameController;
-  final String? oldNumberOfChildren;
   HomeForSupervisor({
-    Key? key,  this.docid,  this.oldName, this.oldType,  this.oldNumber,  this.oldNumberOfChildren,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -35,28 +29,34 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
   final _firestore = FirebaseFirestore.instance;
+  bool dataLoading=false;
 
   getData()async{
+    setState(() {
+      dataLoading =true;
+
+    });
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
     data.addAll(querySnapshot.docs);
     setState(() {
+      dataLoading =false;
+
     });
   }
 
   @override
   void initState() {
+
     getData();
     super.initState();
-    setState(() {
 
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     print('invite'+sharedpref!.getInt('invit').toString());
 
-    if (data.isEmpty) {
+    if (dataLoading) {
       return Center(
         child: Loading(),
       );
@@ -317,15 +317,12 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 25.0),
                             child: GestureDetector(
-                              // onTap: () {
-                              //   Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(builder: (context) => StudentScreen(
-                              //       // childData: child,
-                              //       // parentData: data[index],
-                              //     )),
-                              //   );
-                              // },
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => StudentScreen()),
+                                );
+                              },
                               child: Column(
                                 children: [
                                   SizedBox(
@@ -343,25 +340,14 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                         List<String> words = address.split(' ');
                                         String firstLine = words.take(3).join(' ');
                                         String secondLine = words.skip(3).join(' ');
-                                        return Column(
-                                          children: [
-                                            // for (int i = startIndex; i < childern.length; i++)
-                                            for (var child in children)
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(builder: (context) => StudentScreen(
-                                                      docid: data[index].id,
-                                                      oldNumber: data[index].get('phoneNumber'),
-                                                      oldName: data[index].get('name'),
-                                                      oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
-                                                      oldType: data[index].get('typeOfParent'),
-                                                      // parentData: data[index]['children'],
-                                                    )),
-                                                  );
-                                                },
-                                                child: SizedBox(
+                                        if(data.isEmpty){
+                                          Container(); }
+                                        else
+                                          return Column(
+                                            children: [
+                                              // for (int i = startIndex; i < childern.length; i++)
+                                              for (var child in children)
+                                                SizedBox(
                                                   width: double.infinity,
                                                   height:  98, //92
                                                   child: Card(
@@ -392,7 +378,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                             children: [
                                                               Text(
                                                                 // '${childern[i]['name']}',
-
                                                                 '${child['name']}',
                                                                 style: TextStyle(
                                                                   color: Color(0xff442B72),
@@ -404,7 +389,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                               ),
                                                               // Text('${data[index]['childern']?[0]['name'] }',
                                                               // Text('${data[index]['childern']?[0-3]['name'] }',
-
                                                               Text.rich(
                                                                 TextSpan(
                                                                   children: [
@@ -447,9 +431,6 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
                                                                     TextSpan(
                                                                       text: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
-                                                                      // text: data[index]['address'].length > 20 ?
-                                                                      // '${data[index]['address'].substring(0, 20)}\n${data[index]['address'].substring(20)}'
-                                                                      //     : data[index]['address'],
                                                                       // '${data[index]['address'] }',
                                                                       style: TextStyle(
                                                                         color: Color(0xFF442B72),
@@ -533,10 +514,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
                                                   ),
                                                 ),
-                                              ),
-                                            SizedBox(height: 0,)
-                                          ],
-                                        );
+                                              SizedBox(height: 0,)
+                                            ],
+                                          );
                                       },
                                     ),
                                   ),

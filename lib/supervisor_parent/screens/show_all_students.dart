@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -30,7 +31,98 @@ class ShowAllStudents extends StatefulWidget {
 
 class _ShowAllStudentsState extends State<ShowAllStudents> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  List<QueryDocumentSnapshot> data = [];
+  TextEditingController _searchController = TextEditingController();
+  String SearchQuery = '';
 
+
+  // Future<void> getData({String query = ""}) async {
+  //   List<DocumentSnapshot> allData = [];
+  //
+  //   // Fetch all parent documents
+  //   QuerySnapshot parentQuerySnapshot = await FirebaseFirestore.instance.collection('parent').get();
+  //
+  //   if (query.isEmpty) {
+  //     // Iterate over each parent document and fetch its children
+  //     for (var parentDoc in parentQuerySnapshot.docs) {
+  //       QuerySnapshot childrenQuerySnapshot = await parentDoc.reference.collection('children').get();
+  //       allData.addAll(childrenQuerySnapshot.docs);
+  //     }
+  //   } else {
+  //     // Iterate over each parent document and fetch matching children
+  //     for (var parentDoc in parentQuerySnapshot.docs) {
+  //       QuerySnapshot childrenQuerySnapshot = await parentDoc.reference.collection('children')
+  //           .where('name', isGreaterThanOrEqualTo: query)
+  //           .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+  //           .get();
+  //       allData.addAll(childrenQuerySnapshot.docs);
+  //     }
+  //   }
+  //
+  //   setState(() {
+  //     // data = allData;
+  //   });
+  // }
+  //     querySnapshot = await FirebaseFirestore.instance.collection('parent').get();
+  //   } else {
+  //     querySnapshot = await FirebaseFirestore.instance
+  //         .collection('parent')
+  //         .where('name', isGreaterThanOrEqualTo: query)
+  //         .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+  //         .get();
+  //   }
+  //   setState(() {
+  //     data = querySnapshot.docs;
+  //   });
+  // }
+  Future<void> getData({String query = ""}) async {
+    QuerySnapshot querySnapshot;
+    if (query.isEmpty) {
+      querySnapshot = await FirebaseFirestore.instance.collection('parent').get();
+    } else {
+      querySnapshot = await FirebaseFirestore.instance
+          .collection('parent')
+          .where('name', isGreaterThanOrEqualTo: query)
+          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+    }
+    setState(() {
+      data = querySnapshot.docs;
+    });
+  }
+
+
+  @override
+  void initState() {
+    _searchController.addListener(_onSearchChanged);
+    getData();
+    // getDataForAcceptFilter();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  _onSearchChanged() {
+    setState(() {
+      SearchQuery = _searchController.text.trim();
+    });
+    getData(query: SearchQuery, );
+  }
+
+  //
+  // @override
+  // void initState() {
+  //   getData();
+  //   super.initState();
+  //   setState(() {
+  //
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +197,12 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 height: 15,
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 17.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 17.0),
                                 child: SizedBox(
-                                  width: 318,
+                                  // width: 318,
                                   height: 42,
                                   child: TextField(
+                                    controller: _searchController,
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: Color(0xffF1F1F1),
@@ -140,9 +233,14 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 padding: const EdgeInsets.symmetric(horizontal: 33.0),
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: 3,
+                                  itemCount: data.length,
                                   physics: NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, index) {
+                                    List children = data[index]['children'];
+                                    for (var child in children)
+                                      if(data.isEmpty){
+                                        Container(); }
+                                      else
                                     return Column(
                                       children: [
                                         Row(
@@ -163,7 +261,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Shady Ayman'.tr,
+                                                  '${child['name']}',
                                                   style: TextStyle(
                                                     color: Color(0xFF442B72),
                                                     fontSize: 17,

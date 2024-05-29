@@ -3,31 +3,21 @@ import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:label_marker/label_marker.dart';
 
-
-
-import '../components/custom_app_bar.dart';
 
 class TrackSupervisor extends StatefulWidget {
   @override
@@ -44,11 +34,28 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
   GoogleMapController? controller;
   LatLng startLocation = const LatLng(27.1778429, 31.1859626);
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
+  List<QueryDocumentSnapshot> data = [];
+  bool dataLoading=false;
+
+
+  getData()async{
+    setState(() {
+      dataLoading =true;
+
+    });
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+      dataLoading =false;
+
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     loadCustomIcon();
+    getData();
   }
   //
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
@@ -360,7 +367,8 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            if (index == 19 ) {
+                            List children = data[index]['children'];
+                            if (index == data.length-1 ) {
                               return Row(
                                 children: [
                                   (sharedpref?.getString('lang') == 'ar')?
@@ -382,8 +390,9 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
+                                      for (var child in children)
                                       Text(
-                                        'Manar Ali'.tr,
+                                        '${child['name']}',
                                         style: TextStyle(
                                           color: Color(0xFF442B72),
                                           fontSize: 15,
@@ -470,20 +479,21 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                     width: 15,
                                   ),
                                   SizedBox(
-                                    height:50,
+                                    height:0,
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          'Manar Ali'.tr,
-                                          style: TextStyle(
-                                            color: Color(0xFF442B72),
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins-SemiBold',
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.07,
-                                          ),
+                                        for (var child in children)
+                                          Text(
+                                            '${child['name']}',
+                                            style: TextStyle(
+                                              color: Color(0xFF442B72),
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins-SemiBold',
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.07,
+                                            ),
                                         ),
                                         SizedBox(
                                           height: 3,
@@ -525,8 +535,9 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Manar Ali'.tr,
+                                      for (var child in children)
+                                        Text(
+                                          '${child['name']}',
                                         style: TextStyle(
                                           color: Color(0xFF442B72),
                                           fontSize: 15,
@@ -564,7 +575,106 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 height: 20,
                               );}
                           },
-                          itemCount: 20,
+                          itemCount: data.length,
+                        ),
+
+                      ],
+                    ) ,
+                    Stack(
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: data.length,
+                          // data?[0]['childern'].length,
+                          // data.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            List children = data[index]['children'];
+                            if(data.isEmpty){
+                              Container(); }
+                            else
+                              return Column(
+                                children: [
+                                  for (var child in children)
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height:  70, //92
+                                      child: Padding(
+                                        padding: (sharedpref?.getString('lang') == 'ar')?
+                                        EdgeInsets.only(top: 15.0 , right: 12,):
+                                        EdgeInsets.only(top: 0.0 , left: 0,),
+                                        child:  Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0.0),
+                                              child:  Image.asset(
+                                                'assets/images/Ellipse 6.png',
+                                                width: 50,
+                                                height: 50,
+                                              ),
+                                            ),
+                                            SizedBox(width: 15,),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${child['name']}',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                    fontSize: 15,
+                                                    fontFamily: 'Poppins-SemiBold',
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 1.07,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 3,
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'arrived :'.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: ' 7:45 '.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: 'AM'.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),]
+                                                  ),),
+                                              ],
+                                            )
+                                          ],
+                                        ),),
+                                    ),
+                                ],
+                              );
+                          },
                         ),
                         (sharedpref?.getString('lang') == 'ar')?
                         Positioned(
@@ -579,7 +689,8 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                           child: buildDashedLine(),
                         )
                       ],
-                    )
+                    ),
+
                     //     :
                     // Container()
                   ],

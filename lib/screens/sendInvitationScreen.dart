@@ -63,7 +63,7 @@ class _SendInvitationState extends State<SendInvitation> {
         'phoneNumber': enteredPhoneNumber,
         'state':0,
         'invite':1,
-        'busphoto':'',
+        'busphoto': ' ',
       };
       print('phonenum');
       print( _phoneNumberController.text);
@@ -219,61 +219,60 @@ bool _nameEntered =true;
                       alignment: AlignmentDirectional.topEnd,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: InkWell(onTap: (){},
-                          child: Row(
-                            children: [
-                             GestureDetector(
-                               onTap: () async{
-                                 bool permission = await FlutterContactPicker.requestPermission();
-                                 if(permission){
-                                   if(await FlutterContactPicker.hasPermission()){
-                                     _phoneContact=await FlutterContactPicker.pickPhoneContact();
-                                     if(_phoneContact!=null){
-                                       if(_phoneContact!.fullName!.isNotEmpty){
-                                         setState(() {
-                                           kPickerName=_phoneContact!.fullName.toString();
-                                          _nameController.text=kPickerName;
-                                         });
-                                       }
-                                       if (_phoneContact!.phoneNumber != null &&
-                                           _phoneContact!.phoneNumber!.number != null &&
-                                           _phoneContact!.phoneNumber!.number!.isNotEmpty) {
-                                         setState(() {
-                                           kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
-                                           if (kPickerNumber.startsWith('0')) {
-                                             kPickerNumber = kPickerNumber.substring(1);
-
-                                           }
-                                           kPickerNumber = kPickerNumber.replaceAll(' ', '');
-                                           _phoneNumberController.text = kPickerNumber;
-                                         });
-                                       }
-                                       // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
-                                       //   setState(() {
-                                       //     kPickerNumber=_phoneContact!.phoneNumber.toString();
-                                       //     _phoneNumberController.text=kPickerNumber;
-                                       //   });
-                                       // }
+                        child: Row(
+                          children: [
+                           GestureDetector(
+                             onTap: () async{
+                               bool permission = await FlutterContactPicker.requestPermission();
+                               if(permission){
+                                 if(await FlutterContactPicker.hasPermission()){
+                                   _phoneContact=await FlutterContactPicker.pickPhoneContact();
+                                   if(_phoneContact!=null){
+                                     if(_phoneContact!.fullName!.isNotEmpty){
+                                       setState(() {
+                                         kPickerName=_phoneContact!.fullName.toString();
+                                        _nameController.text=kPickerName;
+                                       });
                                      }
+                                     if (_phoneContact!.phoneNumber != null &&
+                                         _phoneContact!.phoneNumber!.number != null &&
+                                         _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+                                       setState(() {
+                                         kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                         if (kPickerNumber.startsWith('0')) {
+                                           kPickerNumber = kPickerNumber.substring(1);
 
+                                         }
+                                         kPickerNumber = kPickerNumber.replaceAll(' ', '');
+                                         _phoneNumberController.text = kPickerNumber;
+                                         enteredPhoneNumber=kPickerNumber;
+                                       });
+                                     }
+                                     // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+                                     //   setState(() {
+                                     //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+                                     //     _phoneNumberController.text=kPickerNumber;
+                                     //   });
+                                     // }
                                    }
+
                                  }
-                               },
-                               child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
-                                 color: Color(0xff442B72),),
-                             ),
-                              SizedBox(width: 10,),
-                               InkWell(onTap: (){
-                                 Scaffold.of(context).openEndDrawer();
-                                },
+                               }
+                             },
+                             child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+                               color: Color(0xff442B72),),
+                           ),
+                            SizedBox(width: 10,),
+                             InkWell(onTap: (){
+                               Scaffold.of(context).openEndDrawer();
+                              },
                       child: Icon(
                         Icons.menu_rounded,
                       size: 40,
                         color: Color(0xff442B72),
-                            ),)
+                          ),)
 
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                     ),
@@ -552,6 +551,8 @@ bool _nameEntered =true;
                                 initialCountryCode: 'EG', // Set initial country code if needed
                                 onChanged: (phone) {
                                   enteredPhoneNumber = phone.completeNumber;
+
+                                  // _phoneNumberController.text = phone.completeNumber;
                                   // Update the enteredPhoneNumber variable with the entered phone number
 
                                 },

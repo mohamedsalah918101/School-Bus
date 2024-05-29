@@ -1,4 +1,5 @@
 // import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
@@ -13,6 +14,7 @@ import 'package:school_account/supervisor_parent/components/students_card_in_hom
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
+import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
@@ -34,7 +36,33 @@ class AttendanceSupervisorScreen extends StatefulWidget {
 class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isStarting = false;
+  bool Checkin = false;
   List<ChildDataItem> children = [];
+  List<QueryDocumentSnapshot> data = [];
+
+  bool dataLoading=false;
+
+  getData()async{
+    setState(() {
+      dataLoading =true;
+
+    });
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+      dataLoading =false;
+
+    });
+  }
+
+  @override
+  void initState() {
+
+    getData();
+    super.initState();
+
+  }
+
 
   // getToken() async{
 //       String? myToken = await FirebaseMessaging.instance.getToken();
@@ -229,12 +257,260 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                           child: ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            itemCount: 3,
+                            itemCount: data.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return
-                                Column(
+                              List children = data[index]['children'];
+                              return Column(
                                   children: [
-                                    CheckInCard(),
+                                    for (var child in children)
+                                  SizedBox(
+                                  width: double.infinity,
+                                  height:122,
+                                  child: Card(
+                                    elevation: 10,
+                                    color: Colors.white,
+                                    surfaceTintColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14.0),
+                                    ),
+                                    child: Padding(
+                                        padding: (sharedpref?.getString('lang') == 'ar')?
+                                        EdgeInsets.only(right: 10.0 , left: 10) :
+                                        EdgeInsets.only(left: 10.0 , right: 10 , bottom: 0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset(
+                                                        'assets/images/Ellipse 6.png',
+                                                        height: 50,
+                                                        width: 50,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 7,
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(top: 10.0),
+                                                        child: Column(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              '${child['name']}',
+                                                              style: TextStyle(
+                                                                color: Color(0xff442B72),
+                                                                fontSize: 17,
+                                                                fontFamily: 'Poppins-SemiBold',
+                                                                fontWeight: FontWeight.w600,
+                                                                height: 0.94,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 4,
+                                                            ),
+                                                            Text.rich(
+                                                              TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: 'Grade: '.tr,
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF919191),
+                                                                      fontSize: 12,
+                                                                      fontFamily: 'Poppins-Light',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      // height: 1.33,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: '${child['grade']}',
+                                                                    // '${data[index]['children']?[0]['grade'] }',
+                                                                    style: TextStyle(
+                                                                      color: Color(0xFF442B72),
+                                                                      fontSize: 12,
+                                                                      fontFamily: 'Poppins-Light',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      // height: 1.33,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    SizedBox(height: 20),
+                                                    Column(
+                                                      children: [
+                                                        SizedBox(
+                                                          height: 40,
+                                                          width: 80,
+                                                          child: ElevatedButton(
+                                                            style: ElevatedButton.styleFrom(
+                                                                padding:  EdgeInsets.all(0),
+                                                                backgroundColor: Color(0xFF442B72),
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(5)
+                                                                )
+                                                            ),
+                                                            onPressed: (){
+                                                              Checkin = !Checkin;
+                                                              setState(() {
+                                                              });
+                                                            },
+                                                            child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                                                              style: TextStyle(
+                                                                  fontFamily: 'Poppins-SemiBold',
+                                                                  fontWeight: FontWeight.w600,
+                                                                  color: Colors.white,
+                                                                  fontSize: 13
+                                                              ),),
+
+
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 15,),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                              color: Color(0xff442B72),
+                                                              width: 28,
+                                                              height: 28,),
+                                                            SizedBox(width: 9),
+                                                            GestureDetector(
+                                                              child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                                color: Color(0xff442B72),
+                                                                width: 26,
+                                                                height: 26,),
+                                                              onTap: () {
+                                                                print('object');
+                                                                Navigator.of(context).push(
+                                                                    MaterialPageRoute(builder: (context) =>
+                                                                        ChatScreen(
+                                                                          receiverName: data[index]['name'],
+                                                                          receiverPhone: data[index]['phoneNumber'],
+                                                                          // data[index]['children']?[0]['name'],
+                                                                        )));
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                )
+                                                // Column(
+                                                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                //   children: [
+                                                //     Padding(
+                                                //       padding: const EdgeInsets.only(top: 5.0),
+                                                //       child: SizedBox(
+                                                //         width: 80,
+                                                //         height: 40,
+                                                //         child: ElevatedButton(
+                                                //           style: ElevatedButton.styleFrom(
+                                                //               padding:  EdgeInsets.all(0),
+                                                //               backgroundColor: Color(0xFF442B72),
+                                                //               shape: RoundedRectangleBorder(
+                                                //                   borderRadius: BorderRadius.circular(5)
+                                                //               )
+                                                //           ),
+                                                //           onPressed: (){
+                                                //             Checkin = !Checkin;
+                                                //             setState(() {
+                                                //             });
+                                                //           },
+                                                //           child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                                                //             style: TextStyle(
+                                                //                 fontFamily: 'Poppins-SemiBold',
+                                                //                 fontWeight: FontWeight.w600,
+                                                //                 color: Colors.white,
+                                                //                 fontSize: 13
+                                                //             ),),
+                                                //
+                                                //
+                                                //         ),
+                                                //       ),
+                                                //     ),
+                                                //     Padding(
+                                                //       padding: (sharedpref?.getString('lang') == 'ar')?
+                                                //       EdgeInsets.only(top: 12, right:220 ):
+                                                //       EdgeInsets.only(top: 12, left:220 ),
+                                                //       child: Row(
+                                                //         mainAxisAlignment: MainAxisAlignment.start,
+                                                //         crossAxisAlignment: CrossAxisAlignment.start,
+                                                //         children: [
+                                                //           Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                //             color: Color(0xff442B72),
+                                                //             width: 28,
+                                                //             height: 28,),
+                                                //           SizedBox(width: 9),
+                                                //           GestureDetector(
+                                                //             child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                //               color: Color(0xff442B72),
+                                                //               width: 26,
+                                                //               height: 26,),
+                                                //             onTap: () {
+                                                //               Navigator.of(context).push(
+                                                //                   MaterialPageRoute(builder: (context) =>
+                                                //                       ChatScreen()));
+                                                //             },
+                                                //           ),
+                                                //         ],
+                                                //       ),
+                                                //     ),
+                                                //   ],
+                                                // ),
+                                              ],
+                                            ),
+                                            // Padding(
+                                            //   padding: (sharedpref?.getString('lang') == 'ar')?
+                                            //   EdgeInsets.only(top: 12, right:220 ):
+                                            //   EdgeInsets.only(top: 12, left:220 ),
+                                            //   child: Row(
+                                            //     mainAxisAlignment: MainAxisAlignment.start,
+                                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                                            //     children: [
+                                            //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                            //         color: Color(0xff442B72),
+                                            //         width: 28,
+                                            //         height: 28,),
+                                            //       SizedBox(width: 9),
+                                            //       GestureDetector(
+                                            //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                            //           color: Color(0xff442B72),
+                                            //           width: 26,
+                                            //           height: 26,),
+                                            //         onTap: () {
+                                            //           Navigator.of(context).push(
+                                            //               MaterialPageRoute(builder: (context) =>
+                                            //                   ChatScreen()));
+                                            //         },
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
+
+                                          ],
+                                        )),
+                                  ),
+                                ),
+                                    // CheckInCard(),
                                     SizedBox(height: 15,)
                                   ],
                                 );

@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/Functions/functions.dart';
+import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
@@ -35,6 +37,7 @@ class _AddParentsState extends State<AddParents> {
   bool selectedGenderGroupValue = true;
   bool nameError = true;
   bool phoneError = true;
+  bool phoneAdded = true;
   bool numberOfChildrenError = true;
   bool nameChildeError = true;
   bool GradeError = true;
@@ -45,6 +48,9 @@ class _AddParentsState extends State<AddParents> {
   bool allChildFieldsFilled = false;
   String enteredPhoneNumber = '';
   bool _isLoading = false;
+  String kPickerNumber='';
+  String kPickerName='';
+  PhoneContact? _phoneContact;
 
   void _addDataToFirestore() async {
     setState(() {
@@ -77,6 +83,7 @@ class _AddParentsState extends State<AddParents> {
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': enteredPhoneNumber,
+      'address': '',
       'children': childrenData,
       'state': 0,
       'invite': 0,
@@ -103,10 +110,12 @@ class _AddParentsState extends State<AddParents> {
                 false, docid, enteredPhoneNumber, 'parent');
 
             if (res == "success") {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Invitation sent successfully'),
-                backgroundColor: Color(0xFFFF3C3C),
-              ));
+              InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
+
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text('Invitation sent successfully'),
+              //   backgroundColor: Color(0xFFFF3C3C),
+              // ));
               await _firestore
                   .collection('parent')
                   .doc(docid)
@@ -122,10 +131,12 @@ class _AddParentsState extends State<AddParents> {
               nameChildControllers.clear();
               gradeControllers.clear();
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Invitation doesn\'t sent'),
-                backgroundColor: Color(0xFF4CAF50),
-              ));
+              InvitationNotSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFFFF3C3C));
+
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text('Invitation doesn\'t sent'),
+              //   backgroundColor: Color(0xFFFF3C3C),
+              // ));
             }
           }).catchError((error) {
             print('Failed to add data: $error');
@@ -152,10 +163,11 @@ class _AddParentsState extends State<AddParents> {
 
             });
             if (res == "success") {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Invitation sent successfully'),
-                backgroundColor: Color(0xFFFF3C3C),
-              ));
+              InvitationSendSnackBar(context, 'Invitation sent successfully',(Color(0xFF4CAF50)));
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(Color(0xFF4CAF50)
+              //   content: Text('Invitation sent successfully'),
+              //   backgroundColor: Color(0xFF4CAF50),
+              // ));
               await _firestore
                   .collection('parent')
                   .doc(docID)
@@ -175,17 +187,19 @@ class _AddParentsState extends State<AddParents> {
 
             });
             // added parent new update
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('This phone number is already added.'),
-            ));
+            Dialoge.CantAddNewParent(context);
+            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            //   content: Text('This phone number is already added.'),
+            // ));
           }
           // await _firestore.collection('parent').doc(docID).update(data);
         }
       } else {
         //added in another type
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('This phone number is already added.'),
-        ));
+        phoneAdded = false;
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text('This phone number is already added.'),
+        // ));
       }
     } catch (e) {
       print('Error: $e');
@@ -252,11 +266,51 @@ class _AddParentsState extends State<AddParents> {
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: Row(
                           children: [
-                            Image.asset(
-                              'assets/images/icons8_Add_Male_User_Group 1.png',
-                              width: 27,
-                              height: 27,
+                            GestureDetector(
+                              onTap: () async{
+                                bool permission = await FlutterContactPicker.requestPermission();
+                                if(permission){
+                                  if(await FlutterContactPicker.hasPermission()){
+                                    _phoneContact=await FlutterContactPicker.pickPhoneContact();
+                                    if(_phoneContact!=null){
+                                      if(_phoneContact!.fullName!.isNotEmpty){
+                                        setState(() {
+                                          kPickerName=_phoneContact!.fullName.toString();
+                                          _nameController.text=kPickerName;
+                                        });
+                                      }
+                                      if (_phoneContact!.phoneNumber != null &&
+                                          _phoneContact!.phoneNumber!.number != null &&
+                                          _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+                                        setState(() {
+                                          kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                          if (kPickerNumber.startsWith('0')) {
+                                            kPickerNumber = kPickerNumber.substring(1);
+
+                                          }
+                                          kPickerNumber = kPickerNumber.replaceAll(' ', '');
+                                          _phoneNumberController.text = kPickerNumber;
+                                        });
+                                      }
+                                      // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+                                      //   setState(() {
+                                      //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+                                      //     _phoneNumberController.text=kPickerNumber;
+                                      //   });
+                                      // }
+                                    }
+
+                                  }
+                                }
+                              },
+                              child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+                                color: Color(0xff442B72),),
                             ),
+                            // Image.asset(
+                            //   'assets/images/icons8_Add_Male_User_Group 1.png',
+                            //   width: 27,
+                            //   height: 27,
+                            // ),
                             IconButton(
                               onPressed: () {
                                 _scaffoldKey.currentState!.openEndDrawer();
@@ -340,7 +394,7 @@ class _AddParentsState extends State<AddParents> {
                             child: Stack(
                               children: [
                                 Container(
-                                  width: 277,
+                                  // width: 300,
                                   height: 40,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(7),
@@ -351,7 +405,7 @@ class _AddParentsState extends State<AddParents> {
                                     ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       InkWell(
                                         onTap: () {
@@ -369,8 +423,7 @@ class _AddParentsState extends State<AddParents> {
                                                 });
                                               },
                                               child: Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: <Widget>[
                                                   GestureDetector(
                                                     onTap: () {
@@ -410,7 +463,8 @@ class _AddParentsState extends State<AddParents> {
                                                     child: Container(
                                                       child: Padding(
                                                         padding:
-                                                        const EdgeInsets.all(14.0),
+                                                        const EdgeInsets.only(top: 14.0 , bottom: 14, left: 30,
+                                                            right:0),
                                                         child: Image.asset(
                                                           'assets/images/Vectorbottom (12).png',
                                                         ),
@@ -492,26 +546,6 @@ class _AddParentsState extends State<AddParents> {
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
-                          // selectedValue == null || selectedValue.isEmpty
-                          //     ? Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 48),
-                          //   child: Text(
-                          //     "Please enter your type".tr,
-                          //     style: TextStyle(color: Colors.red),
-                          //   ),
-                          // )
-                          //     : Container(),
-                          // typeOfParentError?
-                          // selectedValue!.isEmpty?
-                          // Container():
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 48),
-                          //   child: Text(
-                          //     "Please enter your type".tr,
-                          //     style: TextStyle(color: Colors.red),
-                          //   ),
-                          // ):
-                          //     Container(),
                           SizedBox(
                             height: 11,
                           ),
@@ -550,12 +584,14 @@ class _AddParentsState extends State<AddParents> {
                             height: 13,
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 44.0),
+                            padding: EdgeInsets.symmetric(horizontal: 42.0),
                             child: SizedBox(
-                              width: 277,
+                              // width: 277,
                               height: 40,
                               child: TextFormField(
                                   controller: _nameController,
+
+                                  // cursorRadius: Radius.circular(300),
                                   style: TextStyle(
                                     color: Color(0xFF442B72),
                                   ),
@@ -563,6 +599,7 @@ class _AddParentsState extends State<AddParents> {
                                   textDirection: (sharedpref?.getString('lang') == 'ar')
                                       ? TextDirection.rtl
                                       : TextDirection.ltr,
+                                  // selectionHeightStyle: 20,
                                   autofocus: true,
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.text,
@@ -577,8 +614,8 @@ class _AddParentsState extends State<AddParents> {
                                     filled: true,
                                     contentPadding:
                                     (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.fromLTRB(166, 0, 17, 40)
-                                        : EdgeInsets.fromLTRB(17, 0, 0, 40),
+                                        ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+                                        : EdgeInsets.fromLTRB(17, 0, 0, 10),
                                     hintText: 'Please enter your name'.tr,
                                     floatingLabelBehavior: FloatingLabelBehavior.never,
                                     hintStyle: const TextStyle(
@@ -658,9 +695,9 @@ class _AddParentsState extends State<AddParents> {
                             height: 13,
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 44.0),
+                            padding: EdgeInsets.symmetric(horizontal: 42.0),
                             child: SizedBox(
-                              width: 277,
+                              // width: 277,
                               height: 65,
                               child: IntlPhoneField(
                                 textInputAction: TextInputAction.next,
@@ -728,6 +765,18 @@ class _AddParentsState extends State<AddParents> {
                               ),
                             ),
                           ),
+                          phoneAdded
+                              ? Container()
+                              : Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 48,
+                            ),
+                            child: Text(
+                              "This phone number is already added".tr,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+
 
                           phoneError
                               ? Container()
@@ -779,9 +828,9 @@ class _AddParentsState extends State<AddParents> {
                             height: 13,
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 44.0),
+                            padding: EdgeInsets.symmetric(horizontal: 42.0),
                             child: SizedBox(
-                              width: 277,
+                              // width: 277,
                               height: 40,
                               child: TextFormField(
                                 onChanged: (val) {
@@ -824,8 +873,8 @@ class _AddParentsState extends State<AddParents> {
                                   filled: true,
                                   contentPadding:
                                   (sharedpref?.getString('lang') == 'ar')
-                                      ? EdgeInsets.fromLTRB(166, 0, 17, 40)
-                                      : EdgeInsets.fromLTRB(17, 0, 0, 40),
+                                      ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+                                      : EdgeInsets.fromLTRB(17, 0, 0, 10),
                                   hintText: 'Please enter your number children'.tr,
                                   floatingLabelBehavior: FloatingLabelBehavior.never,
                                   hintStyle: const TextStyle(
@@ -1123,7 +1172,7 @@ class _AddParentsState extends State<AddParents> {
                                                                   'lang') ==
                                                                   'ar')
                                                                   ? EdgeInsets.fromLTRB(
-                                                                  0, 0, 17, 20)
+                                                                  0, 0, 17, 10)
                                                                   : EdgeInsets.fromLTRB(
                                                                   17, 0, 0, 10),
                                                               hintText:
@@ -1292,7 +1341,7 @@ class _AddParentsState extends State<AddParents> {
                                                                   'lang') ==
                                                                   'ar')
                                                                   ? EdgeInsets.fromLTRB(
-                                                                  0, 0, 17, 15)
+                                                                  0, 0, 17, 10)
                                                                   : EdgeInsets.fromLTRB(
                                                                   17, 0, 0, 10),
                                                               hintText:
@@ -1533,27 +1582,32 @@ class _AddParentsState extends State<AddParents> {
                                           allChildFieldsFilled = false;
                                           print('failed');
                                           break;
-                                        } else {
-                                          allChildFieldsFilled = true;
-                                          GradeError = true;
-                                          nameChildeError = true;
-                                          print('done');
                                         }
+                                        //
+                                        // else {
+                                        //   allChildFieldsFilled = true;
+                                        //   GradeError = true;
+                                        //   nameChildeError = true;
+                                        //   print('done');
+                                        // }
                                       }
-                                      if (!allChildFieldsFilled) {
-                                        GradeError = false;
-                                        nameChildeError = false;
-                                      } else if (allChildFieldsFilled) {
-                                        GradeError = true;
-                                        nameChildeError = true;
-                                      }
+
+                                      GradeError = allChildFieldsFilled;
+                                      nameChildeError = allChildFieldsFilled;
+                                      //
+                                      // if (allChildFieldsFilled) {
+                                      //   GradeError = false;
+                                      //   nameChildeError = false;
+                                      // } else if (allChildFieldsFilled) {
+                                      //   GradeError = true;
+                                      //   nameChildeError = true;
+                                      // }
                                     });
                                     if (
                                     // allChildFieldsFilled &&
-                                    // GradeError &&
-                                    // nameChildeError &&
-
-                                    typeOfParentError &&
+                                    GradeError &&
+                                        nameChildeError &&
+                                        typeOfParentError &&
                                         nameError &&
                                         phoneError &&
                                         numberOfChildrenError
@@ -1794,6 +1848,49 @@ class _AddParentsState extends State<AddParents> {
   }
 }
 
+
+void InvitationNotSendSnackBar(context, String message, color,
+    {Duration? duration}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      dismissDirection: DismissDirection.up,
+      duration: duration ?? const Duration(milliseconds: 2000),
+      backgroundColor: Colors.white,
+      margin: EdgeInsets.only(
+        bottom: MediaQuery.of(context).size.height - 150,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      behavior: SnackBarBehavior.floating,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset('assets/images/icons8_cancel 2.png',
+            // 'assets/images/saved.png',
+            width: 30,
+            height: 30,
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          Text(
+            message,
+            style: TextStyle(
+              color: color,
+              fontSize: 16,
+              fontFamily: 'Poppins-Bold',
+              fontWeight: FontWeight.w700,
+              height: 1.23,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 void InvitationSendSnackBar(context, String message, color,
     {Duration? duration}) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -1821,7 +1918,7 @@ void InvitationSendSnackBar(context, String message, color,
             width: 15,
           ),
           Text(
-            'Invitation sent successfully'.tr,
+            message,
             style: TextStyle(
               color: color,
               fontSize: 16,
@@ -1835,399 +1932,3 @@ void InvitationSendSnackBar(context, String message, color,
     ),
   );
 }
-// void addChild() {
-//   setState(() {
-//     String input = _numberOfChildrenController.text;
-//     // List<Map<String, bool>> genderSelection = [];
-//
-//     int count = int.tryParse(input) ?? 0;
-//     NumberOfChildren.clear();
-//     nameChildControllers.clear();
-//     gradeControllers.clear();
-//     genderSelection.clear();
-//
-//     for (int i = 0; i < count; i++) {
-//       bool isFemale = false;
-//       bool isMale = false;
-//       genderSelection.add('');
-//       TextEditingController nameController = TextEditingController();
-//       TextEditingController gradeController = TextEditingController();
-//
-//       nameChildControllers.add(nameController);
-//       gradeControllers.add(gradeController);
-//       NumberOfChildren.add(SizedBox(
-//           width: double.infinity,
-//           height: 310,
-//           child: Column(children: [
-//             Container(
-//                 decoration: BoxDecoration(
-//                   color: Color(0xff771F98).withOpacity(0.03),
-//                   borderRadius: BorderRadius.circular(14),
-//                 ),
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.start,
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     SizedBox(
-//                       height: 10,
-//                     ),
-//                     Padding(
-//                       padding: (sharedpref?.getString('lang') == 'ar')
-//                           ? EdgeInsets.only(right: 12.0)
-//                           : EdgeInsets.only(left: 12.0),
-//                       child: Text.rich(
-//                         TextSpan(
-//                           children: [
-//                             TextSpan(
-//                               text: 'Child '.tr,
-//                               style: TextStyle(
-//                                 color: Color(0xff771F98),
-//                                 fontSize: 16,
-//                                 fontFamily: 'Poppins-Bold',
-//                                 fontWeight: FontWeight.w700,
-//                               ),
-//                             ),
-//                             TextSpan(
-//                               text: '${i + 1}',
-//                               style: TextStyle(
-//                                 color: Color(0xff771F98),
-//                                 fontSize: 16,
-//                                 fontFamily: 'Poppins-Bold',
-//                                 fontWeight: FontWeight.w700,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: 8,
-//                     ),
-//                     Padding(
-//                       padding: (sharedpref?.getString('lang') == 'ar')
-//                           ? EdgeInsets.only(right: 18.0)
-//                           : EdgeInsets.only(left: 18.0),
-//                       child: Text.rich(
-//                         TextSpan(
-//                           children: [
-//                             TextSpan(
-//                               text: 'Name'.tr,
-//                               style: TextStyle(
-//                                 color: Color(0xFF442B72),
-//                                 fontSize: 15,
-//                                 fontFamily: 'Poppins-Bold',
-//                                 fontWeight: FontWeight.w700,
-//                                 height: 1.07,
-//                               ),
-//                             ),
-//                             TextSpan(
-//                               text: ' *',
-//                               style: TextStyle(
-//                                 color: Colors.red,
-//                                 fontSize: 15,
-//                                 fontFamily: 'Poppins-Bold',
-//                                 fontWeight: FontWeight.w700,
-//                                 height: 1.07,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: 8,
-//                     ),
-//                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 18.0),
-//                       child: SizedBox(
-//                         width: 277,
-//                         height: 38,
-//                         child: TextFormField(
-//                           onChanged: (value) {
-//                             setState(() {});
-//                           },
-//                           controller: nameController,
-//                           style: TextStyle(
-//                             color: Color(0xFF442B72),
-//                             fontSize: 12,
-//                             fontFamily: 'Poppins-Light',
-//                             fontWeight: FontWeight.w400,
-//                             height: 1.33,
-//                           ),
-//                           cursorColor: const Color(0xFF442B72),
-//                           textDirection:
-//                           (sharedpref?.getString('lang') == 'ar')
-//                               ? TextDirection.rtl
-//                               : TextDirection.ltr,
-//                           // autofocus: true,
-//                           textInputAction: TextInputAction.next,
-//                           keyboardType: TextInputType.text,
-//                           textAlign: (sharedpref?.getString('lang') == 'ar')
-//                               ? TextAlign.right
-//                               : TextAlign.left,
-//                           scrollPadding: EdgeInsets.symmetric(vertical: 30),
-//                           decoration: InputDecoration(
-//                             alignLabelWithHint: true,
-//                             counterText: "",
-//                             fillColor: const Color(0xFFF1F1F1),
-//                             filled: true,
-//                             contentPadding:
-//                             (sharedpref?.getString('lang') == 'ar')
-//                                 ? EdgeInsets.fromLTRB(0, 0, 17, 20)
-//                                 : EdgeInsets.fromLTRB(17, 0, 0, 10),
-//                             hintText: 'Please enter your child name'.tr,
-//                             floatingLabelBehavior:
-//                             FloatingLabelBehavior.never,
-//                             hintStyle: const TextStyle(
-//                               color: Color(0xFF9E9E9E),
-//                               fontSize: 12,
-//                               fontFamily: 'Poppins-Bold',
-//                               fontWeight: FontWeight.w700,
-//                               height: 1.33,
-//                             ),
-//                             focusedBorder: OutlineInputBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(7)),
-//                               borderSide: BorderSide(
-//                                 color: Color(0xFFFFC53E),
-//                                 width: 0.5,
-//                               ),
-//                             ),
-//                             enabledBorder: OutlineInputBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(7)),
-//                               borderSide: BorderSide(
-//                                 color: Color(0xFFFFC53E),
-//                                 width: 0.5,
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     nameChildeError
-//                         ? Container()
-//                         : Padding(
-//                       padding:
-//                       const EdgeInsets.symmetric(horizontal: 20),
-//                       child: Text(
-//                         "Please enter your child name".tr,
-//                         style: TextStyle(color: Colors.red),
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: 12,
-//                     ),
-//                     Padding(
-//                       padding: (sharedpref?.getString('lang') == 'ar')
-//                           ? EdgeInsets.only(right: 18.0)
-//                           : EdgeInsets.only(left: 18.0),
-//                       child: Text.rich(
-//                         TextSpan(
-//                           children: [
-//                             TextSpan(
-//                               text: 'Grade'.tr,
-//                               style: TextStyle(
-//                                 color: Color(0xFF442B72),
-//                                 fontSize: 15,
-//                                 fontFamily: 'Poppins-Bold',
-//                                 fontWeight: FontWeight.w700,
-//                                 height: 1.07,
-//                               ),
-//                             ),
-//                             TextSpan(
-//                               text: ' *',
-//                               style: TextStyle(
-//                                 color: Colors.red,
-//                                 fontSize: 15,
-//                                 fontFamily: 'Poppins-Bold',
-//                                 fontWeight: FontWeight.w700,
-//                                 height: 1.07,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: 8,
-//                     ),
-//                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 18.0),
-//                       child: SizedBox(
-//                         width: 277,
-//                         height: 38,
-//                         child: TextFormField(
-//                           onChanged: (value) {
-//                             setState(() {});
-//                           },
-//                           controller: gradeControllers[i],
-//                           style: TextStyle(
-//                             color: Color(0xFF442B72),
-//                             fontSize: 12,
-//                             fontFamily: 'Poppins-Light',
-//                             fontWeight: FontWeight.w400,
-//                             height: 1.33,
-//                           ),
-//                           cursorColor: const Color(0xFF442B72),
-//                           textDirection:
-//                           (sharedpref?.getString('lang') == 'ar')
-//                               ? TextDirection.rtl
-//                               : TextDirection.ltr,
-//                           // autofocus: true,
-//                           textInputAction: TextInputAction.done,
-//                           keyboardType: TextInputType.number,
-//                           inputFormatters: <TextInputFormatter>[
-//                             FilteringTextInputFormatter.digitsOnly
-//                           ],
-//                           textAlign: (sharedpref?.getString('lang') == 'ar')
-//                               ? TextAlign.right
-//                               : TextAlign.left,
-//                           scrollPadding: EdgeInsets.symmetric(vertical: 30),
-//                           decoration: InputDecoration(
-//                             alignLabelWithHint: true,
-//                             counterText: "",
-//                             fillColor: const Color(0xFFF1F1F1),
-//                             filled: true,
-//                             contentPadding:
-//                             (sharedpref?.getString('lang') == 'ar')
-//                                 ? EdgeInsets.fromLTRB(0, 0, 17, 15)
-//                                 : EdgeInsets.fromLTRB(17, 0, 0, 10),
-//                             hintText: 'Please enter your child grade'.tr,
-//                             floatingLabelBehavior:
-//                             FloatingLabelBehavior.never,
-//                             hintStyle: const TextStyle(
-//                               color: Color(0xFF9E9E9E),
-//                               fontSize: 12,
-//                               fontFamily: 'Poppins-Bold',
-//                               fontWeight: FontWeight.w700,
-//                               height: 1.33,
-//                             ),
-//                             focusedBorder: OutlineInputBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(7)),
-//                               borderSide: BorderSide(
-//                                 color: Color(0xFFFFC53E),
-//                                 width: 0.5,
-//                               ),
-//                             ),
-//                             enabledBorder: OutlineInputBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(7)),
-//                               borderSide: BorderSide(
-//                                 color: Color(0xFFFFC53E),
-//                                 width: 0.5,
-//                               ),
-//                             ),
-//                             // enabledBorder: myInputBorder(),
-//                             // focusedBorder: myFocusBorder(),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     GradeError
-//                         ? Container()
-//                         : Padding(
-//                       padding:
-//                       const EdgeInsets.symmetric(horizontal: 20),
-//                       child: Text(
-//                         "Please enter your child grade".tr,
-//                         style: TextStyle(color: Colors.red),
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: 12,
-//                     ),
-//                     Padding(
-//                         padding: (sharedpref?.getString('lang') == 'ar')
-//                             ? EdgeInsets.only(right: 18.0)
-//                             : EdgeInsets.only(left: 18.0),
-//                         child: Text(
-//                           'Gender'.tr,
-//                           style: TextStyle(
-//                             color: Color(0xFF442B72),
-//                             fontSize: 15,
-//                             fontFamily: 'Poppins-Bold',
-//                             fontWeight: FontWeight.w700,
-//                             height: 1.07,
-//                           ),
-//                         )),
-//                     // SizedBox(height: 12,),
-//                     Padding(
-//                         padding: (sharedpref?.getString('lang') == 'ar')
-//                             ? EdgeInsets.only(right: 15.0)
-//                             : EdgeInsets.only(left: 15.0),
-//                         child: Row(children: [
-//                           Row(
-//                             children: [
-//                               Radio(
-//                                 value: 'female',
-//                                 groupValue: genderSelection[i],
-//                                 onChanged: (value) {
-//                                   setState(() {
-//                                     genderSelection[i] = 'female';
-//                                   });
-//                                 },
-//                                 fillColor: MaterialStateProperty.resolveWith(
-//                                         (states) {
-//                                       if (states
-//                                           .contains(MaterialState.selected)) {
-//                                         return Color(0xff442B72);
-//                                       }
-//                                       return Color(0xff442B72);
-//                                     }),
-//                                 activeColor: Color(
-//                                     0xff442B72), // Set the color of the selected radio button
-//                               ),
-//                               Text(
-//                                 "Female".tr,
-//                                 style: TextStyle(
-//                                   fontSize: 15,
-//                                   fontFamily: 'Poppins-Regular',
-//                                   fontWeight: FontWeight.w500,
-//                                   color: Color(0xff442B72),
-//                                 ),
-//                               ),
-//                               SizedBox(
-//                                 width: 50, //115
-//                               ),
-//                               Radio(
-//                                 fillColor: MaterialStateProperty.resolveWith(
-//                                         (states) {
-//                                       if (states
-//                                           .contains(MaterialState.selected)) {
-//                                         return Color(0xff442B72);
-//                                       }
-//                                       return Color(0xff442B72);
-//                                     }),
-//                                 value: 'male',
-//                                 groupValue: genderSelection[i],
-//                                 onChanged: (value) {
-//                                   setState(() {
-//                                     genderSelection[i] = 'male';
-//                                   });
-//                                 },
-//                                 activeColor: Color(0xff442B72),
-//                               ),
-//                               Text(
-//                                 "Male".tr,
-//                                 style: TextStyle(
-//                                   fontSize: 15,
-//                                   fontFamily: 'Poppins-Regular',
-//                                   fontWeight: FontWeight.w500,
-//                                   color: Color(0xff442B72),
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                           SizedBox(
-//                             height: 10,
-//                           )
-//                         ])),
-//                   ],
-//                 ))
-//           ])));
-//     }
-//     setState(() {});
-//   });
-// }

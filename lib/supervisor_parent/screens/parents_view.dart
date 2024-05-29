@@ -77,7 +77,7 @@ class _ParentsViewState extends State<ParentsView> {
 
   getDataForWaitingFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -90,7 +90,7 @@ class _ParentsViewState extends State<ParentsView> {
 
   getDataForAcceptFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2 ).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -241,11 +241,11 @@ class _ParentsViewState extends State<ParentsView> {
                                     ),
                                     prefixIcon: Padding(
                                       padding: (sharedpref?.getString('lang') ==
-                                              'ar')
+                                          'ar')
                                           ? EdgeInsets.only(
-                                              right: 6, top: 14.0, bottom: 9)
+                                          right: 6, top: 14.0, bottom: 9)
                                           : EdgeInsets.only(
-                                              left: 3, top: 14.0, bottom: 9),
+                                          left: 3, top: 14.0, bottom: 9),
                                       child: Image.asset(
                                         'assets/images/Vector (12)search.png',
                                       ),
@@ -275,7 +275,7 @@ class _ParentsViewState extends State<ParentsView> {
                                             child:  DropdownRadiobutton(
                                               items: [
                                                 DropdownCheckboxItem(label: 'Accepted'),
-                                                DropdownCheckboxItem(label: 'Rejected'),
+                                                DropdownCheckboxItem(label: 'Declined'),
                                                 DropdownCheckboxItem(label: 'Waiting'),
                                               ],
                                               selectedItems: selectedItems,
@@ -286,9 +286,9 @@ class _ParentsViewState extends State<ParentsView> {
                                                     selectedValueAccept = 'Accepted';
                                                     selectedValueDecline = null;
                                                     selectedValueWaiting = null;
-                                                  } else if (items.first.label == 'Rejected') {
+                                                  } else if (items.first.label == 'Declined') {
                                                     selectedValueAccept = null;
-                                                    selectedValueDecline = 'Rejected';
+                                                    selectedValueDecline = 'Declined';
                                                     selectedValueWaiting = null;
                                                   } else if (items.first.label == 'Waiting') {
                                                     selectedValueAccept = null;
@@ -319,25 +319,25 @@ class _ParentsViewState extends State<ParentsView> {
                                                     ),
                                                   ),
                                                   child: GestureDetector(
-                                                      child: Text('Apply',style: TextStyle(fontSize:18),),
-                                                  onTap: (){
-                                                    if (selectedValueAccept != null) {
-                                                      currentFilter = 'Accepted';
-                                                      getDataForAcceptFilter();
-                                                      Navigator.pop(context);
-                                                      print('2');
-                                                    }else  if (selectedValueDecline != null) {
-                                                      currentFilter = 'Rejected';
-                                                      getDataForDeclinedFilter();
-                                                      Navigator.pop(context);
-                                                      print('0');
-                                                    }else  if (selectedValueWaiting != null) {
-                                                      currentFilter = 'Waiting';
-                                                      getDataForWaitingFilter();
-                                                      Navigator.pop(context);
-                                                      print('1');
-                                                    }
-                                                  },),
+                                                    child: Text('Apply',style: TextStyle(fontSize:18),),
+                                                    onTap: (){
+                                                      if (selectedValueAccept != null) {
+                                                        currentFilter = 'Accepted';
+                                                        getDataForAcceptFilter();
+                                                        Navigator.pop(context);
+                                                        print('1');
+                                                      }else  if (selectedValueDecline != null) {
+                                                        currentFilter = 'Declined';
+                                                        getDataForDeclinedFilter();
+                                                        Navigator.pop(context);
+                                                        print('0');
+                                                      }else  if (selectedValueWaiting != null) {
+                                                        currentFilter = 'Waiting';
+                                                        getDataForWaitingFilter();
+                                                        Navigator.pop(context);
+                                                        print('2');
+                                                      }
+                                                    },),
                                                 ),
                                               ),
                                               SizedBox(width: 3,),
@@ -346,7 +346,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                   padding: const EdgeInsets.all(5.0),
                                                   child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),),
                                                 ), onTap: (){
-                                              Navigator.pop(context);
+                                                Navigator.pop(context);
                                               },
                                               )
                                             ],
@@ -387,7 +387,7 @@ class _ParentsViewState extends State<ParentsView> {
                                         children: [
                                           Padding(
                                             padding:
-                                                const EdgeInsets.only(top: 12.0),
+                                            const EdgeInsets.only(top: 12.0),
                                             child: Image.asset(
                                               'assets/images/Ellipse 6.png',
                                               width: 50,
@@ -401,7 +401,7 @@ class _ParentsViewState extends State<ParentsView> {
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                               Text('${data[index]['name'] }',
+                                              Text('${data[index]['name'] }',
                                                 style: TextStyle(
                                                   color: Color(0xFF442B72),
                                                   fontSize: 17,
@@ -426,7 +426,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                     fontWeight: FontWeight.w400,
                                                     height: 1.23,),),),],),
                                           // SizedBox(width: 103,),
-                                          ],),
+                                        ],),
                                       PopupMenuButton<String>(
                                         padding: EdgeInsets.zero,
                                         shape: RoundedRectangleBorder(
@@ -465,7 +465,9 @@ class _ParentsViewState extends State<ParentsView> {
                                                 oldName: data[index].get('name'),
                                                 oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
                                                 oldType: data[index].get('typeOfParent'),
-                                                // oldNameController: data[index].childrenData[index]['grade'],
+                                                oldNameOfChild: 'test',
+                                                oldGradeOfChild: 'test',
+                                                // oldNameOfChild: data[index].childrenData[index]['grade'],
                                                 // oldGradeOfChild: ['l;']
                                                 // oldGradeOfChild: data[index]['childern'].get('grade'),
                                               )),);
@@ -708,8 +710,8 @@ class _ParentsViewState extends State<ParentsView> {
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ProfileSupervisorScreen(
-                      // onTapMenu: onTapMenu
-                      )));
+                    // onTapMenu: onTapMenu
+                  )));
             },
             child: Image.asset(
               'assets/images/174237 1.png',
@@ -738,7 +740,7 @@ class _ParentsViewState extends State<ParentsView> {
                                 topRight: Radius.circular(38.5))),
                         RoundedRectangleBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(50)))),
+                            BorderRadius.all(Radius.circular(50)))),
                     notchMargin: 7,
                     child: SizedBox(
                         height: 10,
@@ -760,9 +762,9 @@ class _ParentsViewState extends State<ParentsView> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(top: 7, right: 15)
-                                          : EdgeInsets.only(left: 15),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 7, right: 15)
+                                      : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -796,9 +798,9 @@ class _ParentsViewState extends State<ParentsView> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(top: 9, left: 50)
-                                          : EdgeInsets.only(right: 50, top: 2),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 9, left: 50)
+                                      : EdgeInsets.only(right: 50, top: 2),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -832,11 +834,11 @@ class _ParentsViewState extends State<ParentsView> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(
-                                              top: 12, bottom: 4, right: 10)
-                                          : EdgeInsets.only(
-                                              top: 8, bottom: 4, left: 20),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 12, bottom: 4, right: 10)
+                                      : EdgeInsets.only(
+                                      top: 8, bottom: 4, left: 20),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -874,17 +876,17 @@ class _ParentsViewState extends State<ParentsView> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 2,
-                                              right: 10,
-                                              left: 0)
-                                          : EdgeInsets.only(
-                                              top: 8,
-                                              bottom: 2,
-                                              left: 0,
-                                              right: 10),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 2,
+                                      right: 10,
+                                      left: 0)
+                                      : EdgeInsets.only(
+                                      top: 8,
+                                      bottom: 2,
+                                      left: 0,
+                                      right: 10),
                                   child: Column(
                                     children: [
                                       Image.asset(

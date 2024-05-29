@@ -40,12 +40,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
+  String phoneError='';
 
   bool _validatePhoneNumber() {
     bool isValid = _phoneNumberController.text.isNotEmpty;
     setState(() {
       _phoneNumberEntered = isValid;
+      phoneError ='Please enter your phone number'.tr;
+
     });
+
     return isValid;
   }
 
@@ -440,9 +444,13 @@ String typeAccount='';
                                                           //         : Color(0xFFFFC53E),
                                                           //   ),
                                                           // ),
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                            borderSide: BorderSide(color: Color(0xFFFFC53E)), // Change border color here
+                                                          border:      OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(7)),
+                                                            borderSide:  BorderSide(
+                                                              color: !_phoneNumberEntered
+                                                                  ? Colors.red // Red border if phone number not entered
+                                                                  : Color(0xFFFFC53E),
+                                                            ),
                                                           ),
 
                                                           focusedErrorBorder: OutlineInputBorder(
@@ -497,7 +505,17 @@ String typeAccount='';
                                             ),
                                           ),
                                         ),
-                                      ),
+                                      ),    if (!_phoneNumberEntered)
+                                        Align(alignment: AlignmentDirectional.topStart,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                                            child: Text(
+                                              phoneError,
+                                              style: TextStyle(color: Colors.red),
+
+                                            ),
+                                          ),
+                                        ),
                                       // TextFormFieldCustom(
                                       //   width: constrains.maxWidth / 1.4,
                                       //   hintTxt: 'Your Phone'.tr,
@@ -776,10 +794,21 @@ String typeAccount='';
                                           //   }
                                           // },
                                           onPress: () async {
+                                            if (
+                                            _validatename()){
+                                              if(_phoneNumberController.text.length == 0){
+                                                setState(() {
+                                                  phoneError ='Please enter your phone number'.tr;
+                                                  _phoneNumberEntered =false;
+                                                });
+                                                // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
 
-                                            if(_phoneNumberController.text.length < 10){                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,select account type')));
-                                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('Please,enter valid number')));
+                                              }else if(_phoneNumberController.text.length < 10){
+                                              setState(() {
+                                                phoneError ='Please enter valid phone number'.tr;
 
+                                                _phoneNumberEntered =false;
+                                              });
                                             }else{
 
                                             if(selectedContainer == 0) {
@@ -787,7 +816,7 @@ String typeAccount='';
 
                                             }else{
                                             if (
-                                            _validatename()&&
+
                                             _validatePhoneNumber()) { // Step 3
                                               setState(() {
                                                 _isLoading = true;
@@ -799,19 +828,9 @@ String typeAccount='';
                                               isPhoneExiting = isNumberExits ;
                                             });
                                             if(isNumberExits){
+                                              _isLoading = false;
+                                                existDialoge();
 
-                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already exist')));
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                      // children.isNotEmpty?
-                                                      LoginScreen(
-
-                                                      )
-                                                    //no data
-                                                    // : NoInvitation( selectedImage: selectedImage)
-                                                  ));
                                             }
                                             else {
                                               _isLoading = true;
@@ -844,7 +863,7 @@ String typeAccount='';
                                             //
                                             // }}
 
-                                          }},
+                                          }}},
                                           // => Navigator.push(
                                           //     context,
                                           //     MaterialPageRoute(
@@ -958,4 +977,134 @@ String typeAccount='';
           })),
     );
   }
+
+  void existDialoge() {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => Dialog(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            // contentPadding: const EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                30,
+              ),
+            ),
+            child: SizedBox(
+              height: 182,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Flexible(
+                          child: Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: Image.asset(
+                                  'assets/images/Vertical container.png',
+                                  width: 27,
+                                  height: 27,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              )
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'Alert'.tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 18,
+                              fontFamily: 'Poppins-SemiBold',
+                              fontWeight: FontWeight.w600,
+                              height: 1.23,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'This number already exist.'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Light',
+                        fontWeight: FontWeight.w400,
+                        height: 1.23,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Row(                    mainAxisAlignment: MainAxisAlignment.center,
+
+                      children: [
+
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+
+                            backgroundColor: Color(0xFF442B72),
+                            surfaceTintColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: Color(0xFF442B72),
+                                ),
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: 38,
+                            width: 120,
+                            child: Center(
+                              child: Text(
+                                  'Go to login'.tr,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Poppins-Regular',
+                                      fontWeight: FontWeight.w500 ,
+                                      fontSize: 16)
+                              ))),
+                             onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                  // children.isNotEmpty?
+                                  LoginScreen(
+
+                                  )
+                                //no data
+                                // : NoInvitation( selectedImage: selectedImage)
+                              ),
+                                  (Route<dynamic> route) => false);
+                          },
+
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )),
+      );
+
+
+  }
+
 }

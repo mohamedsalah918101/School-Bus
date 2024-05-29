@@ -26,7 +26,7 @@ class _ChildrenCardState extends State<ChildrenCard> {
 
     return SizedBox(
       width: double.infinity,
-      height:  media.height*.18,
+      height: widget.childrenData!.supervisors!.length > 1 ? media.height*.20 : media.height*.18,
       child: Card(
         elevation: 8,
         color: Colors.white,
@@ -173,9 +173,7 @@ class _ChildrenCardState extends State<ChildrenCard> {
                           child:
                           Padding(
                             padding:
-                            (sharedpref?.getString('lang') == 'ar')
-                                ? const EdgeInsets.only(right: 25.0)
-                                : const EdgeInsets.only(left: 25.0),
+                             const EdgeInsets.only(right: 7.0,left: 7.0),
                             child: PopupMenuButton<String>(
                               padding: EdgeInsets.zero,
                               shape: RoundedRectangleBorder(
@@ -252,22 +250,7 @@ class _ChildrenCardState extends State<ChildrenCard> {
                     SizedBox(
                         height: 5
                     ),
-                    Padding(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
-                      child: Align(
-                        alignment: AlignmentDirectional.topStart,
-                        child: Text(
-                          'Supervisor'.tr,
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontFamily: 'Poppins-SemiBold',
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff7269AD)
-                          ),
-                        ),
-                      ),
-                    ),
+
                     widget.childrenData!.supervisors!.length == 1 && widget.childrenData!.supervisors!.length >0 ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,109 +258,92 @@ class _ChildrenCardState extends State<ChildrenCard> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Text(
-                            widget.childrenData!.supervisors![0].name!,
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Poppins-Light',
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff929292)
-                            ),
-                          ),
+                          child:Row(
+                            children: [
+                              Text(
+                                'Supervisor#1'.tr,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Poppins-Light',
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff7269AD)
+                                ),
+                              ),
+                              SizedBox(width: media.width * .02),
+                              Text(
+                                widget.childrenData!.supervisors!.length >0? widget.childrenData!.supervisors![0].name!:'',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Poppins-Light',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xff929292)
+                                ),
+                              ),
+                            ],
+                          )
                         ),
 
 
                       ],
                     ):  widget.childrenData!.supervisors!.length >0 ?Padding(
                       padding: const EdgeInsets.only(right: 10.0,left: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
                         children: [
-
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: const Color(0xff7269AD),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Color(0xff7269AD),
-                                            spreadRadius: 2,
-                                            blurRadius: 2,
-                                            // offset: Offset(0, 3), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      width: 5,
-                                      height: 5,
-                                    ),                        SizedBox(width: media.width * .02),
-                                    Text(
-                                      widget.childrenData!.supervisors!.length >0? widget.childrenData!.supervisors![0].name!:'',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Poppins-Light',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff929292)
-                                      ),
-                                    ),
-                                  ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child:
+                            Row(
+                              children: [
+                                Text(
+                                  'Supervisor#1'.tr,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Poppins-Light',
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xff7269AD)
+                                  ),
                                 ),
-                              ),
-
-
-                            ],
-                          ),
-                          SizedBox(height: media.height*.03,
-                            child: VerticalDivider(
-                              color: Color(0xff929292),
-                              thickness: .6,
+                                SizedBox(width: media.width * .02),
+                                Text(
+                                  widget.childrenData!.supervisors!.length >0? widget.childrenData!.supervisors![0].name!:'',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Poppins-Light',
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff929292)
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: const Color(0xff7269AD),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Color(0xff7269AD),
-                                            spreadRadius: 2,
-                                            blurRadius: 2,
-                                            // offset: Offset(0, 3), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      width: 5,
-                                      height: 5,
-                                    ),
-                                    SizedBox(width: media.width * .02),
-                                    Text(
-                                      widget.childrenData!.supervisors!.length >0 ? widget.childrenData!.supervisors![1].name!:'',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Poppins-Light',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff929292)
-                                      ),
-                                    ),
-                                  ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Supervisor#2'.tr,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Poppins-Light',
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xff7269AD)
+                                  ),
                                 ),
-                              ),
-
-
-                            ],
+                                SizedBox(width: media.width * .02),
+                                Text(
+                                  widget.childrenData!.supervisors!.length >0 ? widget.childrenData!.supervisors![1].name!:'',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Poppins-Light',
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff929292)
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+
+
                         ],
                       ),
                     ):Container(),

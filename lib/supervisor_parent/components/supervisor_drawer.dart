@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
@@ -33,6 +33,8 @@ class SupervisorDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<SupervisorDrawer> {
   late final int selectedImage;
+  final _firestore = FirebaseFirestore.instance;
+
 
   // List<ChildDataItem> children = [];
 
@@ -299,13 +301,51 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                          FutureBuilder(
+                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.data?.data() == null) {
+                              return Text(
+                                'No data available',
+                                style: TextStyle(
+                                  color: Color(0xff442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Regular',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              );
+                            }
+
+                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                            sharedpref?.getString('lang') == 'en';
+                            return
+                              CircleAvatar(
+                                radius: 31,
+                                backgroundColor: Color(0xff442B72),
+                                child: CircleAvatar(
+                                  backgroundImage:
+                                  NetworkImage('${data['busphoto'] }'),
+                                  radius: 31,
+                                ),
+                              );
+                          }
+
+                          return Container();
+                        },
+                      ),
                               // children.isNotEmpty?
-                              Image.asset(
-                                'assets/images/Ellipse 1.png',
-                                fit: BoxFit.fill,
-                                height: 62,
-                                width: 62,
-                              ),
+                              // Image.asset(
+                              //   'assets/images/Ellipse 1.png',
+                              //   fit: BoxFit.fill,
+                              //   height: 62,
+                              //   width: 62,
+                              // ),
                               //     :
                               // Image.asset(
                               //   'assets/images/Group 237679.png',
@@ -316,15 +356,50 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text(
-                                'Shady Ayman'.tr,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontFamily: 'Poppins-SemiBold',
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              FutureBuilder(
+                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (snapshot.data?.data() == null) {
+                                      return Text(
+                                        'No data available',
+                                        style: TextStyle(
+                                          color: Color(0xff442B72),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Regular',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      );
+                                    }
+
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    return Text(
+                                      '${data['name']}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                            fontSize: 18,
+                                            fontFamily: 'Poppins-SemiBold',
+                                            fontWeight: FontWeight.w600,
+                                      ),
+                                    );
+                                  }
+
+                                  return Container();
+                                },
                               ),
+                              // Text(
+                              //   'Shady Ayman'.tr,
+                              //   style: TextStyle(
+                              //     color: Colors.white,
+                              //     fontSize: 18,
+                              //     fontFamily: 'Poppins-SemiBold',
+                              //     fontWeight: FontWeight.w600,
+                              //   ),
+                              // ),
                               SizedBox(
                                 height: 0,
                               ),

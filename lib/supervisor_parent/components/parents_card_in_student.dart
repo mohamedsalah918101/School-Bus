@@ -139,9 +139,9 @@ class _ParentCardInStudentState extends State<ParentCardInStudent> {
                                   width: 26,
                                   height: 26,),
                                 onTap: () {
-                                  Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) =>
-                                          ChatScreen()));
+                                  // Navigator.of(context).push(
+                                  //     MaterialPageRoute(builder: (context) =>
+                                  //         ChatScreen()));
                                 },
                               ),
                             ],

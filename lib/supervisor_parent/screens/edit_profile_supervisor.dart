@@ -18,18 +18,10 @@ import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 
 
 class EditProfileSupervisorScreen extends StatefulWidget {
-  final String docid;
-  final String oldName;
-  final String oldEmail;
-  final String oldPhoto;
-  final String oldNumber;
 
-  const EditProfileSupervisorScreen({super.key,
-    required this.docid,
-    required this.oldName,
-    required this.oldEmail,
-    required this.oldNumber,
-    required this.oldPhoto ,});
+  // const EditProfileSupervisorScreen({super.key,
+  //
+  //   });
   @override
   _EditProfileSupervisorScreenState createState() => _EditProfileSupervisorScreenState();
 }
@@ -41,55 +33,118 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   final _nameController = TextEditingController();
   bool nameError = true;
   bool phoneError = true;
-  // bool emailError = true;
   File ? _selectedImage;
   String? imageUrl;
   File? file ;
-  GlobalKey<FormState> formState = GlobalKey<FormState>();
+  final formState = GlobalKey<FormState>();
+
+  // GlobalKey<FormState> formState = GlobalKey<FormState>();
   final _firestore = FirebaseFirestore.instance;
   CollectionReference Supervisor = FirebaseFirestore.instance.collection('supervisor');
   // List<ChildDataItem> children = [];
 
   Future<void> _pickImageFromGallery() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? returnedImage = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (returnedImage == null) {
-      print('No image selected');
-      return;
-    }
-
-    File imageFile = File(returnedImage.path);
-
-    if (!imageFile.existsSync()) {
-      print('The selected image file does not exist');
-      return;
-    }
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) return;
 
     setState(() {
-      _selectedImage = imageFile;
+      _selectedImage = File(returnedImage.path);
     });
 
     // Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = referenceRoot.child('images_supervisor');
-    Reference referenceImageToUpload = referenceDirImages.child('profile_supervisor');
+    Reference referenceDirImages = referenceRoot.child('images');
+    Reference referenceImageToUpload = referenceDirImages.child('name'); // استخدم اسم مناسب أو مولد تلقائيًا
 
     try {
       // Store the file
-      UploadTask uploadTask = referenceImageToUpload.putFile(imageFile);
-
-      // Get the download URL
-      TaskSnapshot taskSnapshot = await uploadTask;
-      imageUrl = await taskSnapshot.ref.getDownloadURL();
+      await referenceImageToUpload.putFile(File(returnedImage.path));
+      // Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
       print('Image uploaded successfully. URL: $imageUrl');
-
-      setState(() {});
+      // Update Firestore with the new image URL
+      await editProfile();
     } catch (error) {
       print('Error uploading image: $error');
     }
   }
 
+  editProfile() async {
+    print('editprofile called');
+
+    if (formState.currentState != null) {
+      print('formState.currentState is not null');
+
+      if (formState.currentState!.validate()) {
+        print('form is valid');
+
+        try {
+          print('updating document...');
+          await FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString('id')).update({
+            'phoneNumber': _phoneNumberController.text,
+            'email': _emailController.text,
+            'name': _nameController.text,
+            'busphoto': imageUrl,
+          });
+
+          print('document updated successfully');
+
+          setState(() {
+            // Trigger a rebuild of the widget tree if necessary
+          });
+        } catch (e) {
+          print('Error updating document: $e');
+        }
+      } else {
+        print('form is not valid');
+      }
+    } else {
+      print('formState.currentState is null');
+    }
+  }
+
+
+  // Future<void> _pickImageFromGallery() async {
+  //   final ImagePicker _picker = ImagePicker();
+  //   final XFile? returnedImage = await _picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (returnedImage == null) {
+  //     print('No image selected');
+  //     return;
+  //   }
+  //
+  //   File imageFile = File(returnedImage.path);
+  //
+  //   if (!imageFile.existsSync()) {
+  //     print('The selected image file does not exist');
+  //     return;
+  //   }
+  //
+  //   setState(() {
+  //     _selectedImage = imageFile;
+  //   });
+  //
+  //   // Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = referenceRoot.child('images_supervisor');
+  //   Reference referenceImageToUpload = referenceDirImages.child('profile_supervisor');
+  //
+  //   try {
+  //     // Store the file
+  //     UploadTask uploadTask = referenceImageToUpload.putFile(imageFile);
+  //
+  //     // Get the download URL
+  //     TaskSnapshot taskSnapshot = await uploadTask;
+  //     imageUrl = await taskSnapshot.ref.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $imageUrl');
+  //
+  //     setState(() {});
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //   }
+  // }
+
+  //test
 
   // Future _pickImageFromGallery() async{
   //   final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -119,47 +174,93 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
   //   }
   // }
 
-  editAddSupervisor() async {
-    print('editAddParent called');
-    if (formState.currentState != null) {
-      print('formState.currentState is not null');
-      if (formState.currentState!.validate()) {
-        print('form is valid');
-        try {
-          setState(() {
+//   editProfile() async {
+//     print('editprofile called');
+//
+//     if (formState.currentState != null) {
+//       print('formState.currentState is not null');
+//
+//       if (formState.currentState!.validate()) {
+//         print('form is valid');
+//
+//         try {
+//           print('updating document...');
+// //profile.doc(widget.docid)
+//           await FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString('id')).update({
+//             'phoneNumber': _phoneNumberController.text,
+//             'email': _emailController.text,
+//             'name':_nameController.text,
+//             'busphoto':imageUrl,
+//
+//           });
+//
+//           print('document updated successfully');
+//
+//           setState(() {
+//             // Trigger a rebuild of the widget tree if necessary
+//           });
+//         } catch (e) {
+//           print('Error updating document: $e');
+//           // Handle specific error cases here
+//         }
+//       } else {
+//         print('form is not valid');
+//       }
+//     } else {
+//       print('formState.currentState is null');
+//     }
+//   }
 
-          });
-          print('updating document...');
 
-          await Supervisor.doc(widget.docid).update({
-            'phoneNumber': _phoneNumberController.text,
-            'name': _nameController.text,
-            'email': _emailController.text,
-            'busphoto':imageUrl,
-          });
-          print('document updated successfully');
+  // editAddSupervisor() async {
+  //   print('editAddParent called');
+  //   if (formState.currentState != null) {
+  //     print('formState.currentState is not null');
+  //     if (formState.currentState!.validate()) {
+  //       print('form is valid');
+  //       try {
+  //         setState(() {
+  //
+  //         });
+  //         print('updating document...');
+  //
+  //         await Supervisor.doc(widget.docid).update({
+  //           'phoneNumber': _phoneNumberController.text,
+  //           'name': _nameController.text,
+  //           'email': _emailController.text,
+  //           'busphoto':imageUrl,
+  //         });
+  //         print('document updated successfully');
+  //
+  //         setState(() {
+  //           // _pickImageFromGallery();
+  //         });
+  //       } catch (e) {
+  //         print('Error updating document: $e');
+  //       }
+  //     } else {
+  //       print('form is not valid');
+  //     }
+  //   } else {
+  //     print('formState.currentState is null');
+  //   }
+  // }
+  late Future<DocumentSnapshot<Map<String, dynamic>>> _future;
 
-          setState(() {
-            // _pickImageFromGallery();
-          });
-        } catch (e) {
-          print('Error updating document: $e');
-        }
-      } else {
-        print('form is not valid');
-      }
-    } else {
-      print('formState.currentState is null');
-    }
+  @override
+  dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.oldName!;
-    _phoneNumberController.text = widget.oldNumber!;
-    _emailController.text = widget.oldEmail!;
-    imageUrl= widget.oldPhoto;
+    _future = FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString('id')).get();
+
     setState(() {
 
     });
@@ -170,7 +271,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
     return Scaffold(
         backgroundColor: Colors.white,
         endDrawer: SupervisorDrawer(),
-        key: _scaffoldKey,
+        key: formState,
         appBar: PreferredSize(
           child: Container(
             decoration: BoxDecoration(boxShadow: [
@@ -265,6 +366,8 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                             //       backgroundImage: NetworkImage( '$imageUrl',),
                             //       radius: 50.5,)
                             // ),
+
+
                             GestureDetector(
                               onTap: (){
                                 print('object');
@@ -399,51 +502,78 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                     child: SizedBox(
                       width: 277,
                       height: 38,
-                      child: TextFormField(
-                        style: TextStyle(
-                          color: Color(0xFF442B72),
-                        ),
-                        controller: _nameController,
-                        cursorColor: const Color(0xFF442B72),
-                        textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                        TextDirection.rtl:
-                        TextDirection.ltr,
-                        scrollPadding:  EdgeInsets.symmetric(
-                            vertical: 30),
-                        decoration:  InputDecoration(
-                          alignLabelWithHint: true,
-                          counterText: "",
-                          fillColor: const Color(0xFFF1F1F1),
-                          filled: true,
-                          contentPadding:
-                          (sharedpref?.getString('lang') == 'ar') ?
-                          EdgeInsets.fromLTRB(0, 0, 17, 40):
-                          EdgeInsets.fromLTRB(17, 0, 0, 40),
-                          hintText:''.tr,
-                          floatingLabelBehavior:  FloatingLabelBehavior.never,
-                          hintStyle: const TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 12,
-                            fontFamily: 'Poppins-Light',
-                            fontWeight: FontWeight.w400,
-                            height: 1.33,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(7)),
-                            borderSide: BorderSide(
+                      child:
+                      FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String name = data?['name'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _nameController.text = name;
+
+                          return TextFormField(
+                            controller:  _nameController,
+                            style: TextStyle(
                               color: Color(0xFF442B72),
-                              width: 0.5,
-                            ),),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(7)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF442B72),
-                              width: 0.5,
+                              fontSize: 14,
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
                             ),
-                          ),
-                          // enabledBorder: myInputBorder(),
-                          // focusedBorder: myFocusBorder(),
-                        ),
+                          scrollPadding:  EdgeInsets.symmetric(
+                                vertical: 30),
+                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                              TextDirection.rtl:
+                              TextDirection.ltr,
+                            cursorColor: const Color(0xFF442B72),
+                            decoration: InputDecoration(
+                                hintStyle: const TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.33,
+                                ),
+                              alignLabelWithHint: true,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                              (sharedpref?.getString('lang') == 'ar') ?
+                                  EdgeInsets.fromLTRB(0, 15, 17, 50):
+                                  EdgeInsets.fromLTRB(17, 15, 0, 50),
+                              // const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF442B72),
+                                  width: 0.5,
+                                ),),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF442B72),
+                                  width: 0.5,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -492,55 +622,80 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                     child: SizedBox(
                       width: 277,
                       height: 38,
-                      child: TextFormField(
-                        style: TextStyle(
-                          color: Color(0xFF442B72),
-                        ),
-                        controller: _phoneNumberController,
-                        cursorColor: const Color(0xFF442B72),
-                        textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                        TextDirection.rtl:
-                        TextDirection.ltr,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          LengthLimitingTextInputFormatter(11),
-                          FilteringTextInputFormatter.digitsOnly],
-                        scrollPadding:  EdgeInsets.symmetric(
-                            vertical: 30),
-                        decoration:  InputDecoration(
-                          alignLabelWithHint: true,
-                          counterText: "",
-                          fillColor: const Color(0xFFF1F1F1),
-                          filled: true,
-                          contentPadding:
-                          (sharedpref?.getString('lang') == 'ar') ?
-                          EdgeInsets.fromLTRB(0, 0, 17, 40):
-                          EdgeInsets.fromLTRB(17, 0, 0, 40),
-                          hintText:''.tr,
-                          floatingLabelBehavior:  FloatingLabelBehavior.never,
-                          hintStyle: const TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 12,
-                            fontFamily: 'Poppins-Light',
-                            fontWeight: FontWeight.w400,
-                            height: 1.33,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(7)),
-                            borderSide: BorderSide(
+                      child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String PhoneNumber = data?['phoneNumber'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _phoneNumberController.text = PhoneNumber;
+                          return TextFormField(
+                            controller:  _phoneNumberController,
+                            style: TextStyle(
                               color: Color(0xFF442B72),
-                              width: 0.5,
-                            ),),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(7)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF442B72),
-                              width: 0.5,
+                              fontSize: 14,
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
                             ),
-                          ),
-                          // enabledBorder: myInputBorder(),
-                          // focusedBorder: myFocusBorder(),
-                        ),
+                            scrollPadding:  EdgeInsets.symmetric(
+                                vertical: 30),
+                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                            TextDirection.rtl:
+                            TextDirection.ltr,
+                            keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                LengthLimitingTextInputFormatter(11),
+                                FilteringTextInputFormatter.digitsOnly],
+                            cursorColor: const Color(0xFF442B72),
+                            decoration: InputDecoration(
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 12,
+                                fontFamily: 'Poppins-Light',
+                                fontWeight: FontWeight.w400,
+                                height: 1.33,
+                              ),
+                              alignLabelWithHint: true,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                              (sharedpref?.getString('lang') == 'ar') ?
+                              EdgeInsets.fromLTRB(0, 15, 17, 50):
+                              EdgeInsets.fromLTRB(17, 15, 0, 50),
+                              // const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF442B72),
+                                  width: 0.5,
+                                ),),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF442B72),
+                                  width: 0.5,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -573,61 +728,127 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                     child: SizedBox(
                       width: 277,
                       height: 38,
-                      child: TextFormField(
-                        style: TextStyle(
-                          color: Color(0xFF442B72),
-                        ),
-                        controller: _emailController,
-                        cursorColor: const Color(0xFF442B72),
-                        textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                        TextDirection.rtl:
-                        TextDirection.ltr,
-                        scrollPadding:  EdgeInsets.symmetric(
-                            vertical: 30),
-                        decoration:  InputDecoration(
-                          alignLabelWithHint: true,
-                          counterText: "",
-                          fillColor: const Color(0xFFF1F1F1),
-                          filled: true,
-                          contentPadding:
-                          (sharedpref?.getString('lang') == 'ar') ?
-                          EdgeInsets.fromLTRB(0, 0, 17, 40):
-                          EdgeInsets.fromLTRB(17, 0, 0, 40),
-                          hintText:''.tr,
-                          floatingLabelBehavior:  FloatingLabelBehavior.never,
-                          hintStyle: const TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 12,
-                            fontFamily: 'Poppins-Light',
-                            fontWeight: FontWeight.w400,
-                            height: 1.33,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(7)),
-                            borderSide: BorderSide(
+                      child:  FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String email = data?['email'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _emailController.text = email;
+
+                          return TextFormField(
+                            controller:  _emailController,
+                            style: TextStyle(
                               color: Color(0xFF442B72),
-                              width: 0.5,
-                            ),),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(7)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF442B72),
-                              width: 0.5,
+                              fontSize: 14,
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
                             ),
-                          ),
-                          // enabledBorder: myInputBorder(),
-                          // focusedBorder: myFocusBorder(),
-                        ),
+                            scrollPadding:  EdgeInsets.symmetric(
+                                vertical: 30),
+                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                            TextDirection.rtl:
+                            TextDirection.ltr,
+                            cursorColor: const Color(0xFF442B72),
+                            decoration: InputDecoration(
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 12,
+                                fontFamily: 'Poppins-Light',
+                                fontWeight: FontWeight.w400,
+                                height: 1.33,
+                              ),
+                              alignLabelWithHint: true,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                              (sharedpref?.getString('lang') == 'ar') ?
+                              EdgeInsets.fromLTRB(0, 15, 17, 50):
+                              EdgeInsets.fromLTRB(17, 15, 0, 50),
+                              // const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF442B72),
+                                  width: 0.5,
+                                ),),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF442B72),
+                                  width: 0.5,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
+
+                      // TextFormField(
+                      //   style: TextStyle(
+                      //     color: Color(0xFF442B72),
+                      //   ),
+                      //   controller: _emailController,
+                      //   cursorColor: const Color(0xFF442B72),
+                      //   textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                      //   TextDirection.rtl:
+                      //   TextDirection.ltr,
+                      //   scrollPadding:  EdgeInsets.symmetric(
+                      //       vertical: 30),
+                      //   decoration:  InputDecoration(
+                      //     alignLabelWithHint: true,
+                      //     counterText: "",
+                      //     fillColor: const Color(0xFFF1F1F1),
+                      //     filled: true,
+                      //     contentPadding:
+                      //     (sharedpref?.getString('lang') == 'ar') ?
+                      //     EdgeInsets.fromLTRB(0, 0, 17, 40):
+                      //     EdgeInsets.fromLTRB(17, 0, 0, 40),
+                      //     hintText:''.tr,
+                      //     floatingLabelBehavior:  FloatingLabelBehavior.never,
+                      //     hintStyle: const TextStyle(
+                      //       color: Color(0xFF442B72),
+                      //       fontSize: 12,
+                      //       fontFamily: 'Poppins-Light',
+                      //       fontWeight: FontWeight.w400,
+                      //       height: 1.33,
+                      //     ),
+                      //     focusedBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.all(Radius.circular(7)),
+                      //       borderSide: BorderSide(
+                      //         color: Color(0xFF442B72),
+                      //         width: 0.5,
+                      //       ),),
+                      //     enabledBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.all(Radius.circular(7)),
+                      //       borderSide: BorderSide(
+                      //         color: Color(0xFF442B72),
+                      //         width: 0.5,
+                      //       ),
+                      //     ),
+                      //     // enabledBorder: myInputBorder(),
+                      //     // focusedBorder: myFocusBorder(),
+                      //   ),
+                      // ),
                     ),
                   ),
-                  // emailError ? Container(): Padding(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 48),
-                  //   child: Text(
-                  //     "Please enter your email".tr,
-                  //     style: TextStyle(color: Colors.red),
-                  //   ),
-                  // ),
                   SizedBox(
                     height: 35,
                   ),
@@ -671,10 +892,15 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                           //
                           //   });
                           // }
-                          if( nameError &&
+                          if(
+
+                          nameError &&
                               // emailError &&
                               phoneError){
-                            editAddSupervisor();
+                            editProfile();
+                            setState(() {
+
+                            });
                             DataSavedSnackBar(context, 'Data saved successfully');
                             Navigator.pop(context , true);
                           }

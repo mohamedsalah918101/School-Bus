@@ -71,6 +71,7 @@ class SenderMessageItem extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(height: 10,)
         ],
       ),
     );

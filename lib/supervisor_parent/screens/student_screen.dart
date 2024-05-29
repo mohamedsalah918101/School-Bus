@@ -23,10 +23,10 @@ import 'notification_parent.dart';
 class StudentScreen extends StatefulWidget {
   // final Map<String, dynamic> parentData;
 
-  StudentScreen({
-    Key? key,  required String docid, required oldNumber, required oldName, required String oldNumberOfChildren, required oldType,
-    // required this.parentData,
-  }) : super(key: key);
+  // StudentScreen({
+  //   Key? key,  required String docid, required oldNumber, required oldName, required String oldNumberOfChildren, required oldType,
+  //   // required this.parentData,
+  // }) : super(key: key);
 
   @override
   _StudentScreen createState() => _StudentScreen();
