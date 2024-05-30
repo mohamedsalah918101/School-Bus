@@ -3,12 +3,15 @@ import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
@@ -17,6 +20,7 @@ import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:dotted_line/dotted_line.dart';
+
 
 
 class TrackSupervisor extends StatefulWidget {
@@ -36,28 +40,112 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
   List<QueryDocumentSnapshot> data = [];
   bool dataLoading=false;
+  Position? currentPosition;
+  // String currentLatitude = currentPosition.latitude.toString();
+  // String currentLongitude = currentPosition.longitude.toString();
 
+  // Future<void> getCurrentLocation() async {
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //     setState(() {
+  //       currentPosition = position;
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
-  getData()async{
-    setState(() {
-      dataLoading =true;
-
-    });
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
-    data.addAll(querySnapshot.docs);
-    setState(() {
-      dataLoading =false;
-
-    });
+  Future<void> getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        currentPosition = position;
+      });
+      // Store the latitude and longitude values in Firebase Realtime Database
+      final databaseReference = FirebaseDatabase.instance.reference();
+      databaseReference.child('users').child('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    } catch (e) {
+      print(e);
+    }
   }
+
+  Future<bool> _checkLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+
+  // getData()async{
+  //   setState(() {
+  //     dataLoading =true;
+  //
+  //   });
+  //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+  //   data.addAll(querySnapshot.docs);
+  //   // if (data.isNotEmpty) {
+  //   //   var firstDoc = data.first;
+  //   //   String latString = firstDoc['lat'];
+  //   //   String lngString = firstDoc['lng'];
+  //   //
+  //   //   try {
+  //   //     double lat = double.parse(latString);
+  //   //     double lng = double.parse(lngString);
+  //   //
+  //   //     setState(() {
+  //   //       startLocation = LatLng(lat, lng);
+  //   //       dataLoading = false;
+  //   //     });
+  //   //   } catch (e) {
+  //   //     print('Error converting lat/lng to double: $e');
+  //   //     setState(() {
+  //   //       dataLoading = false;
+  //   //     });
+  //   //   }
+  //   // } else
+  //   setState(() {
+  //     dataLoading =false;
+  //
+  //   });
+  // }
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
     loadCustomIcon();
-    getData();
+    initData();
+
   }
-  //
+
+  void initData() async {
+    await getCurrentLocation();
+    print('Current position: ${currentPosition}');
+    if (await _checkLocationPermission()) {
+      // Enable MyLocation layer
+      print('Location permission granted');
+    } else {
+      // Show message asking user to grant location permissions
+      print('Location permission denied');
+    }
+  }  //
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
 
   Future<void> loadCustomIcon() async {
@@ -83,6 +171,19 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
 
   @override
   Widget build(BuildContext context) {
+
+    String currentLatitude = currentPosition?.latitude?.toString() ?? '';
+    String currentLongitude = currentPosition?.longitude?.toString() ?? '';
+
+    LatLng targetLocation = startLocation;
+    if (currentLatitude.isNotEmpty && currentLongitude.isNotEmpty) {
+      try {
+        targetLocation = LatLng(double.parse(currentLatitude), double.parse(currentLongitude));
+      } catch (e) {
+        print('Invalid double: $e');
+      }
+    }
+
     return Scaffold(
         endDrawer: SupervisorDrawer(),
         key: _scaffoldKey,
@@ -160,29 +261,66 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                 height: 350,
                 child: GoogleMap(
                   scrollGesturesEnabled: true,
-                  gestureRecognizers: Set()
-                    ..add(Factory<EagerGestureRecognizer>(() =>
-                        EagerGestureRecognizer())),
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(27.180134, 31.189283),
+                  gestureRecognizers: Set()..add(Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
+                  initialCameraPosition: CameraPosition(
+                    target: targetLocation,
                     zoom: 12,
+
+
+                  // scrollGesturesEnabled: true,
+                  // gestureRecognizers: Set()
+                  //   ..add(Factory<EagerGestureRecognizer>(() =>
+                  //       EagerGestureRecognizer())),
+                  // initialCameraPosition:  CameraPosition(
+                  //
+                  //   // target: startLocation,
+                  //   // position: LatLng(double.parse(currentLatitude), double.parse(currentLongitude)),
+                  //   target:LatLng(double.parse(currentLatitude), double.parse(currentLongitude)),
+                  //   // LatLng(29.180134, 65.189283),
+                  //   zoom: 12,
+
+                  //break
+                 
+                  //  if (_isValidDouble(currentLatitude) && _isValidDouble(currentLongitude)) {
+                    //   // Parse the strings to doubles
+                    //   double latitude = double.parse(currentLatitude);
+                    //   double longitude = double.parse(currentLongitude);
+                    //
+                    //   // Use the latitude and longitude values
+                    //   initialCameraPosition: CameraPosition(
+                    //     target: LatLng(latitude, longitude),
+                    //     zoom: 12,
+                    //   ),
+                    // } else {
+                    //   // Show an error message or use default values
+                    // }
                   ),
                   markers: markers,
                   onMapCreated: ((mapController) {
                     setState(() {
                       controller = mapController;
                     });
+                    if (currentPosition != null) {
+                      //                   markers.add(
+                      //                     Marker(
+                      //                       markerId: const MarkerId('marker_2'),
+                      //                       position: LatLng(currentPosition!.latitude, currentPosition!.longitude),
+                      //                       icon: anotherCustomIcon,
 
-                    markers.add(
-                      Marker(
-                        // consumeTapEvents: true,
+                      markers.add(
+                        Marker(
+                          // consumeTapEvents: true,
                           markerId: const MarkerId('marker_2'),
-                          position: const LatLng(27.190000, 31.200000),
+                          position: LatLng(double.parse(currentLatitude),
+                              double.parse(currentLongitude)),
                           icon: anotherCustomIcon,
-                      ),
-                    );
-                    setState(() {});
-
+                        ),
+                      );
+                      setState(() {
+                        print('testtttttttttttttt+${LatLng}');
+                      });
+                    }
+                    getCurrentLocation();
                   }),
                 ),
 
@@ -360,234 +498,231 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                     const SizedBox(
                       height: 30,
                     ),
-                    // children.isNotEmpty?
-                    Stack(
-                      children: [
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            List children = data[index]['children'];
-                            if (index == data.length-1 ) {
-                              return Row(
-                                children: [
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
-                                  Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),),
-                                  Column(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/Ellipse 6.png',
-                                        width: 50,
-                                        height: 50,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      for (var child in children)
-                                      Text(
-                                        '${child['name']}',
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 15,
-                                          fontFamily: 'Poppins-SemiBold',
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.07,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text.rich(
-                                        TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: 'arrived :'.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.23,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: ' 7:45 '.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.23,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: 'AM'.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.23,
-                                                ),
-                                              ),]
-                                        ),),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }
-                            else if (index == 0 ) {
-                              return Row(
-                                children: [
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
-                                  Text(' - - -' , style: TextStyle(color: Color(0xffFFC53E),),),
-                                  Column(
-                                    children: [
-                                      Padding(
-                                        padding: (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(right: 5.0):
-                                        EdgeInsets.only(left: 0.0),
-                                        child: Image.asset(
-                                          'assets/images/Ellipse 6.png',
-                                          width: 50,
-                                          height: 50,
-                                        ),
-                                      ), SizedBox(
-                                        // width: 15,
-                                        height: 20,
-                                        child: Padding(
-                                          padding: (sharedpref?.getString('lang') == 'ar')?
-                                          EdgeInsets.only(right: 1.0):
-                                          EdgeInsets.only(left: 1.0),
-                                          child: DottedLine(
-                                            direction: Axis.vertical,
-                                            dashColor: Color(0xFF432B72),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  SizedBox(
-                                    height:0,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        for (var child in children)
-                                          Text(
-                                            '${child['name']}',
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-SemiBold',
-                                              fontWeight: FontWeight.w600,
-                                              height: 1.07,
-                                            ),
-                                        ),
-                                        SizedBox(
-                                          height: 3,
-                                        ),
-                                        Text(
-                                          'arrived : 7:45 AM'.tr,
-                                          style: TextStyle(
-                                            color: Color(0xFF13DB63),
-                                            fontSize: 13,
-                                            fontFamily: 'Poppins-Regular',
-                                            fontWeight: FontWeight.w400,
-                                            height: 1.23,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                            else {
-                              return Row(
-                                children: [
-                                  Padding(
-                                    padding:
-                                    (sharedpref?.getString('lang') == 'ar')?
-                                    EdgeInsets.only(right: 25.0):
-                                    EdgeInsets.only(left: 25.0),
-                                    child: Image.asset(
-                                      'assets/images/Ellipse 6.png',
-                                      width: 50,
-                                      height: 50,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      for (var child in children)
-                                        Text(
-                                          '${child['name']}',
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 15,
-                                          fontFamily: 'Poppins-SemiBold',
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.07,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        'arrived : 7:45 AM'.tr,
-                                        style: TextStyle(
-                                          color: Color(0xFF13DB63),
-                                          fontSize: 13,
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w400,
-                                          height: 1.23,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }
-                          },
-                          separatorBuilder: (context, index) {
-                            if(index == 0) {return
-                              SizedBox(
-                                height: 0,
-                              );
-                            }else{
-                              return  SizedBox(
-                                height: 20,
-                              );}
-                          },
-                          itemCount: data.length,
-                        ),
-
-                      ],
-                    ) ,
+                    // Stack(
+                    //   children: [
+                    //     ListView.separated(
+                    //       shrinkWrap: true,
+                    //       physics: NeverScrollableScrollPhysics(),
+                    //       itemBuilder: (context, index) {
+                    //         List children = data[index]['children'];
+                    //         if (index == data.length-1 ) {
+                    //           return Row(
+                    //             children: [
+                    //               (sharedpref?.getString('lang') == 'ar')?
+                    //               Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
+                    //               Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),),
+                    //               Column(
+                    //                 children: [
+                    //                   Image.asset(
+                    //                     'assets/images/Ellipse 6.png',
+                    //                     width: 50,
+                    //                     height: 50,
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               const SizedBox(
+                    //                 width: 15,
+                    //               ),
+                    //               Column(
+                    //                 mainAxisAlignment: MainAxisAlignment.start,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   for (var child in children)
+                    //                   Text(
+                    //                     '${child['name']}',
+                    //                     style: TextStyle(
+                    //                       color: Color(0xFF442B72),
+                    //                       fontSize: 15,
+                    //                       fontFamily: 'Poppins-SemiBold',
+                    //                       fontWeight: FontWeight.w600,
+                    //                       height: 1.07,
+                    //                     ),
+                    //                   ),
+                    //                   SizedBox(
+                    //                     height: 3,
+                    //                   ),
+                    //                   Text.rich(
+                    //                     TextSpan(
+                    //                         children: [
+                    //                           TextSpan(
+                    //                             text: 'arrived :'.tr,
+                    //                             style: TextStyle(
+                    //                               color: Color(0xFF13DB63),
+                    //                               fontSize: 13,
+                    //                               fontFamily: 'Poppins-Regular',
+                    //                               fontWeight: FontWeight.w400,
+                    //                               height: 1.23,
+                    //                             ),
+                    //                           ),
+                    //                           TextSpan(
+                    //                             text: ' 7:45 '.tr,
+                    //                             style: TextStyle(
+                    //                               color: Color(0xFF13DB63),
+                    //                               fontSize: 13,
+                    //                               fontFamily: 'Poppins-Regular',
+                    //                               fontWeight: FontWeight.w400,
+                    //                               height: 1.23,
+                    //                             ),
+                    //                           ),
+                    //                           TextSpan(
+                    //                             text: 'AM'.tr,
+                    //                             style: TextStyle(
+                    //                               color: Color(0xFF13DB63),
+                    //                               fontSize: 13,
+                    //                               fontFamily: 'Poppins-Regular',
+                    //                               fontWeight: FontWeight.w400,
+                    //                               height: 1.23,
+                    //                             ),
+                    //                           ),]
+                    //                     ),),
+                    //                 ],
+                    //               ),
+                    //             ],
+                    //           );
+                    //         }
+                    //         else if (index == 0 ) {
+                    //           return Row(
+                    //             children: [
+                    //               (sharedpref?.getString('lang') == 'ar')?
+                    //               Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
+                    //               Text(' - - -' , style: TextStyle(color: Color(0xffFFC53E),),),
+                    //               Column(
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: (sharedpref?.getString('lang') == 'ar')?
+                    //                     EdgeInsets.only(right: 5.0):
+                    //                     EdgeInsets.only(left: 0.0),
+                    //                     child: Image.asset(
+                    //                       'assets/images/Ellipse 6.png',
+                    //                       width: 50,
+                    //                       height: 50,
+                    //                     ),
+                    //                   ), SizedBox(
+                    //                     // width: 15,
+                    //                     height: 20,
+                    //                     child: Padding(
+                    //                       padding: (sharedpref?.getString('lang') == 'ar')?
+                    //                       EdgeInsets.only(right: 1.0):
+                    //                       EdgeInsets.only(left: 1.0),
+                    //                       child: DottedLine(
+                    //                         direction: Axis.vertical,
+                    //                         dashColor: Color(0xFF432B72),
+                    //                       ),
+                    //                     ),
+                    //                   )
+                    //                 ],
+                    //               ),
+                    //               const SizedBox(
+                    //                 width: 15,
+                    //               ),
+                    //               SizedBox(
+                    //                 height:0,
+                    //                 child: Column(
+                    //                   mainAxisAlignment: MainAxisAlignment.start,
+                    //                   crossAxisAlignment: CrossAxisAlignment.start,
+                    //                   children: [
+                    //                     for (var child in children)
+                    //                       Text(
+                    //                         '${child['name']}',
+                    //                         style: TextStyle(
+                    //                           color: Color(0xFF442B72),
+                    //                           fontSize: 15,
+                    //                           fontFamily: 'Poppins-SemiBold',
+                    //                           fontWeight: FontWeight.w600,
+                    //                           height: 1.07,
+                    //                         ),
+                    //                     ),
+                    //                     SizedBox(
+                    //                       height: 3,
+                    //                     ),
+                    //                     Text(
+                    //                       'arrived : 7:45 AM'.tr,
+                    //                       style: TextStyle(
+                    //                         color: Color(0xFF13DB63),
+                    //                         fontSize: 13,
+                    //                         fontFamily: 'Poppins-Regular',
+                    //                         fontWeight: FontWeight.w400,
+                    //                         height: 1.23,
+                    //                       ),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           );
+                    //         }
+                    //         else {
+                    //           return Row(
+                    //             children: [
+                    //               Padding(
+                    //                 padding:
+                    //                 (sharedpref?.getString('lang') == 'ar')?
+                    //                 EdgeInsets.only(right: 25.0):
+                    //                 EdgeInsets.only(left: 25.0),
+                    //                 child: Image.asset(
+                    //                   'assets/images/Ellipse 6.png',
+                    //                   width: 50,
+                    //                   height: 50,
+                    //                 ),
+                    //               ),
+                    //               const SizedBox(
+                    //                 width: 15,
+                    //               ),
+                    //               Column(
+                    //                 mainAxisAlignment: MainAxisAlignment.start,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   for (var child in children)
+                    //                     Text(
+                    //                       '${child['name']}',
+                    //                     style: TextStyle(
+                    //                       color: Color(0xFF442B72),
+                    //                       fontSize: 15,
+                    //                       fontFamily: 'Poppins-SemiBold',
+                    //                       fontWeight: FontWeight.w600,
+                    //                       height: 1.07,
+                    //                     ),
+                    //                   ),
+                    //                   SizedBox(
+                    //                     height: 3,
+                    //                   ),
+                    //                   Text(
+                    //                     'arrived : 7:45 AM'.tr,
+                    //                     style: TextStyle(
+                    //                       color: Color(0xFF13DB63),
+                    //                       fontSize: 13,
+                    //                       fontFamily: 'Poppins-Regular',
+                    //                       fontWeight: FontWeight.w400,
+                    //                       height: 1.23,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ],
+                    //           );
+                    //         }
+                    //       },
+                    //       separatorBuilder: (context, index) {
+                    //         if(index == 0) {return
+                    //           SizedBox(
+                    //             height: 0,
+                    //           );
+                    //         }else{
+                    //           return  SizedBox(
+                    //             height: 20,
+                    //           );}
+                    //       },
+                    //       itemCount: data.length,
+                    //     ),
+                    //
+                    //   ],
+                    // ) ,
                     Stack(
                       children: [
                         ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: data.length,
-                          // data?[0]['childern'].length,
-                          // data.length,
                           itemBuilder: (BuildContext context, int index) {
                             List children = data[index]['children'];
                             if(data.isEmpty){
@@ -596,24 +731,98 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                               return Column(
                                 children: [
                                   for (var child in children)
+                                    if (index == data.length -1 || index == 0)
                                     SizedBox(
                                       width: double.infinity,
                                       height:  70, //92
-                                      child: Padding(
-                                        padding: (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(top: 15.0 , right: 12,):
-                                        EdgeInsets.only(top: 0.0 , left: 0,),
-                                        child:  Row(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          (sharedpref?.getString('lang') == 'ar')?
+                                          Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 15.0),
+                                            child: Text(' - - -' , style: TextStyle(color: Color(0xffFFC53E),),),
+                                          ),
+                                          Image.asset(
+                                            'assets/images/Ellipse 6.png',
+                                            width: 50,
+                                            height: 50,
+                                          ),
+                                          SizedBox(width: 15,),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 10.0),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${child['name']}',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                    fontSize: 15,
+                                                    fontFamily: 'Poppins-SemiBold',
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 1.07,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 3,
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'arrived :'.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: ' 7:45 '.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: 'AM'.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),]
+                                                  ),),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                    else   Padding(
+                                      padding: const EdgeInsets.only(left: 15.0),
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        height:  70, //92
+                                        child: Row(
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0.0),
-                                              child:  Image.asset(
-                                                'assets/images/Ellipse 6.png',
-                                                width: 50,
-                                                height: 50,
-                                              ),
+                                            Image.asset(
+                                              'assets/images/Ellipse 6.png',
+                                              width: 50,
+                                              height: 50,
                                             ),
                                             SizedBox(width: 15,),
                                             Column(
@@ -671,7 +880,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                             )
                                           ],
                                         ),),
-                                    ),
+                                    )
                                 ],
                               );
                           },
@@ -684,7 +893,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                           child: buildDashedLine(),
                         ):
                         Positioned(
-                          top: 35,
+                          top: 28,
                           bottom: 85,
                           child: buildDashedLine(),
                         )

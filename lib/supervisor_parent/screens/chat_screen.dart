@@ -175,9 +175,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
 
   void _scrollToBottom() {
-     // if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent+5);
-     // }
+    // if (_scrollController.hasClients) {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent+5);
+    // }
 
   }
 
@@ -228,10 +228,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               ),
             ),
           ],
-      title:
-            Padding(
-              padding: const EdgeInsets.only(right: 0.0),
-              child: Row(
+          title:
+          Padding(
+            padding: const EdgeInsets.only(right: 0.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -271,20 +271,20 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   ),
                 )
               ],
-                        ),
             ),
-        // },
-      // ),
+          ),
+          // },
+          // ),
           backgroundColor: Color(0xffF8F8F8),
           surfaceTintColor: Colors.transparent,
         ),
       ),
       body:
 
-    // GestureDetector(
-    // onTap: () {
-    // FocusScope.of(context).unfocus();
-    // },
+      // GestureDetector(
+      // onTap: () {
+      // FocusScope.of(context).unfocus();
+      // },
       GestureDetector(
         onTap: (){
           FocusScope.of(context).unfocus();
@@ -307,29 +307,29 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       WidgetsBinding.instance!.addPostFrameCallback((_) {
                         _scrollToBottom();
 
-                      print('ssssssssss');});
+                        print('ssssssssss');});
                       List<Widget> allMessages = [];
                       var responseMessages = snapshot.data!.docs;
                       for (var i = 0; i < responseMessages.length; i++) {
-    if (responseMessages[i].get('sender') == currentUserID || responseMessages[i].get('receiver') == currentUserID) {
+                        if ((responseMessages[i].get('sender') == currentUserID && responseMessages[i].get('receiver') == widget.receiverId) || (responseMessages[i].get('sender') == widget.receiverId &&  responseMessages[i].get('receiver') == currentUserID)) {
 
-    String txt = responseMessages[i].get('txt');
-                        String sender = responseMessages[i].get('sender');
-                        allMessages.add(
-                          sender == currentUserID
-                              ? SenderMessageItem(
-                            messageContent: txt,
-                            time: responseMessages[i].get('time').toString(),
-                          )
-                              : ReciverMessageItem(
-                            messageContent: txt,
-                            time: responseMessages[i].get('time').toString(),
-                          ),
-                        );
-                        if (i > 0) {
-                          previousSender = responseMessages[i - 1].get('sender');
-                        }
-                      }}
+                          String txt = responseMessages[i].get('txt');
+                          String sender = responseMessages[i].get('sender');
+                          allMessages.add(
+                            sender == currentUserID
+                                ? SenderMessageItem(
+                              messageContent: txt,
+                              time: responseMessages[i].get('time').toString(),
+                            )
+                                : ReciverMessageItem(
+                              messageContent: txt,
+                              time: responseMessages[i].get('time').toString(),
+                            ),
+                          );
+                          if (i > 0) {
+                            previousSender = responseMessages[i - 1].get('sender');
+                          }
+                        }}
                       return ListView(
                         controller: _scrollController,
                         reverse: false,
@@ -418,9 +418,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                 enabledBorder: myInputBorder(),
                                 focusedBorder: myFocusBorder(),
                                 suffixIcon:
-                                    sending == false?
-                                        SizedBox(height: 0,
-                                        width: 0,):
+                                sending == false?
+                                SizedBox(height: 0,
+                                  width: 0,):
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                                   child: Row(
@@ -448,20 +448,20 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                             // await _startRecording();
                                           }
                                         },
-    child: Icon(
-    _recorder?.isRecording ?? false
-    ? Icons.stop
-        : Icons.mic,
-    size: 24,
-    ),
-    ),
-    SizedBox(width: 14),
-    // Image.asset(
-    // 'assets/images/Voice.png',
-    // width: 24,
-    // height: 24,
-    //
-    //                                   ),
+                                        child: Icon(
+                                          _recorder?.isRecording ?? false
+                                              ? Icons.stop
+                                              : Icons.mic,
+                                          size: 24,
+                                        ),
+                                      ),
+                                      SizedBox(width: 14),
+                                      // Image.asset(
+                                      // 'assets/images/Voice.png',
+                                      // width: 24,
+                                      // height: 24,
+                                      //
+                                      //                                   ),
                                     ],
                                   ),
                                 ),
@@ -477,7 +477,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         onPressed: msgText.text.isEmpty ? null : () {
                           setState(() {
                             sending = true;
-                          //  sending = !sending
+                            //  sending = !sending
                           });
                           String formattedTime = DateFormat('HH:mm:ss').format(DateTime.now());
 
