@@ -1,19 +1,16 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
-
-
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../classes/classDay.dart';
-import '../components/custom_app_bar.dart';
-import '../components/dialogs.dart';
 import '../components/elevated_icon_button.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/home_drawer.dart';
+import 'Holiday.dart';
 import 'busesScreen.dart';
+import 'calenderadd.dart';
+import 'holidayDetailsClass.dart';
 import 'homeScreen.dart';
 import 'notificationsScreen.dart';
 
@@ -23,33 +20,159 @@ class VacationsScreen extends StatefulWidget {
 }
 
 class _VacationsScreenState extends State<VacationsScreen> {
+  //new
 
-  //function to add holiday in firestore
+  bool isLoading = false;
+  Holiday? _addedHoliday;
+
+  final _holidayNameController = TextEditingController();
+  List<DateTime> _selectedHolidayDates = [];
+
+  void _onDateRangeSelected(DateRangePickerSelectionChangedArgs args) {
+    print("DATE TEST");
+    print(args.value);
+    setState(() {
+      _selectedHolidayDates = args.value;
+    });
+  }
+String newDocId='';
+  //correct add data to firestore
+  // Future<void> _addHolidayToFirestore() async {
+  //   if (_holidayNameController.text.isNotEmpty && _selectedHolidayDates.isNotEmpty) {
+  //     final holiday = SchoolHoliday(
+  //       name: _holidayNameController.text,
+  //       fromDate: _selectedHolidayDates.first,
+  //       toDate: _selectedHolidayDates.last,
+  //     );
+  //
+  //     try {
+  //      // await _firestore.collection('schoolholiday').add(holiday.toJson());
+  //       DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+  //
+  //        newDocId = docRef.id; // Get the ID of the newly created document
+  //       print('New holiday added with ID: $newDocId');
+  //       AddAbsentDay = false;
+  //       isAddingHoliday = false;
+  //       _holidayNameController.clear();
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Holiday added successfully')),
+  //       );
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to add holiday: $e')),
+  //       );
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Please enter a holiday name and select dates')),
+  //     );
+  //   }
+  // }
+
+  Future<void> _addHolidayToFirestore() async {
+    if (_holidayNameController.text.isNotEmpty && _selectedHolidayDates.isNotEmpty) {
+      final List<String> selectedDates = _selectedHolidayDates.map((date) => date.toIso8601String()).toList();
+
+      final holiday = Holiday(
+        name: _holidayNameController.text,
+        fromDate: _selectedHolidayDates.first.toIso8601String(),
+        toDate: _selectedHolidayDates.last.toIso8601String(),
+        selectedDates: selectedDates,
+      );
+
+      try {
+        DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+
+        newDocId = docRef.id; // Get the ID of the newly created document
+        print('New holiday added with ID: $newDocId');  // Update the state with the new holiday details
+        setState(() {
+          _addedHoliday = holiday;
+          _holidayNameController.clear();
+          _selectedHolidayDates.clear();
+          isLoading = false;
+        });
+        AddAbsentDay = false;
+        isAddingHoliday = false;
+        _holidayNameController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Holiday added successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add holiday: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a holiday name and select dates')),
+      );
+    }
+  }
+
+
+  Future<List<SchoolHoliday>> _fetchHolidays() async {
+    final firestore = FirebaseFirestore.instance;
+    final holidaysRef = firestore.collection('schoolholiday');
+    final holidaysSnapshot = await holidaysRef.get();
+
+    List<SchoolHoliday> holidays = [];
+    for (var doc in holidaysSnapshot.docs) {
+      SchoolHoliday holiday = SchoolHoliday.fromJson(doc.data());
+      holidays.add(holiday);
+    }
+
+    return holidays;
+  }
+  //Fun get holiday
+  // Future<List<Holiday>> _fetchHolidays() async {
+  //   try {
+  //     final firestore = FirebaseFirestore.instance;
+  //     final holidaysRef = firestore.collection('schoolholiday');
+  //     final holidaysSnapshot = await holidaysRef.get();
+  //
+  //     if (holidaysSnapshot.docs.isEmpty) {
+  //       print("No holidays found.");
+  //       return [];
+  //     }
+  //
+  //     List<Holiday> holidays = [];
+  //     for (var doc in holidaysSnapshot.docs) {
+  //       Holiday holiday = Holiday.fromJson(doc.data());
+  //       holidays.add(holiday);
+  //     }
+  //
+  //     return holidays;
+  //   } catch (e) {
+  //     print("Error fetching holidays: $e");
+  //     return [];
+  //   }
+  // }
+
+  List<QueryDocumentSnapshot> data = [];
+  List<Holiday> holidays = [];
+
+  // getData() async {
+  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').get();
+  //
+  //   for (var doc in querySnapshot.docs) {
+  //     final holiday = Holiday(
+  //       name: doc['nameHoliday'],
+  //       fromDate: doc['fromDate'].toDate(),
+  //       toDate: doc['toDate'].toDate(),
+  //     );
+  //
+  //     holidays.add(holiday);
+  //   }
+  //
+  //   setState(() {
+  //     data = querySnapshot.docs;
+  //     // Add the following line to update the holidays list
+  //     holidays = holidays;
+  //   });
+  // }
   String docid='';
   final _firestore = FirebaseFirestore.instance;
-  // void _addDataToFirestore() async {
-  //   //if (_formKey.currentState!.validate()) {
-  //   // Define the data to add
-  //   Map<String, dynamic> data = {
-  //     'nameholiday': _nameController.text,
-  //     'fromdate': _emailController.text,
-  //     'todate': _phoneNumberController.text,
-  //
-  //   };
-  //   // Add the data to the Firestore collection
-  //   await _firestore.collection('holiday').add(data).then((docRef) {
-  //     docid=docRef.id;
-  //     print('Data added with document ID: ${docRef.id}');
-  //
-  //     // showSnackBarFun(context);
-  //   }).catchError((error) {
-  //     print('Failed to add data: $error');
-  //   });
-  //   // Clear the text fields
-  //   // _nameController.clear();
-  //   // _phoneNumberController.clear();
-  //   // _emailController.clear();
-  // }
+
 
 
 
@@ -67,6 +190,15 @@ class _VacationsScreenState extends State<VacationsScreen> {
     Day(name: 'F', isChecked: false),
     Day(name: 'S', isChecked: false),
   ];
+
+  Future<void> _saveDaysToFirestore() async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
+
+    List<String> selectedDays = days.where((day) => day.isChecked).map((day) => day.name).toList();
+
+    await _weekendCollection.add({'days': selectedDays});
+  }
   bool color = false;
   bool isVisible = false;
 
@@ -87,6 +219,62 @@ class _VacationsScreenState extends State<VacationsScreen> {
           color: Color(0xFFFFC53E),
           width: 0.5,
         ));
+  }
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  void retrieveDateTime() async {
+    try {
+      // Check if newDocId is valid
+      if (newDocId.isNotEmpty) {
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+            .collection('schoolholiday')
+            .doc(newDocId)
+            .get();
+
+        if (documentSnapshot.exists) {
+          // Extract fromDate, toDate, and name from the document
+          String name = documentSnapshot['name'];
+
+          // Parse fromDate and toDate from string to DateTime
+          DateTime fromDate = DateTime.parse(documentSnapshot['fromDate']);
+          DateTime toDate = DateTime.parse(documentSnapshot['toDate']);
+
+          // Extract and parse selectedDates from string to DateTime
+          List<dynamic> dateStrings = documentSnapshot['selectedDates'];
+          List<DateTime> dates = dateStrings.map((dateString) => DateTime.parse(dateString)).toList();
+
+          // Print extracted data
+          print('Name: $name');
+          print('From Date: ${fromDate.toLocal()}');
+          print('To Date: ${toDate.toLocal()}');
+          print('Selected Dates:');
+          for (DateTime date in dates) {
+            print(' - ${date.toLocal()}');
+          }
+        } else {
+          print("Document does not exist");
+        }
+      } else {
+        print("Invalid document ID");
+      }
+    } catch (e) {
+      print("Error retrieving data: $e");
+    }
+  }
+
+
+
+  List<Holiday> _holidays = [];
+  @override
+  void initState() {
+    super.initState();
+   // getData();
+
+    // _fetchHolidays().then((holidays) {
+    //   setState(() {
+    //     _holidays = holidays;
+    //   });
+    // });
   }
 
   @override
@@ -164,7 +352,9 @@ class _VacationsScreenState extends State<VacationsScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+MaterialButton(onPressed: (){retrieveDateTime();},child:Text("TEST")),
                   Row(
+
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -308,7 +498,8 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                         height: 41,
                                         child: ListView(
                                           scrollDirection: Axis.horizontal,
-                                          children: days.map((day) {
+                                          children:
+                                          days.map((day) {
                                             return GestureDetector(
                                               onTap: () {
                                                 setState(() {
@@ -362,6 +553,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                             setState(() {
                                               isVisible = false;
                                             });
+                                            _saveDaysToFirestore();
                                           },
                                           style: ButtonStyle(
                                             backgroundColor:
@@ -555,6 +747,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                             //ignoring: !AddAbsentDay,
                             ignoring: !isAddingHoliday,
                             child: SfDateRangePicker(
+                              onSelectionChanged: _onDateRangeSelected,
                               //navigationMode: DateRangePickerNavigationMode.none,
                               showNavigationArrow: true,
                               headerStyle: DateRangePickerHeaderStyle(
@@ -712,10 +905,12 @@ class _VacationsScreenState extends State<VacationsScreen> {
                       ),
                     )
                   else
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 33.0),
                       child: Center(
                         child: Container(
+
                           // elevation: 5,
                           width: 301,
                           height: 339,
@@ -734,9 +929,13 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               )
                             ],
                           ),
+
                           child: IgnorePointer(
                             ignoring: !isAddingHoliday,
                             child: SfDateRangePicker(
+                              //new
+                             // onSelectionChanged: _onDateRangeSelected,
+
                               navigationMode: DateRangePickerNavigationMode.none,
                               showNavigationArrow: true,
                               headerStyle: DateRangePickerHeaderStyle(
@@ -912,6 +1111,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                           //   ),
                                           // ),
                                           TextField(
+                                            controller: _holidayNameController,
                                         style:
                                             TextStyle(color: Color(0xFF442B72)),
                                         // controller: _namesupervisor,
@@ -947,14 +1147,19 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 17),
-                                child: ElevatedSimpleButton(
+                                child:
+
+                                ElevatedSimpleButton(
                                     txt: 'Add'.tr,
                                     // fontFamily: 'Poppins-Regular',
                                     width: 100,
                                     hight: 50,
                                     onPress: () {
                                       AddAbsentDay = false;
-                                      setState(() {});
+                                      setState(() {
+                                        _addHolidayToFirestore(); //new
+
+                                      });
                                     },
                                     color: Color(0xFF442B72),
                                     fontSize: 16),
@@ -969,6 +1174,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                           width: 200,
                           hight: 42,
                           onPress: () {
+
                             AddAbsentDay = true;
                             //addAbsentDay=true;
                             setState(() {
@@ -977,6 +1183,14 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               //_selectedDates = [];
 
                             });
+                            _addHolidayToFirestore();
+                            isLoading ? Center(child: CircularProgressIndicator()) : Container();
+                            if (_addedHoliday != null)
+                              HolidayDetails(
+                            name: _addedHoliday!.name,
+                            fromDate: DateTime.parse(_addedHoliday!.fromDate),
+                            toDate: DateTime.parse(_addedHoliday!.toDate),
+                            );
                             // Dialoge.addAbsentCalenderDialog(context);
                           },
                           icon: Row(
@@ -1011,6 +1225,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                             const SizedBox(
                               width: 18,
                             ),
+                            //old column to display holidays
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -1037,6 +1252,8 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                 ),
                               ],
                             )
+
+
                           ],
                         ),
                         const SizedBox(
