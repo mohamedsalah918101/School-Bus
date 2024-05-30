@@ -311,7 +311,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       List<Widget> allMessages = [];
                       var responseMessages = snapshot.data!.docs;
                       for (var i = 0; i < responseMessages.length; i++) {
-    if (responseMessages[i].get('sender') == currentUserID || responseMessages[i].get('receiver') == currentUserID) {
+    if ((responseMessages[i].get('sender') == currentUserID && responseMessages[i].get('receiver') == widget.receiverId) || (responseMessages[i].get('sender') == widget.receiverId &&  responseMessages[i].get('receiver') == currentUserID)) {
 
     String txt = responseMessages[i].get('txt');
                         String sender = responseMessages[i].get('sender');
