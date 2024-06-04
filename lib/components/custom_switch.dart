@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+bool isSwitched = false;
 class CustomSwitch extends StatefulWidget {
   // bool isSwitched;
   CustomSwitch({
@@ -11,8 +12,20 @@ class CustomSwitch extends StatefulWidget {
 }
 
 class _CustomSwitchState extends State<CustomSwitch> {
-  bool isSwitched = false;
+  // bool isSwitched = false;
+  late SharedPreferences _prefs;
 
+  Future<void> _loadPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isSwitched = _prefs.getBool('switch_state') ?? false;
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -21,6 +34,7 @@ class _CustomSwitchState extends State<CustomSwitch> {
       highlightColor: Colors.transparent,
       onTap: () {
         isSwitched = !isSwitched;
+        _prefs.setBool('switch_state', isSwitched);
         setState(() {});
         // print(isSwitched);
       },
