@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
@@ -10,6 +12,7 @@ import 'package:school_account/supervisor_parent/components/supervisor_drawer.da
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
+import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
@@ -21,18 +24,50 @@ import '../components/main_bottom_bar.dart';
 import '../components/supervisor_card.dart';
 import 'notification_parent.dart';
 class StudentScreen extends StatefulWidget {
-  // final Map<String, dynamic> parentData;
+  final String? name;
+  final String? grade;
+  final String? address;
+  final String phonenumber;
+  final String? ParentName;
 
-  // StudentScreen({
-  //   Key? key,  required String docid, required oldNumber, required oldName, required String oldNumberOfChildren, required oldType,
-  //   // required this.parentData,
-  // }) : super(key: key);
+  StudentScreen({ this.name,  this.grade,  this.address , required this.phonenumber , this.ParentName});
 
   @override
   _StudentScreen createState() => _StudentScreen();
 }
 class _StudentScreen extends State<StudentScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  List<QueryDocumentSnapshot> data = [];
+  bool dataLoading=false;
+
+  void _makePhoneCall() async {
+    bool? res = await FlutterPhoneDirectCaller.callNumber(widget.phonenumber);
+    if (!res!) {
+      print("Failed to make the call");
+    }
+  }
+
+  getData()async{
+    setState(() {
+      dataLoading =true;
+
+    });
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
+    data.addAll(querySnapshot.docs);
+    setState(() {
+      dataLoading =false;
+
+    });
+  }
+
+  @override
+  void initState() {
+
+    getData();
+    super.initState();
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +155,119 @@ class _StudentScreen extends State<StudentScreen> {
                           itemBuilder: (BuildContext context, int index) {
                             return Column(
                               children: [
-                                StudentCardInStudent(childData: {},),
+                              SizedBox(
+                              width: double.infinity,
+                              height:  92,
+                              child: Card(
+                                elevation: 10,
+                                color: Colors.white,
+                                surfaceTintColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14.0),
+                                ),
+                                child: Padding(
+                                    padding: (sharedpref?.getString('lang') == 'ar')?
+                                    EdgeInsets.only(right: 10.0 , bottom: 0):
+                                    EdgeInsets.only(left: 10.0 , bottom: 0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/Ellipse 6.png',
+                                              height: 50,
+                                              width: 50,
+                                            ),
+                                            const SizedBox(
+                                              width: 15,
+                                            ),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 0.0),
+                                                  child: Text(
+                                                    // 'Gender: ${childData['gender']}',
+                                                   '${widget.name}',
+                                                    style: TextStyle(
+                                                      color: Color(0xff442B72),
+                                                      fontSize: 17,
+                                                      fontFamily: 'Poppins-SemiBold',
+                                                      fontWeight: FontWeight.w600,
+                                                      height: 0.94,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 4,
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: 'Grade: '.tr,
+                                                        style: TextStyle(
+                                                          color: Color(0xFF919191),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          // height: 1.33,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:'${widget.grade}',
+                                                        style: TextStyle(
+                                                          color: Color(0xFF442B72),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.33,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: 'Address: '.tr,
+                                                        style: TextStyle(
+                                                          color: Color(0xFF919191),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.33,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '${widget.address}',
+                                                        style: TextStyle(
+                                                          color: Color(0xFF442B72),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.33,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+
+                                              ],
+                                            ),
+
+                                          ],
+                                        ),
+                                      ],
+                                    )),
+                              ),
+                            ),
+                                // StudentCardInStudent(childData: {},),
                                 SizedBox(height:10),
                               ],
                             );
@@ -145,11 +292,158 @@ class _StudentScreen extends State<StudentScreen> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 2,
+                      itemCount: 1,
                       itemBuilder: (BuildContext context, int index) {
                         return Column(
                           children: [
-                            ParentCardInStudent(),
+                          SizedBox(
+                          width: double.infinity,
+                          height:125,
+                          child: Card(
+                            elevation: 10,
+                            color: Colors.white,
+                            surfaceTintColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                            ),
+                            child: Padding(
+                                padding:(sharedpref?.getString('lang') == 'ar')?
+                                EdgeInsets.only(right: 10.0 ):
+                                EdgeInsets.only(left: 10.0 ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/Ellipse 6.png',
+                                          height: 50,
+                                          width: 50,
+                                        ),
+                                        const SizedBox(
+                                          width: 15,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 8.0),
+                                              child: Text(
+                                                '${widget.ParentName}',
+                                                style: TextStyle(
+                                                  color: Color(0xff442B72),
+                                                  fontSize: 17,
+                                                  fontFamily: 'Poppins-SemiBold',
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 0.94,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 4,
+                                            ),
+                                            Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: 'Number: '.tr,
+                                                    style: TextStyle(
+                                                      color: Color(0xFF919191),
+                                                      fontSize: 12,
+                                                      fontFamily: 'Poppins-Light',
+                                                      fontWeight: FontWeight.w400,
+                                                      // height: 1.33,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '${widget.phonenumber}',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF442B72),
+                                                      fontSize: 12,
+                                                      fontFamily: 'Poppins-Light',
+                                                      fontWeight: FontWeight.w400,
+                                                      // height: 1.33,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: 'Address: '.tr,
+                                                    style: TextStyle(
+                                                      color: Color(0xFF919191),
+                                                      fontSize: 12,
+                                                      fontFamily: 'Poppins-Light',
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.33,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '${widget.address}',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF442B72),
+                                                      fontSize: 12,
+                                                      fontFamily: 'Poppins-Light',
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.33,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: (sharedpref?.getString('lang') == 'ar')?
+                                              EdgeInsets.only(top: 8.0 , right: 150):
+                                              EdgeInsets.only(top: 8.0 , left: 150),
+                                              child: Row(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: (){
+                                            _makePhoneCall();
+                                                       },
+
+
+                                                    child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                      color: Color(0xff442B72),
+                                                      width: 28,
+                                                      height: 28,),
+                                                  ),
+                                                  SizedBox(width: 9),
+                                                  GestureDetector(
+                                                    child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                      color: Color(0xff442B72),
+                                                      width: 26,
+                                                      height: 26,),
+                                                    onTap: () {
+                                                      print('object');
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(builder: (context) =>
+                                                              ChatScreen(
+                                                                receiverName: data[index]['name'],
+                                                                receiverPhone: data[index]['phoneNumber'],
+                                                                receiverId : data[index].id,
+                                                              )));
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                      ],
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        ),
+                            // ParentCardInStudent(),
                             SizedBox(height:10),
                           ],
                         );

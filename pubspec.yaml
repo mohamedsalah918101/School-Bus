@@ -65,7 +65,9 @@ dependencies:
   intl: ^0.18.0
   flutter_sound: ^9.2.13
   permission_handler: ^10.2.1
-#  record: ^5.0.5
+  geolocator: ^9.0.1
+  firebase_database: ^10.4.9
+  #  record: ^5.0.5
 #  audioplayers: ^5.2.1
 #  camera: ^0.11.0
 

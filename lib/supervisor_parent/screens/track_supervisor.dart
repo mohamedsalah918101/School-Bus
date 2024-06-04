@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -18,7 +18,6 @@ import 'package:school_account/supervisor_parent/screens/notification_supervisor
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:dotted_line/dotted_line.dart';
 
-
 class TrackSupervisor extends StatefulWidget {
   @override
   _TrackSupervisorState createState() => _TrackSupervisorState();
@@ -26,17 +25,136 @@ class TrackSupervisor extends StatefulWidget {
 
 class _TrackSupervisorState extends State<TrackSupervisor> {
   late final String title;
-  // List<ChildDataItem> children = [];
   bool tracking = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   Set<Marker> markers = {};
   GoogleMapController? controller;
-  LatLng startLocation = const LatLng(27.1778429, 31.1859626);
+  LatLng startLocation = const LatLng(27.1819438, 31.1859626);
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
   List<QueryDocumentSnapshot> data = [];
-  bool dataLoading=false;
+  bool dataLoading = false;
+  Position? currentPosition;
+  Timer? locationUpdateTimer;
+  String _namedriver = ' ';
+  String _photobus = ' ';
+  String _busnumber = ' ';
+  String arrivalTime = '';
+  bool hasArrived = false;
+  StreamSubscription<Position>? _positionStreamSubscription;
+  late Timer _timer;
+  late DateTime estimatedArrivalTime;
+  String remainingTime = '';
 
+
+  // Define target location (example coordinates)
+  double targetLatitude = 27.182;
+  double targetLongitude = 31.186;
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getLatLngStream() {
+    return FirebaseFirestore.instance.collection('collection_name').snapshots();
+  }
+
+  // Future<void> getCurrentLocation() async {
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //     setState(() {
+  //       currentPosition = position;
+  //       arrivalTime = calculateArrivalTime(); // Update arrival time here
+  //
+  //     });
+  //
+  //     // Store the latitude and longitude values in Firestore
+  //     final databaseReference = FirebaseFirestore.instance;
+  //     databaseReference.collection('users').doc('current_location').set({
+  //       'latitude': currentPosition!.latitude,
+  //       'longitude': currentPosition!.longitude,
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        currentPosition = position;
+        arrivalTime = calculateArrivalTime(); // Update arrival time here
+        hasArrived = checkIfArrived(position); // Update arrival status here
+      });
+
+      // Store the latitude and longitude values in Firestore
+      final databaseReference = FirebaseFirestore.instance;
+      databaseReference.collection('users').doc('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<bool> _checkLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  Future<void> getDataForBus() async {
+    setState(() {
+      dataLoading = true;
+    });
+
+    DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+        .collection('supervisor')
+        .doc(sharedpref?.getString('id'))
+        .get();
+
+    if (supervisorDoc.exists) {
+      String busId = supervisorDoc['bus_id'];
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('busdata')
+          .where(FieldPath.documentId, isEqualTo: busId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var busData = querySnapshot.docs.first;
+        String namedriver = busData['namedriver'];
+        String photobus = busData['busphoto'];
+        String busnumber = busData['busnumber'];
+
+        setState(() {
+          _namedriver = namedriver;
+          _photobus = photobus;
+          _busnumber = busnumber;
+        });
+      }
+       else {
+        print('No bus data found');
+      }
+    } else {
+      print('Supervisor document does not exist');
+    }
+
+    setState(() {
+      dataLoading = false;
+    });
+  }
 
   getData()async{
     setState(() {
@@ -51,18 +169,134 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
     });
   }
 
+  // Future<void> updateCurrentLocation() async {
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //     setState(() {
+  //       currentPosition = position;
+  //     });
+  //
+  //     // Store the latitude and longitude values in Realtime Database
+  //     final databaseReference = FirebaseDatabase.instance.reference();
+  //     databaseReference.child('users').child('current_location').set({
+  //       'latitude': currentPosition!.latitude,
+  //       'longitude': currentPosition!.longitude,
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  Future<void> updateCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        currentPosition = position;
+      });
+
+      // Store the latitude and longitude values in Realtime Database
+      final databaseReference = FirebaseDatabase.instance.reference();
+      databaseReference.child('users').child('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     loadCustomIcon();
+    _startListeningToPositionStream();
     getData();
+    getDataForBus();
+    estimatedArrivalTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 14, 30);
+    _startTimer();
+    initData();
+
+
+    locationUpdateTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      updateCurrentLocation();
+    });
+
+    Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        currentPosition = position;
+      });
+
+
+      // Update Realtime Database with the new position
+      final databaseReference = FirebaseDatabase.instance.reference();
+      databaseReference.child('users').child('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    });
   }
-  //
+
+  @override void dispose() {
+    locationUpdateTimer?.cancel();
+    _stopListeningToPositionStream();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startListeningToPositionStream() {
+    Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        currentPosition = position;
+      });
+    }, onError: (error) {
+      print('Error in geolocation stream: $error');
+    });
+  }
+
+  void _stopListeningToPositionStream() {
+    _positionStreamSubscription?.cancel();
+  }
+
+  void _startTimer() {
+    // Start a timer that calls calculateRemainingTime every minute
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      if (mounted) { // Check if the widget is still mounted
+        setState(() {
+          // Calculate remaining time based on the farthest destination
+          remainingTime = calculateRemainingTime();
+        });
+      }
+    });
+  }
+
+  String calculateRemainingTime() {
+    // Calculate remaining time dynamically
+    DateTime now = DateTime.now();
+    Duration remainingDuration = estimatedArrivalTime.difference(now);
+    int remainingMinutes = remainingDuration.inMinutes;
+    return remainingMinutes.toString();
+  }
+
+
+  void initData() async {
+    await getCurrentLocation();
+    if (mounted) { // Check if the widget is still mounted
+      print('Current position: ${currentPosition}');
+      if (await _checkLocationPermission()) {
+        // Enable MyLocation layer
+        print('Location permission granted');
+      } else {
+        // Show message asking user to grant location permissions
+        print('Location permission denied');
+      }
+    }
+  }
+
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
 
   Future<void> loadCustomIcon() async {
-
-    final Uint8List imageData2 = await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
+    final Uint8List imageData2 =
+        await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
     anotherCustomIcon = BitmapDescriptor.fromBytes(imageData2);
 
     setState(() {});
@@ -74,23 +308,106 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
         targetWidth: width);
     final FrameInfo frameInfo = await codec.getNextFrame();
     final Uint8List resizedImage =
-    (await frameInfo.image.toByteData(format: ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+        (await frameInfo.image.toByteData(format: ImageByteFormat.png))!
+            .buffer
+            .asUint8List();
     return resizedImage;
+  }
+
+  String calculateArrivalTime() {
+    // Your logic to calculate the arrival time
+    // This is just a placeholder example
+    DateTime now = DateTime.now();
+    DateTime arrival = now.add(Duration(minutes: 15)); // Assume bus arrives in 15 minutes
+    return '${arrival.hour}:${arrival.minute}';
+  }
+
+  bool checkIfArrived(Position position) {
+    // Your logic to check if the bus has arrived
+    // This is just a placeholder example
+    // Replace this with actual logic to check if the bus has arrived
+    return position.latitude == targetLatitude && position.longitude == targetLongitude;
   }
 
 
   @override
   Widget build(BuildContext context) {
+    // String currentLatitude = currentPosition?.latitude?.toString() ?? '';
+    // String currentLongitude = currentPosition?.longitude?.toString() ?? '';
+    //
+    // LatLng targetLocation = startLocation;
+    // if (currentLatitude.isNotEmpty && currentLongitude.isNotEmpty) {
+    //   try {
+    //     targetLocation = LatLng(
+    //         double.parse(currentLatitude), double.parse(currentLongitude));
+    //   } catch (e) {
+    //     print('Invalid double: $e');
+    //   }
+    // }
+    String currentLatitude = currentPosition?.latitude?.toString() ?? '';
+    String currentLongitude = currentPosition?.longitude?.toString() ?? '';
+
+    LatLng startLocation = LatLng(currentPosition?.latitude ?? 0.0, currentPosition?.longitude ?? 0.0);
+
+    List<LatLng> polylineCoordinates = [startLocation];
+    Set<Marker> markers = {
+      Marker(
+        markerId: MarkerId('current_location'),
+        position: startLocation,
+        icon: anotherCustomIcon,
+      ),
+    };
+
+    for (var doc in data) {
+      var childData = doc.data() as Map<String, dynamic>;
+      var latString = childData['lat'];
+      var lngString = childData['lng'];
+
+      if (latString != null && lngString != null) {
+        try {
+          var lat = double.parse(latString.toString());
+          var lng = double.parse(lngString.toString());
+          var childLocation = LatLng(lat, lng);
+
+          markers.add(
+            Marker(
+              markerId: MarkerId(doc.id),
+              position: childLocation,
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              // infoWindow: InfoWindow(
+              //   title: childData['name'],
+              // ),
+            ),
+          );
+
+          // Check if the bus has reached the child location (e.g., within 50 meters)
+          double distanceInMeters = Geolocator.distanceBetween(
+            currentPosition!.latitude,
+            currentPosition!.longitude,
+            lat,
+            lng,
+          );
+
+          if (distanceInMeters <= 50) {
+            polylineCoordinates.add(childLocation);
+          }
+
+        } catch (e) {
+          print('Invalid double: $e');
+        }
+      }
+    }
+
+
+
     return Scaffold(
         endDrawer: SupervisorDrawer(),
         key: _scaffoldKey,
-        appBar:PreferredSize(
+        appBar: PreferredSize(
           child: Container(
             decoration: BoxDecoration(boxShadow: [
               BoxShadow(
-                color:  Color(0x3F000000),
+                color: Color(0x3F000000),
                 blurRadius: 12,
                 offset: Offset(-1, 4),
                 spreadRadius: 0,
@@ -106,27 +423,27 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
               ),
               elevation: 0.0,
               leading: GestureDetector(
-                onTap: (){
+                onTap: () {
                   Navigator.of(context).pop();
                 },
                 child: Padding(
-                  padding: (sharedpref?.getString('lang') == 'ar')?
-                  EdgeInsets.all( 23.0):
-                  EdgeInsets.all( 17.0),
+                  padding: (sharedpref?.getString('lang') == 'ar')
+                      ? EdgeInsets.all(23.0)
+                      : EdgeInsets.all(17.0),
                   child: Image.asset(
-                    (sharedpref?.getString('lang') == 'ar')?
-                    'assets/images/Layer 1.png':
-                    'assets/images/fi-rr-angle-left.png',
+                    (sharedpref?.getString('lang') == 'ar')
+                        ? 'assets/images/Layer 1.png'
+                        : 'assets/images/fi-rr-angle-left.png',
                     width: 10,
-                    height: 22,),
+                    height: 22,
+                  ),
                 ),
               ),
               actions: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child:
-                  GestureDetector(
-                    onTap: (){
+                  child: GestureDetector(
+                    onTap: () {
                       _scaffoldKey.currentState!.openEndDrawer();
                     },
                     child: const Icon(
@@ -137,15 +454,17 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                   ),
                 ),
               ],
-              title: Text('Tracking Bus'.tr ,
+              title: Text(
+                'Tracking Bus'.tr,
                 style: const TextStyle(
                   color: Color(0xFF993D9A),
                   fontSize: 17,
                   fontFamily: 'Poppins-Bold',
                   fontWeight: FontWeight.w700,
                   height: 1,
-                ),),
-              backgroundColor:  Color(0xffF8F8F8),
+                ),
+              ),
+              backgroundColor: Color(0xffF8F8F8),
               surfaceTintColor: Colors.transparent,
             ),
           ),
@@ -157,36 +476,74 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 350,
-                child: GoogleMap(
-                  scrollGesturesEnabled: true,
-                  gestureRecognizers: Set()
-                    ..add(Factory<EagerGestureRecognizer>(() =>
-                        EagerGestureRecognizer())),
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(27.180134, 31.189283),
-                    zoom: 12,
-                  ),
-                  markers: markers,
-                  onMapCreated: ((mapController) {
-                    setState(() {
-                      controller = mapController;
-                    });
+                  height: 350,
+                  child: StreamBuilder<DatabaseEvent>(
+                    stream:FirebaseDatabase.instance
+                        .reference()
+                        .child('users')
+                        .child('current_location')
+                        .onValue,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        var data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+                        var latitude = data['latitude'] ?? startLocation.latitude;
+                        var longitude = data['longitude'] ?? startLocation.longitude;
+                        var targetLocation = LatLng(latitude, longitude);
 
-                    markers.add(
-                      Marker(
-                        // consumeTapEvents: true,
-                          markerId: const MarkerId('marker_2'),
-                          position: const LatLng(27.190000, 31.200000),
-                          icon: anotherCustomIcon,
-                      ),
-                    );
-                    setState(() {});
-
-                  }),
-                ),
-
-              ),
+                        return dataLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : GoogleMap(
+                          zoomControlsEnabled: false,
+                          zoomGesturesEnabled: true,
+                          scrollGesturesEnabled: true,
+                          tiltGesturesEnabled: true,
+                          rotateGesturesEnabled: true,
+                          initialCameraPosition: CameraPosition(
+                            target: startLocation,
+                            zoom: 12,
+                          ),
+                          markers: markers,
+                          polylines: {
+                            Polyline(
+                              polylineId: PolylineId('route'),
+                              points: polylineCoordinates,
+                              color: Colors.red,
+                              width: 5,
+                            ),
+                          },
+    onMapCreated: (GoogleMapController controller) {
+    this.controller = controller;
+    },
+    );
+    }
+    //   GoogleMap(
+                        //   scrollGesturesEnabled: true,
+                        //   gestureRecognizers: Set()
+                        //     ..add(Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
+                        //   initialCameraPosition: CameraPosition(
+                        //     target: targetLocation,
+                        //     zoom: 12,
+                        //   ),
+                        //   markers: {
+                        //     Marker(
+                        //       markerId: MarkerId('current_location'),
+                        //       position: targetLocation,
+                        //       icon: anotherCustomIcon,
+                        //     ),
+                        //   },
+                        //   onMapCreated: (mapController) {
+                        //     setState(() {
+                        //       controller = mapController;
+                        //     });
+                        //   },
+                        // );
+                       else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  )),
               const SizedBox(
                 height: 8,
               ),
@@ -217,7 +574,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                     fontSize: 16,
                                     fontFamily: tracking
                                         ? 'Poppins-SemiBold'
-                                        : 'Poppins-Light' ,
+                                        : 'Poppins-Light',
                                     fontWeight: tracking
                                         ? FontWeight.w600
                                         : FontWeight.w400),
@@ -259,7 +616,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                           title: Column(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(left:7.0),
+                                padding: const EdgeInsets.only(left: 7.0),
                                 child: Text(
                                   'Bus Info'.tr,
                                   style: TextStyle(
@@ -267,7 +624,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                       fontSize: 17,
                                       fontFamily: tracking
                                           ? 'Poppins-Light'
-                                          : 'Poppins-SemiBold' ,
+                                          : 'Poppins-SemiBold',
                                       fontWeight: tracking
                                           ? FontWeight.w400
                                           : FontWeight.w600),
@@ -302,526 +659,704 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
               ),
               tracking
                   ? Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 30, vertical: 0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // children.isNotEmpty?
-                Text.rich(
-                TextSpan(
-                children: [
-                  TextSpan(
-                  text: '25 ',
-                  style: TextStyle(
-                    color: Color(0xFF993D9A),
-                    fontSize: 29.71,
-                    fontFamily: 'Poppins-Medium',
-                    fontWeight: FontWeight.w700,
-                    height: 1.23,
-                  ),
-                ),
-                TextSpan(
-                  text: 'Min.'.tr,
-                  style: TextStyle(
-                    color: Color(0xFF993D9A),
-                    fontSize: 29.71,
-                    fontFamily: 'Poppins-Medium',
-                    fontWeight: FontWeight.w700,
-                    height: 1.23,
-                  ),
-                ),]
-              ),),
-                    //     :
-                    // Text(
-                    //   '0 Min.'.tr,
-                    //   style: TextStyle(
-                    //     color: Color(0xFF993D9A),
-                    //     fontSize: 29.71,
-                    //     fontFamily: 'Poppins-Medium',
-                    //     fontWeight: FontWeight.w700,
-                    //     height: 1.23,
-                    //   ),
-                    // ),
-                     SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      'Arrive to you.'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 24.12,
-                        fontFamily: 'Poppins-Light',
-                        fontWeight: FontWeight.w300,
-                        height: 1.23,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    // children.isNotEmpty?
-                    Stack(
-                      children: [
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            List children = data[index]['children'];
-                            if (index == data.length-1 ) {
-                              return Row(
-                                children: [
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
-                                  Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),),
-                                  Column(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/Ellipse 6.png',
-                                        width: 50,
-                                        height: 50,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      for (var child in children)
-                                      Text(
-                                        '${child['name']}',
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 15,
-                                          fontFamily: 'Poppins-SemiBold',
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.07,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text.rich(
-                                        TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: 'arrived :'.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.23,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: ' 7:45 '.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.23,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: 'AM'.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
-                                                  height: 1.23,
-                                                ),
-                                              ),]
-                                        ),),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }
-                            else if (index == 0 ) {
-                              return Row(
-                                children: [
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
-                                  Text(' - - -' , style: TextStyle(color: Color(0xffFFC53E),),),
-                                  Column(
-                                    children: [
-                                      Padding(
-                                        padding: (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(right: 5.0):
-                                        EdgeInsets.only(left: 0.0),
-                                        child: Image.asset(
-                                          'assets/images/Ellipse 6.png',
-                                          width: 50,
-                                          height: 50,
-                                        ),
-                                      ), SizedBox(
-                                        // width: 15,
-                                        height: 20,
-                                        child: Padding(
-                                          padding: (sharedpref?.getString('lang') == 'ar')?
-                                          EdgeInsets.only(right: 1.0):
-                                          EdgeInsets.only(left: 1.0),
-                                          child: DottedLine(
-                                            direction: Axis.vertical,
-                                            dashColor: Color(0xFF432B72),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  SizedBox(
-                                    height:0,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // children.isNotEmpty?
+                          Text.rich(
+                            TextSpan(children: [
+                              TextSpan(
+                                text: '$remainingTime', // Use the dynamic value here
+                                style: TextStyle(
+                                  color: Color(0xFF993D9A),
+                                  fontSize: 29.71,
+                                  fontFamily: 'Poppins-Medium',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.23,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Min.'.tr,
+                                style: TextStyle(
+                                  color: Color(0xFF993D9A),
+                                  fontSize: 29.71,
+                                  fontFamily: 'Poppins-Medium',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.23,
+                                ),
+                              ),
+                            ]),
+                          ),
+                          //     :
+                          // Text(
+                          //   '0 Min.'.tr,
+                          //   style: TextStyle(
+                          //     color: Color(0xFF993D9A),
+                          //     fontSize: 29.71,
+                          //     fontFamily: 'Poppins-Medium',
+                          //     fontWeight: FontWeight.w700,
+                          //     height: 1.23,
+                          //   ),
+                          // ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            'To arrive'.tr,
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 24.12,
+                              fontFamily: 'Poppins-Light',
+                              fontWeight: FontWeight.w300,
+                              height: 1.23,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          // Stack(
+                          //   children: [
+                          //     ListView.separated(
+                          //       shrinkWrap: true,
+                          //       physics: NeverScrollableScrollPhysics(),
+                          //       itemBuilder: (context, index) {
+                          //         List children = data[index]['children'];
+                          //         if (index == data.length-1 ) {
+                          //           return Row(
+                          //             children: [
+                          //               (sharedpref?.getString('lang') == 'ar')?
+                          //               Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
+                          //               Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),),
+                          //               Column(
+                          //                 children: [
+                          //                   Image.asset(
+                          //                     'assets/images/Ellipse 6.png',
+                          //                     width: 50,
+                          //                     height: 50,
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //               const SizedBox(
+                          //                 width: 15,
+                          //               ),
+                          //               Column(
+                          //                 mainAxisAlignment: MainAxisAlignment.start,
+                          //                 crossAxisAlignment: CrossAxisAlignment.start,
+                          //                 children: [
+                          //                   for (var child in children)
+                          //                   Text(
+                          //                     '${child['name']}',
+                          //                     style: TextStyle(
+                          //                       color: Color(0xFF442B72),
+                          //                       fontSize: 15,
+                          //                       fontFamily: 'Poppins-SemiBold',
+                          //                       fontWeight: FontWeight.w600,
+                          //                       height: 1.07,
+                          //                     ),
+                          //                   ),
+                          //                   SizedBox(
+                          //                     height: 3,
+                          //                   ),
+                          //                   Text.rich(
+                          //                     TextSpan(
+                          //                         children: [
+                          //                           TextSpan(
+                          //                             text: 'arrived :'.tr,
+                          //                             style: TextStyle(
+                          //                               color: Color(0xFF13DB63),
+                          //                               fontSize: 13,
+                          //                               fontFamily: 'Poppins-Regular',
+                          //                               fontWeight: FontWeight.w400,
+                          //                               height: 1.23,
+                          //                             ),
+                          //                           ),
+                          //                           TextSpan(
+                          //                             text: ' 7:45 '.tr,
+                          //                             style: TextStyle(
+                          //                               color: Color(0xFF13DB63),
+                          //                               fontSize: 13,
+                          //                               fontFamily: 'Poppins-Regular',
+                          //                               fontWeight: FontWeight.w400,
+                          //                               height: 1.23,
+                          //                             ),
+                          //                           ),
+                          //                           TextSpan(
+                          //                             text: 'AM'.tr,
+                          //                             style: TextStyle(
+                          //                               color: Color(0xFF13DB63),
+                          //                               fontSize: 13,
+                          //                               fontFamily: 'Poppins-Regular',
+                          //                               fontWeight: FontWeight.w400,
+                          //                               height: 1.23,
+                          //                             ),
+                          //                           ),]
+                          //                     ),),
+                          //                 ],
+                          //               ),
+                          //             ],
+                          //           );
+                          //         }
+                          //         else if (index == 0 ) {
+                          //           return Row(
+                          //             children: [
+                          //               (sharedpref?.getString('lang') == 'ar')?
+                          //               Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
+                          //               Text(' - - -' , style: TextStyle(color: Color(0xffFFC53E),),),
+                          //               Column(
+                          //                 children: [
+                          //                   Padding(
+                          //                     padding: (sharedpref?.getString('lang') == 'ar')?
+                          //                     EdgeInsets.only(right: 5.0):
+                          //                     EdgeInsets.only(left: 0.0),
+                          //                     child: Image.asset(
+                          //                       'assets/images/Ellipse 6.png',
+                          //                       width: 50,
+                          //                       height: 50,
+                          //                     ),
+                          //                   ), SizedBox(
+                          //                     // width: 15,
+                          //                     height: 20,
+                          //                     child: Padding(
+                          //                       padding: (sharedpref?.getString('lang') == 'ar')?
+                          //                       EdgeInsets.only(right: 1.0):
+                          //                       EdgeInsets.only(left: 1.0),
+                          //                       child: DottedLine(
+                          //                         direction: Axis.vertical,
+                          //                         dashColor: Color(0xFF432B72),
+                          //                       ),
+                          //                     ),
+                          //                   )
+                          //                 ],
+                          //               ),
+                          //               const SizedBox(
+                          //                 width: 15,
+                          //               ),
+                          //               SizedBox(
+                          //                 height:0,
+                          //                 child: Column(
+                          //                   mainAxisAlignment: MainAxisAlignment.start,
+                          //                   crossAxisAlignment: CrossAxisAlignment.start,
+                          //                   children: [
+                          //                     for (var child in children)
+                          //                       Text(
+                          //                         '${child['name']}',
+                          //                         style: TextStyle(
+                          //                           color: Color(0xFF442B72),
+                          //                           fontSize: 15,
+                          //                           fontFamily: 'Poppins-SemiBold',
+                          //                           fontWeight: FontWeight.w600,
+                          //                           height: 1.07,
+                          //                         ),
+                          //                     ),
+                          //                     SizedBox(
+                          //                       height: 3,
+                          //                     ),
+                          //                     Text(
+                          //                       'arrived : 7:45 AM'.tr,
+                          //                       style: TextStyle(
+                          //                         color: Color(0xFF13DB63),
+                          //                         fontSize: 13,
+                          //                         fontFamily: 'Poppins-Regular',
+                          //                         fontWeight: FontWeight.w400,
+                          //                         height: 1.23,
+                          //                       ),
+                          //                     ),
+                          //                   ],
+                          //                 ),
+                          //               ),
+                          //             ],
+                          //           );
+                          //         }
+                          //         else {
+                          //           return Row(
+                          //             children: [
+                          //               Padding(
+                          //                 padding:
+                          //                 (sharedpref?.getString('lang') == 'ar')?
+                          //                 EdgeInsets.only(right: 25.0):
+                          //                 EdgeInsets.only(left: 25.0),
+                          //                 child: Image.asset(
+                          //                   'assets/images/Ellipse 6.png',
+                          //                   width: 50,
+                          //                   height: 50,
+                          //                 ),
+                          //               ),
+                          //               const SizedBox(
+                          //                 width: 15,
+                          //               ),
+                          //               Column(
+                          //                 mainAxisAlignment: MainAxisAlignment.start,
+                          //                 crossAxisAlignment: CrossAxisAlignment.start,
+                          //                 children: [
+                          //                   for (var child in children)
+                          //                     Text(
+                          //                       '${child['name']}',
+                          //                     style: TextStyle(
+                          //                       color: Color(0xFF442B72),
+                          //                       fontSize: 15,
+                          //                       fontFamily: 'Poppins-SemiBold',
+                          //                       fontWeight: FontWeight.w600,
+                          //                       height: 1.07,
+                          //                     ),
+                          //                   ),
+                          //                   SizedBox(
+                          //                     height: 3,
+                          //                   ),
+                          //                   Text(
+                          //                     'arrived : 7:45 AM'.tr,
+                          //                     style: TextStyle(
+                          //                       color: Color(0xFF13DB63),
+                          //                       fontSize: 13,
+                          //                       fontFamily: 'Poppins-Regular',
+                          //                       fontWeight: FontWeight.w400,
+                          //                       height: 1.23,
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             ],
+                          //           );
+                          //         }
+                          //       },
+                          //       separatorBuilder: (context, index) {
+                          //         if(index == 0) {return
+                          //           SizedBox(
+                          //             height: 0,
+                          //           );
+                          //         }else{
+                          //           return  SizedBox(
+                          //             height: 20,
+                          //           );}
+                          //       },
+                          //       itemCount: data.length,
+                          //     ),
+                          //
+                          //   ],
+                          // ) ,
+                          Stack(
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: data.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  List children = data[index]['children'];
+                                  if (data.isEmpty) {
+                                    Container();
+                                  } else
+                                    return Column(
                                       children: [
                                         for (var child in children)
-                                          Text(
-                                            '${child['name']}',
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-SemiBold',
-                                              fontWeight: FontWeight.w600,
-                                              height: 1.07,
-                                            ),
-                                        ),
-                                        SizedBox(
-                                          height: 3,
-                                        ),
-                                        Text(
-                                          'arrived : 7:45 AM'.tr,
-                                          style: TextStyle(
-                                            color: Color(0xFF13DB63),
-                                            fontSize: 13,
-                                            fontFamily: 'Poppins-Regular',
-                                            fontWeight: FontWeight.w400,
-                                            height: 1.23,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                            else {
-                              return Row(
-                                children: [
-                                  Padding(
-                                    padding:
-                                    (sharedpref?.getString('lang') == 'ar')?
-                                    EdgeInsets.only(right: 25.0):
-                                    EdgeInsets.only(left: 25.0),
-                                    child: Image.asset(
-                                      'assets/images/Ellipse 6.png',
-                                      width: 50,
-                                      height: 50,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      for (var child in children)
-                                        Text(
-                                          '${child['name']}',
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 15,
-                                          fontFamily: 'Poppins-SemiBold',
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.07,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        'arrived : 7:45 AM'.tr,
-                                        style: TextStyle(
-                                          color: Color(0xFF13DB63),
-                                          fontSize: 13,
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w400,
-                                          height: 1.23,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }
-                          },
-                          separatorBuilder: (context, index) {
-                            if(index == 0) {return
-                              SizedBox(
-                                height: 0,
-                              );
-                            }else{
-                              return  SizedBox(
-                                height: 20,
-                              );}
-                          },
-                          itemCount: data.length,
-                        ),
-
-                      ],
-                    ) ,
-                    Stack(
-                      children: [
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: data.length,
-                          // data?[0]['childern'].length,
-                          // data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            List children = data[index]['children'];
-                            if(data.isEmpty){
-                              Container(); }
-                            else
-                              return Column(
-                                children: [
-                                  for (var child in children)
-                                    SizedBox(
-                                      width: double.infinity,
-                                      height:  70, //92
-                                      child: Padding(
-                                        padding: (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(top: 15.0 , right: 12,):
-                                        EdgeInsets.only(top: 0.0 , left: 0,),
-                                        child:  Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0.0),
-                                              child:  Image.asset(
-                                                'assets/images/Ellipse 6.png',
-                                                width: 50,
-                                                height: 50,
-                                              ),
-                                            ),
-                                            SizedBox(width: 15,),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '${child['name']}',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF442B72),
-                                                    fontSize: 15,
-                                                    fontFamily: 'Poppins-SemiBold',
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.07,
+                                          if (index == data.length - 1 ||
+                                              index == 0)
+                                            SizedBox(
+                                              width: double.infinity,
+                                              height: 70, //92
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  (sharedpref?.getString(
+                                                              'lang') ==
+                                                          'ar')
+                                                      ? Text(
+                                                          '- - -',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xffFFC53E),
+                                                          ),
+                                                        )
+                                                      : Padding(
+                                                          padding:
+                                                          const EdgeInsets
+                                                                  .only(
+                                                                  top: 15.0),
+                                                          child: Text(
+                                                            ' - - -',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xffFFC53E),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                  Image.asset(
+                                                    'assets/images/Ellipse 6.png',
+                                                    width: 50,
+                                                    height: 50,
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  height: 3,
-                                                ),
-                                                Text.rich(
-                                                  TextSpan(
+                                                  SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10.0),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
-                                                        TextSpan(
-                                                          text: 'arrived :'.tr,
+                                                        Text(
+                                                          '${child['name']}',
                                                           style: TextStyle(
-                                                            color: Color(0xFF13DB63),
-                                                            fontSize: 13,
-                                                            fontFamily: 'Poppins-Regular',
-                                                            fontWeight: FontWeight.w400,
-                                                            height: 1.23,
+                                                            color: Color(
+                                                                0xFF442B72),
+                                                            fontSize: 15,
+                                                            fontFamily:
+                                                            'Poppins-SemiBold',
+                                                            fontWeight:
+                                                            FontWeight.w600,
+                                                            height: 1.07,
                                                           ),
                                                         ),
-                                                        TextSpan(
-                                                          text: ' 7:45 '.tr,
-                                                          style: TextStyle(
-                                                            color: Color(0xFF13DB63),
-                                                            fontSize: 13,
-                                                            fontFamily: 'Poppins-Regular',
-                                                            fontWeight: FontWeight.w400,
-                                                            height: 1.23,
-                                                          ),
-                                                        ),
-                                                        TextSpan(
-                                                          text: 'AM'.tr,
-                                                          style: TextStyle(
-                                                            color: Color(0xFF13DB63),
-                                                            fontSize: 13,
-                                                            fontFamily: 'Poppins-Regular',
-                                                            fontWeight: FontWeight.w400,
-                                                            height: 1.23,
-                                                          ),
-                                                        ),]
-                                                  ),),
-                                              ],
-                                            )
-                                          ],
-                                        ),),
-                                    ),
-                                ],
-                              );
-                          },
-                        ),
-                        (sharedpref?.getString('lang') == 'ar')?
-                        Positioned(
-                          left: 299,
-                          top: 35,
-                          bottom: 85,
-                          child: buildDashedLine(),
-                        ):
-                        Positioned(
-                          top: 35,
-                          bottom: 85,
-                          child: buildDashedLine(),
-                        )
-                      ],
-                    ),
 
-                    //     :
-                    // Container()
-                  ],
-                ),
-              )
-                  :
-              // children.isNotEmpty?
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Bus Number'.tr,
-                                style: TextStyle(
-                                  color: Color(0xFF432B72),
-                                  fontSize: 17,
-                                  fontFamily: 'Poppins-SemiBold',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0.94,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 12,
-                              ),
-                              Text(
-                                " 1458 ى ر س ",
-                                textDirection: _getTextDirection(" 1458ى ر س "),
-                                style: TextStyle(
-                                  color: Color(0xFF919191),
-                                  fontSize: 17,
-                                  fontFamily: 'Roboto-Regular',
-                                  fontWeight: FontWeight.w400,
-                                  height: 0.89,
-                                ),
-                                overflow: TextOverflow.ellipsis, //,
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 65,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Driver Name'.tr,
-                                style: TextStyle(
-                                  color: Color(0xFF432B72),
-                                  fontSize: 17,
-                                  fontFamily: 'Poppins-SemiBold',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0.94,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 12,
-                              ),
-                              Text(
-                                'Ahmed Emad'.tr,
-                                style: TextStyle(
-                                  color: Color(0xFF919191),
-                                  fontSize: 18,
+                                                        SizedBox(
+                                                          height: 3,
+                                                        ),
+
+                                                        hasArrived?
+                                                        Text.rich(
+                                                          TextSpan(children:
+                                                          [
+
+
+                                                            TextSpan(
+                                                              text: 'arrived :'
+                                                                  .tr,
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF13DB63),
+                                                                fontSize: 13,
+                                                                fontFamily:
+                                                                    'Poppins-Regular',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                height: 1.23,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: ' $arrivalTime '.tr,
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF13DB63),
+                                                                fontSize: 13,
+                                                                fontFamily:
+                                                                    'Poppins-Regular',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                height: 1.23,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: 'AM'.tr,
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF13DB63),
+                                                                fontSize: 13,
+                                                                fontFamily:
+                                                                    'Poppins-Regular',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                height: 1.23,
+                                                              ),
+                                                            )
+                                                          ]),
+                                                        ) :
+                                                        Text(
+                                'not yet'.tr,
+                                  style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 13,
                                   fontFamily: 'Poppins-Regular',
-                                  fontWeight: FontWeight.w500,
-                                  height: 0.89,
-                                ),
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.23,
+                                  ),)
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            )
+                                          else
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 23.0),
+                                              child: SizedBox(
+                                                width: double.infinity,
+                                                height: 70, //92
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/Ellipse 6.png',
+                                                      width: 50,
+                                                      height: 50,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 15,
+                                                    ),
+                                                    Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          '${child['name']}',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFF442B72),
+                                                            fontSize: 15,
+                                                            fontFamily:
+                                                                'Poppins-SemiBold',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            height: 1.07,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 3,
+                                                        ),
+                                                        hasArrived?
+                                                        Text.rich(
+                                                          TextSpan(children:
+                                                          [
+
+
+                                                            TextSpan(
+                                                              text: 'arrived :'
+                                                                  .tr,
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF13DB63),
+                                                                fontSize: 13,
+                                                                fontFamily:
+                                                                'Poppins-Regular',
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w400,
+                                                                height: 1.23,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: ' $arrivalTime '.tr,
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF13DB63),
+                                                                fontSize: 13,
+                                                                fontFamily:
+                                                                'Poppins-Regular',
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w400,
+                                                                height: 1.23,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: 'AM'.tr,
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF13DB63),
+                                                                fontSize: 13,
+                                                                fontFamily:
+                                                                'Poppins-Regular',
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w400,
+                                                                height: 1.23,
+                                                              ),
+                                                            )
+                                                          ]),
+                                                        ) :
+                                                        Text(
+                                                          'not yet'.tr,
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontSize: 13,
+                                                            fontFamily: 'Poppins-Regular',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),)
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                      ],
+                                    );
+                                },
                               ),
+                              (sharedpref?.getString('lang') == 'ar')
+                                  ? Positioned(
+                                      left: 299,
+                                      top: 35,
+                                      bottom: 85,
+                                      child: buildDashedLine(),
+                                    )
+                                  : Positioned(
+                                      top: 28,
+                                      bottom: 105,
+                                      child: buildDashedLine(),
+                                    )
                             ],
                           ),
 
+                          //     :
+                          // Container()
                         ],
                       ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Text(
-                        'Bus photos'.tr,
-                        style: TextStyle(
-                          color: Color(0xFF432B72),
-                          fontSize: 17,
-                          fontFamily: 'Poppins-SemiBold',
-                          fontWeight: FontWeight.w600,
-                          height: 0.94,
+                    )
+                  :
+                  // children.isNotEmpty?
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Bus Number'.tr,
+                                      style: TextStyle(
+                                        color: Color(0xFF432B72),
+                                        fontSize: 17,
+                                        fontFamily: 'Poppins-SemiBold',
+                                        fontWeight: FontWeight.w600,
+                                        height: 0.94,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Text(
+                                      '$_busnumber',
+                                      textDirection:
+                                          _getTextDirection(" 1458ى ر س "),
+                                      style: TextStyle(
+                                        color: Color(0xFF919191),
+                                        fontSize: 17,
+                                        fontFamily: 'Roboto-Regular',
+                                        fontWeight: FontWeight.w400,
+                                        height: 0.89,
+                                      ),
+                                      overflow: TextOverflow.ellipsis, //,
+                                    ),
+                                  ],
+                                ),
+
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Driver Name'.tr,
+                                      style: TextStyle(
+                                        color: Color(0xFF432B72),
+                                        fontSize: 17,
+                                        fontFamily: 'Poppins-SemiBold',
+                                        fontWeight: FontWeight.w600,
+                                        height: 0.94,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Text(
+                                      _namedriver,
+                                      style: TextStyle(
+                                        color: Color(0xFF919191),
+                                        fontSize: 18,
+                                        fontFamily: 'Poppins-Regular',
+                                        fontWeight: FontWeight.w500,
+                                        height: 0.89,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Text(
+                              'Bus photos'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF432B72),
+                                fontSize: 17,
+                                fontFamily: 'Poppins-SemiBold',
+                                fontWeight: FontWeight.w600,
+                                height: 0.94,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 12,
+                            ),
+                            Container(
+                                height: 170,
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: <Widget>[
+                                    InteractiveViewer(
+                                        child:(_photobus == null || _photobus == '') ?
+                                        Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                        Image.network(_photobus!,width: 144,height: 154.42,fit: BoxFit.cover,)
+                                    ),
+
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    // InteractiveViewer(
+                                    //     child:(_photobus == null || _photobus == '') ?
+                                    //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                    //     Image.network(_photobus!,width: 104,height: 111.53,)
+                                    // ),
+                                    // SizedBox(
+                                    //   width: 10,
+                                    // ),
+                                    // InteractiveViewer(
+                                    //     child:(_photobus == null || _photobus == '') ?
+                                    //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                    //     Image.network(_photobus!,width: 104,height: 111.53,)
+                                    // ),
+                                    // SizedBox(
+                                    //   width: 10,
+                                    // ),
+                                    // InteractiveViewer(
+                                    //     child:(_photobus == null || _photobus == '') ?
+                                    //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                    //     Image.network(_photobus!,width: 104,height: 111.53,)
+                                    // ),
+                                  ],
+                                )),
+                            SizedBox(
+                              height: 44,
+                            )
+                          ],
                         ),
                       ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                          height: 170,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: <Widget>[
-                              Image.asset('assets/images/photo container (1).png',
-                                width: 144, height: 154.42,),
-                              SizedBox(width: 10,),
-                              Image.asset('assets/images/photo container.png',
-                                width: 104, height: 111.53,),
-                              SizedBox(width: 10,),
-                              Image.asset('assets/images/Property 1=3.png',
-                                width: 104, height: 111.53,),
-                              SizedBox(width: 10,),
-                              Image.asset('assets/images/Property 1=4.png',
-                                width:104, height: 111.53,),
-                            ],
-                          )
-                      ),
-
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                      //   child: Row(
-                      //     children: [
-                      //       Image.asset('assets/images/Frame 135.png',
-                      //       width: 56, height: 51,),
-                      //       SizedBox(width: 10,),
-                      //       Image.asset('assets/images/Frame 136.png',
-                      //       width: 56, height: 51,),
-                      //     ],
-                      //   ),
-                      // ),
-                      SizedBox(height: 44,)
-                    ],
-                  ),
-                ),
-              )
+                    )
               //     :
               // Column(
               //   children: [
@@ -852,7 +1387,8 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
               //             // onTapMenu: onTapMenu
               //           )));
               // //     }, child: Text('if we have data')),
-              , const SizedBox(
+              ,
+              const SizedBox(
                 height: 90,
               ),
             ],
@@ -860,8 +1396,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
         ),
         extendBody: true,
         resizeToAvoidBottomInset: false,
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(100)),
@@ -869,17 +1404,15 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ProfileSupervisorScreen(
-                    // onTapMenu: onTapMenu
-                  )));
+                      // onTapMenu: onTapMenu
+                      )));
             },
             child: Image.asset(
               'assets/images/174237 1.png',
               height: 33,
               width: 33,
               fit: BoxFit.cover,
-            )
-
-        ),
+            )),
         bottomNavigationBar: Directionality(
             textDirection: Get.locale == Locale('ar')
                 ? TextDirection.rtl
@@ -901,7 +1434,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 topRight: Radius.circular(38.5))),
                         RoundedRectangleBorder(
                             borderRadius:
-                            BorderRadius.all(Radius.circular(50)))),
+                                BorderRadius.all(Radius.circular(50)))),
                     notchMargin: 7,
                     child: SizedBox(
                         height: 10,
@@ -923,16 +1456,15 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top:7 , right: 15):
-                                  EdgeInsets.only(left: 15),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(top: 7, right: 15)
+                                          : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (7).png',
                                           height: 20,
-                                          width: 20
-                                      ),
+                                          width: 20),
                                       SizedBox(height: 3),
                                       Text(
                                         "Home".tr,
@@ -960,16 +1492,15 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 9, left: 50):
-                                  EdgeInsets.only( right: 50, top: 2 ),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(top: 9, left: 50)
+                                          : EdgeInsets.only(right: 50, top: 2),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/icons8_checklist_1 1.png',
                                           height: 19,
-                                          width: 19
-                                      ),
+                                          width: 19),
                                       SizedBox(height: 3),
                                       Text(
                                         "Attendance".tr,
@@ -997,21 +1528,21 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                  EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(
+                                              top: 12, bottom: 4, right: 10)
+                                          : EdgeInsets.only(
+                                              top: 8, bottom: 4, left: 20),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (2).png',
                                           height: 17,
-                                          width: 16.2
-                                      ),
+                                          width: 16.2),
                                       Image.asset(
                                           'assets/images/Vector (5).png',
                                           height: 4,
-                                          width: 6
-                                      ),
+                                          width: 6),
                                       SizedBox(height: 2),
                                       Text(
                                         "Notifications".tr,
@@ -1027,17 +1558,17 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                 ),
                               ),
                               Padding(
-                                padding:
-                                (sharedpref?.getString('lang') == 'ar')?
-                                EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
-                                EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
+                                padding: (sharedpref?.getString('lang') == 'ar')
+                                    ? EdgeInsets.only(
+                                        top: 10, bottom: 2, right: 10, left: 0)
+                                    : EdgeInsets.only(
+                                        top: 8, bottom: 2, left: 0, right: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
                                         'assets/images/icons8_bus 1 (1).png',
                                         height: 22,
-                                        width: 25
-                                    ),
+                                        width: 25),
                                     SizedBox(height: 3),
                                     Text(
                                       "Buses".tr,
@@ -1053,9 +1584,9 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                               ),
                             ],
                           ),
-                        )))))
-    );
+                        ))))));
   }
+
   TextDirection _getTextDirection(String text) {
     // Determine the text direction based on text content
     if (text.contains(RegExp(
@@ -1067,6 +1598,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
       return TextDirection.ltr;
     }
   }
+
   // Widget DashedLineInList() {
   //   // double lineLength = students.length * 5;
   //   return Padding(
