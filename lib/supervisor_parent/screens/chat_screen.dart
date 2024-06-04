@@ -307,7 +307,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       WidgetsBinding.instance!.addPostFrameCallback((_) {
                         _scrollToBottom();
 
-                      print('ssssssssss');});
+                     });
                       List<Widget> allMessages = [];
                       var responseMessages = snapshot.data!.docs;
                       for (var i = 0; i < responseMessages.length; i++) {
