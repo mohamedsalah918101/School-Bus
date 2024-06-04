@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:school_account/classes/loading.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
@@ -23,10 +24,73 @@ class _YourBusState extends State<YourBus> {
   String _photobus = ' ';
   String _phonedriver = ' ';
   String _busnumber = ' ';
-  String _secondsupervisor = ' ';
+  String firstChildName = '';
+  bool dataLoading=false;
+
+
+  // Future<void> getDataForBus() async {
+  //   setState(() {
+  //     dataLoading = true;
+  //   });
+  //
+  //   DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+  //       .collection('supervisor')
+  //       .doc(sharedpref?.getString('id'))
+  //       .get();
+  //
+  //   if (supervisorDoc.exists) {
+  //     String busId = supervisorDoc['bus_id'];
+  //
+  //     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //         .collection('busdata')
+  //         .where(FieldPath.documentId, isEqualTo: busId)
+  //         .get();
+  //
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       var busData = querySnapshot.docs.first;
+  //       String namedriver = busData['namedriver'];
+  //       String photodriver = busData['imagedriver'];
+  //       String photobus = busData['busphoto'];
+  //       String phonedriver = busData['phonedriver'];
+  //       String busnumber = busData['busnumber'];
+  //
+  //       setState(() {
+  //         _namedriverText = namedriver;
+  //         _photodriver = photodriver;
+  //         _photobus = photobus;
+  //         _phonedriver = phonedriver;
+  //         _busnumber = busnumber;
+  //       });
+  //
+  //       // جلب قائمة المشرفين
+  //       List supervisors = busData['supervisors'];
+  //
+  //       if (supervisors.isNotEmpty) {
+  //         setState(() {
+  //           firstChildName = supervisors.first['name'];
+  //         });
+  //       } else {
+  //         print('No supervisors found');
+  //       }
+  //     } else {
+  //       print('No bus data found');
+  //     }
+  //   } else {
+  //     print('Supervisor document does not exist');
+  //   }
+  //
+  //   setState(() {
+  //     dataLoading = false;
+  //   });
+  // }
+
 
 
   Future<void> getDataForBus() async {
+    setState(() {
+      dataLoading = true;
+    });
+
     DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
         .collection('supervisor')
         .doc(sharedpref?.getString('id'))
@@ -41,28 +105,44 @@ class _YourBusState extends State<YourBus> {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        String namedriver = querySnapshot.docs.first['namedriver'];
-        String photodriver = querySnapshot.docs.first['imagedriver'];
-        String photobus = querySnapshot.docs.first['busphoto'];
-        String phonedriver = querySnapshot.docs.first['phonedriver'];
-        String busnumber = querySnapshot.docs.first['busnumber'];
-        String secondsupervisor = querySnapshot.docs.first['name'];
+        var busData = querySnapshot.docs.first;
+        String namedriver = busData['namedriver'];
+        String photodriver = busData['imagedriver'];
+        String photobus = busData['busphoto'];
+        String phonedriver = busData['phonedriver'];
+        String busnumber = busData['busnumber'];
+
         setState(() {
           _namedriverText = namedriver;
           _photodriver = photodriver;
-          _photobus = photobus ;
+          _photobus = photobus;
           _phonedriver = phonedriver;
           _busnumber = busnumber;
-          _secondsupervisor = secondsupervisor;
         });
+
+        List supervisors = busData['supervisors'];
+
+        if (supervisors.length > 1) {
+          setState(() {
+            firstChildName = supervisors[1]['name'];
+          });
+        } else {
+          setState(() {
+            firstChildName = 'No second supervisor found';
+          });
+          print('No second supervisor found');
+        }
       } else {
         print('No bus data found');
       }
     } else {
       print('Supervisor document does not exist');
     }
-  }
 
+    setState(() {
+      dataLoading = false;
+    });
+  }
   @override
   void initState() {
     getDataForBus();
@@ -73,10 +153,15 @@ class _YourBusState extends State<YourBus> {
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<ChildDataItem> children = [];
+  // List<ChildDataItem> children = [];
 
   @override
   Widget build(BuildContext context) {
+    if (dataLoading) {
+      return Center(
+        child: Loading(),
+      );
+    }
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
@@ -138,6 +223,7 @@ class _YourBusState extends State<YourBus> {
                       padding:  EdgeInsets.symmetric(horizontal: 31.0),
                       child: Row(
                         children: [
+
 
                           CircleAvatar(
                             backgroundImage: NetworkImage( _photodriver ?? 'no data'),
@@ -220,6 +306,13 @@ class _YourBusState extends State<YourBus> {
                             padding: const EdgeInsets.only(left: 3.0),
                             child: Row(
                               children: [
+                                InteractiveViewer(
+                                  // transformationController: _imagebuscontroller,
+                                    child:(_photobus == null || _photobus == '') ?
+                                    //Image.network(widget.oldphotobus),
+                                    Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                    Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                ),
                                 // Image.network(_photobus ,
                                 // width: 82,
                                 // height: 80,),
@@ -230,16 +323,32 @@ class _YourBusState extends State<YourBus> {
                                 // Image.network(_photobus ,
                                 //   width: 82,
                                 //   height: 80,),
+                                InteractiveViewer(
+                                  // transformationController: _imagebuscontroller,
+                                    child:(_photobus == null || _photobus == '') ?
+                                    //Image.network(widget.oldphotobus),
+                                    Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                    Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                ),
                                 SizedBox(width: 10,),
-                            CircleAvatar(
-                              radius: 31,
-                              backgroundColor: Color(0xff442B72),
-                              child: CircleAvatar(
-                                backgroundImage:
-                                NetworkImage( _photobus),
-                                radius: 31,
-                              ),
-                            ),
+                            // CircleAvatar(
+                            //   radius: 31,
+                            //   backgroundColor: Color(0xff442B72),
+                            //   child:
+                            //   CircleAvatar(
+                            //     backgroundImage:
+                            //     NetworkImage( _photobus),
+                            //     radius: 31,
+                            //   ),
+                            // ),
+
+
+                                InteractiveViewer(
+                                  // transformationController: _imagebuscontroller,
+                                    child:(_photobus == null || _photobus == '') ?
+                                    Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                    Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                ),
 
                                 // Image.network(_photobus ,
                                 //   width: 82,
@@ -278,8 +387,9 @@ class _YourBusState extends State<YourBus> {
                           SizedBox(height: 10,),
                           Padding(
                             padding: const EdgeInsets.only(left: 3.0),
-                            child: Text( 'reham',
-                              // _secondsupervisor,
+                            child: Text(
+                              firstChildName.isNotEmpty ? firstChildName : 'No second supervisor found',
+                              // 'reham',
                               style: TextStyle(
                                 color: Color(0xFF442B72),
                                 fontSize: 12,
@@ -287,6 +397,7 @@ class _YourBusState extends State<YourBus> {
                                 fontWeight: FontWeight.w400,
                               ),),
                           ),
+
                         ],
                       ),
                     ),

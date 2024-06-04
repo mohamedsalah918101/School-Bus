@@ -313,218 +313,168 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 0),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 25.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => StudentScreen()),
-                                );
-                              },
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 318, //300
-                                    width: double.infinity,
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: data.length,
-                                      // data?[0]['childern'].length,
-                                      // data.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        List children = data[index]['children'];
-                                        String address = data[index]['address'];
-                                        List<String> words = address.split(' ');
-                                        String firstLine = words.take(3).join(' ');
-                                        String secondLine = words.skip(3).join(' ');
-                                        if(data.isEmpty){
-                                          Container(); }
-                                        else
-                                          return Column(
-                                            children: [
-                                              // for (int i = startIndex; i < childern.length; i++)
-                                              for (var child in children)
-                                                SizedBox(
-                                                  width: double.infinity,
-                                                  height:  98, //92
-                                                  child: Card(
-                                                    elevation: 5,
-                                                    color: Colors.white,
-                                                    surfaceTintColor: Colors.transparent,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(8.0),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 25.0),
+                      child: GestureDetector(
+                        // onTap: () {
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(builder: (context) => StudentScreen()),
+                        //   );
+                        // },
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 318, //300
+                              width: double.infinity,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: data.length,
+                                // data?[0]['childern'].length,
+                                // data.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  List children = data[index]['children'];
+                                  String address = data[index]['address'];
+                                  List<String> words = address.split(' ');
+                                  String firstLine = words.take(3).join(' ');
+                                  String secondLine = words.skip(3).join(' ');
+                                  if (data.isEmpty) {
+                                    return Container();
+                                  } else {
+                                    return Column(
+                                      children: [
+                                        for (var child in children)
+                                          SizedBox(
+                                            width: double.infinity,
+                                            height: 98, //92
+                                            child: Card(
+                                              elevation: 5,
+                                              color: Colors.white,
+                                              surfaceTintColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8.0),
+                                              ),
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => StudentScreen(
+                                                        name: child['name'],
+                                                        phonenumber: data[index]['phoneNumber'],
+                                                        ParentName: data[index]['name'],
+                                                        grade: child['grade'],
+                                                        address: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
+                                                      ),
                                                     ),
-                                                    child: Padding(
-                                                      padding: (sharedpref?.getString('lang') == 'ar')?
-                                                      EdgeInsets.only(top: 15.0 , right: 12,):
-                                                      EdgeInsets.only(top: 15.0 , left: 12,),
-                                                      child:  Row(
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding: (sharedpref?.getString('lang') == 'ar')
+                                                      ? EdgeInsets.only(top: 15.0, right: 12)
+                                                      : EdgeInsets.only(top: 15.0, left: 12),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(top: 8.0),
+                                                        child: Image.asset(
+                                                          'assets/images/Ellipse 1.png',
+                                                          width: 36,
+                                                          height: 36,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Column(
                                                         mainAxisAlignment: MainAxisAlignment.start,
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(top: 8.0),
-                                                            child: Image.asset('assets/images/Ellipse 1.png',
-                                                              width: 36,
-                                                              height: 36,),
+                                                          Text(
+                                                            '${child['name']}',
+                                                            style: TextStyle(
+                                                              color: Color(0xff442B72),
+                                                              fontSize: 15,
+                                                              fontFamily: 'Poppins-SemiBold',
+                                                              fontWeight: FontWeight.w600,
+                                                              // height: 1,
+                                                            ),
                                                           ),
-                                                          SizedBox(width: 12,),
-                                                          Column(
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              Text(
-                                                                // '${childern[i]['name']}',
-                                                                '${child['name']}',
-                                                                style: TextStyle(
-                                                                  color: Color(0xff442B72),
-                                                                  fontSize: 15,
-                                                                  fontFamily: 'Poppins-SemiBold',
-                                                                  fontWeight: FontWeight.w600,
-                                                                  // height: 1,
-                                                                ),
-                                                              ),
-                                                              // Text('${data[index]['childern']?[0]['name'] }',
-                                                              // Text('${data[index]['childern']?[0-3]['name'] }',
-                                                              Text.rich(
+                                                          Text.rich(
+                                                            TextSpan(
+                                                              children: [
                                                                 TextSpan(
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text: 'Grade: '.tr,
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF919191),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: '${data[index]['children']?[0]['grade'] }',
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF442B72),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                                  text: 'Grade: '.tr,
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF919191),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              Text.rich(
                                                                 TextSpan(
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text: 'Address: '.tr,
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF919191),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-
-                                                                    TextSpan(
-                                                                      text: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
-                                                                      // '${data[index]['address'] }',
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF442B72),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                                  text: '${child['grade']}',
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF442B72),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              // FutureBuilder(
-                                                              //   future: _firestore.collection('parent').doc(sharedpref!.getString('id')).get(),
-                                                              //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                                              //     if (snapshot.hasError) {
-                                                              //       return Text('Something went wrong');
-                                                              //     }
-                                                              //
-                                                              //     if (snapshot.connectionState == ConnectionState.done) {
-                                                              //       if (snapshot.data?.data() == null) {
-                                                              //         return Text(
-                                                              //           'No data available',
-                                                              //           style: TextStyle(
-                                                              //             color: Color(0xff442B72),
-                                                              //             fontSize: 12,
-                                                              //             fontFamily: 'Poppins-Regular',
-                                                              //             fontWeight: FontWeight.w400,
-                                                              //           ),
-                                                              //         );
-                                                              //       }
-                                                              //
-                                                              //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                                              //
-                                                              //       sharedpref?.getString('lang') == 'en';
-                                                              //       return Text(
-                                                              //         '${data[index]['grade'] }',
-                                                              //         style: TextStyle(
-                                                              //           color: Color(0xff442B72),
-                                                              //           fontSize: 15,
-                                                              //           fontFamily: 'Poppins-Bold',
-                                                              //           fontWeight: FontWeight.w700,
-                                                              //         ),
-                                                              //       );
-                                                              //     }
-                                                              //     return CircularProgressIndicator();
-                                                              //   },
-                                                              // ),
-
-                                                              // Text.rich(
-                                                              //   TextSpan(
-                                                              //     children: [
-                                                              //       TextSpan(
-                                                              //         text: 'Address: '.tr,
-                                                              //         style: TextStyle(
-                                                              //           color: Color(0xFF919191),
-                                                              //           fontSize: 12,
-                                                              //           fontFamily: 'Poppins-Light',
-                                                              //           fontWeight: FontWeight.w400,
-                                                              //           height: 1.33,
-                                                              //         ),
-                                                              //       ),
-                                                              //
-                                                              //       TextSpan(
-                                                              //         text: '16 Khaled st,Asyut,Egypt',
-                                                              //         style: TextStyle(
-                                                              //           color: Color(0xFF442B72),
-                                                              //           fontSize: 12,
-                                                              //           fontFamily: 'Poppins-Light',
-                                                              //           fontWeight: FontWeight.w400,
-                                                              //           height: 1.33,
-                                                              //         ),
-                                                              //       ),
-                                                              //     ],
-                                                              //   ),
-                                                              // ),
-                                                            ],
-                                                          )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Text.rich(
+                                                            TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: 'Address: '.tr,
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF919191),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: secondLine.isNotEmpty
+                                                                      ? '$firstLine\n$secondLine'
+                                                                      : firstLine,
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF442B72),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
                                                         ],
-                                                      ),),
-
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              SizedBox(height: 0,)
-                                            ],
-                                          );
-                                      },
-                                    ),
-                                  ),
-                                ],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    );
+                                  }
+                                },
                               ),
                             ),
-                          ),
-                          SizedBox(height: 44),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 44),
                         ],
                       )
                           : Column(
