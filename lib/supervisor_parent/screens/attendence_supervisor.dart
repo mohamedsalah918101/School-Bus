@@ -1,16 +1,13 @@
 // import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/check_in_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/profile_card_in_supervisor.dart';
-import 'package:school_account/supervisor_parent/components/parents_card_in_student.dart';
-import 'package:school_account/supervisor_parent/components/student_card_in_student.dart';
-import 'package:school_account/supervisor_parent/components/students_card_in_home.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
@@ -21,10 +18,10 @@ import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import '../components/bus_component.dart';
-import '../components/main_bottom_bar.dart';
-import '../components/supervisor_card.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
 import 'notification_parent.dart';
+
 class AttendanceSupervisorScreen extends StatefulWidget {
   AttendanceSupervisorScreen({
     Key? key,
@@ -39,8 +36,40 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   bool Checkin = false;
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
-
+  var fbm = FirebaseMessaging.instance ;
   bool dataLoading=false;
+
+  sendNotify( String tittle, String body , String id) async{
+    await http.post(
+      Uri.parse('https://api.rnfirebase.io/messaging/send'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        // 'Authorization': 'key=$serv',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'notification':<String, dynamic>{
+          'body': body.toString(),
+          'tittle': tittle.toString()
+        },
+        'priority': 'high'   ,
+        'data' : <String, dynamic>{
+          'click_action' : 'FLUTTER_NOTIFICATION_CLICK',
+          'id' : id.toString()
+        },
+        'to': await FirebaseMessaging.instance.getToken()
+      },),
+    );
+  }
+
+  getMassege(){
+    FirebaseMessaging.onMessage.listen((message) {
+      print('message================');
+      print('${message.notification!.title}');
+      print('${message.notification!.body}');
+      print('${message.data['name']}');
+    });
+  }
+
 
   getData()async{
     setState(() {
@@ -57,6 +86,25 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
 
   @override
   void initState() {
+    getMassege();
+    fbm.getToken().then((token) {
+      print('token===========================================');
+      print(token);
+      print('token');
+    });
+    FirebaseMessaging.onMessage.listen((event) {
+      print('notification===========================================');
+      print("${event.notification!.body}");
+      print('notification===========================================');
+    });
+
+    FirebaseMessaging.onMessage.listen((event) {
+      print('notification===========================================');
+      print("${event.notification!.body}");
+      print('notification===========================================');
+      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("${event.notification!.body}")));
+
+    });
 
     getData();
     super.initState();
@@ -201,6 +249,8 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     isStarting =
                                     // children.isNotEmpty?
                                     true;
+                                    sendNotify('tittle', 'body', 'id');
+
                                     // no data
                                     // : false;
                                     setState(() {
@@ -237,6 +287,11 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                         ),
                       ),
                       SizedBox(height: 15,),
+                      // GestureDetector(
+                      //     onTap: (){
+                      //
+                      //     },
+                      //     child: Text('datatest' , style: TextStyle(fontSize: 60),)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 28.0),
                         child: Text('Attendances'.tr,
