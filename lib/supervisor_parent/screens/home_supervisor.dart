@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -30,6 +31,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
   List<QueryDocumentSnapshot> data = [];
   final _firestore = FirebaseFirestore.instance;
   bool dataLoading=false;
+  var fbm = FirebaseMessaging.instance ;
+
 
   getData()async{
     setState(() {
@@ -46,6 +49,16 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
   @override
   void initState() {
+    // fbm.getToken().then((token) {
+    //   print('token===========================================');
+    //   print(token);
+    //   print('token');
+    // });
+    // FirebaseMessaging.onMessage.listen((event) {
+    //   print('notification===========================================');
+    //   print("${event.notification!.body}");
+    //   print('notification===========================================');
+    // });
 
     getData();
     super.initState();
