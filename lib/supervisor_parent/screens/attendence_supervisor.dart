@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
@@ -60,6 +61,15 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
     );
   }
 
+  getMassege(){
+    FirebaseMessaging.onMessage.listen((message) {
+      print('message================');
+      print('${message.notification!.title}');
+      print('${message.notification!.body}');
+      print('${message.data['name']}');
+    });
+  }
+
 
   getData()async{
     setState(() {
@@ -76,7 +86,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
 
   @override
   void initState() {
-
+    getMassege();
     fbm.getToken().then((token) {
       print('token===========================================');
       print(token);
@@ -239,6 +249,8 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     isStarting =
                                     // children.isNotEmpty?
                                     true;
+                                    sendNotify('tittle', 'body', 'id');
+
                                     // no data
                                     // : false;
                                     setState(() {
@@ -275,12 +287,11 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                         ),
                       ),
                       SizedBox(height: 15,),
-                      GestureDetector(
-                          onTap: (){
-                            sendNotify('tittle', 'body', 'id');
-
-                          },
-                          child: Text('datatest' , style: TextStyle(fontSize: 60),)),
+                      // GestureDetector(
+                      //     onTap: (){
+                      //
+                      //     },
+                      //     child: Text('datatest' , style: TextStyle(fontSize: 60),)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 28.0),
                         child: Text('Attendances'.tr,
