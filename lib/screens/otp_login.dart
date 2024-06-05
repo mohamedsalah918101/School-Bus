@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/components/main_bottom_bar.dart';
@@ -38,6 +39,8 @@ class OtpScreenLogin extends StatefulWidget {
 }
 
 class _OtpScreenLoginState extends State<OtpScreenLogin> {
+
+
   Timer? _timer; // Variable to store the timer
   int _seconds = 60;
   String verificationId = '';

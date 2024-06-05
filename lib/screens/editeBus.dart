@@ -147,6 +147,11 @@ class _EditeBusState extends State<EditeBus> {
       //Success: get the download URL
       imageUrldriver = await referenceImageToUpload.getDownloadURL();
       print('Image uploaded successfully. URL: $imageUrldriver');
+
+      print('Image uploaded successfully. URL: $imageUrldbus');
+      await Bus.doc(widget.docid).update({
+        'imagedriver': imageUrldriver,
+      });
       return imageUrldriver;
     } catch (error) {
       print('Error uploading image: $error');
@@ -183,6 +188,9 @@ class _EditeBusState extends State<EditeBus> {
       //Success: get the download URL
       imageUrldbus = await referenceImageToUpload.getDownloadURL();
       print('Image uploaded successfully. URL: $imageUrldbus');
+      await Bus.doc(widget.docid).update({
+        'busphoto': imageUrldbus,
+      });
       return imageUrldbus;
     } catch (error) {
       print('Error uploading image: $error');
@@ -211,6 +219,29 @@ class _EditeBusState extends State<EditeBus> {
     }
     setState(() {
 
+    });
+  }
+
+  // fun delete busphoto
+  String docid='';
+
+  // void _deletebusphoto() {
+  //   FirebaseFirestore.instance.collection('busdata').doc(widget.docid).set(
+  //     {'busphoto': FieldValue.delete()},
+  //     SetOptions(
+  //       merge: true,
+  //     ),
+  //   );
+  // }
+  void _deletebusphoto() {
+    FirebaseFirestore.instance.collection('busdata').doc(widget.docid).update({
+      'busphoto': FieldValue.delete(),
+    }).then((_) {
+      FirebaseFirestore.instance.collection('busdata').doc(widget.docid).update({
+        'busphoto': '',
+      });
+    }).catchError((error) {
+      print("Failed to delete busphoto: $error");
     });
   }
 
@@ -287,58 +318,56 @@ class _EditeBusState extends State<EditeBus> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: InkWell(onTap: (){},
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional.topStart,
-                            child: InkWell(
-                              // onTap: ()=>exit(0),
-                              onTap: () {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                // Navigate back to the previous page
-                                Navigator.pop(context);
+                    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional.topStart,
+                          child: InkWell(
+                            // onTap: ()=>exit(0),
+                            onTap: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              // Navigate back to the previous page
+                              Navigator.pop(context);
 
-                              },
+                            },
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 23,
+                              color: Color(0xff442B72),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20,),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              "Buses".tr,
+                              style: TextStyle(
+                                color: Color(0xFF993D9A),
+                                fontSize: 16,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.bold,
+                                height: 0.64,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: InkWell(onTap: (){
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                            child: Align(
+                              alignment: AlignmentDirectional.topEnd,
                               child: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 23,
+                                Icons.menu_rounded,
+                                size: 40,
                                 color: Color(0xff442B72),
                               ),
                             ),
                           ),
-                          SizedBox(width: 20,),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                "Buses".tr,
-                                style: TextStyle(
-                                  color: Color(0xFF993D9A),
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins-Bold',
-                                  fontWeight: FontWeight.bold,
-                                  height: 0.64,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: InkWell(onTap: (){
-                              Scaffold.of(context).openEndDrawer();
-                            },
-                              child: Align(
-                                alignment: AlignmentDirectional.topEnd,
-                                child: const Icon(
-                                  Icons.menu_rounded,
-                                  size: 40,
-                                  color: Color(0xff442B72),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -366,19 +395,6 @@ class _EditeBusState extends State<EditeBus> {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 12),
                                     child:
-                                    // GestureDetector(
-                                    //   onTap: (){
-                                    //     _pickImageDriverFromGallery();
-                                    //     print('edit');
-                                    //   },
-                                    //   child:  CircleAvatar(
-                                    //       radius: 30.5,
-                                    //       backgroundColor: Color(0xff442B72),
-                                    //       child: CircleAvatar(
-                                    //         backgroundImage: NetworkImage( '$imageUrldriver'),
-                                    //         radius: 30.5,)
-                                    //   ),
-                                    // ),
                                     GestureDetector(
                                       onTap: () {
                                         _pickImageDriverFromGallery();
@@ -393,20 +409,69 @@ class _EditeBusState extends State<EditeBus> {
                                        // NetworkImage(_selectedImageDriver),
                                       ),
                                     ),
+                                    // GestureDetector(
+                                    //   onTap: () {
+                                    //     _pickImageDriverFromGallery();
+                                    //   },
+                                    //   child: Stack(
+                                    //     children: [
+                                    //       Center(
+                                    //         child: Padding(
+                                    //           padding: const EdgeInsets.only(top: 20),
+                                    //           child: _selectedImagedriverEdite != null
+                                    //               ? Image.file(
+                                    //             _selectedImagedriverEdite!,
+                                    //             width: 83,
+                                    //             height: 78.5,
+                                    //             fit: BoxFit.cover,
+                                    //           )
+                                    //               : CircleAvatar(
+                                    //             backgroundColor: Colors.white,
+                                    //             radius: 50,
+                                    //             child: widget.oldphotodriver == null || widget.oldphotodriver == ''
+                                    //                 ? Image.asset(
+                                    //               'assets/imgs/school/Ellipse 2 (1).png',
+                                    //               fit: BoxFit.cover,
+                                    //               width: 100,
+                                    //               height: 100,
+                                    //             )
+                                    //                 : Image.network(
+                                    //               widget.oldphotodriver!,
+                                    //               fit: BoxFit.fill,
+                                    //               width: 90,
+                                    //               height: 90,
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //       Center(
+                                    //         child: Padding(
+                                    //           padding: const EdgeInsets.only(top: 95, left: 55),
+                                    //           child: Container(
+                                    //             decoration: BoxDecoration(
+                                    //               shape: BoxShape.circle,
+                                    //               border: Border.all(width: 3, color: Color(0xff432B72)),
+                                    //             ),
+                                    //             child: CircleAvatar(
+                                    //               backgroundColor: Colors.white,
+                                    //               radius: 10,
+                                    //               child: Image.asset(
+                                    //                 'assets/imgs/school/edite.png',
+                                    //                 fit: BoxFit.cover,
+                                    //                 width: 15,
+                                    //                 height: 15,
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
+
                                   ),
-                                  // Padding(
-                                  //   padding: const EdgeInsets.only(left: 12),
-                                  //   child:
-                                  //   GestureDetector(
-                                  //     onTap: (){
-                                  //       _pickImageDriverFromGallery();
-                                  //     },
-                                  //
-                                  //     child: CircleAvatar( radius:30, // Set the radius of the circle
-                                  //       backgroundImage: AssetImage('assets/imgs/school/Ellipse 2 (1).png'),
-                                  //     ),
-                                  //   ),
-                                  // ),
+
+
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
                                     child: Align(
@@ -594,12 +659,24 @@ class _EditeBusState extends State<EditeBus> {
 
                                   Stack(alignment: Alignment.topRight,
                                       children:[
-                                        InteractiveViewer(
-                                           // transformationController: _imagebuscontroller,
-                                            child:(widget.oldphotobus == null || widget.oldphotobus == '') ?
-                                            //Image.network(widget.oldphotobus),
-                                          Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                                Image.network(widget.oldphotobus!,width: 75,height: 74,fit: BoxFit.cover,)
+                                        // InteractiveViewer(
+                                        //    // transformationController: _imagebuscontroller,
+                                        //     child:(widget.oldphotobus == null || widget.oldphotobus == '') ?
+                                        //     //Image.network(widget.oldphotobus),
+                                        //   Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                        //         Image.network(widget.oldphotobus!,width: 75,height: 74,fit: BoxFit.cover,)
+                                        // ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            _pickImagebusFromGallery();
+                                          },
+                                          child: InteractiveViewer(
+                                            child: _selectedImageBusEdite != null
+                                                ? Image.file(_selectedImageBusEdite!, width: 75, height: 74, fit: BoxFit.cover)
+                                                : (widget.oldphotobus == null || widget.oldphotobus == '')
+                                                ? Image.asset("assets/imgs/school/Frame 137.png", width: 75, height: 74)
+                                                : Image.network(widget.oldphotobus!, width: 75, height: 74, fit: BoxFit.cover),
+                                          ),
                                         ),
 
                                         Align(alignment: AlignmentDirectional.topEnd,
@@ -1185,7 +1262,7 @@ class _EditeBusState extends State<EditeBus> {
                         width: 120,
                         hight: 38,
                         onPress: () => {
-
+                          _deletebusphoto(),
                         Navigator.pop(context),
                           showSnackBarDeleteFun(context),
                         }

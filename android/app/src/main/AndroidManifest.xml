@@ -21,6 +21,7 @@
     <!-- Optional: Add this permission if you want to save your recordings in public folders -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 
     <application
         android:label="school_account"

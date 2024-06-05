@@ -490,6 +490,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                 padding: const EdgeInsets.all(5.0),
                                                                 child: GestureDetector(
                                                                     onTap: (){
+                                                                      getData();
                                                                       Navigator.pop(context);
                                                                     },child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),)),
                                                               )

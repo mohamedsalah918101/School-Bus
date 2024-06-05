@@ -57,7 +57,7 @@ dependencies:
   fdottedline_nullsafety: ^2.0.0
   image_picker: ^1.0.2
   path_provider: ^2.1.1
-  firebase_storage: ^11.6.9
+  firebase_storage: ^11.6.0
   google_places_autocomplete_text_field: ^0.1.3
   share_plus: ^7.0.2
   firebase_messaging: ^14.6.5
@@ -76,6 +76,7 @@ dependencies:
   flutter_phone_direct_caller: ^2.1.1
   fluttercontactpicker: ^4.7.0
 #  firebase_messaging: ^14.7.20
+  local_auth: ^2.1.8
 
 dev_dependencies:
   flutter_test:

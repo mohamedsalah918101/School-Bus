@@ -1,19 +1,18 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:school_account/screens/profileScreen.dart';
+import 'package:intl/intl.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
-
-
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../classes/classDay.dart';
-import '../components/custom_app_bar.dart';
-import '../components/dialogs.dart';
+import '../classes/custom_month_cell.dart';
 import '../components/elevated_icon_button.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/home_drawer.dart';
+import 'Holiday.dart';
 import 'busesScreen.dart';
+import 'calenderadd.dart';
+import 'holidayDetailsClass.dart';
 import 'homeScreen.dart';
 import 'notificationsScreen.dart';
 
@@ -24,32 +23,135 @@ class VacationsScreen extends StatefulWidget {
 
 class _VacationsScreenState extends State<VacationsScreen> {
 
-  //function to add holiday in firestore
+  bool _isHoliday(DateTime date) {
+    for (Holiday holiday in _holidays) {
+      if (date.isAtSameMomentAs(DateTime.parse(holiday.fromDate)) ||
+          date.isAfter(DateTime.parse(holiday.fromDate)) &&
+              date.isBefore(DateTime.parse(holiday.toDate))) {
+        return true;
+      }
+    }
+    return false;
+  }
+  //new
+  List<int> _selectedWeekendDays = [];
+  // //List<DateTime> selectedWeekendDays = [];
+  // void updateSelectedWeekendDays() {
+  //   selectedWeekendDays = days.where((day) => day.isChecked).map((day) {
+  //     DateTime now = DateTime.now();
+  //     return DateTime.utc(now.year, now.month, day.name == 'S' ? 7 : 6);
+  //   }).toList();
+  // }
+  bool isLoading = false;
+  Holiday? _addedHoliday;
+
+  final _holidayNameController = TextEditingController();
+  List<DateTime> _selectedHolidayDates = [];
+
+  void _onDateRangeSelected(DateRangePickerSelectionChangedArgs args) {
+    print("DATE TEST");
+    print(args.value);
+    setState(() {
+      _selectedHolidayDates = args.value;
+    });
+  }
+String newDocId='';
+  //correct add data to firestore
+  // Future<void> _addHolidayToFirestore() async {
+  //   if (_holidayNameController.text.isNotEmpty && _selectedHolidayDates.isNotEmpty) {
+  //     final holiday = SchoolHoliday(
+  //       name: _holidayNameController.text,
+  //       fromDate: _selectedHolidayDates.first,
+  //       toDate: _selectedHolidayDates.last,
+  //     );
+  //
+  //     try {
+  //      // await _firestore.collection('schoolholiday').add(holiday.toJson());
+  //       DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+  //
+  //        newDocId = docRef.id; // Get the ID of the newly created document
+  //       print('New holiday added with ID: $newDocId');
+  //       AddAbsentDay = false;
+  //       isAddingHoliday = false;
+  //       _holidayNameController.clear();
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Holiday added successfully')),
+  //       );
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to add holiday: $e')),
+  //       );
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Please enter a holiday name and select dates')),
+  //     );
+  //   }
+  // }
+
+  Future<void> _addHolidayToFirestore() async {
+    if (_holidayNameController.text.isNotEmpty && _selectedHolidayDates.isNotEmpty) {
+      final List<String> selectedDates = _selectedHolidayDates.map((date)
+      => date.toIso8601String()).toList();
+
+      final holiday = Holiday(
+        name: _holidayNameController.text,
+        fromDate: _selectedHolidayDates.first.toIso8601String(),
+        toDate: _selectedHolidayDates.last.toIso8601String(),
+        selectedDates: selectedDates,
+      );
+
+      try {
+        DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+
+        newDocId = docRef.id; // Get the ID of the newly created document
+        print('New holiday added with ID: $newDocId');  // Update the state with the new holiday details
+        setState(() {
+          _addedHoliday = holiday;
+          _holidays.add(holiday); // Add the holiday to the list NEW
+          _holidayNameController.clear();
+          _selectedHolidayDates.clear();
+          isLoading = false;
+        });
+        AddAbsentDay = false;
+        isAddingHoliday = false;
+       // _holidayNameController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Holiday added successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add holiday: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a holiday name and select dates')),
+      );
+    }
+  }
+
+
+  Future<List<SchoolHoliday>> _fetchHolidays() async {
+    final firestore = FirebaseFirestore.instance;
+    final holidaysRef = firestore.collection('schoolholiday');
+    final holidaysSnapshot = await holidaysRef.get();
+
+    List<SchoolHoliday> holidays = [];
+    for (var doc in holidaysSnapshot.docs) {
+      SchoolHoliday holiday = SchoolHoliday.fromJson(doc.data());
+      holidays.add(holiday);
+    }
+
+    return holidays;
+  }
+
+
+  List<QueryDocumentSnapshot> data = [];
+  List<Holiday> holidays = [];
   String docid='';
   final _firestore = FirebaseFirestore.instance;
-  // void _addDataToFirestore() async {
-  //   //if (_formKey.currentState!.validate()) {
-  //   // Define the data to add
-  //   Map<String, dynamic> data = {
-  //     'nameholiday': _nameController.text,
-  //     'fromdate': _emailController.text,
-  //     'todate': _phoneNumberController.text,
-  //
-  //   };
-  //   // Add the data to the Firestore collection
-  //   await _firestore.collection('holiday').add(data).then((docRef) {
-  //     docid=docRef.id;
-  //     print('Data added with document ID: ${docRef.id}');
-  //
-  //     // showSnackBarFun(context);
-  //   }).catchError((error) {
-  //     print('Failed to add data: $error');
-  //   });
-  //   // Clear the text fields
-  //   // _nameController.clear();
-  //   // _phoneNumberController.clear();
-  //   // _emailController.clear();
-  // }
+
 
 
 
@@ -59,14 +161,23 @@ class _VacationsScreenState extends State<VacationsScreen> {
   bool isAddingHoliday = false;
   List<DateTime> _selectedDates = [];
   List<Day> days = [
-    Day(name: 'S', isChecked: false),
-    Day(name: 'M', isChecked: false),
-    Day(name: 'T', isChecked: false),
-    Day(name: 'W', isChecked: false),
-    Day(name: 'T', isChecked: false),
-    Day(name: 'F', isChecked: false),
-    Day(name: 'S', isChecked: false),
+    Day(name: 'Su',weekdayIndex:0, isChecked: false),
+    Day(name: 'M',weekdayIndex:1, isChecked: false),
+    Day(name: 'T', weekdayIndex:2,isChecked: false),
+    Day(name: 'W',weekdayIndex:3, isChecked: false),
+    Day(name: 'Th', weekdayIndex:4,isChecked: false),
+    Day(name: 'F', weekdayIndex:5,isChecked: false),
+    Day(name: 'Sa', weekdayIndex:6,isChecked: false),
   ];
+
+  Future<void> _saveDaysToFirestore() async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
+
+    List<String> selectedDays = days.where((day) => day.isChecked).map((day) => day.name).toList();
+
+    await _weekendCollection.add({'days': selectedDays});
+  }
   bool color = false;
   bool isVisible = false;
 
@@ -79,7 +190,71 @@ class _VacationsScreenState extends State<VacationsScreen> {
           width: 0.5,
         ));
   }
+//fun get weekend
+  Future<List<String>> _getSelectedDaysFromFirestore() async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
 
+    QuerySnapshot querySnapshot = await _weekendCollection.get();
+    if (querySnapshot.docs.isNotEmpty) {
+      var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+      print("WEEKEND TEST");
+      return List<String>.from(data['days']);
+    } else {
+      print("WEEKEND TEST ERROR");
+      return [];
+    }
+  }
+  List<DateTime> _getHighlightedDates(List<String> selectedDays) {
+    List<DateTime> highlightedDates = [];
+    DateTime now = DateTime.now();
+
+    for (var i = 0; i < 30; i++) { // Example: Highlight next 30 days as per the selected days
+      DateTime date = now.add(Duration(days: i));
+      String dayName;
+
+      switch (date.weekday) {
+        case DateTime.sunday:
+          dayName = 'Su';
+          break;
+        case DateTime.monday:
+          dayName = 'M';
+          break;
+        case DateTime.tuesday:
+          dayName = 'T';
+          break;
+        case DateTime.wednesday:
+          dayName = 'W';
+          break;
+        case DateTime.thursday:
+          dayName = 'Th';
+          break;
+        case DateTime.friday:
+          dayName = 'F';
+          break;
+        case DateTime.saturday:
+          dayName = 'Sa';
+          break;
+        default:
+          dayName = '';
+      }
+
+      if (selectedDays.contains(dayName)) {
+        highlightedDates.add(date);
+      }
+    }
+
+    return highlightedDates;
+  }
+
+  List<String> selectedDays = [];
+  List<DateTime> highlightedDates = [];
+  Future<void> _loadSelectedDays() async {
+    selectedDays = await _getSelectedDaysFromFirestore();
+    setState(() {
+      highlightedDates = _getHighlightedDates(selectedDays);
+    });
+  }
   OutlineInputBorder myFocusBorder() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -87,6 +262,131 @@ class _VacationsScreenState extends State<VacationsScreen> {
           color: Color(0xFFFFC53E),
           width: 0.5,
         ));
+  }
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  void retrieveDateTime() async {
+    try {
+      // Check if newDocId is valid
+      if (newDocId.isNotEmpty) {
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+            .collection('schoolholiday')
+            .doc(newDocId)
+            .get();
+
+        if (documentSnapshot.exists) {
+          // Extract fromDate, toDate, and name from the document
+          String name = documentSnapshot['name'];
+
+          // Parse fromDate and toDate from string to DateTime
+          DateTime fromDate = DateTime.parse(documentSnapshot['fromDate']);
+          DateTime toDate = DateTime.parse(documentSnapshot['toDate']);
+
+          // Extract and parse selectedDates from string to DateTime
+          List<dynamic> dateStrings = documentSnapshot['selectedDates'];
+          List<DateTime> dates = dateStrings.map((dateString) => DateTime.parse(dateString)).toList();
+
+          // Print extracted data
+          print('Name: $name');
+          print('From Date: ${fromDate.toLocal()}');
+          print('To Date: ${toDate.toLocal()}');
+          print('Selected Dates:');
+          for (DateTime date in dates) {
+            print(' - ${date.toLocal()}');
+          }
+        } else {
+          print("Document does not exist");
+        }
+      } else {
+        print("Invalid document ID");
+      }
+    } catch (e) {
+      print("Error retrieving data: $e");
+    }
+  }
+
+
+
+  List<Holiday> _holidays = [];
+
+//other fun to retrive data of holiday from DB
+
+  void retrieveAllData() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').get();
+
+      if (querySnapshot.size > 0) {
+        for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
+          Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+
+          if (data != null) {
+            if (data.containsKey('name') &&
+                data.containsKey('fromDate') &&
+                data.containsKey('toDate') &&
+                data.containsKey('selectedDates')) {
+              // Extract fromDate, toDate, and name from the document
+              String name = data['name'];
+
+              // Parse fromDate and toDate from string to DateTime
+              DateTime fromDate = DateTime.parse(data['fromDate']);
+              DateTime toDate = DateTime.parse(data['toDate']);
+
+              // Extract and parse selectedDates from string to DateTime
+              List<dynamic> dateStrings = data['selectedDates'];
+              List<DateTime> dates = dateStrings.map((dateString) => DateTime.parse(dateString)).toList();
+
+              // Convert the DateTime objects to strings
+              String fromDateString = fromDate.toString();
+              String toDateString = toDate.toString();
+
+              // Convert the list of DateTime objects to a list of strings
+              List<String> selectedDatesStrings = dates.map((date) => date.toString()).toList();
+
+              // Create a new Holiday object and add it to the list
+              Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings);
+              _holidays.add(holiday);
+
+              // Print extracted data
+              print('Name: $name');
+              print('From Date: ${fromDate.toLocal()}');
+              print('To Date: ${toDate.toLocal()}');
+              print('Selected Dates:');
+              for (DateTime date in dates) {
+                print(' - ${date.toLocal()}');
+              }
+              print('-----------------------------------');
+            } else {
+              print("Document does not contain all required fields");
+            }
+          } else {
+            print("Document data is null");
+          }
+        }
+      } else {
+        print("No documents exist");
+      }
+    } catch (e) {
+      print("Error retrieving data: $e");
+    }
+  }
+
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    //_getSelectedDaysFromFirestore();
+    retrieveAllData();
+    _loadSelectedDays();
+   // retrieveDateTime();
+   // getData();
+
+    // _fetchHolidays().then((holidays) {
+    //   setState(() {
+    //     _holidays = holidays;
+    //   });
+    // });
   }
 
   @override
@@ -165,6 +465,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -308,11 +609,14 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                         height: 41,
                                         child: ListView(
                                           scrollDirection: Axis.horizontal,
-                                          children: days.map((day) {
+                                          children:
+                                          days.map((day) {
                                             return GestureDetector(
                                               onTap: () {
                                                 setState(() {
                                                   day.toggleCheck();
+
+
                                                 });
                                               },
                                               child: Padding(
@@ -358,10 +662,13 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                       child: SizedBox(
                                         width: 100,
                                         child: ElevatedButton(
-                                          onPressed: () {
+                                          onPressed: () async {
+                                            await _saveDaysToFirestore();
+                                            await _loadSelectedDays(); // Update calendar after saving
                                             setState(() {
                                               isVisible = false;
                                             });
+
                                           },
                                           style: ButtonStyle(
                                             backgroundColor:
@@ -555,8 +862,11 @@ class _VacationsScreenState extends State<VacationsScreen> {
                             //ignoring: !AddAbsentDay,
                             ignoring: !isAddingHoliday,
                             child: SfDateRangePicker(
+
+                              onSelectionChanged: _onDateRangeSelected,
                               //navigationMode: DateRangePickerNavigationMode.none,
                               showNavigationArrow: true,
+
                               headerStyle: DateRangePickerHeaderStyle(
                                 textStyle: TextStyle(
                                   color: Color(0xFF771F98),
@@ -587,17 +897,17 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                 // ],
                               ),
                               monthCellStyle: DateRangePickerMonthCellStyle(
-                                weekendDatesDecoration: BoxDecoration(
-                                    color: const Color(0xFFFEDF96),
-                                    border: Border.all(
-                                        color: const Color(0xFFFEDF96), width: 1),
-                                    shape: BoxShape.circle),
-                                weekendTextStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins-Bold',
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                // weekendDatesDecoration: BoxDecoration(
+                                //     color: const Color(0xFFFEDF96),
+                                //     border: Border.all(
+                                //         color: const Color(0xFFFEDF96), width: 1),
+                                //     shape: BoxShape.circle),
+                                // weekendTextStyle: const TextStyle(
+                                //   color: Colors.black,
+                                //   fontSize: 16,
+                                //   fontFamily: 'Poppins-Bold',
+                                //   fontWeight: FontWeight.w400,
+                                // ),
                                 disabledDatesTextStyle: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 15,
@@ -712,10 +1022,12 @@ class _VacationsScreenState extends State<VacationsScreen> {
                       ),
                     )
                   else
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 33.0),
                       child: Center(
                         child: Container(
+
                           // elevation: 5,
                           width: 301,
                           height: 339,
@@ -734,9 +1046,14 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               )
                             ],
                           ),
+
                           child: IgnorePointer(
                             ignoring: !isAddingHoliday,
                             child: SfDateRangePicker(
+
+                              //new
+                             // onSelectionChanged: _onDateRangeSelected,
+
                               navigationMode: DateRangePickerNavigationMode.none,
                               showNavigationArrow: true,
                               headerStyle: DateRangePickerHeaderStyle(
@@ -748,10 +1065,14 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                 ),
                               ),
                               view: DateRangePickerView.month,
+
                               monthViewSettings: DateRangePickerMonthViewSettings(
+
+                                //monthCellStyle: CustomMonthCellStyle(_selectedWeekendDays),
                                 showTrailingAndLeadingDates: false,
                                 viewHeaderStyle:
                                     const DateRangePickerViewHeaderStyle(
+
                                   textStyle: TextStyle(
                                     color: Color(0xFF5F5F5F),
                                     fontSize: 17,
@@ -759,14 +1080,17 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                weekendDays: const [5, 6],
-                                specialDates: [
-                                  DateTime(2024, 03, 3),
-                                  DateTime(2023, 08, 16),
-                                  DateTime(2023, 08, 17),
-                                  DateTime(2023, 09, 17)
-                                ],
+                               specialDates: highlightedDates,
+
+                                // weekendDays: const [5, 6],
+                                // specialDates: [
+                                //   DateTime(2024, 03, 3),
+                                //   DateTime(2023, 08, 16),
+                                //   DateTime(2023, 08, 17),
+                                //   DateTime(2023, 09, 17)
+                                // ],
                               ),
+
                               // monthCellStyle: DateRangePickerMonthCellStyle(
                               //   weekendDatesDecoration: BoxDecoration(
                               //       color: const Color(0xFFFEDF96),
@@ -807,18 +1131,54 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               // selectableDayPredicate: (val) {
                               //   return false;
                               // },
+
                               monthCellStyle: DateRangePickerMonthCellStyle(
-                                  weekendDatesDecoration: BoxDecoration(
-                                      color: const Color(0xFFFEDF96),
-                                      border: Border.all(
-                                          color: const Color(0xFFFEDF96), width: 1),
-                                      shape: BoxShape.circle),
-                                  weekendTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w400,
-                                  ),
+
+                                  // weekendDatesDecoration: BoxDecoration(
+                                  //     color: const Color(0xFFFEDF96),
+                                  //     border: Border.all(
+                                  //         color: const Color(0xFFFEDF96), width: 1),
+                                  //     shape: BoxShape.circle),
+                                  // weekendTextStyle: const TextStyle(
+                                  //   color: Colors.black,
+                                  //   fontSize: 16,
+                                  //   fontFamily: 'Poppins-Bold',
+                                  //   fontWeight: FontWeight.w400,
+                                  // ), cellDecoration: (DateTime date) {
+                                //                     if (_isHoliday(date)) {
+                                //                       return BoxDecoration(
+                                //                         color: const Color(0xFF7A12FF),
+                                //                         shape: BoxShape.circle,
+                                //                       );
+                                //                     } else if (_isSpecialDate(date)) {
+                                //                       return BoxDecoration(
+                                //                         color: const Color(0xFFFEDF96),
+                                //                         shape: BoxShape.circle,
+                                //                       );
+                                //                     }
+                                //                     return null;
+                                //                   },
+                                //                   cellTextStyle: (DateTime date) {
+                                //                     if (_isHoliday(date)) {
+                                //                       return TextStyle(
+                                //                         color: Colors.white,
+                                //                         fontFamily: 'Poppins-SemiBold',
+                                //                         fontSize: 15,
+                                //                       );
+                                //                     } else if (_isSpecialDate(date)) {
+                                //                       return TextStyle(
+                                //                         color: Colors.white,
+                                //                         fontFamily: 'Poppins-SemiBold',
+                                //                         fontSize: 15,
+                                //                       );
+                                //                     }
+                                //                     return TextStyle(
+                                //                       color: Colors.black,
+                                //                       fontFamily: 'Poppins-Regular',
+                                //                       fontSize: 15,
+                                //                     );
+                                //                   },
+
                                   disabledDatesTextStyle: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
@@ -832,6 +1192,15 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                       shape: BoxShape.circle),
                                   todayTextStyle:
                                       const TextStyle(color: Color(0xFF5F5F5F)),
+                                specialDatesDecoration: BoxDecoration(
+                                  color: const Color(0xFFFEDF96),
+                                  border: Border.all(
+                                    color: const Color(0xFFFEDF96),
+                                    width: 1,
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+
                                 // specialDatesDecoration: addAbsentDay
                                 //     ? BoxDecoration(
                                 //   color: const Color(0xFF7A12FF),
@@ -849,10 +1218,20 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               ),
 
                               selectionMode: DateRangePickerSelectionMode.multiple,
+                              selectionColor: const Color(0xFF7A12FF),
+                              rangeSelectionColor: const Color(0xFF7A12FF),
+                              rangeTextStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontFamily: 'Poppins-SemiBold',
+                                fontWeight: FontWeight.w400,
+                              ),
+
                               initialSelectedRange: PickerDateRange(
                                   DateTime.now().subtract(const Duration(days: 4)),
                                   DateTime.now().add(const Duration(days: 3))),
                             ),
+
                           ),
                         ),
                       ),
@@ -912,6 +1291,7 @@ class _VacationsScreenState extends State<VacationsScreen> {
                                           //   ),
                                           // ),
                                           TextField(
+                                            controller: _holidayNameController,
                                         style:
                                             TextStyle(color: Color(0xFF442B72)),
                                         // controller: _namesupervisor,
@@ -947,14 +1327,19 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 17),
-                                child: ElevatedSimpleButton(
+                                child:
+
+                                ElevatedSimpleButton(
                                     txt: 'Add'.tr,
                                     // fontFamily: 'Poppins-Regular',
                                     width: 100,
                                     hight: 50,
                                     onPress: () {
                                       AddAbsentDay = false;
-                                      setState(() {});
+                                      setState(() {
+                                        _addHolidayToFirestore(); //new
+
+                                      });
                                     },
                                     color: Color(0xFF442B72),
                                     fontSize: 16),
@@ -977,6 +1362,14 @@ class _VacationsScreenState extends State<VacationsScreen> {
                               //_selectedDates = [];
 
                             });
+                            _addHolidayToFirestore();
+                            isLoading ? Center(child: CircularProgressIndicator()) : Container();
+                            if (_addedHoliday != null)
+                              HolidayDetails(
+                            name: _addedHoliday!.name,
+                            fromDate: DateTime.parse(_addedHoliday!.fromDate),
+                            toDate: DateTime.parse(_addedHoliday!.toDate),
+                            );
                             // Dialoge.addAbsentCalenderDialog(context);
                           },
                           icon: Row(
@@ -997,89 +1390,126 @@ class _VacationsScreenState extends State<VacationsScreen> {
                   const SizedBox(
                     height: 40,
                   ),
+                  // _holidays.isEmpty
+                  //     ? Center(child: CircularProgressIndicator())
+                  //     :
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30.0),
                     child: Column(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 3,
-                              height: 55,
-                              color: const Color(0xFF442B72),
-                            ),
-                            const SizedBox(
-                              width: 18,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
+
+
+                        //old column to display holidays
+                        // Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     Text(
+                        //       '16 Aug. 2023'.tr,
+                        //       style: TextStyle(
+                        //         color: Color(0xFF4F4F4F),
+                        //         fontSize: 25,
+                        //         fontFamily: 'Poppins-Regular',
+                        //         fontWeight: FontWeight.w500,
+                        //         height: 1.53,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       'Ramadan Kareem'.tr,
+                        //       style: TextStyle(
+                        //         color: Color(0xFF442B72),
+                        //         fontSize: 14,
+                        //         fontFamily: 'Poppins-Light',
+                        //         fontWeight: FontWeight.w400,
+                        //         height: 2.38,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // )
+
+                        Column(
+                          children: _holidays.map((holiday) {
+                            return Row(
                               children: [
-                                Text(
-                                  '16 Aug. 2023'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF4F4F4F),
-                                    fontSize: 25,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.53,
-                                  ),
+                                Container(
+                                  width: 3,
+                                  height: 55,
+                                  color: const Color(0xFF442B72),
                                 ),
-                                Text(
-                                  'Ramadan Kareem'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 14,
-                                    fontFamily: 'Poppins-Light',
-                                    fontWeight: FontWeight.w400,
-                                    height: 2.38,
-                                  ),
+                                const SizedBox(
+                                  width: 18,
                                 ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))} - ${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.toDate))}',
+                                      style: TextStyle(
+                                        color: Color(0xFF505050),
+                                        fontSize: 20,
+                                        fontFamily: 'Poppins-Medium',
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.53,
+                                      ),
+                                    ),
+                                    Text(
+                                      holiday.name,
+                                      style: TextStyle(
+                                        color: Color(0xFF442B72),
+                                        fontSize: 14,
+                                        fontFamily: 'Poppins-Regular',
+                                        fontWeight: FontWeight.w400,
+                                        height: 2.38,
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
-                            )
-                          ],
+                            );
+                          }).toList(),
                         ),
                         const SizedBox(
                           height: 35,
                         ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 3,
-                              height: 55,
-                              color: const Color(0xFFFEDF96),
-                            ),
-                            const SizedBox(
-                              width: 18,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '4 Aug. 2023'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF4F4F4F),
-                                    fontSize: 25,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.53,
-                                  ),
-                                ),
-                                Text(
-                                  'Holiday'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFFFFC53D),
-                                    fontSize: 14,
-                                    fontFamily: 'Poppins-Light',
-                                    fontWeight: FontWeight.w400,
-                                    height: 2.38,
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
+                        // Row(
+                        //   children: [
+                        //     Container(
+                        //       width: 3,
+                        //       height: 55,
+                        //       color: const Color(0xFFFEDF96),
+                        //     ),
+                        //     const SizedBox(
+                        //       width: 18,
+                        //     ),
+                        //     Column(
+                        //       crossAxisAlignment: CrossAxisAlignment.start,
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         Text(
+                        //           '4 Aug. 2023'.tr,
+                        //           style: TextStyle(
+                        //             color: Color(0xFF4F4F4F),
+                        //             fontSize: 25,
+                        //             fontFamily: 'Poppins-Regular',
+                        //             fontWeight: FontWeight.w500,
+                        //             height: 1.53,
+                        //           ),
+                        //         ),
+                        //         Text(
+                        //           'Holiday'.tr,
+                        //           style: TextStyle(
+                        //             color: Color(0xFFFFC53D),
+                        //             fontSize: 14,
+                        //             fontFamily: 'Poppins-Light',
+                        //             fontWeight: FontWeight.w400,
+                        //             height: 2.38,
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     )
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
@@ -1275,135 +1705,132 @@ class _VacationsScreenState extends State<VacationsScreen> {
           ),
         ),
 
-        bottomNavigationBar: Directionality(
-          textDirection: TextDirection.ltr,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            ),
-            child: BottomAppBar(
-              color: const Color(0xFF442B72),
-              clipBehavior: Clip.antiAlias,
-              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(38.5),
-                      topRight: Radius.circular(38.5))),
-                  RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.all(Radius.circular(50)))),
-              //CircularNotchedRectangle(),
-              //shape of notch
-              notchMargin: 7,
-              child: SizedBox(
-                height: 50,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: SingleChildScrollView(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 2.0, vertical: 5),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              Navigator.pushReplacement(
+        bottomNavigationBar: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
+          child: BottomAppBar(
+            color: const Color(0xFF442B72),
+            clipBehavior: Clip.antiAlias,
+            shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(38.5),
+                    topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
+            //CircularNotchedRectangle(),
+            //shape of notch
+            notchMargin: 7,
+            child: SizedBox(
+              height: 50,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: SingleChildScrollView(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 2.0, vertical: 5),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                  maintainState: false),
+                            );
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset('assets/imgs/school/icons8_home_1 1.png',
+                                    height: 21, width: 21),
+                                Text("Home".tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => HomeScreen(),
-                                    maintainState: false),
-                              );
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset('assets/imgs/school/icons8_home_1 1.png',
-                                      height: 21, width: 21),
-                                  Text("Home".tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
+                                    builder: (context) => NotificationScreen(),
+                                    maintainState: false));
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset(
+                                    'assets/imgs/school/clarity_notification-line (1).png',
+                                    height: 22,
+                                    width: 22),
+                                Text('Notification'.tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => NotificationScreen(),
-                                      maintainState: false));
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset(
-                                      'assets/imgs/school/clarity_notification-line (1).png',
-                                      height: 22,
-                                      width: 22),
-                                  Text('Notification'.tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 100),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SupervisorScreen(),
+                                    maintainState: false));
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset('assets/imgs/school/empty_supervisor.png',
+                                    height: 22, width: 22),
+                                Text("Supervisor".tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 100),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SupervisorScreen(),
-                                      maintainState: false));
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset('assets/imgs/school/empty_supervisor.png',
-                                      height: 22, width: 22),
-                                  Text("Supervisor".tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 0),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BusScreen(),
+                                    maintainState: false));
+                            // _key.currentState!.openDrawer();
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset('assets/imgs/school/ph_bus-light (1).png',
+                                    height: 22, width: 22),
+                                Text("Buses".tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 0),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => BusScreen(),
-                                      maintainState: false));
-                              // _key.currentState!.openDrawer();
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset('assets/imgs/school/ph_bus-light (1).png',
-                                      height: 22, width: 22),
-                                  Text("Buses".tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

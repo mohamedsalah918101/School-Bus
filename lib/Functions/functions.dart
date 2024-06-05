@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
+import 'package:http/http.dart' as http;
 import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
 dynamic platform;
@@ -190,6 +192,62 @@ Future<bool> addSupervisorCheck(String phoneNumber) async {
     print('Error: $error');
     return false;
   }
+}
+String constructFCMPayload(String? token) {
+
+  return jsonEncode({
+    'token': token,
+    'data': {
+      'via': 'FlutterFire Cloud Messaging!!!',
+      'count': 1,
+    },
+    'notification': {
+      'title': 'Hello FlutterFire!',
+      'body': 'This notification (#) was created via FCM!',
+    },  "android": {
+      "notification": {
+        "channel_id": "notification"
+      }
+    }
+  });
+}
+Future<void> sendPushMessage(_token) async {
+  if (_token == null) {
+    print('Unable to send FCM message, no token exists.');
+    return;
+  }
+
+  try {
+    await http.post(
+      Uri.parse('https://api.rnfirebase.io/messaging/send'),
+
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization' : " key=AIzaSyDid2iv9pn1QZrPDCAbXGM7zTgcg6dWI1E",
+      },
+      body: constructFCMPayload(_token),
+    );
+    print('FCM request for device sent!');
+  } catch (e) {
+    print(e);
+  }
+}
+sendNotification(String token,String msg) async {
+
+  var request =await  http.post( Uri.parse("https://fcm.googleapis.com/fcm/send"),body:
+
+  jsonEncode({
+  'to' :token,
+  'notification':[{
+  'title' :'School Account',
+  'body' : msg,
+   // 'json_data': jsonEncode({"ddddd", true})
+    }]
+  }),headers: {'Authorization' :'key=AIzaSyDid2iv9pn1QZrPDCAbXGM7zTgcg6dWI1E',
+  'Content-Type': 'application/json'});
+  print(request.body.toString());
+
+
 }
 
 Future<bool> addParentCheck(String phoneNumber) async {
