@@ -9,6 +9,7 @@ import '../classes/custom_month_cell.dart';
 import '../components/elevated_icon_button.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/home_drawer.dart';
+import '../main.dart';
 import 'Holiday.dart';
 import 'busesScreen.dart';
 import 'calenderadd.dart';
@@ -99,6 +100,7 @@ String newDocId='';
         fromDate: _selectedHolidayDates.first.toIso8601String(),
         toDate: _selectedHolidayDates.last.toIso8601String(),
         selectedDates: selectedDates,
+
       );
 
       try {
@@ -176,7 +178,11 @@ String newDocId='';
 
     List<String> selectedDays = days.where((day) => day.isChecked).map((day) => day.name).toList();
 
-    await _weekendCollection.add({'days': selectedDays});
+    await _weekendCollection.add({'days': selectedDays,
+      'schoolid':sharedpref!.getString('id')
+    });
+
+
   }
   bool color = false;
   bool isVisible = false;
@@ -195,7 +201,7 @@ String newDocId='';
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
 
-    QuerySnapshot querySnapshot = await _weekendCollection.get();
+    QuerySnapshot querySnapshot = await _weekendCollection.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     if (querySnapshot.docs.isNotEmpty) {
       var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
       print("WEEKEND TEST");

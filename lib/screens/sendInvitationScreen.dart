@@ -86,7 +86,8 @@ class _SendInvitationState extends State<SendInvitation> {
         'invite':1,
         'busphoto': ' ',
         'schoolid':_schoolId,
-        'schoolname':sharedpref!.getString('nameEnglish')
+        'schoolname':sharedpref!.getString('nameEnglish'),
+         'photo':sharedpref!.getString('photo')
       };
       print('phonenum');
       print( _phoneNumberController.text);
@@ -166,10 +167,10 @@ bool _nameEntered =true;
   }
 
   bool isValidEmail(String email) {
-    final RegExp emailRegex = RegExp(
-        r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-    );
-    return emailRegex.hasMatch(email);
+    // Use a regular expression to check the email format
+    String pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
   }
 // to lock in landscape view
   @override
@@ -687,10 +688,13 @@ bool _nameEntered =true;
                               height: 44,
                               child: TextFormField(
                                 validator: (value) {
-                                  if (value != null && value.isNotEmpty && !isValidEmail(value)) {
-                                    return 'Please enter a valid email';
+                                  if (value == null || value.isEmpty) {
+                                    return null; // allow empty email field
                                   }
-                                  return null; // No error if empty or valid email
+                                  if (!isValidEmail(value)) {
+                                    return 'Invalid email address';
+                                  }
+                                  return null;
                                 },
                                 controller: _emailController,
                                 focusNode: _emailSupervisorFocus,
@@ -751,7 +755,7 @@ bool _nameEntered =true;
                                  async {
 
                                    setState(() {
-                                     if (_nameController.text.isEmpty) {
+                                     if (_nameController.text.trim().isEmpty) {
                                        nameerror = false;
                                      } else {
                                        nameerror = true;
@@ -764,9 +768,9 @@ bool _nameEntered =true;
                                      // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
                                      // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                    });
-                                   if(nameerror &&_formKey.currentState!.validate()
+                                   if(nameerror &&
                                   // ! _nameController.text.isEmpty
-                                       &&
+
                                        //! _phoneNumberController.text.isEmpty
                                    _phoneNumberController.text.length == 10 && phoneerror){
                                      _addDataToFirestore();
@@ -780,7 +784,7 @@ bool _nameEntered =true;
                                      }
                                    }
                                    else{
-                                     SnackBar(content: Text('Please,enter valid number'));
+                                     SnackBar(content: Text('Please,enter valid name and phone number'));
                                    }
                                 //   _addDataToFirestore();
                                   },
