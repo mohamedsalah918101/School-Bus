@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/components/reciver_message_item.dart';
 import 'package:school_account/supervisor_parent/components/sender_message_item.dart';
@@ -378,6 +379,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                             "txt": msgText.text.toString(),
                             "time": formattedTime,
                           });
+                          sendPushMessage("eGyy6TIfS0y_CxplD_gb2k:APA91bH4Z4p9zu2GgnFl4gPODxw34kXvU7axi2xTjhizswv6UgH-V_mE9JeNgE17JorjgMKvTHbetm5Hwy11LM7A73YEAp6HygHViLEpAf6pW5fkaEPoC7U6h4QF81-TFrUxGxyuwFhTjjshsghshs");
                           msgText.clear();
                         },
                         child: Icon(

@@ -39,36 +39,9 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   var fbm = FirebaseMessaging.instance ;
   bool dataLoading=false;
 
-  sendNotify( String tittle, String body , String id) async{
-    await http.post(
-      Uri.parse('https://api.rnfirebase.io/messaging/send'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        // 'Authorization': 'key=$serv',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'notification':<String, dynamic>{
-          'body': body.toString(),
-          'tittle': tittle.toString()
-        },
-        'priority': 'high'   ,
-        'data' : <String, dynamic>{
-          'click_action' : 'FLUTTER_NOTIFICATION_CLICK',
-          'id' : id.toString()
-        },
-        'to': await FirebaseMessaging.instance.getToken()
-      },),
-    );
-  }
 
-  getMassege(){
-    FirebaseMessaging.onMessage.listen((message) {
-      print('message================');
-      print('${message.notification!.title}');
-      print('${message.notification!.body}');
-      print('${message.data['name']}');
-    });
-  }
+
+
 
 
   getData()async{
@@ -86,25 +59,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
 
   @override
   void initState() {
-    getMassege();
-    fbm.getToken().then((token) {
-      print('token===========================================');
-      print(token);
-      print('token');
-    });
-    FirebaseMessaging.onMessage.listen((event) {
-      print('notification===========================================');
-      print("${event.notification!.body}");
-      print('notification===========================================');
-    });
 
-    FirebaseMessaging.onMessage.listen((event) {
-      print('notification===========================================');
-      print("${event.notification!.body}");
-      print('notification===========================================');
-      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("${event.notification!.body}")));
-
-    });
 
     getData();
     super.initState();
@@ -249,7 +204,6 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     isStarting =
                                     // children.isNotEmpty?
                                     true;
-                                    sendNotify('tittle', 'body', 'id');
 
                                     // no data
                                     // : false;

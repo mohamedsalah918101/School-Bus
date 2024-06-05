@@ -14,12 +14,6 @@ import 'Functions/notifications.dart';
 import 'controller/local_controller.dart';
 
 SharedPreferences? sharedpref;
-Future backgroundMessage(RemoteMessage message) async{
-  print('background===========================================');
-  print('${message.notification!.body}');
-  print('background===========================================');
-
-}
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,14 +29,10 @@ void main()async {
         measurementId: "G-3YG0J7RYWM"
     ),
   );
-  
-  FirebaseMessaging.onBackgroundMessage(backgroundMessage );
-  
-  
-  
   sharedpref = await SharedPreferences.getInstance();
   var token = await FirebaseMessaging.instance.getToken();
   var fcm = token.toString();
+  print(fcm.toString()+'jjshsghshs');
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
     announcement: false,
@@ -73,8 +63,8 @@ class MyApp extends StatelessWidget{
       debugShowCheckedModeBanner: false,
 
 
-     home:
-     // HomeForSupervisor(),
+      home:
+      // HomeForSupervisor(),
 
 
       // home:SplashScreen(),
