@@ -316,22 +316,22 @@ class _EditeProfileState extends State<EditeProfile> {
                 ),
               ),
               //icon menu and drawer
-              // actions: [
-              //   Padding(
-              //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              //     child:
-              //     InkWell(
-              //       onTap: (){
-              //         _scaffoldKey.currentState!.openEndDrawer();
-              //       },
-              //       child: const Icon(
-              //         Icons.menu_rounded,
-              //         color: Color(0xff442B72),
-              //         size: 35,
-              //       ),
-              //     ),
-              //   ),
-              // ],
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child:
+                  InkWell(
+                    onTap: (){
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    child: const Icon(
+                      Icons.menu_rounded,
+                      color: Color(0xff442B72),
+                      size: 35,
+                    ),
+                  ),
+                ),
+              ],
               title: Text(
                 'Edit Profile'.tr,
                 style: const TextStyle(
@@ -470,11 +470,14 @@ class _EditeProfileState extends State<EditeProfile> {
 
                                         // Check if data contains photo URL
                                         if (data != null && data.containsKey('photo')) {
-                                          return Image.network(
-                                            data['photo'],
-                                            fit: BoxFit.fill,
-                                            width: 90,
-                                            height: 90,
+                                          return ClipOval(
+                                            child: Image.network(
+                                              data['photo'],
+                                              //fit: BoxFit.fill,
+                                              width: 90,
+                                              height: 90,
+                                              fit: BoxFit.cover,
+                                            ),
                                           );
                                         } else {
                                           return Image.asset(
@@ -574,41 +577,7 @@ class _EditeProfileState extends State<EditeProfile> {
                       //     ],
                       //   ),
                       // ),
-                      Positioned(
-                        top:15,
-                        right: 5,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>EditeProfile()));
 
-                          },
-
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              side: BorderSide(color: Color(0xff432B72)),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Image.asset("assets/imgs/school/icons8_edit_1 1 (1).png",width: 17,height: 17,),
-                              // Transform(
-                              //   alignment: Alignment.center,
-                              //   transform: Matrix4.rotationY(math.pi),
-                              //   child:
-                              //   Icon(Icons.edit_outlined, color: Color(0xFF442B72), size: 20),
-                              // ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Edit',
-                                style: TextStyle(color: Color(0xff432B72), fontSize: 16, fontFamily: "Poppins-Regular"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
                   ),
 

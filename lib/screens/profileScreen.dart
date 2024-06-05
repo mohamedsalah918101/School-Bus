@@ -259,23 +259,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
 
               ),
-              //menu icon and drawer
-              // actions: [
-              //   Padding(
-              //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              //     child:
-              //     InkWell(
-              //       onTap: (){
-              //         _scaffoldKey.currentState!.openEndDrawer();
-              //       },
-              //       child: const Icon(
-              //         Icons.menu_rounded,
-              //         color: Color(0xff442B72),
-              //         size: 35,
-              //       ),
-              //     ),
-              //   ),
-              // ],
+           //   menu icon and drawer
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child:
+                  InkWell(
+                    onTap: (){
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    child: const Icon(
+                      Icons.menu_rounded,
+                      color: Color(0xff442B72),
+                      size: 35,
+                    ),
+                  ),
+                ),
+              ],
               title: Text('Profile'.tr ,
                 style: const TextStyle(
                   color: Color(0xFF993D9A),
@@ -413,11 +413,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                           // Check if data contains photo URL
                                           if (data != null && data.containsKey('photo')) {
-                                            return Image.network(
-                                              data['photo'],
-                                              fit: BoxFit.fill,
-                                              width: 90,
-                                              height: 90,
+                                            return ClipOval(
+                                              child: Image.network(
+                                                data['photo'],
+                                                fit: BoxFit.cover,
+                                                width: 90,
+                                                height: 90,
+                                              ),
                                             );
                                           } else {
                                             return Image.asset(

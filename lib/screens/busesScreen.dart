@@ -38,6 +38,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'editeBus.dart';
 import 'homeScreen.dart';
 import 'dart:math' as math;
@@ -55,8 +56,29 @@ class BusScreen extends StatefulWidget{
 
 
 class BusScreenSate extends State<BusScreen> {
-  //fun to make call
 
+  //func to get current schoolid
+  String? _schoolId;
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLID$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
+
+  //fun to make call
   void _makePhoneCall(String phoneNumber) async {
     var mobileCall = 'tel:$phoneNumber';
     if (await canLaunchUrlString(mobileCall)) {
@@ -69,8 +91,26 @@ class BusScreenSate extends State<BusScreen> {
   List<QueryDocumentSnapshot<Object?>> filteredQuerySnapshots = [];
 
   List data=[];
-  getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
+  // getData()async{
+  //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('busdata').get();
+  //   data.addAll(querySnapshot.docs);
+  //   setState(() {
+  //     data = querySnapshot.docs;
+  //     // Initialize filteredData with a copy of data
+  //     filteredData = List.from(data);
+  //
+  //     // Cast filteredData to List<QueryDocumentSnapshot<Object?>>
+  //     filteredQuerySnapshots =
+  //         filteredData.cast<QueryDocumentSnapshot<Object?>>();
+  //     //filteredData = List.from(data);
+  //   });
+  // }
+  getData() async {
+   // Get the current school ID from SharedPreferences
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('busdata')
+        .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
+        .get();
     data.addAll(querySnapshot.docs);
     setState(() {
       data = querySnapshot.docs;
@@ -80,7 +120,6 @@ class BusScreenSate extends State<BusScreen> {
       // Cast filteredData to List<QueryDocumentSnapshot<Object?>>
       filteredQuerySnapshots =
           filteredData.cast<QueryDocumentSnapshot<Object?>>();
-      //filteredData = List.from(data);
     });
   }
   void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ,List<dynamic>supervisors) {
@@ -203,8 +242,10 @@ class BusScreenSate extends State<BusScreen> {
 // to lock in landscape view
   @override
   void initState() {
-    getData();
+
     super.initState();
+    getSchoolId();
+    getData();
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -414,9 +455,9 @@ class BusScreenSate extends State<BusScreen> {
                                                           Container(
                                                             child:  DropdownRadiobutton(
                                                               items: [
-                                                                DropdownCheckboxItem(label: 'Bus Number'),
-                                                                DropdownCheckboxItem(label: 'Driver Name'),
-                                                                DropdownCheckboxItem(label: 'Supervisor'),
+                                                                DropdownCheckboxItem(label: 'Bus Number'.tr),
+                                                                DropdownCheckboxItem(label: 'Driver Name'.tr),
+                                                                DropdownCheckboxItem(label: 'Supervisor'.tr),
                                                               ],
                                                               selectedItems: selectedItems,
                                                               onSelectionChanged: (items) {
@@ -480,7 +521,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                           print('1');
                                                                         }
                                                                       },
-                                                                      child: Text('Apply',style: TextStyle(fontSize:18),)
+                                                                      child: Text('Apply'.tr,style: TextStyle(fontSize:18),)
 
                                                                   ),
                                                                 ),
@@ -492,7 +533,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                     onTap: (){
                                                                       getData();
                                                                       Navigator.pop(context);
-                                                                    },child: Text("Reset",style: TextStyle(color: Color(0xFF442B72),fontSize: 20),)),
+                                                                    },child: Text("Reset".tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 20),)),
                                                               )
                                                             ],
                                                           ),
@@ -606,21 +647,24 @@ class BusScreenSate extends State<BusScreen> {
                                                           children: [
                                                             ListTile(
                                                               leading:imageUrl.isNotEmpty
-                                                                  ? Image.network(
+                                                                  ? ClipOval(
+                                                                    child: Image.network(
                                                                 imageUrl,
                                                                 width: 61,
                                                                 height: 61,
+                                                                      fit: BoxFit.cover,
                                                                 errorBuilder: (context, error, stackTrace) {
-                                                                  // Display a default image if loading fails
-                                                                  return Image.asset(
-                                                                    defaultImageAsset,
-                                                                    width: 61,
-                                                                    height: 61,
-                                                                    fit: BoxFit.cover,
-                                                                  );
+                                                                    // Display a default image if loading fails
+                                                                    return Image.asset(
+                                                                      defaultImageAsset,
+                                                                      width: 61,
+                                                                      height: 61,
+                                                                      fit: BoxFit.cover,
+                                                                    );
                                                                 },
-                                                                fit: BoxFit.cover,
-                                                              )
+                                                                //fit: BoxFit.cover,
+                                                              ),
+                                                                  )
                                                                   : Image.asset(
                                                                 defaultImageAsset,
                                                                 width: 61,

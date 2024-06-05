@@ -18,6 +18,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -31,6 +32,30 @@ class AddBus extends StatefulWidget{
 
 
 class _AddBusState extends State<AddBus> {
+
+
+
+//fun to get current schoolid
+  String? _schoolId;
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLID$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
+
 
   MyLocalController ControllerLang = Get.find();
   String? _selectedSupervisor;
@@ -92,20 +117,37 @@ class _AddBusState extends State<AddBus> {
       //Some error occurred
     }
   }
+
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
-  getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+  // getData()async{
+  //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+  //       .get();
+  //
+  //  // data.addAll(querySnapshot.docs);
+  //   for(int i=0;i<querySnapshot.docs.length;i++)
+  //     {
+  //       items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber')));
+  //     }
+  //   setState(() {
+  //
+  //   });
+  // }
+  getData() async {
+     // Get the current school ID from SharedPreferences
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('supervisor')
+        .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
+        .where('state', isEqualTo: 1) // Example condition
         .get();
 
-   // data.addAll(querySnapshot.docs);
-    for(int i=0;i<querySnapshot.docs.length;i++)
-      {
-        items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber')));
-      }
-    setState(() {
-
-    });
+    for (int i = 0; i < querySnapshot.docs.length; i++) {
+      items.add(DropdownCheckboxItem(
+          label: querySnapshot.docs[i].get('name'),
+          docID: querySnapshot.docs[i].id,
+          phone: querySnapshot.docs[i].get('phoneNumber')));
+    }
+    setState(() {});
   }
   //fun image bus from gallery
   Future _pickBusImageFromGallery() async{
@@ -164,6 +206,7 @@ class _AddBusState extends State<AddBus> {
       'supervisors':supervisorsList,
       'imagedriver':imageUrl ??'',
       'busphoto':busimage ??'',
+      'schoolid':_schoolId
     };
     // Add the data to the Firestore collection
     await _firestore.collection('busdata').add(data).then((docRef) {
@@ -196,6 +239,7 @@ class _AddBusState extends State<AddBus> {
   @override
   void initState() {
     super.initState();
+    getSchoolId();
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,

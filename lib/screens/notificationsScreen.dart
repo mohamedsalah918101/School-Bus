@@ -42,7 +42,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           messageType: "Alarm",
           messageTime: '03:35 PM'),
     ];
-    List dates = ['Today', 'Yesterday'];
+    List dates = ['Today'.tr, 'Yesterday'.tr];
     return SafeArea(
       child: Scaffold(
         endDrawer: HomeDrawer(),

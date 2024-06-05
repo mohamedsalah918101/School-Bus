@@ -265,10 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 );
                                               },
                                               child:
-                                              data['photo'] != null ? Image.network(data['photo'], width: 61, height: 61,
-                                                errorBuilder: (context, error, stackTrace) {
-                                                  return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
-                                                },
+                                              data['photo'] != null ? ClipOval(
+                                                child: Image.network(data['photo'], width: 61, height: 61,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                                  },
+                                                ),
                                               ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
                                             ),
                                             title: Text(
@@ -345,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Align(alignment: AlignmentDirectional.bottomStart,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(left: 10),
-                                                    child: Text("Buses",style: TextStyle(fontSize: 16,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
+                                                    child: Text("Buses".tr,style: TextStyle(fontSize: 14,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
                                                   )),
                                               Align(alignment: AlignmentDirectional.bottomStart,
                                                   child: Padding(
@@ -417,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Align(alignment: AlignmentDirectional.bottomStart,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(left: 10),
-                                                    child: Text("Supervisors",style: TextStyle(fontSize: 16,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
+                                                    child: Text("Supervisors".tr,style: TextStyle(fontSize: 14,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
                                                   )),
                                               Align(alignment: AlignmentDirectional.bottomStart,
                                                   child: Padding(
@@ -478,7 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Expanded(
                                         child: Align(alignment: AlignmentDirectional.centerStart,
-                                            child: Text("Parents",style: TextStyle(color: Color(0xff442B72)
+                                            child: Text("Parents".tr,style: TextStyle(color: Color(0xff442B72)
                                                 ,fontSize: 16,fontFamily:"Poppins-SemiBold" ),)),
                                       ),
                                       GestureDetector(
@@ -486,7 +489,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Navigator.push(context, MaterialPageRoute(builder: (context)=>ParentsScreen()));
                                         },
                                         child: Align(alignment: AlignmentDirectional.centerEnd,
-                                            child: Text("Show all", style: TextStyle(
+                                            child: Text("Show all".tr, style: TextStyle(
                                               fontFamily: "Poppins-Regular",
                                               fontSize: 15,
                                               color: Color(0xff442B72),

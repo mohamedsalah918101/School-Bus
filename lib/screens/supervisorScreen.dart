@@ -22,6 +22,7 @@ import '../components/home_drawer.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'homeScreen.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
@@ -39,6 +40,26 @@ class SupervisorScreen extends StatefulWidget {
 }
 
 class SupervisorScreenSate extends State<SupervisorScreen> {
+//fun to get current schoolid
+  String? _schoolId;
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLID$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
 
 
   String busNumber = '';
@@ -105,8 +126,20 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   }
 // to lock in landscape view
   List<QueryDocumentSnapshot> data = [];
-  getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').get();
+  // getData()async{
+  //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').get();
+  //   data.addAll(querySnapshot.docs);
+  //   setState(() {
+  //     data = querySnapshot.docs;
+  //     filteredData = List.from(data);
+  //   });
+  // }
+  getData() async {
+    //String currentSchoolId = sharedpref!.getString('id'); // Get the current school ID from SharedPreferences
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('supervisor')
+        .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
+        .get();
     data.addAll(querySnapshot.docs);
     setState(() {
       data = querySnapshot.docs;
@@ -159,6 +192,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
    // supervisorsStream = FirebaseFirestore.instance.collection('supervisor').snapshots();
     // responsible
+    getSchoolId();
   getData();
     // setState(() {
     //   filteredData = data;
@@ -446,11 +480,11 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                           child: DropdownRadiobutton(
                                                             items: [
                                                               DropdownCheckboxItem(
-                                                                  label: 'Accepted'),
+                                                                  label: 'Accepted'.tr),
                                                               DropdownCheckboxItem(
-                                                                  label: 'Declined'),
+                                                                  label: 'Declined'.tr),
                                                               DropdownCheckboxItem(
-                                                                  label: 'Waiting'),
+                                                                  label: 'Waiting'.tr),
                                                             ],
                                                             selectedItems:
                                                                 selectedItems,
@@ -507,7 +541,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                 ),
                                                                 child: GestureDetector(
                                                                   child: Text(
-                                                                    'Apply',
+                                                                    'Apply'.tr,
                                                                     style: TextStyle(
                                                                         fontSize: 18),
                                                                   ),
@@ -546,7 +580,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                     Navigator.pop(context);
                                                                 },
                                                                 child: Text(
-                                                                  "Reset",
+                                                                  "Reset".tr,
                                                                   style: TextStyle(
                                                                       color: Color(
                                                                           0xFF442B72),
@@ -668,24 +702,27 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 //                                             );
 //                                           }
                                                   filteredData[index]['busphoto'] != null ?
-                                                  Image.network(filteredData[index]['busphoto']as String, width: 61, height: 61,
-                                                    errorBuilder: (context, error, stackTrace) {
-                                                      return Container(
-                                                          width:50,
-                                                          height:40,
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            border: Border.all(
-                                                              color: Color(0xffCCCCCC),
-                                                              width: 2.0,
+                                                  ClipOval(
+                                                    child: Image.network(filteredData[index]['busphoto']as String, width: 61, height: 61,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (context, error, stackTrace) {
+                                                        return Container(
+                                                            width:50,
+                                                            height:40,
+                                                            decoration: BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              border: Border.all(
+                                                                color: Color(0xffCCCCCC),
+                                                                width: 2.0,
+                                                              ),
                                                             ),
-                                                          ),
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.only(top:10,bottom: 3),
-                                                            child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
-                                                          ));
-                                                      //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
-                                                    },
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                              child: Image.asset("assets/imgs/school/Vector (16).png",width: 15,height: 15,),
+                                                            ));
+                                                        //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                                      },
+                                                    ),
                                                   ):
                                                   //Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
                                                   Container(

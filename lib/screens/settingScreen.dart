@@ -14,6 +14,7 @@ import '../components/dialogs.dart';
 import '../components/elevated_icon_button.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/home_drawer.dart';
+import '../controller/local_controller.dart';
 import '../main.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  MyLocalController ControllerLang = Get.find();
   //fun delete account
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -204,7 +206,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                         ],
-                      )),
+                      ),
+              onTap: (){
+      ControllerLang.ChangeLang('ar');
+      },
+                      ),
                       Container(
                         width: double.infinity,
                         decoration: const ShapeDecoration(
@@ -241,7 +247,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                         ],
-                      )),
+                      ),
+                        onTap: () {
+                          ControllerLang.ChangeLang('en');
+                        },
+                      ),
+
                     ],
                   ),
                 ),

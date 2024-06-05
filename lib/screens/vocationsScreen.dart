@@ -506,7 +506,7 @@ String newDocId='';
                       ),
                     ),
 
-                    //SizedBox(width: 80,),
+                    SizedBox(width: 40,),
                     Row(
                       //mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -1050,7 +1050,7 @@ String newDocId='';
                           child: IgnorePointer(
                             ignoring: !isAddingHoliday,
                             child: SfDateRangePicker(
-
+                              allowViewNavigation: true,
                               //new
                              // onSelectionChanged: _onDateRangeSelected,
 
@@ -1081,7 +1081,7 @@ String newDocId='';
                                   ),
                                 ),
                                specialDates: highlightedDates,
-
+                            //   weekendDays: ,
                                 // weekendDays: const [5, 6],
                                 // specialDates: [
                                 //   DateTime(2024, 03, 3),
@@ -1200,6 +1200,15 @@ String newDocId='';
                                   ),
                                   shape: BoxShape.circle,
                                 ),
+                                //لون الويكند بالموف
+                                // weekendDatesDecoration: BoxDecoration(
+                                //   color: const Color(0xFF7A12FF),
+                                //   border: Border.all(
+                                //     color: const Color(0xFF7A12FF),
+                                //     width: 1,
+                                //   ),
+                                //   shape: BoxShape.circle,
+                                // ),
 
                                 // specialDatesDecoration: addAbsentDay
                                 //     ? BoxDecoration(
@@ -1433,7 +1442,7 @@ String newDocId='';
                               children: [
                                 Container(
                                   width: 3,
-                                  height: 55,
+                                  height: 48,
                                   color: const Color(0xFF442B72),
                                 ),
                                 const SizedBox(
@@ -1444,7 +1453,9 @@ String newDocId='';
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))} - ${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.toDate))}',
+                                      holiday.fromDate == holiday.toDate
+                                          ? '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))}'
+                                          : '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))} to ${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.toDate))}',
                                       style: TextStyle(
                                         color: Color(0xFF505050),
                                         fontSize: 20,
