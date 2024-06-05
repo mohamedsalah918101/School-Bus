@@ -44,6 +44,8 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
   late Timer _timer;
   late DateTime estimatedArrivalTime;
   String remainingTime = '';
+  final _firestore = FirebaseFirestore.instance;
+
 
 
   // Define target location (example coordinates)
@@ -984,11 +986,49 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                             ),
                                                           ),
                                                         ),
-                                                  Image.asset(
-                                                    'assets/images/Ellipse 6.png',
-                                                    width: 50,
-                                                    height: 50,
+                                                  FutureBuilder(
+                                                    future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                      if (snapshot.hasError) {
+                                                        return Text('Something went wrong');
+                                                      }
+
+                                                      if (snapshot.connectionState == ConnectionState.done) {
+                                                        if (snapshot.data?.data() == null) {
+                                                          return Text(
+                                                            'No data available',
+                                                            style: TextStyle(
+                                                              color: Color(0xff442B72),
+                                                              fontSize: 12,
+                                                              fontFamily: 'Poppins-Regular',
+                                                              fontWeight: FontWeight.w400,
+                                                            ),
+                                                          );
+                                                        }
+
+                                                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                                        sharedpref?.getString('lang') == 'en';
+                                                        return
+                                                          CircleAvatar(
+                                                            radius: 25,
+                                                            backgroundColor: Color(0xff442B72),
+                                                            child: CircleAvatar(
+                                                              backgroundImage:
+                                                              NetworkImage('${data['busphoto'] }'),
+                                                              radius: 25,
+                                                            ),
+                                                          );
+                                                      }
+
+                                                      return Container();
+                                                    },
                                                   ),
+                                                  // Image.asset(
+                                                  //   'assets/images/Ellipse 6.png',
+                                                  //   width: 50,
+                                                  //   height: 50,
+                                                  // ),
                                                   SizedBox(
                                                     width: 15,
                                                   ),
@@ -1101,11 +1141,49 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Image.asset(
-                                                      'assets/images/Ellipse 6.png',
-                                                      width: 50,
-                                                      height: 50,
+                                                    FutureBuilder(
+                                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                        if (snapshot.hasError) {
+                                                          return Text('Something went wrong');
+                                                        }
+
+                                                        if (snapshot.connectionState == ConnectionState.done) {
+                                                          if (snapshot.data?.data() == null) {
+                                                            return Text(
+                                                              'No data available',
+                                                              style: TextStyle(
+                                                                color: Color(0xff442B72),
+                                                                fontSize: 12,
+                                                                fontFamily: 'Poppins-Regular',
+                                                                fontWeight: FontWeight.w400,
+                                                              ),
+                                                            );
+                                                          }
+
+                                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                                          sharedpref?.getString('lang') == 'en';
+                                                          return
+                                                            CircleAvatar(
+                                                              radius: 25,
+                                                              backgroundColor: Color(0xff442B72),
+                                                              child: CircleAvatar(
+                                                                backgroundImage:
+                                                                NetworkImage('${data['busphoto'] }'),
+                                                                radius: 25,
+                                                              ),
+                                                            );
+                                                        }
+
+                                                        return Container();
+                                                      },
                                                     ),
+                                                    // Image.asset(
+                                                    //   'assets/images/Ellipse 6.png',
+                                                    //   width: 50,
+                                                    //   height: 50,
+                                                    // ),
                                                     SizedBox(
                                                       width: 15,
                                                     ),
@@ -1300,56 +1378,62 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                             SizedBox(
                               height: 30,
                             ),
-                            Text(
-                              'Bus photos'.tr,
-                              style: TextStyle(
-                                color: Color(0xFF432B72),
-                                fontSize: 17,
-                                fontFamily: 'Poppins-SemiBold',
-                                fontWeight: FontWeight.w600,
-                                height: 0.94,
+                            Padding(
+                              padding: const EdgeInsets.only(left: 22.0),
+                              child: Text(
+                                'Bus photos'.tr,
+                                style: TextStyle(
+                                  color: Color(0xFF432B72),
+                                  fontSize: 17,
+                                  fontFamily: 'Poppins-SemiBold',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0.94,
+                                ),
                               ),
                             ),
                             SizedBox(
                               height: 12,
                             ),
-                            Container(
-                                height: 170,
-                                child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: <Widget>[
-                                    InteractiveViewer(
-                                        child:(_photobus == null || _photobus == '') ?
-                                        Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                        Image.network(_photobus!,width: 144,height: 154.42,fit: BoxFit.cover,)
-                                    ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 22.0),
+                              child: Container(
+                                  height: 170,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: <Widget>[
+                                      InteractiveViewer(
+                                          child:(_photobus == null || _photobus == '') ?
+                                          Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                          Image.network(_photobus!,width: 144,height: 154.42,fit: BoxFit.cover,)
+                                      ),
 
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    // InteractiveViewer(
-                                    //     child:(_photobus == null || _photobus == '') ?
-                                    //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                    //     Image.network(_photobus!,width: 104,height: 111.53,)
-                                    // ),
-                                    // SizedBox(
-                                    //   width: 10,
-                                    // ),
-                                    // InteractiveViewer(
-                                    //     child:(_photobus == null || _photobus == '') ?
-                                    //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                    //     Image.network(_photobus!,width: 104,height: 111.53,)
-                                    // ),
-                                    // SizedBox(
-                                    //   width: 10,
-                                    // ),
-                                    // InteractiveViewer(
-                                    //     child:(_photobus == null || _photobus == '') ?
-                                    //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                    //     Image.network(_photobus!,width: 104,height: 111.53,)
-                                    // ),
-                                  ],
-                                )),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      // InteractiveViewer(
+                                      //     child:(_photobus == null || _photobus == '') ?
+                                      //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                      //     Image.network(_photobus!,width: 104,height: 111.53,)
+                                      // ),
+                                      // SizedBox(
+                                      //   width: 10,
+                                      // ),
+                                      // InteractiveViewer(
+                                      //     child:(_photobus == null || _photobus == '') ?
+                                      //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                      //     Image.network(_photobus!,width: 104,height: 111.53,)
+                                      // ),
+                                      // SizedBox(
+                                      //   width: 10,
+                                      // ),
+                                      // InteractiveViewer(
+                                      //     child:(_photobus == null || _photobus == '') ?
+                                      //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                      //     Image.network(_photobus!,width: 104,height: 111.53,)
+                                      // ),
+                                    ],
+                                  )),
+                            ),
                             SizedBox(
                               height: 44,
                             )

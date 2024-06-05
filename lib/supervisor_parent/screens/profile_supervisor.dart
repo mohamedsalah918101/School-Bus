@@ -286,7 +286,7 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
           key: formState,
           child: SingleChildScrollView(
               child:
-              // children.isNotEmpty?
+              sharedpref!.getInt('invit') == 1 ?
               Column(
                 children: [
                   Row(
@@ -843,32 +843,102 @@ class _ProfileSupervisorScreenState extends State<ProfileSupervisorScreen> {
                 ],
               )
             //no data
-            // :
-            // Center(
-            //   child: Column(
-            //        children: [
-            //          SizedBox(height: 25,),
-            //          Image.asset('assets/images/Group 237679.png',
-            //          width: 97,
-            //          height: 97,),
-            //          Text('Atef Latif',
-            //          style: TextStyle(
-            //              color: Color(0xff442B72),
-            //              fontSize: 20,
-            //              fontFamily: 'Poppins-SemiBold',
-            //              fontWeight: FontWeight.w600
-            //          ),),
-            //          Text('0128361532',
-            //            style: TextStyle(
-            //                color: Color(0xff442B72),
-            //                fontSize: 12,
-            //                fontFamily: 'Poppins-Light',
-            //                fontWeight: FontWeight.w400
-            //            ),
-            //          )
-            //        ],
-            //   ),
-            // )
+            :
+            Center(
+              child: Column(
+                   children: [
+                     SizedBox(height: 25,),
+                     Image.asset('assets/images/Group 237679.png',
+                     width: 97,
+                     height: 97,),
+                     // Text('Atef Latif',
+                     // style: TextStyle(
+                     //     color: Color(0xff442B72),
+                     //     fontSize: 20,
+                     //     fontFamily: 'Poppins-SemiBold',
+                     //     fontWeight: FontWeight.w600
+                     // ),),
+                     FutureBuilder(
+                       future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                         if (snapshot.hasError) {
+                           return Text('Something went wrong');
+                         }
+
+                         if (snapshot.connectionState == ConnectionState.done) {
+                           if (snapshot.data?.data() == null) {
+                             return Text(
+                               'No data available',
+                               style: TextStyle(
+                                 color: Color(0xff442B72),
+                                 fontSize: 12,
+                                 fontFamily: 'Poppins-Regular',
+                                 fontWeight: FontWeight.w400,
+                               ),
+                             );
+                           }
+
+                           Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                           return Text(
+                             '${data['name']}',
+                             style: TextStyle(
+                               color: Color(0xff442B72),
+                                   fontSize: 20,
+                                   fontFamily: 'Poppins-SemiBold',
+                                   fontWeight: FontWeight.w600
+                             ),
+                           );
+                         }
+
+                         return Container();
+                       },
+                     ),
+                     // Text('0128361532',
+                     //   style: TextStyle(
+                     //       color: Color(0xff442B72),
+                     //       fontSize: 12,
+                     //       fontFamily: 'Poppins-Light',
+                     //       fontWeight: FontWeight.w400
+                     //   ),
+                     // )
+                     FutureBuilder(
+                       future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                         if (snapshot.hasError) {
+                           return Text('Something went wrong');
+                         }
+
+                         if (snapshot.connectionState == ConnectionState.done) {
+                           if (snapshot.data?.data() == null) {
+                             return Text(
+                               'No data available',
+                               style: TextStyle(
+                                 color: Color(0xff442B72),
+                                       fontSize: 12,
+                                       fontFamily: 'Poppins-Light',
+                                       fontWeight: FontWeight.w400
+                               ),
+                             );
+                           }
+
+                           Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                           return Text(
+                             '${data['phoneNumber']}',
+                             style: TextStyle(
+                               color: Color(0xff442B72),
+                                     fontSize: 12,
+                                     fontFamily: 'Poppins-Light',
+                                     fontWeight: FontWeight.w400
+                             ),
+                           );
+                         }
+
+                         return Container();
+                       },
+                     ),
+                   ],
+              ),
+            )
           ),
         ),
         resizeToAvoidBottomInset: false,

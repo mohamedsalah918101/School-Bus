@@ -39,6 +39,42 @@ class _ParentsViewState extends State<ParentsView> {
   String? currentFilter;
   TextEditingController _searchController = TextEditingController();
   String SearchQuery = '';
+  String getJoinText(Timestamp joinDate) {
+    final now = DateTime.now();
+    final joinDateTime = joinDate.toDate();
+    final difference = now.difference(joinDateTime).inDays;
+
+    if (difference == 0) {
+      return 'Today';
+    } else if (difference == 1) {
+      return 'Yesterday';
+    } else if (difference < 7) {
+      return '${difference} days ago';
+    } else {
+      return '${joinDateTime.day}/${joinDateTime.month}/${joinDateTime.year}';
+    }
+  }
+
+
+   // DateTime? joinDate;
+
+  // String getJoinText(DateTime? joinDate) {
+  //   if (joinDate == null) {
+  //     return 'join date is not available';
+  //   }
+  //
+  //   final now = DateTime.now();
+  //   final difference = now.difference(joinDate).inDays;
+  //
+  //   if (difference == 0) {
+  //     return 'joined today';
+  //   } else if (difference == 1) {
+  //     return 'joined yesterday';
+  //   } else {
+  //     return 'joined $difference days ago';
+  //   }
+  // }
+
 
   void _deleteSupervisorDocument(String documentId) {
     FirebaseFirestore.instance
@@ -150,7 +186,40 @@ class _ParentsViewState extends State<ParentsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final joinDate = DateTime.now();
+    // final difference = joinDate.difference(joinDate).inDays;
+    // if(difference == 0){
+    //   return 'today';
+    // }else if (difference == 1) {
+    //   return 'yesterday';}
+    // else {
+    //   return '$difference days ago';
+    // }
+
+
+    String getJoinText(dynamic joinDate) {
+      final now = DateTime.now();
+      late final DateTime joinDateTime;
+      if (joinDate is Timestamp) {
+        joinDateTime = joinDate.toDate();
+      } else if (joinDate is DateTime) {
+        joinDateTime = joinDate;
+      } else {
+        return 'Invalid date';
+      }
+
+      final difference = now.difference(joinDateTime).inDays;
+
+      if (difference == 0) {
+        return 'Today';
+      } else if (difference == 1) {
+        return 'Yesterday';
+      } else if (difference < 7) {
+        return '${difference} days ago';
+      } else {
+        return '${joinDateTime.day}/${joinDateTime.month}/${joinDateTime.year}';
+      }
+    }    return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
         body: Stack(
@@ -361,14 +430,6 @@ class _ParentsViewState extends State<ParentsView> {
                             ],
                           ),
                         ),
-                        //ListView.builder(
-                        //               itemCount: searchResults.length,
-                        //               itemBuilder: (context, index) {
-                        //                 return ListTile(
-                        //                   title: Text(searchResults[index]),
-                        //                 );
-                        //               },
-                        //             ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 28.0),
                           child:
@@ -378,6 +439,8 @@ class _ParentsViewState extends State<ParentsView> {
                             // itemCount: data.length,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
+                              final joinDate = DateTime.now();
+
                               return Column(
                                 children: [
                                   Row(
@@ -400,6 +463,7 @@ class _ParentsViewState extends State<ParentsView> {
                                           Column(
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             crossAxisAlignment: CrossAxisAlignment.start,
+
                                             children: [
                                               Text('${data[index]['name'] }',
                                                 style: TextStyle(
@@ -413,12 +477,16 @@ class _ParentsViewState extends State<ParentsView> {
                                               SizedBox(
                                                 height: 5,
                                               ),
+
+
                                               Padding(
                                                 padding: (sharedpref?.getString('lang') == 'ar')
                                                     ? EdgeInsets.only(right: 3.0)
                                                     : EdgeInsets.all(0.0),
                                                 child: Text(
-                                                  'Joined yesterday'.tr,
+                                                  '${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                                                 // '${data[index]['joinDate']}',
+
                                                   style: TextStyle(
                                                     color: Color(0xFF0E8113),
                                                     fontSize: 13,

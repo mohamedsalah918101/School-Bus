@@ -123,7 +123,7 @@ class _NotificationsSupervisorState extends State<NotificationsSupervisor> {
         body: SingleChildScrollView(
 
             child:
-            // children.isNotEmpty?
+            sharedpref!.getInt('invit') == 1 ?
             ListView.separated(
               itemBuilder: (context, index) {
                 return Padding(
@@ -191,32 +191,32 @@ class _NotificationsSupervisorState extends State<NotificationsSupervisor> {
               physics: NeverScrollableScrollPhysics(),
             )
           //no data
-          //     :
-          // Center(
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       SizedBox(height: 70,),
-          //       Image.asset('assets/images/Group 237685.png',
-          //       width: 322,),
-          //       Text('No Notification Found'.tr,
-          //         style: TextStyle(
-          //             color: Color(0xFF442B72),
-          //             fontSize: 19,
-          //             fontFamily: 'Poppins-Regular',
-          //             fontWeight: FontWeight.w500,
-          //         ),),
-          //       Text('You haven’t received any \n'
-          //           'notification yet'.tr,
-          //         textAlign: TextAlign.center,
-          //         style: TextStyle(
-          //           color: Color(0xffBE7FBF),
-          //           fontFamily: 'Poppins-Light',
-          //           fontWeight: FontWeight.w400,
-          //           fontSize: 12,
-          //         ),),
-          //     ]),
-          // )
+              :
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 70,),
+                Image.asset('assets/images/Group 237685.png',
+                width: 322,),
+                Text('No Notification Found'.tr,
+                  style: TextStyle(
+                      color: Color(0xFF442B72),
+                      fontSize: 19,
+                      fontFamily: 'Poppins-Regular',
+                      fontWeight: FontWeight.w500,
+                  ),),
+                Text('You haven’t received any \n'
+                    'notification yet'.tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xffBE7FBF),
+                    fontFamily: 'Poppins-Light',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                  ),),
+              ]),
+          )
         ),
 
         // extendBody: true,

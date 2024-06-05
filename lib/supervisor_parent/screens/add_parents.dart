@@ -89,6 +89,7 @@ class _AddParentsState extends State<AddParents> {
       'invite': 0,
       'supervisor': sharedpref!.getString('id'),
       'supervisor_name': sharedpref!.getString('name'),
+      'joinDate': FieldValue.serverTimestamp(),
     };
 
     try {
@@ -152,6 +153,7 @@ class _AddParentsState extends State<AddParents> {
               'numberOfChildren': childNum+int.parse(_numberOfChildrenController.text),
               'supervisor': sharedpref!.getString('id'),
               'supervisor_name': sharedpref!.getString('name'),
+              'joinDate': FieldValue.serverTimestamp(),
               'bus_id': busID
             });
           }

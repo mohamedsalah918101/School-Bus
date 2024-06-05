@@ -159,7 +159,80 @@ class _YourBusState extends State<YourBus> {
   Widget build(BuildContext context) {
     if (dataLoading) {
       return Center(
-        child: Loading(),
+        child: sharedpref!.getInt('invit') == 1 ?
+
+        Loading(): Scaffold(
+          body: Column(
+            children: [
+              SizedBox(
+                height: 35,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.of(context).pop();
+                    },
+                    child:  Padding(
+                      padding:
+                      EdgeInsets.symmetric(horizontal: 17.0),
+                      child: Image.asset(
+                        (sharedpref?.getString('lang') == 'ar')?
+                        'assets/images/Layer 1.png':
+                        'assets/images/fi-rr-angle-left.png',
+                        width: 20,
+                        height: 22,),
+                    ),
+                  ),
+                  Text(
+                    'My Bus'.tr,
+                    style: TextStyle(
+                      color: Color(0xFF993D9A),
+                      fontSize: 16,
+                      fontFamily: 'Poppins-Bold',
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    icon: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: const Icon(
+                        Icons.menu_rounded,
+                        color: Color(0xff442B72),
+                        size: 35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 200,),
+              Image.asset('assets/images/Group 237684.png',
+              ),
+              Text('No Data Found'.tr,
+                style: TextStyle(
+                  color: Color(0xff442B72),
+                  fontFamily: 'Poppins-Regular',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 19,
+                ),
+              ),
+              Text('You haven’t added any \n '
+                  'buses yet'.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xffBE7FBF),
+                  fontFamily: 'Poppins-Light',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                ),)
+            ],
+          ),
+        ),
       );
     }
     return Scaffold(

@@ -38,6 +38,52 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   List<QueryDocumentSnapshot> data = [];
   var fbm = FirebaseMessaging.instance ;
   bool dataLoading=false;
+  final _firestore = FirebaseFirestore.instance;
+  String _nameSchool = ' ';
+
+
+  Future<void> getDataForattendance() async {
+    setState(() {
+      dataLoading = true;
+    });
+
+    DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+        .collection('supervisor')
+        .doc(sharedpref?.getString('id'))
+        .get();
+
+    // if (supervisorDoc.exists) {
+    //   String SchoolId = supervisorDoc['schoolid'];
+    //
+    //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+    //       .collection('schooldata')
+    //       .where(FieldPath.documentId, isEqualTo: SchoolId)
+    //       .get();
+    //
+    //   if (querySnapshot.docs.isNotEmpty) {
+    //     var busData = querySnapshot.docs.first;
+    //     String namedriver = busData['schoolname'];
+    //
+    //
+    //     setState(() {
+    //       _nameSchool = namedriver;
+    //
+    //     });
+    //
+    //
+    //
+    //   } else {
+    //     print('No bus data found');
+    //   }
+    // } else {
+    //   print('Supervisor document does not exist');
+    // }
+
+    setState(() {
+      dataLoading = false;
+    });
+  }
+
 
   sendNotify( String tittle, String body , String id) async{
     await http.post(
@@ -87,6 +133,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   @override
   void initState() {
     getMassege();
+    getDataForattendance();
     fbm.getToken().then((token) {
       print('token===========================================');
       print(token);
@@ -193,42 +240,105 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 25.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 20.0),
-                                  child: Image.asset('assets/images/Ellipse 2.png',
-                                  width: 60,
-                                  height: 60,),
+                                  child: FutureBuilder(
+                                    future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                      if (snapshot.hasError) {
+                                        return Text('Something went wrong');
+                                      }
+
+                                      if (snapshot.connectionState == ConnectionState.done) {
+                                        if (snapshot.data?.data() == null) {
+                                          return Text(
+                                            'No data available',
+                                            style: TextStyle(
+                                              color: Color(0xff442B72),
+                                              fontSize: 12,
+                                              fontFamily: 'Poppins-Regular',
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          );
+                                        }
+
+                                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                        sharedpref?.getString('lang') == 'en';
+                                        return
+                                          CircleAvatar(
+                                            radius: 30.5,
+                                            backgroundColor: Color(0xff442B72),
+                                            child: CircleAvatar(
+                                              backgroundImage:
+                                              NetworkImage('${data['busphoto'] }'),
+                                              radius: 30.5,
+                                            ),
+                                          );
+                                      }
+
+                                      return Container();
+                                    },
+                                  ),
+                                  // child: Image.asset('assets/images/Ellipse 2.png',
+                                  // width: 60,
+                                  // height: 60,),
                                 ),
                                 SizedBox(width: 10,),
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'El Salam \nSchool'.tr,
-                                        style: TextStyle(
-                                          color: Color(0xFF993D9A),
-                                          fontSize: 20,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          // height: 1.07,
+                                FutureBuilder(
+                                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Text('Something went wrong');
+                                    }
+
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      if (snapshot.data?.data() == null) {
+                                        return Text(
+                                          'No data available',
+                                          style: TextStyle(
+                                            color: Color(0xff442B72),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        );
+                                      }
+
+                                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                      String schoolName = data['schoolname']?.toString() ?? 'no school';
+                                      List<String> words = schoolName.split(' ');
+
+                                      return Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            for (String word in words) ...[
+                                              TextSpan(
+                                                text: '$word\n',
+                                                style: TextStyle(
+                                                  color: Color(0xFF993D9A),
+                                                  fontSize: 20,
+                                                  fontFamily: 'Poppins-Bold',
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                         ),
-                                      ),
-                                      TextSpan(
-                                        text: '\n.',
-                                        style: TextStyle(
-                                          color: Color(0xffFFC53E),
-                                          fontSize: 20,
-                                          fontFamily: 'Poppins-Light',
-                                          fontWeight: FontWeight.w300,
-                                          height: 1.07,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                      );
+                                    }
+
+                                    return CircularProgressIndicator();
+                                  },
+                                )
+
+
                                 // SizedBox(width: 25,),
                               ],
                             ),
@@ -246,10 +356,12 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                       )
                                   ),
                                   onPressed: () async {
-                                    isStarting =
-                                    // children.isNotEmpty?
-                                    true;
-                                    sendNotify('tittle', 'body', 'id');
+                                    if (sharedpref!.getInt('invit') == 1) {
+                                      isStarting = true;
+                                      sendNotify('tittle', 'body', 'id');
+                                    } else {
+                                      isStarting = false;
+                                    }
 
                                     // no data
                                     // : false;
@@ -303,14 +415,15 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                           ),),
                       ),
 
-                      // children.isNotEmpty?
+                      sharedpref!.getInt('invit') == 1 ?
                       Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                         child: SizedBox(
-                          height: 450,
+                          height: data.length*180,
                           width: double.infinity,
                           child: ListView.builder(
                             shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
                             itemCount: data.length,
                             itemBuilder: (BuildContext context, int index) {
                               List children = data[index]['children'];
@@ -319,7 +432,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     for (var child in children)
                                   SizedBox(
                                   width: double.infinity,
-                                  height:122,
+                                  // height:122,
                                   child: Card(
                                     elevation: 10,
                                     color: Colors.white,
@@ -344,11 +457,49 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     mainAxisAlignment: MainAxisAlignment.start,
                                                     children: [
-                                                      Image.asset(
-                                                        'assets/images/Ellipse 6.png',
-                                                        height: 50,
-                                                        width: 50,
+                                                      FutureBuilder(
+                                                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                          if (snapshot.hasError) {
+                                                            return Text('Something went wrong');
+                                                          }
+
+                                                          if (snapshot.connectionState == ConnectionState.done) {
+                                                            if (snapshot.data?.data() == null) {
+                                                              return Text(
+                                                                'No data available',
+                                                                style: TextStyle(
+                                                                  color: Color(0xff442B72),
+                                                                  fontSize: 12,
+                                                                  fontFamily: 'Poppins-Regular',
+                                                                  fontWeight: FontWeight.w400,
+                                                                ),
+                                                              );
+                                                            }
+
+                                                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                                            sharedpref?.getString('lang') == 'en';
+                                                            return
+                                                              CircleAvatar(
+                                                                radius: 25,
+                                                                backgroundColor: Color(0xff442B72),
+                                                                child: CircleAvatar(
+                                                                  backgroundImage:
+                                                                  NetworkImage('${data['busphoto'] }'),
+                                                                  radius: 25,
+                                                                ),
+                                                              );
+                                                          }
+
+                                                          return Container();
+                                                        },
                                                       ),
+                                                      // Image.asset(
+                                                      //   'assets/images/Ellipse 6.png',
+                                                      //   height: 50,
+                                                      //   width: 50,
+                                                      // ),
                                                       const SizedBox(
                                                         width: 7,
                                                       ),
@@ -565,39 +716,39 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                   ),
                                 ),
                                     // CheckInCard(),
-                                    SizedBox(height: 15,)
+                                    SizedBox(height: 0,)
                                   ],
                                 );
                             },
                           ),
                         ),
-                      ),
+                      )
                       //no data
-                      //     :
-                      // Column(
-                      //   children: [
-                      //     SizedBox(height: 50,),
-                      //     Image.asset('assets/images/Group 237684.png',
-                      //     ),
-                      //     Text('No Data Found'.tr,
-                      //       style: TextStyle(
-                      //         color: Color(0xff442B72),
-                      //         fontFamily: 'Poppins-Regular',
-                      //         fontWeight: FontWeight.w500,
-                      //         fontSize: 19,
-                      //       ),
-                      //     ),
-                      //     Text('You haven’t added any \n '
-                      //         'dates yet'.tr,
-                      //       textAlign: TextAlign.center,
-                      //       style: TextStyle(
-                      //         color: Color(0xffBE7FBF),
-                      //         fontFamily: 'Poppins-Light',
-                      //         fontWeight: FontWeight.w400,
-                      //         fontSize: 12,
-                      //       ),)
-                      //   ],
-                      // ),
+                          :
+                      Column(
+                        children: [
+                          SizedBox(height: 50,),
+                          Image.asset('assets/images/Group 237684.png',
+                          ),
+                          Text('No Data Found'.tr,
+                            style: TextStyle(
+                              color: Color(0xff442B72),
+                              fontFamily: 'Poppins-Regular',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 19,
+                            ),
+                          ),
+                          Text('You haven’t added any \n '
+                              'dates yet'.tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xffBE7FBF),
+                              fontFamily: 'Poppins-Light',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),)
+                        ],
+                      ),
                       const SizedBox(
                         height: 44,
                       ),

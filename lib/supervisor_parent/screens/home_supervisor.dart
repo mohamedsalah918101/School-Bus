@@ -393,11 +393,49 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                     children: [
                                                       Padding(
                                                         padding: const EdgeInsets.only(top: 8.0),
-                                                        child: Image.asset(
-                                                          'assets/images/Ellipse 1.png',
-                                                          width: 36,
-                                                          height: 36,
+                                                        child: FutureBuilder(
+                                                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                            if (snapshot.hasError) {
+                                                              return Text('Something went wrong');
+                                                            }
+
+                                                            if (snapshot.connectionState == ConnectionState.done) {
+                                                              if (snapshot.data?.data() == null) {
+                                                                return Text(
+                                                                  'No data available',
+                                                                  style: TextStyle(
+                                                                    color: Color(0xff442B72),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Regular',
+                                                                    fontWeight: FontWeight.w400,
+                                                                  ),
+                                                                );
+                                                              }
+
+                                                              Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                                              sharedpref?.getString('lang') == 'en';
+                                                              return
+                                                                CircleAvatar(
+                                                                  radius: 18,
+                                                                  backgroundColor: Color(0xff442B72),
+                                                                  child: CircleAvatar(
+                                                                    backgroundImage:
+                                                                    NetworkImage('${data['busphoto'] }'),
+                                                                    radius: 18,
+                                                                  ),
+                                                                );
+                                                            }
+
+                                                            return Container();
+                                                          },
                                                         ),
+                                                        // Image.asset(
+                                                        //   'assets/images/Ellipse 1.png',
+                                                        //   width: 36,
+                                                        //   height: 36,
+                                                        // ),
                                                       ),
                                                       SizedBox(width: 12),
                                                       Column(
@@ -504,7 +542,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                             ),
                           ),
                           Text('You haven’t added any \n '
-                              'data yet'.tr,
+                              'children yet'.tr,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color(0xffBE7FBF),
