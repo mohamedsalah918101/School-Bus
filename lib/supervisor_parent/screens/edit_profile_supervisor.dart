@@ -400,7 +400,7 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                                       radius: 52.5,
                                       backgroundColor: Color(0xff442B72),
                                       child: CircleAvatar(
-                                        backgroundImage: NetworkImage(imageUrl),
+                                        backgroundImage: NetworkImage(imageUrl) ,
                                         radius: 50.5,
                                       ),
                                     );

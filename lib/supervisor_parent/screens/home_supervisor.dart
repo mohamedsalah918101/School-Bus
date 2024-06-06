@@ -393,49 +393,41 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                     children: [
                                                       Padding(
                                                         padding: const EdgeInsets.only(top: 8.0),
-                                                        child: FutureBuilder(
+                                                        child:FutureBuilder(
                                                           future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
                                                             if (snapshot.hasError) {
                                                               return Text('Something went wrong');
                                                             }
 
                                                             if (snapshot.connectionState == ConnectionState.done) {
-                                                              if (snapshot.data?.data() == null) {
-                                                                return Text(
-                                                                  'No data available',
-                                                                  style: TextStyle(
-                                                                    color: Color(0xff442B72),
-                                                                    fontSize: 12,
-                                                                    fontFamily: 'Poppins-Regular',
-                                                                    fontWeight: FontWeight.w400,
+                                                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                                return CircleAvatar(
+                                                                  radius: 18,
+                                                                  backgroundColor: Color(0xff442B72),
+                                                                  child: CircleAvatar(
+                                                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                                    radius: 18,
                                                                   ),
                                                                 );
                                                               }
 
-                                                              Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                                              sharedpref?.getString('lang') == 'en';
-                                                              return
-                                                                CircleAvatar(
+                                                              Map<String, dynamic>? data = snapshot.data?.data();
+                                                              if (data != null && data['busphoto'] != null) {
+                                                                return CircleAvatar(
                                                                   radius: 18,
                                                                   backgroundColor: Color(0xff442B72),
                                                                   child: CircleAvatar(
-                                                                    backgroundImage:
-                                                                    NetworkImage('${data['busphoto'] }'),
-                                                                    radius: 18,
+                                                                    backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                                    radius:18,
                                                                   ),
                                                                 );
+                                                              }
                                                             }
 
                                                             return Container();
                                                           },
                                                         ),
-                                                        // Image.asset(
-                                                        //   'assets/images/Ellipse 1.png',
-                                                        //   width: 36,
-                                                        //   height: 36,
-                                                        // ),
                                                       ),
                                                       SizedBox(width: 12),
                                                       Column(

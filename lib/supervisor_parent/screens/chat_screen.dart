@@ -41,6 +41,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   final String? currentUserID = sharedpref?.getString('id'); // replace with actual user email
   String previousSender = '';
+  final _firestore = FirebaseFirestore.instance;
   UserStatusService _userStatusService = UserStatusService();
   bool sending = true;
   final ScrollController _scrollController = ScrollController();
@@ -183,10 +184,40 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/images/Ellipse 1.png',
-                  height: 50,
-                  width: 50,
+                FutureBuilder(
+                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Something went wrong');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                        return CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Color(0xff442B72),
+                          child: CircleAvatar(
+                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                            radius: 25,
+                          ),
+                        );
+                      }
+
+                      Map<String, dynamic>? data = snapshot.data?.data();
+                      if (data != null && data['busphoto'] != null) {
+                        return CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Color(0xff442B72),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage('${data['busphoto']}'),
+                            radius:25,
+                          ),
+                        );
+                      }
+                    }
+
+                    return Container();
+                  },
                 ),
                 const SizedBox(
                   width: 20,

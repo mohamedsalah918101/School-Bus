@@ -36,9 +36,11 @@ class _ParentsViewState extends State<ParentsView> {
   bool isDeclineFiltered = false;
   bool isWaitingFiltered = false;
   bool isFiltered  = false;
+  final _firestore = FirebaseFirestore.instance;
   String? currentFilter;
   TextEditingController _searchController = TextEditingController();
   String SearchQuery = '';
+
   String getJoinText(Timestamp joinDate) {
     final now = DateTime.now();
     final joinDateTime = joinDate.toDate();
@@ -186,40 +188,32 @@ class _ParentsViewState extends State<ParentsView> {
 
   @override
   Widget build(BuildContext context) {
-    final joinDate = DateTime.now();
-    // final difference = joinDate.difference(joinDate).inDays;
-    // if(difference == 0){
-    //   return 'today';
-    // }else if (difference == 1) {
-    //   return 'yesterday';}
-    // else {
-    //   return '$difference days ago';
+
+    // String getJoinText(dynamic joinDate) {
+    //   final now = DateTime.now();
+    //   late final DateTime joinDateTime;
+    //   if (joinDate is Timestamp) {
+    //     joinDateTime = joinDate.toDate();
+    //   } else if (joinDate is DateTime) {
+    //     joinDateTime = joinDate;
+    //   } else {
+    //     return 'Invalid date';
+    //   }
+    //
+    //   final difference = now.difference(joinDateTime).inDays;
+    //
+    //   if (difference == 0) {
+    //     return 'Today';
+    //   } else if (difference == 1) {
+    //     return 'Yesterday';
+    //   } else if (difference < 7) {
+    //     return '${difference} days ago';
+    //   } else {
+    //     return '${joinDateTime.day}/${joinDateTime.month}/${joinDateTime.year}';
+    //   }
     // }
 
-
-    String getJoinText(dynamic joinDate) {
-      final now = DateTime.now();
-      late final DateTime joinDateTime;
-      if (joinDate is Timestamp) {
-        joinDateTime = joinDate.toDate();
-      } else if (joinDate is DateTime) {
-        joinDateTime = joinDate;
-      } else {
-        return 'Invalid date';
-      }
-
-      final difference = now.difference(joinDateTime).inDays;
-
-      if (difference == 0) {
-        return 'Today';
-      } else if (difference == 1) {
-        return 'Yesterday';
-      } else if (difference < 7) {
-        return '${difference} days ago';
-      } else {
-        return '${joinDateTime.day}/${joinDateTime.month}/${joinDateTime.year}';
-      }
-    }    return Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
         body: Stack(
@@ -451,11 +445,46 @@ class _ParentsViewState extends State<ParentsView> {
                                           Padding(
                                             padding:
                                             const EdgeInsets.only(top: 12.0),
-                                            child: Image.asset(
-                                              'assets/images/Ellipse 6.png',
-                                              width: 50,
-                                              height: 50,
+                                            child: FutureBuilder(
+                                              future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                if (snapshot.hasError) {
+                                                  return Text('Something went wrong');
+                                                }
+
+                                                if (snapshot.connectionState == ConnectionState.done) {
+                                                  if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                    return CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundColor: Color(0xff442B72),
+                                                      child: CircleAvatar(
+                                                        backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                        radius: 25,
+                                                      ),
+                                                    );
+                                                  }
+
+                                                  Map<String, dynamic>? data = snapshot.data?.data();
+                                                  if (data != null && data['busphoto'] != null) {
+                                                    return CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundColor: Color(0xff442B72),
+                                                      child: CircleAvatar(
+                                                        backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                        radius:25,
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+
+                                                return Container();
+                                              },
                                             ),
+                                            // Image.asset(
+                                            //   'assets/images/Ellipse 6.png',
+                                            //   width: 50,
+                                            //   height: 50,
+                                            // ),
                                           ),
                                           const SizedBox(
                                             width: 5,
@@ -484,7 +513,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                     ? EdgeInsets.only(right: 3.0)
                                                     : EdgeInsets.all(0.0),
                                                 child: Text(
-                                                  '${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                                                  'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
                                                  // '${data[index]['joinDate']}',
 
                                                   style: TextStyle(

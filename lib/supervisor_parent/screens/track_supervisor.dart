@@ -496,10 +496,10 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                             ? Center(child: CircularProgressIndicator())
                             : GoogleMap(
                           zoomControlsEnabled: false,
-                          zoomGesturesEnabled: true,
                           scrollGesturesEnabled: true,
-                          tiltGesturesEnabled: true,
-                          rotateGesturesEnabled: true,
+                          gestureRecognizers: Set()
+                            ..add(Factory<EagerGestureRecognizer>(() =>
+                                EagerGestureRecognizer())),
                           initialCameraPosition: CameraPosition(
                             target: startLocation,
                             zoom: 12,
@@ -988,37 +988,34 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                         ),
                                                   FutureBuilder(
                                                     future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
                                                       if (snapshot.hasError) {
                                                         return Text('Something went wrong');
                                                       }
 
                                                       if (snapshot.connectionState == ConnectionState.done) {
-                                                        if (snapshot.data?.data() == null) {
-                                                          return Text(
-                                                            'No data available',
-                                                            style: TextStyle(
-                                                              color: Color(0xff442B72),
-                                                              fontSize: 12,
-                                                              fontFamily: 'Poppins-Regular',
-                                                              fontWeight: FontWeight.w400,
+                                                        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                          return CircleAvatar(
+                                                            radius: 25,
+                                                            backgroundColor: Color(0xff442B72),
+                                                            child: CircleAvatar(
+                                                              backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                              radius: 25,
                                                             ),
                                                           );
                                                         }
 
-                                                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                                        sharedpref?.getString('lang') == 'en';
-                                                        return
-                                                          CircleAvatar(
+                                                        Map<String, dynamic>? data = snapshot.data?.data();
+                                                        if (data != null && data['busphoto'] != null) {
+                                                          return CircleAvatar(
                                                             radius: 25,
                                                             backgroundColor: Color(0xff442B72),
                                                             child: CircleAvatar(
-                                                              backgroundImage:
-                                                              NetworkImage('${data['busphoto'] }'),
-                                                              radius: 25,
+                                                              backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                              radius:25,
                                                             ),
                                                           );
+                                                        }
                                                       }
 
                                                       return Container();
@@ -1143,37 +1140,34 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                   children: [
                                                     FutureBuilder(
                                                       future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
                                                         if (snapshot.hasError) {
                                                           return Text('Something went wrong');
                                                         }
 
                                                         if (snapshot.connectionState == ConnectionState.done) {
-                                                          if (snapshot.data?.data() == null) {
-                                                            return Text(
-                                                              'No data available',
-                                                              style: TextStyle(
-                                                                color: Color(0xff442B72),
-                                                                fontSize: 12,
-                                                                fontFamily: 'Poppins-Regular',
-                                                                fontWeight: FontWeight.w400,
+                                                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                            return CircleAvatar(
+                                                              radius: 25,
+                                                              backgroundColor: Color(0xff442B72),
+                                                              child: CircleAvatar(
+                                                                backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                                radius: 25,
                                                               ),
                                                             );
                                                           }
 
-                                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                                          sharedpref?.getString('lang') == 'en';
-                                                          return
-                                                            CircleAvatar(
+                                                          Map<String, dynamic>? data = snapshot.data?.data();
+                                                          if (data != null && data['busphoto'] != null) {
+                                                            return CircleAvatar(
                                                               radius: 25,
                                                               backgroundColor: Color(0xff442B72),
                                                               child: CircleAvatar(
-                                                                backgroundImage:
-                                                                NetworkImage('${data['busphoto'] }'),
-                                                                radius: 25,
+                                                                backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                                radius:25,
                                                               ),
                                                             );
+                                                          }
                                                         }
 
                                                         return Container();

@@ -55,17 +55,21 @@ class _AddParentsState extends State<AddParents> {
   void _addDataToFirestore() async {
     setState(() {
       // _isLoading = true;
-
     });
+
     int numberOfChildren = int.parse(_numberOfChildrenController.text);
     String busID = '';
     DocumentSnapshot documentSnapshot = await _firestore
         .collection('supervisor')
         .doc(sharedpref!.getString('id'))
         .get();
+
     if (documentSnapshot.exists) {
       busID = documentSnapshot.get('bus_id');
     }
+
+    Timestamp currentTimestamp = Timestamp.now();
+
     List<Map<String, dynamic>> childrenData = List.generate(
       numberOfChildren,
           (index) => {
@@ -74,7 +78,8 @@ class _AddParentsState extends State<AddParents> {
         'gender': genderSelection[index],
         'supervisor': sharedpref!.getString('id'),
         'supervisor_name': sharedpref!.getString('name'),
-        'bus_id': busID
+        'bus_id': busID,
+        'joinDateChild': currentTimestamp,
       },
     );
 
@@ -105,7 +110,6 @@ class _AddParentsState extends State<AddParents> {
             String docid = docRef.id;
             setState(() {
               _isLoading = false;
-
             });
             var res = await createDynamicLink(
                 false, docid, enteredPhoneNumber, 'parent');
@@ -113,15 +117,17 @@ class _AddParentsState extends State<AddParents> {
             if (res == "success") {
               InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
 
-              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              //   content: Text('Invitation sent successfully'),
-              //   backgroundColor: Color(0xFFFF3C3C),
-              // ));
+              await _firestore.collection('notification').add({
+                'item': 'You have Invitation',
+                'timestamp': FieldValue.serverTimestamp(),
+                'parentId': docid,
+                'phoneNumber': enteredPhoneNumber,
+              });
+
               await _firestore
                   .collection('parent')
                   .doc(docid)
                   .update({'invite': 1});
-              // await _firestore.collection('parent').doc(docID).update(data);
 
               count = 0;
               showList = false;
@@ -133,24 +139,17 @@ class _AddParentsState extends State<AddParents> {
               gradeControllers.clear();
             } else {
               InvitationNotSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFFFF3C3C));
-
-              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              //   content: Text('Invitation doesn\'t sent'),
-              //   backgroundColor: Color(0xFFFF3C3C),
-              // ));
             }
           }).catchError((error) {
             print('Failed to add data: $error');
           });
         } else {
-          if(childNum == 0){
+          if (childNum == 0) {
             await _firestore.collection('parent').doc(docID).update(data);
-
-          }else{
-
+          } else {
             await _firestore.collection('parent').doc(docID).update({
               'children': FieldValue.arrayUnion(childrenData),
-              'numberOfChildren': childNum+int.parse(_numberOfChildrenController.text),
+              'numberOfChildren': childNum + int.parse(_numberOfChildrenController.text),
               'supervisor': sharedpref!.getString('id'),
               'supervisor_name': sharedpref!.getString('name'),
               'joinDate': FieldValue.serverTimestamp(),
@@ -158,18 +157,19 @@ class _AddParentsState extends State<AddParents> {
             });
           }
           if (invitCheck == 0) {
-
             var res = await createDynamicLink(
-                false, docID, _phoneNumberController.text, 'parent');     setState(() {
+                false, docID, _phoneNumberController.text, 'parent');
+            setState(() {
               _isLoading = false;
-
             });
             if (res == "success") {
-              InvitationSendSnackBar(context, 'Invitation sent successfully',(Color(0xFF4CAF50)));
-              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(Color(0xFF4CAF50)
-              //   content: Text('Invitation sent successfully'),
-              //   backgroundColor: Color(0xFF4CAF50),
-              // ));
+              InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
+              await _firestore.collection('notification').add({
+                'item': 'You have Invitation',
+                'timestamp': FieldValue.serverTimestamp(),
+                'parentId': docID,
+                'phoneNumber': _phoneNumberController.text,
+              });
               await _firestore
                   .collection('parent')
                   .doc(docID)
@@ -186,27 +186,187 @@ class _AddParentsState extends State<AddParents> {
           } else {
             setState(() {
               _isLoading = false;
-
             });
-            // added parent new update
             Dialoge.CantAddNewParent(context);
-            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            //   content: Text('This phone number is already added.'),
-            // ));
           }
-          // await _firestore.collection('parent').doc(docID).update(data);
         }
       } else {
-        //added in another type
         phoneAdded = false;
-        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //   content: Text('This phone number is already added.'),
-        // ));
       }
     } catch (e) {
       print('Error: $e');
     }
   }
+
+  // void _addDataToFirestore() async {
+  //   setState(() {
+  //     // _isLoading = true;
+  //
+  //   });
+  //   int numberOfChildren = int.parse(_numberOfChildrenController.text);
+  //   String busID = '';
+  //   DocumentSnapshot documentSnapshot = await _firestore
+  //       .collection('supervisor')
+  //       .doc(sharedpref!.getString('id'))
+  //       .get();
+  //   if (documentSnapshot.exists) {
+  //     busID = documentSnapshot.get('bus_id');
+  //   }
+  //
+  //   Timestamp currentTimestamp = Timestamp.now();
+  //
+  //   List<Map<String, dynamic>> childrenData = List.generate(
+  //     numberOfChildren,
+  //         (index) => {
+  //       'name': nameChildControllers[index].text,
+  //       'grade': gradeControllers[index].text,
+  //       'gender': genderSelection[index],
+  //       'supervisor': sharedpref!.getString('id'),
+  //       'supervisor_name': sharedpref!.getString('name'),
+  //       'bus_id': busID,
+  //       'joinDateChild': currentTimestamp,
+  //
+  //         },
+  //   );
+  //
+  //   Map<String, dynamic> data = {
+  //     'typeOfParent': selectedValue,
+  //     'name': _nameController.text,
+  //     'numberOfChildren': _numberOfChildrenController.text,
+  //     'phoneNumber': enteredPhoneNumber,
+  //     'address': '',
+  //     'children': childrenData,
+  //     'state': 0,
+  //     'invite': 0,
+  //     'supervisor': sharedpref!.getString('id'),
+  //     'supervisor_name': sharedpref!.getString('name'),
+  //     'joinDate': FieldValue.serverTimestamp(),
+  //   };
+  //
+  //   try {
+  //     print('Checking parent existence...');
+  //     var check = await addParentCheck(enteredPhoneNumber);
+  //     if (!check) {
+  //       print('Parent does not exist. Checking for update...');
+  //       var res = await checkUpdate(enteredPhoneNumber);
+  //       if (!res) {
+  //         print('Adding new parent to Firestore...');
+  //         await _firestore.collection('parent').add(data).then((docRef) async {
+  //           print('Data added with document ID: ${docRef.id}');
+  //           String docid = docRef.id;
+  //           setState(() {
+  //             _isLoading = false;
+  //
+  //           });
+  //           var res = await createDynamicLink(
+  //               false, docid, enteredPhoneNumber, 'parent');
+  //
+  //           if (res == "success") {
+  //             InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
+  //
+  //             // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //             //   content: Text('Invitation sent successfully'),
+  //             //   backgroundColor: Color(0xFFFF3C3C),
+  //             // ));
+  //
+  //             await _firestore.collection('notification').add({
+  //               'item': 'You have Invitation',
+  //               'timestamp': FieldValue.serverTimestamp(),
+  //               'parentId': docid,
+  //               'phoneNumber': enteredPhoneNumber,
+  //             });
+  //
+  //
+  //             await _firestore
+  //                 .collection('parent')
+  //                 .doc(docid)
+  //                 .update({'invite': 1});
+  //             // await _firestore.collection('parent').doc(docID).update(data);
+  //
+  //             count = 0;
+  //             showList = false;
+  //             setState(() {});
+  //             _nameController.clear();
+  //             _phoneNumberController.clear();
+  //             _numberOfChildrenController.clear();
+  //             nameChildControllers.clear();
+  //             gradeControllers.clear();
+  //           } else {
+  //             InvitationNotSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFFFF3C3C));
+  //
+  //             // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //             //   content: Text('Invitation doesn\'t sent'),
+  //             //   backgroundColor: Color(0xFFFF3C3C),
+  //             // ));
+  //           }
+  //         }).catchError((error) {
+  //           print('Failed to add data: $error');
+  //         });
+  //       } else {
+  //         if(childNum == 0){
+  //           await _firestore.collection('parent').doc(docID).update(data);
+  //
+  //         }else{
+  //
+  //           await _firestore.collection('parent').doc(docID).update({
+  //             'children': FieldValue.arrayUnion(childrenData),
+  //             'numberOfChildren': childNum+int.parse(_numberOfChildrenController.text),
+  //             'supervisor': sharedpref!.getString('id'),
+  //             'supervisor_name': sharedpref!.getString('name'),
+  //             'joinDate': FieldValue.serverTimestamp(),
+  //             'bus_id': busID
+  //           });
+  //         }
+  //         if (invitCheck == 0) {
+  //
+  //           var res = await createDynamicLink(
+  //               false, docID, _phoneNumberController.text, 'parent');     setState(() {
+  //             _isLoading = false;
+  //
+  //           });
+  //           if (res == "success") {
+  //             InvitationSendSnackBar(context, 'Invitation sent successfully',(Color(0xFF4CAF50)));
+  //             // ScaffoldMessenger.of(context).showSnackBar(SnackBar(Color(0xFF4CAF50)
+  //             //   content: Text('Invitation sent successfully'),
+  //             //   backgroundColor: Color(0xFF4CAF50),
+  //             // ));
+  //             await _firestore
+  //                 .collection('parent')
+  //                 .doc(docID)
+  //                 .update({'invite': 1});
+  //             count = 0;
+  //             showList = false;
+  //             setState(() {});
+  //             _nameController.clear();
+  //             _phoneNumberController.clear();
+  //             _numberOfChildrenController.clear();
+  //             nameChildControllers.clear();
+  //             gradeControllers.clear();
+  //           }
+  //         } else {
+  //           setState(() {
+  //             _isLoading = false;
+  //
+  //           });
+  //           // added parent new update
+  //           Dialoge.CantAddNewParent(context);
+  //           // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //           //   content: Text('This phone number is already added.'),
+  //           // ));
+  //         }
+  //         // await _firestore.collection('parent').doc(docID).update(data);
+  //       }
+  //     } else {
+  //       //added in another type
+  //       phoneAdded = false;
+  //       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       //   content: Text('This phone number is already added.'),
+  //       // ));
+  //     }
+  //   } catch (e) {
+  //     print('Error: $e');
+  //   }
+  // }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> NumberOfChildren = [];

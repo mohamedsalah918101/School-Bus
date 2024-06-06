@@ -296,12 +296,25 @@ class _YourBusState extends State<YourBus> {
                       padding:  EdgeInsets.symmetric(horizontal: 31.0),
                       child: Row(
                         children: [
-
-
                           CircleAvatar(
-                            backgroundImage: NetworkImage( _photodriver ?? 'no data'),
                             radius: 25.5,
+                            backgroundColor: Colors.cyan,
+                            child: _photodriver != null && _photodriver.isNotEmpty
+                                ? CircleAvatar(
+                              backgroundImage: NetworkImage(_photodriver),
+                              radius: 25.5,
+                            )
+                                : CircleAvatar(
+                              backgroundImage: AssetImage('ssets/images/Group 237679 (2).png'), // Replace with your default image path
+                              radius: 25.5,
+                            ),
                           ),
+
+
+                          // CircleAvatar(
+                          //   backgroundImage: NetworkImage( _photodriver ?? 'no data'),
+                          //   radius: 25.5,
+                          // ),
                           // NetworkImage(
                           //   _photodriver ?? 'no data',
                           //   // 'assets/images/Ellipse 1.png',
@@ -386,46 +399,22 @@ class _YourBusState extends State<YourBus> {
                                     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
                                     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
                                 ),
-                                // Image.network(_photobus ,
-                                // width: 82,
-                                // height: 80,),
-                                // Image.asset('assets/images/Frame 151.png',
-                                //   width: 82,
-                                //   height: 80,),
                                 SizedBox(width: 10,),
-                                // Image.network(_photobus ,
-                                //   width: 82,
-                                //   height: 80,),
-                                InteractiveViewer(
-                                  // transformationController: _imagebuscontroller,
-                                    child:(_photobus == null || _photobus == '') ?
-                                    //Image.network(widget.oldphotobus),
-                                    Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                    Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
-                                ),
+                                // InteractiveViewer(
+                                //   // transformationController: _imagebuscontroller,
+                                //     child:(_photobus == null || _photobus == '') ?
+                                //     //Image.network(widget.oldphotobus),
+                                //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                // ),
                                 SizedBox(width: 10,),
-                            // CircleAvatar(
-                            //   radius: 31,
-                            //   backgroundColor: Color(0xff442B72),
-                            //   child:
-                            //   CircleAvatar(
-                            //     backgroundImage:
-                            //     NetworkImage( _photobus),
-                            //     radius: 31,
-                            //   ),
-                            // ),
+                                // InteractiveViewer(
+                                //   // transformationController: _imagebuscontroller,
+                                //     child:(_photobus == null || _photobus == '') ?
+                                //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                // ),
 
-
-                                InteractiveViewer(
-                                  // transformationController: _imagebuscontroller,
-                                    child:(_photobus == null || _photobus == '') ?
-                                    Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                    Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
-                                ),
-
-                                // Image.network(_photobus ,
-                                //   width: 82,
-                                //   height: 80,),
                               ],
                             ),
                           ),
