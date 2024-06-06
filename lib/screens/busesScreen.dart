@@ -44,7 +44,11 @@ import 'homeScreen.dart';
 import 'dart:math' as math;
 
 
+class Supervisor {
+  String name;
 
+  Supervisor({required this.name});
+}
 class BusScreen extends StatefulWidget{
 
   // const EditeSupervisor({super.key});
@@ -182,7 +186,7 @@ class BusScreenSate extends State<BusScreen> {
   String? selectedValueWaiting;
   getDataForBusNumberFilter()async{
     CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('busnumber').get();
+    QuerySnapshot BusData = await Bus.where('busnumber').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -195,7 +199,7 @@ class BusScreenSate extends State<BusScreen> {
 
   getDataForDriverNameFilter()async{
     CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('namedriver' ).get();
+    QuerySnapshot BusData = await Bus.where('namedriver' ).where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -208,7 +212,7 @@ class BusScreenSate extends State<BusScreen> {
 
   getDataForSupervisorFilter()async{
     CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('supervisorname').get();
+    QuerySnapshot BusData = await Bus.where('supervisorname').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -239,6 +243,25 @@ class BusScreenSate extends State<BusScreen> {
   //new
   List<DropdownCheckboxItem> selectedItems = [];
 
+  //new
+  List<Supervisor> _supervisors = [];
+  Future<void> _getSupervisorName() async {
+    final firestore = FirebaseFirestore.instance;
+    final busDataCollection = firestore.collection('busdata');
+    final busDataDoc = busDataCollection.doc('LHYs0SGoFtBM9H4dUr4X'); // Replace with the actual document ID
+    final busData = await busDataDoc.get();
+    final supervisors = busData.get('supervisors');
+
+    if (supervisors.isNotEmpty) {
+      final supervisorDoc = await firestore.collection('supervisor').doc(supervisors[0]['id']).get();
+      final supervisorName = supervisorDoc.get('name');
+      setState(() {
+        _supervisorName = supervisorName;
+      });
+    }
+  }
+  String _supervisorName = '';
+
 // to lock in landscape view
   @override
   void initState() {
@@ -246,6 +269,7 @@ class BusScreenSate extends State<BusScreen> {
     super.initState();
     getSchoolId();
     getData();
+    _getSupervisorName();
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -835,10 +859,10 @@ class BusScreenSate extends State<BusScreen> {
                                                               tileColor: Colors.white,
                                                               onTap: (){
 
-                                                                List<DropdownCheckboxItem>allSupervisors=[];
-                                                                for(int i=0;i<data[index]['supervisors'].length;i++){
-                                                                  allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
-                                                                }
+                                                                // List<DropdownCheckboxItem>allSupervisors=[];
+                                                                // for(int i=0;i<data[index]['supervisors'].length;i++){
+                                                                //   allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
+                                                                // }
                                                                 showModalBottomSheet(
                                                                   shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -924,16 +948,18 @@ class BusScreenSate extends State<BusScreen> {
                                                                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                               children: [
                                                                                 SizedBox(
-                                                                                  width: 80,
-                                                                                  height: 80,
-                                                                                  child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
-                                                                                      ? Image.network(
-                                                                                    data[index]['busphoto'],
-                                                                                    fit: BoxFit.scaleDown,
-                                                                                  )
-                                                                                      : Image.asset(
-                                                                                    'assets/imgs/school/ph_bus-light (1).png',
-                                                                                    fit: BoxFit.scaleDown,
+                                                                                  width: 70,
+                                                                                  height: 70,
+                                                                                  child: ClipOval(
+                                                                                    child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                                        ? Image.network(
+                                                                                      data[index]['busphoto'],
+                                                                                      fit: BoxFit.cover,
+                                                                                    )
+                                                                                        : Image.asset(
+                                                                                      'assets/imgs/school/ph_bus-light (1).png',
+                                                                                      fit: BoxFit.cover,
+                                                                                    ),
                                                                                   ),
                                                                                 ),
                                                                                 // SizedBox(
@@ -962,16 +988,18 @@ class BusScreenSate extends State<BusScreen> {
                                                                                 //   ),
                                                                                 // ),
                                                                                 SizedBox(
-                                                                                  width: 80,
-                                                                                  height: 80,
-                                                                                  child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
-                                                                                      ? Image.network(
-                                                                                    data[index]['imagedriver'],
-                                                                                    fit: BoxFit.scaleDown,
-                                                                                  )
-                                                                                      : Image.asset(
-                                                                                    'assets/imgs/school/empty_supervisor.png',
-                                                                                    fit: BoxFit.scaleDown,
+                                                                                  width: 60,
+                                                                                  height: 60,
+                                                                                  child: ClipOval(
+                                                                                    child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
+                                                                                        ? Image.network(
+                                                                                      data[index]['imagedriver'],
+                                                                                      fit: BoxFit.cover,
+                                                                                    )
+                                                                                        : Image.asset(
+                                                                                      'assets/imgs/school/empty_supervisor.png',
+                                                                                      fit: BoxFit.cover,
+                                                                                    ),
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: 20,),
@@ -1033,7 +1061,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                             Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
                                                                             SizedBox(height: 10),
 
-
+                                                                        for(int i=0;i<data[index]['supervisors'].length;i++)
                                                                             Padding(
                                                                               padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                               child: Row(
@@ -1050,7 +1078,7 @@ class BusScreenSate extends State<BusScreen> {
 
 
                                                                                   Text(
-                                                                                    'Ahmed Atef',
+                                                                                    data[index]['supervisors'][i]['name'],
                                                                                     style: TextStyle(
                                                                                         fontSize: 14,
                                                                                         color: Color(0xFF442B72),
@@ -1060,30 +1088,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                                 ],
                                                                               ),
                                                                             ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                                              child: Row(
-                                                                                children: [
-                                                                                  Container(
-                                                                                    width: 7,
-                                                                                    height: 7,
-                                                                                    decoration: BoxDecoration(
-                                                                                      shape: BoxShape.circle,
-                                                                                      color: Color(0xFF442B72),
-                                                                                    ),
-                                                                                  ),
-                                                                                  SizedBox(width: 10),
-                                                                                  Text(
-                                                                                    'Kariem atif',
-                                                                                    style: TextStyle(
-                                                                                        fontSize: 14,
-                                                                                        color: Color(0xFF442B72),
-                                                                                        fontFamily: "Poppins-Regular"
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
+
 
                                                                           ],
                                                                         ),
