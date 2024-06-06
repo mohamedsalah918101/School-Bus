@@ -111,6 +111,9 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;
+      sharedpref!.setString('nameEnglish',snapshot.docs[0].get('nameEnglish'));
+      sharedpref!.setString('photo',snapshot.docs[0].get('photo'));
+
       if(snapshot.docs[0].get('state') == 0)
        {
          print(snapshot.docs[0].get('state').toString()+'ghghgh');

@@ -373,10 +373,13 @@ class _MainDrawerState extends State<HomeDrawer> {
                                   return data['photo'] != null ? CircleAvatar(
                                     backgroundColor: Colors.white,
                                     radius: 31,
-                                    child: Image.network(data['photo'], width: 61, height: 61,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
-                                      },
+                                    child: ClipOval(
+                                      child: Image.network(data['photo'], width: 61, height: 61,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Image.asset('assets/images/school (2) 1.png', width: 61, height: 61); // Display a default image if loading fails
+                                        },
+                                      ),
                                     ),
                                   ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61);
                                 }

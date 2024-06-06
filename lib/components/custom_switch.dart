@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 bool isSwitched = false;
 class CustomSwitch extends StatefulWidget {
+  final ValueChanged<bool> onChanged;
   // bool isSwitched;
   CustomSwitch({
     super.key,
+    required this.onChanged
   });
 
   @override
@@ -14,6 +16,7 @@ class CustomSwitch extends StatefulWidget {
 class _CustomSwitchState extends State<CustomSwitch> {
   // bool isSwitched = false;
   late SharedPreferences _prefs;
+  bool alarm =false;
 
   Future<void> _loadPreferences() async {
     _prefs = await SharedPreferences.getInstance();
@@ -36,6 +39,7 @@ class _CustomSwitchState extends State<CustomSwitch> {
         isSwitched = !isSwitched;
         _prefs.setBool('switch_state', isSwitched);
         setState(() {});
+        widget.onChanged(isSwitched);
         // print(isSwitched);
       },
       child: Container(
