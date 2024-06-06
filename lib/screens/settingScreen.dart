@@ -23,10 +23,33 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+
+
   MyLocalController ControllerLang = Get.find();
   //fun delete account
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+// fun delete school account only
+  // void _deleteAccountFromFirestore() async {
+  //   // Get the document ID from shared preferences
+  //   String? documentId = sharedpref!.getString('id');
+  //
+  //   // Check if document ID is not null
+  //   if (documentId != null) {
+  //     try {
+  //       // Delete the document from Firestore
+  //       await _firestore.collection('schooldata').doc(documentId).delete();
+  //       print('Data deleted for document ID: $documentId');
+  //
+  //       // Optionally, you can clear the shared preferences or any local storage related to this document
+  //       sharedpref!.remove('id');
+  //       sharedpref!.remove('allData');
+  //     } catch (error) {
+  //       print('Failed to delete data: $error');
+  //     }
+  //   } else {
+  //     print('Document ID is null, cannot delete data');
+  //   }
+  // }
   void _deleteAccountFromFirestore() async {
     // Get the document ID from shared preferences
     String? documentId = sharedpref!.getString('id');
@@ -34,9 +57,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Check if document ID is not null
     if (documentId != null) {
       try {
-        // Delete the document from Firestore
-        await _firestore.collection('schooldata').doc(documentId).delete();
-        print('Data deleted for document ID: $documentId');
+        // Check if the document ID exists in each collection
+        bool existsInParent = await _firestore.collection('parent').doc(documentId).get().then((doc) => doc.exists);
+        bool existsInSchoolData = await _firestore.collection('schooldata').doc(documentId).get().then((doc) => doc.exists);
+        bool existsInSupervisor = await _firestore.collection('supervisor').doc(documentId).get().then((doc) => doc.exists);
+
+        // Delete the document from each collection if it exists
+        if (existsInParent) {
+          await _firestore.collection('parent').doc(documentId).delete();
+          print('Data deleted from parent collection for document ID: $documentId');
+        }
+        if (existsInSchoolData) {
+          await _firestore.collection('schooldata').doc(documentId).get().then((doc) async {
+            //String schoolId = doc.get('schoolId'); // Assuming schoolId is a field in schooldata document
+
+            // Delete documents from other collections that have the same schoolId
+            await _deleteDocumentsFromCollection('supervisor', documentId);
+            await _deleteDocumentsFromCollection('schoolholiday', documentId);
+            await _deleteDocumentsFromCollection('schoolweekend', documentId);
+            await _deleteDocumentsFromCollection('busdata', documentId);
+
+            await _firestore.collection('schooldata').doc(documentId).delete();
+            print('Data deleted from schooldata collection for document ID: $documentId');
+          });
+        }
+        if (existsInSupervisor) {
+          await _firestore.collection('supervisor').doc(documentId).delete();
+          print('Data deleted from supervisor collection for document ID: $documentId');
+        }
 
         // Optionally, you can clear the shared preferences or any local storage related to this document
         sharedpref!.remove('id');
@@ -49,9 +97,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _deleteDocumentsFromCollection(String collectionName, String schoolId) async {
+    QuerySnapshot querySnapshot = await _firestore.collection(collectionName).where('schoolid', isEqualTo: schoolId).get();
+    for (var doc in querySnapshot.docs) {
+      await doc.reference.delete();
+      print('Data deleted from $collectionName collection for schoolId: $schoolId');
+    }
+  }
   // Completer<GoogleMapController> _controller = Completer();
   bool tracking = true;
   bool isExpanded = false;
+  bool alarm=false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -156,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       height: 1.07,
                     ),
                   ),
-                  trailing: CustomSwitch(),
+                  //trailing: CustomSwitch(),
                 ),
                 Theme(
                   data: ThemeData().copyWith(dividerColor: Colors.transparent),
@@ -298,24 +354,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       height: 1.07,
                     ),
                   ),
-                  trailing: CustomSwitch(),
+                  trailing: CustomSwitch(onChanged: (value) {
+                    // Here, value will be true if the switch is turned on and false if it's turned off
+                    if (value) {
+                      // Add to Firestore
+                      FirebaseFirestore.instance.collection('schooldata').doc(sharedpref!.getString('id')).set({
+                        'fingerprint': true,
+                      }, SetOptions(merge: true));
+                    } else {
+                      // Remove from Firestore
+                      FirebaseFirestore.instance.collection('schooldata').doc(sharedpref!.getString('id')).set({
+                        'fingerprint': false,
+                      }, SetOptions(merge: true));
+                    }
+                  },
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                // ListTile(
-                //   title: const Text(
-                //     'Alarm',
-                //     style: TextStyle(
-                //       color: Color(0xFF771F98),
-                //       fontSize: 15,
-                //       fontFamily: 'Poppins-Medium',
-                //       fontWeight: FontWeight.w500,
-                //       height: 1.07,
-                //     ),
-                //   ),
-                //   trailing: CustomSwitch(),
-                // ),
+                ListTile(
+                  title: const Text(
+                    'Alarm',
+                    style: TextStyle(
+                      color: Color(0xFF771F98),
+                      fontSize: 15,
+                      fontFamily: 'Poppins-Medium',
+                      fontWeight: FontWeight.w500,
+                      height: 1.07,
+                    ),
+                  ),
+                  trailing: CustomSwitch(
+                    onChanged: (value) {
+                      // Here, value will be true if the switch is turned on and false if it's turned off
+                      if (value) {
+                        // Add to Firestore
+                        FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).set({
+                          'alarm': true,
+                        }, SetOptions(merge: true));
+                      } else {
+                        // Remove from Firestore
+                        FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).set({
+                          'alarm': false,
+                        }, SetOptions(merge: true));
+                      }
+                    },
+                  ),
+                ),
                 const SizedBox(
                   height: 40,
                 ),

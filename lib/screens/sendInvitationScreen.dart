@@ -84,7 +84,7 @@ class _SendInvitationState extends State<SendInvitation> {
         'phoneNumber': enteredPhoneNumber,
         'state':0,
         'invite':1,
-        'busphoto': ' ',
+        'busphoto': '',
         'schoolid':_schoolId,
         'schoolname':sharedpref!.getString('nameEnglish'),
          'photo':sharedpref!.getString('photo')

@@ -216,7 +216,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   String? selectedValueWaiting;
   getDataForDeclinedFilter()async{
     CollectionReference supervisor = FirebaseFirestore.instance.collection('supervisor');
-    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 0).get();
+    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 2).where('schoolid', isEqualTo: sharedpref!.getString('id')).get(); //0
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -229,7 +229,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
   getDataForWaitingFilter()async{
     CollectionReference supervisor = FirebaseFirestore.instance.collection('supervisor');
-    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 1).get();
+    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 0).where('schoolid', isEqualTo: sharedpref!.getString('id')).get(); //1
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -242,7 +242,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
   getDataForAcceptFilter()async{
     CollectionReference supervisor = FirebaseFirestore.instance.collection('supervisor');
-    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 2 ).get();
+    QuerySnapshot supervisorData = await supervisor.where('state' , isEqualTo: 1 ).where('schoolid', isEqualTo: sharedpref!.getString('id')).get(); //2
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }

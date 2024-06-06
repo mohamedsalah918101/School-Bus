@@ -100,6 +100,9 @@ String newDocId='';
         fromDate: _selectedHolidayDates.first.toIso8601String(),
         toDate: _selectedHolidayDates.last.toIso8601String(),
         selectedDates: selectedDates,
+        schoolid: sharedpref!.getString('id').toString(),
+
+
 
       );
 
@@ -319,7 +322,7 @@ String newDocId='';
 
   void retrieveAllData() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolId', isEqualTo: sharedpref!.getString('id')).get();
 
       if (querySnapshot.size > 0) {
         for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
@@ -349,7 +352,7 @@ String newDocId='';
               List<String> selectedDatesStrings = dates.map((date) => date.toString()).toList();
 
               // Create a new Holiday object and add it to the list
-              Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings);
+              Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings,schoolid:sharedpref!.getString('id').toString(),);
               _holidays.add(holiday);
 
               // Print extracted data
@@ -1060,7 +1063,7 @@ String newDocId='';
                               //new
                              // onSelectionChanged: _onDateRangeSelected,
 
-                              navigationMode: DateRangePickerNavigationMode.none,
+                              navigationMode: DateRangePickerNavigationMode.snap,
                               showNavigationArrow: true,
                               headerStyle: DateRangePickerHeaderStyle(
                                 textStyle: TextStyle(
@@ -1074,8 +1077,10 @@ String newDocId='';
 
                               monthViewSettings: DateRangePickerMonthViewSettings(
 
+                                enableSwipeSelection:true,
+
                                 //monthCellStyle: CustomMonthCellStyle(_selectedWeekendDays),
-                                showTrailingAndLeadingDates: false,
+                                showTrailingAndLeadingDates: true,
                                 viewHeaderStyle:
                                     const DateRangePickerViewHeaderStyle(
 
@@ -1087,7 +1092,7 @@ String newDocId='';
                                   ),
                                 ),
                                specialDates: highlightedDates,
-                            //   weekendDays: ,
+                              //weekendDays: _selectedHolidayDates,
                                 // weekendDays: const [5, 6],
                                 // specialDates: [
                                 //   DateTime(2024, 03, 3),
