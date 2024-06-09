@@ -203,6 +203,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     ]);
   }
   //functions of filter
+  String selectedFilter = '';
   bool isAcceptFiltered = false;
   bool isDeclineFiltered = false;
   bool isWaitingFiltered = false;
@@ -425,6 +426,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                         }).toList();
                                                       }
                                                     });
+
                                                   },
                                                   // onChanged: (value) {
                                                   //   filterSearchResults(value);
@@ -547,16 +549,19 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                   ),
                                                                   onTap: (){
                                                                     if (selectedValueAccept != null) {
+                                                                      selectedFilter='Accepted';
                                                                       currentFilter = 'Accepted';
                                                                       getDataForAcceptFilter();
                                                                       Navigator.pop(context);
                                                                       print('2');
                                                                     }else  if (selectedValueDecline != null) {
+                                                                      selectedFilter='Declined';
                                                                       currentFilter = 'Declined';
                                                                       getDataForDeclinedFilter();
                                                                       Navigator.pop(context);
                                                                       print('0');
                                                                     }else  if (selectedValueWaiting != null) {
+                                                                      selectedFilter='Waiting';
                                                                       currentFilter = 'Waiting';
                                                                       getDataForWaitingFilter();
                                                                       Navigator.pop(context);

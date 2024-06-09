@@ -210,16 +210,40 @@ class BusScreenSate extends State<BusScreen> {
     });
   }
 
-  getDataForSupervisorFilter()async{
-    CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('supervisorname').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
+  // getDataForSupervisorFilter()async{
+  //   CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+  //   QuerySnapshot BusData = await Bus.where('supervisorname').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
+  //   // parentData.docs.forEach((element) {
+  //   //   data.add(element);
+  //   // }
+  //   // );
+  //   setState(() {
+  //     data = BusData.docs;
+  //     isFiltered = true;
+  //   });
+  // }
+  Future<void> getDataForSupervisorFilter() async {
+    CollectionReference busDataCollection = FirebaseFirestore.instance.collection('busdata');
+    QuerySnapshot busDataQuerySnapshot = await busDataCollection.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
+    List<QueryDocumentSnapshot> filteredData = busDataQuerySnapshot.docs;
+
     setState(() {
-      data = BusData.docs;
+      data = filteredData;
       isFiltered = true;
+    });
+
+    // Extract the supervisors from the filtered data
+    List<Supervisor> supervisors = [];
+    for (QueryDocumentSnapshot doc in filteredData) {
+      List<dynamic> docSupervisors = doc.get('supervisors');
+      for (dynamic supervisor in docSupervisors) {
+        supervisors.add(Supervisor(name: supervisor['name']));
+      }
+    }
+
+    // Update the _supervisors list with the extracted supervisors
+    setState(() {
+      _supervisors = supervisors;
     });
   }
 
@@ -402,7 +426,8 @@ class BusScreenSate extends State<BusScreen> {
                                                     ),
                                                     child: Padding(
                                                       padding: const EdgeInsets.only(left: 10),
-                                                      child: SearchBar(
+                                                      child:
+                                                      SearchBar(
                                                         leading: Padding(
                                                           padding: const EdgeInsets.only(left: 4.0),
                                                           child: Image.asset("assets/imgs/school/icons8_search 1.png",width: 22,height: 22,),
@@ -418,11 +443,23 @@ class BusScreenSate extends State<BusScreen> {
                                                                 // Filter by bus number
                                                                 String busNumber = item['busnumber'] as String;
                                                                 return busNumber.toLowerCase().contains(query.toLowerCase());
-                                                              } else if (selectedFilter == 'Driver Name') {
+                                                              } else if (selectedFilter == 'Driver Name')
+                                                              {
                                                                 // Filter by driver name
                                                                 String driverName = item['namedriver'] as String;
                                                                 return driverName.toLowerCase().contains(query.toLowerCase());
                                                               }
+                                                              else if (selectedFilter == 'Supervisor') {
+                                                                // Filter by supervisor name
+                                                                List<dynamic> supervisors = item['supervisors'];
+                                                                for (var supervisor in supervisors) {
+                                                                  if (supervisor['name'].toLowerCase().contains(query.toLowerCase())) {
+                                                                    return true;
+                                                                  }
+                                                                }
+                                                                return false;
+                                                              }
+
                                                               return false; // Default case
                                                             }).toList().cast<QueryDocumentSnapshot<Object?>>();
                                                           });
@@ -540,6 +577,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                           print('0');
                                                                         }else  if (selectedValueWaiting != null) {
                                                                           currentFilter = 'Supervisor';
+                                                                          selectedFilter='Supervisor';
                                                                           getDataForSupervisorFilter();
                                                                           Navigator.pop(context);
                                                                           print('1');
@@ -653,7 +691,7 @@ class BusScreenSate extends State<BusScreen> {
                                                   // shrinkWrap: true,
                                                   //itemCount: filteredData.length,
                                                   //itemCount: data.length,
-                                                    itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' ?  filteredData.length : data.length,
+                                                    itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' || selectedFilter =='Supervisor' ?  filteredData.length : data.length,
                                                     itemBuilder: (context, index) {
 
 
@@ -670,27 +708,25 @@ class BusScreenSate extends State<BusScreen> {
                                                         Column(
                                                           children: [
                                                             ListTile(
-                                                              leading:imageUrl.isNotEmpty
+                                                              leading: imageUrl.isNotEmpty
                                                                   ? ClipOval(
-                                                                    child: Image.network(
-                                                                imageUrl,
-                                                                width: 61,
-                                                                height: 61,
-                                                                      fit: BoxFit.cover,
-                                                                errorBuilder: (context, error, stackTrace) {
-                                                                    // Display a default image if loading fails
-                                                                    return Image.asset(
-                                                                      defaultImageAsset,
-                                                                      width: 61,
-                                                                      height: 61,
-                                                                      fit: BoxFit.cover,
-                                                                    );
-                                                                },
-                                                                //fit: BoxFit.cover,
-                                                              ),
-                                                                  )
+                                                                  child: Image.network(
+                                                                    imageUrl,
+                                                                    width: 61,
+                                                                    height: 61,
+                                                                    fit: BoxFit.cover,
+                                                                    errorBuilder: (context, error, stackTrace) {
+                                                                      // Display a default image if loading fails
+                                                                      return Image.asset(
+                                                                        defaultImageAsset,
+                                                                        width: 61,
+                                                                        height: 61,
+                                                                        fit: BoxFit.cover,
+                                                                      );
+                                                                    },
+                                                                  ))
                                                                   : Image.asset(
-                                                                defaultImageAsset,
+                                                                'assets/imgs/school/empty_supervisor.png',
                                                                 width: 61,
                                                                 height: 61,
                                                                 fit: BoxFit.cover,
@@ -700,9 +736,11 @@ class BusScreenSate extends State<BusScreen> {
                                                               //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
                                                               //               },),
                                                               title: Text(
-                                                                selectedFilter == 'Bus Number' ? '${filteredData[index]['busnumber']}' : '${filteredData[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
-
-                                                                //'${data[index]['busnumber'] }',
+                                                                selectedFilter == 'Bus Number'
+                                                                    ? '${filteredData[index]['busnumber']}'
+                                                                    : selectedFilter == 'Supervisor'
+                                                                    ? '${filteredData[index]['supervisors'][0]['name']}'
+                                                                    : '${filteredData[index]['namedriver']}',
                                                                 style: TextStyle(
                                                                   color: Color(0xFF442B72),
                                                                   fontSize: 17,
@@ -711,8 +749,11 @@ class BusScreenSate extends State<BusScreen> {
                                                                 ),
                                                               ),
                                                               subtitle: Text(
-                                                                selectedFilter == 'Bus Number' ?'Driver Name : ${filteredData[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
-                                                                //"Driver Name : "+data[index]['namedriver'],
+                                                                selectedFilter == 'Bus Number'
+                                                                    ? 'Driver Name: ${filteredData[index]['namedriver']}'
+                                                                    : selectedFilter == 'Supervisor'
+                                                                    ? 'Bus Number: ${filteredData[index]['busnumber']}'
+                                                                    : 'Bus number: ${data[index]['busnumber']}',
                                                                 style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
                                                               ),
                                                               trailing:

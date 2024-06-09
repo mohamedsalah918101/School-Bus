@@ -322,7 +322,7 @@ String newDocId='';
 
   void retrieveAllData() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolId', isEqualTo: sharedpref!.getString('id')).get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
 
       if (querySnapshot.size > 0) {
         for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {

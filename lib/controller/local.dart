@@ -308,6 +308,9 @@ class MyLocal implements Translations{
       'Delays': 'التأخير',
       'Cancel Absence': 'إلغاء الغياب',
       'Number *': 'رقم التليفون *',
+      'Home':'الرئسيه',
+      'Vacations':'الاجازات',
+
       'Add Additional Data': 'إضافة بيانات إضافية',
       'Location *': 'العنوان',
       'Location' : 'العنوان',

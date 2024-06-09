@@ -185,10 +185,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(
                   height: 30,
                 ),
-                const Padding(
+                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
-                    'General',
+                    'General'.tr,
                     style: TextStyle(
                       color: Color(0xFF442B72),
                       fontSize: 18,
@@ -202,8 +202,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 30,
                 ),
                 ListTile(
-                  title: const Text(
-                    'Notifications',
+                  title:  Text(
+                    'Notifications'.tr,
                     style: TextStyle(
                       color: Color(0xFF771F98),
                       fontSize: 15,
@@ -217,8 +217,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Theme(
                   data: ThemeData().copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
-                    title: const Text(
-                      'Language',
+                    title:  Text(
+                      'Language'.tr,
                       style: TextStyle(
                         color: Color(0xFF771F98),
                         fontSize: 15,
@@ -330,10 +330,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
-                const Padding(
+                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 25),
                   child: Text(
-                    'Advanced',
+                    'Advanced'.tr,
                     style: TextStyle(
                       color: Color(0xFF442B72),
                       fontSize: 18,
@@ -344,8 +344,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 ListTile(
-                  title: const Text(
-                    'Fingerprint and Face ID',
+                  title:  Text(
+                    'Fingerprint and Face ID'.tr,
                     style: TextStyle(
                       color: Color(0xFF771F98),
                       fontSize: 15,
@@ -374,8 +374,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 20,
                 ),
                 ListTile(
-                  title: const Text(
-                    'Alarm',
+                  title:  Text(
+                    'Alarm'.tr,
                     style: TextStyle(
                       color: Color(0xFF771F98),
                       fontSize: 15,
@@ -442,7 +442,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           Text(
-                            "Delete Account",
+                            "Delete Account".tr,
                             style: TextStyle(
                                 fontSize: 16,
                                 fontFamily: "Poppins-Medium",
