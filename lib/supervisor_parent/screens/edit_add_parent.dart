@@ -90,12 +90,6 @@ class _EditAddParentsState extends State<EditAddParents> {
           // Check if the number of children and the length of the nameChildControllers and gradeControllers lists match
           if (nameChildControllers.length!= numberOfChildren || gradeControllers.length!= numberOfChildren) {
             print('Mismatch in number of children and controllers length');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Mismatch in number of children and controllers length'),
-                duration: Duration(seconds: 2),
-              ),
-            );
             return;
           }
 
