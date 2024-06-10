@@ -90,12 +90,6 @@ class _EditAddParentsState extends State<EditAddParents> {
           // Check if the number of children and the length of the nameChildControllers and gradeControllers lists match
           if (nameChildControllers.length!= numberOfChildren || gradeControllers.length!= numberOfChildren) {
             print('Mismatch in number of children and controllers length');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Mismatch in number of children and controllers length'),
-                duration: Duration(seconds: 2),
-              ),
-            );
             return;
           }
 
@@ -816,22 +810,40 @@ class _EditAddParentsState extends State<EditAddParents> {
                                   height: 40,
                                   child: TextFormField(
                                     onChanged: (val) {
+                                      print('g');
                                       setState(() {
-
+                                        if (val.isNotEmpty) {
+                                          NumberOfChildrenCard = true;
+                                        }
+                                        String input = _numberOfChildrenController.text;
+                                        count = int.tryParse(input) ?? 0;
+                                        // count = count - nameChildControllers.length;
+                                        for (int i = 0; i < count; i++) {
+                                          genderSelection.add('male');
+                                          TextEditingController nameController = TextEditingController();
+                                          TextEditingController gradeController = TextEditingController();
+                                          nameChildControllers.add(nameController);
+                                          gradeControllers.add(gradeController);
+                                        }
                                       });
-                                      String input = _numberOfChildrenController.text;
-                                      count = int.tryParse(input) ?? 0;
-                                      // count = count - nameChildControllers.length;
-                                      for (int i = 0; i < count; i++) {
-                                        genderSelection.add('male');
-                                        TextEditingController nameController =
-                                        TextEditingController();
-                                        TextEditingController gradeController =
-                                        TextEditingController();
-                                        nameChildControllers.add(nameController);
-                                        gradeControllers.add(gradeController);
-                                      }
                                     },
+                                    // onChanged: (val) {
+                                    //   setState(() {
+                                    //
+                                    //   });
+                                    //   String input = _numberOfChildrenController.text;
+                                    //   count = int.tryParse(input) ?? 0;
+                                    //   // count = count - nameChildControllers.length;
+                                    //   for (int i = 0; i < count; i++) {
+                                    //     genderSelection.add('male');
+                                    //     TextEditingController nameController =
+                                    //     TextEditingController();
+                                    //     TextEditingController gradeController =
+                                    //     TextEditingController();
+                                    //     nameChildControllers.add(nameController);
+                                    //     gradeControllers.add(gradeController);
+                                    //   }
+                                    // },
                                     controller: _numberOfChildrenController,
                                     style: TextStyle(
                                       color: Color(0xFF442B72),

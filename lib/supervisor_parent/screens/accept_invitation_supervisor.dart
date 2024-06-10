@@ -2,27 +2,52 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/decline_invitation_parent.dart';
 import 'package:school_account/supervisor_parent/screens/decline_invitation_supervisore.dart';
-import 'package:school_account/supervisor_parent/screens/final_invitation_parent.dart';
 import 'package:school_account/supervisor_parent/screens/final_invitation_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent_takebus.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent.dart';
-import 'package:school_account/supervisor_parent/screens/sign_up.dart';
 import '../components/elevated_simple_button.dart';
-import '../components/main_bottom_bar.dart';
 
 class AcceptInvitationSupervisor extends StatefulWidget {
-  const AcceptInvitationSupervisor({super.key});
+  final String? schoolDataDocumentId;
+  // String schoolDataDocumentId = sharedpref?.getString('id') ?? '';
+
+
+  const AcceptInvitationSupervisor({super.key,  this.schoolDataDocumentId});
 
   @override
   State<AcceptInvitationSupervisor> createState() => _AcceptInvitationSupervisorState();
 }
 
 class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor> {
+
+  final _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use the schoolDataDocumentId in the initState method
+    print('Supervisor class received document ID: ${widget.schoolDataDocumentId}');
+  }
+
+  String? _schoolId;
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLID$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
 
 
   @override
@@ -116,6 +141,15 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
 
                               setState(() {
                               });
+
+
+                                            await _firestore.collection('notification').add({
+                                              'item': 'accept Invitation',
+                                              'timestamp': FieldValue.serverTimestamp(),
+                                              'SchoolId': widget.schoolDataDocumentId ?? 'N/A',
+                                            });
+
+
                             },
                             color: Color(0xFF442B72),
                             fontSize: 16),
