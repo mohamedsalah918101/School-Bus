@@ -51,7 +51,10 @@ void main()async {
 
   }
   initMessaging();
-  addPoints();
+  if(sharedpref!.getString('id').toString() != 'null' ||
+      sharedpref!.getString('id').toString() != ''
+      ){
+  addPoints();}
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget{

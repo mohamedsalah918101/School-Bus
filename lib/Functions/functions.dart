@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart' as FDB;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -426,7 +427,15 @@ dynamic last;
 
 //supervisir track
 addPoints(){
-  Timer.periodic(const Duration(seconds: 15), (timer) async {
+  Timer.periodic(const Duration(seconds: 5), (timer) async {
+    geolocator.LocationPermission permission;
+
+   var serviceEnabled =
+    await geolocator.GeolocatorPlatform.instance.isLocationServiceEnabled();
+    permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
+    if (
+        permission != geolocator.LocationPermission.denied &&
+        permission != geolocator.LocationPermission.deniedForever) {
     var locs = await geolocator.Geolocator.getLastKnownPosition();
     if (locs != null) {
       center = LatLng(locs.latitude, locs.longitude);
@@ -448,6 +457,11 @@ addPoints(){
         'lat': center.latitude, 'lang': center.longitude
       });
 
+    }}else{
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.denied) {
+        addPoints();
+      }
     }
   });
 }
