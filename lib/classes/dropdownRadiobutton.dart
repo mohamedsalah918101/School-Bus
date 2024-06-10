@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'dropdowncheckboxitem.dart';
 
@@ -116,7 +117,7 @@ class _DropdownRadiobuttonState extends State<DropdownRadiobutton> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Filter',style: TextStyle(color: Color(0xff993D9A),
+                Text('Filter'.tr,style: TextStyle(color: Color(0xff993D9A),
                   fontSize: 18,
                   fontFamily: 'Poppins-Bold',
                   ),),

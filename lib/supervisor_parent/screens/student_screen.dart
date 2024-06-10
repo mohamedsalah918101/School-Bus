@@ -38,6 +38,7 @@ class StudentScreen extends StatefulWidget {
 class _StudentScreen extends State<StudentScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<QueryDocumentSnapshot> data = [];
+  final _firestore = FirebaseFirestore.instance;
   bool dataLoading=false;
 
   void _makePhoneCall() async {
@@ -74,392 +75,457 @@ class _StudentScreen extends State<StudentScreen> {
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 35,
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).pop();
-                    },
-                    child:  Padding(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 17.0),
-                      child: Image.asset(
-                        (sharedpref?.getString('lang') == 'ar')?
-                        'assets/images/Layer 1.png':
-                        'assets/images/fi-rr-angle-left.png',
-                        width: 20,
-                        height: 22,),
-                    ),
-                  ),
-                  Text(
-                    'Student'.tr,
-                    style: TextStyle(
-                      color: Color(0xFF993D9A),
-                      fontSize: 16,
-                      fontFamily: 'Poppins-Bold',
-                      fontWeight: FontWeight.w700,
-                      height: 1,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _scaffoldKey.currentState!.openEndDrawer();
-                    },
-                    icon: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: const Icon(
-                        Icons.menu_rounded,
-                        color: Color(0xff442B72),
-                        size: 35,
-                      ),
-                    ),
-                  ),
-                ],
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Column(
+            children: [
+              SizedBox(
+                height: 35,
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // if(children.isEmpty)
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                        child: Text('Child'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF771F98),
-                            fontSize: 19,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                          ),),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).pop();
+                      },
+                      child:  Padding(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: 17.0),
+                        child: Image.asset(
+                          (sharedpref?.getString('lang') == 'ar')?
+                          'assets/images/Layer 1.png':
+                          'assets/images/fi-rr-angle-left.png',
+                          width: 20,
+                          height: 22,),
                       ),
-
-
-                      // Text('Gender: ${childData['gender']}'),
-
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                              SizedBox(
-                              width: double.infinity,
-                              height:  92,
-                              child: Card(
-                                elevation: 10,
-                                color: Colors.white,
-                                surfaceTintColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14.0),
-                                ),
-                                child: Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')?
-                                    EdgeInsets.only(right: 10.0 , bottom: 0):
-                                    EdgeInsets.only(left: 10.0 , bottom: 0),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Image.asset(
-                                              'assets/images/Ellipse 6.png',
-                                              height: 50,
-                                              width: 50,
-                                            ),
-                                            const SizedBox(
-                                              width: 15,
-                                            ),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(top: 0.0),
-                                                  child: Text(
-                                                    // 'Gender: ${childData['gender']}',
-                                                   '${widget.name}',
-                                                    style: TextStyle(
-                                                      color: Color(0xff442B72),
-                                                      fontSize: 17,
-                                                      fontFamily: 'Poppins-SemiBold',
-                                                      fontWeight: FontWeight.w600,
-                                                      height: 0.94,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 4,
-                                                ),
-                                                Text.rich(
-                                                  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Grade: '.tr,
-                                                        style: TextStyle(
-                                                          color: Color(0xFF919191),
-                                                          fontSize: 12,
-                                                          fontFamily: 'Poppins-Light',
-                                                          fontWeight: FontWeight.w400,
-                                                          // height: 1.33,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:'${widget.grade}',
-                                                        style: TextStyle(
-                                                          color: Color(0xFF442B72),
-                                                          fontSize: 12,
-                                                          fontFamily: 'Poppins-Light',
-                                                          fontWeight: FontWeight.w400,
-                                                          height: 1.33,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Text.rich(
-                                                  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text: 'Address: '.tr,
-                                                        style: TextStyle(
-                                                          color: Color(0xFF919191),
-                                                          fontSize: 12,
-                                                          fontFamily: 'Poppins-Light',
-                                                          fontWeight: FontWeight.w400,
-                                                          height: 1.33,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text: '${widget.address}',
-                                                        style: TextStyle(
-                                                          color: Color(0xFF442B72),
-                                                          fontSize: 12,
-                                                          fontFamily: 'Poppins-Light',
-                                                          fontWeight: FontWeight.w400,
-                                                          height: 1.33,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-
-                                              ],
-                                            ),
-
-                                          ],
-                                        ),
-                                      ],
-                                    )),
-                              ),
-                            ),
-                                // StudentCardInStudent(childData: {},),
-                                SizedBox(height:10),
-                              ],
-                            );
-                          },
-                        )
-
-                      ),
-                      SizedBox(height: 50,),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                    child: Text('Parent'.tr,
+                    ),
+                    Text(
+                      'Student'.tr,
                       style: TextStyle(
-                        color: Color(0xFF771F98),
-                        fontSize: 19,
+                        color: Color(0xFF993D9A),
+                        fontSize: 16,
                         fontFamily: 'Poppins-Bold',
                         fontWeight: FontWeight.w700,
-                      ),),
-                  ),
+                        height: 1,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openEndDrawer();
+                      },
+                      icon: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: const Icon(
+                          Icons.menu_rounded,
+                          color: Color(0xff442B72),
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // if(children.isEmpty)
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: 1,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Column(
-                          children: [
-                          SizedBox(
-                          width: double.infinity,
-                          height:125,
-                          child: Card(
-                            elevation: 10,
-                            color: Colors.white,
-                            surfaceTintColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                            ),
-                            child: Padding(
-                                padding:(sharedpref?.getString('lang') == 'ar')?
-                                EdgeInsets.only(right: 10.0 ):
-                                EdgeInsets.only(left: 10.0 ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/Ellipse 6.png',
-                                          height: 50,
-                                          width: 50,
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 8.0),
-                                              child: Text(
-                                                '${widget.ParentName}',
-                                                style: TextStyle(
-                                                  color: Color(0xff442B72),
-                                                  fontSize: 17,
-                                                  fontFamily: 'Poppins-SemiBold',
-                                                  fontWeight: FontWeight.w600,
-                                                  height: 0.94,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                          child: Text('Child'.tr,
+                            style: TextStyle(
+                              color: Color(0xFF771F98),
+                              fontSize: 19,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                            ),),
+                        ),
+
+
+                        // Text('Gender: ${childData['gender']}'),
+
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: 1,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Column(
+                                children: [
+                                SizedBox(
+                                width: double.infinity,
+                                height:  92,
+                                child: Card(
+                                  elevation: 10,
+                                  color: Colors.white,
+                                  surfaceTintColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.0),
+                                  ),
+                                  child: Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')?
+                                      EdgeInsets.only(right: 10.0 , bottom: 0):
+                                      EdgeInsets.only(left: 10.0 , bottom: 0),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              FutureBuilder(
+                                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return Text('Something went wrong');
+                                                  }
+
+                                                  if (snapshot.connectionState == ConnectionState.done) {
+                                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                      return CircleAvatar(
+                                                        radius: 25,
+                                                        backgroundColor: Color(0xff442B72),
+                                                        child: CircleAvatar(
+                                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                          radius: 25,
+                                                        ),
+                                                      );
+                                                    }
+
+                                                    Map<String, dynamic>? data = snapshot.data?.data();
+                                                    if (data != null && data['busphoto'] != null) {
+                                                      return CircleAvatar(
+                                                        radius: 25,
+                                                        backgroundColor: Color(0xff442B72),
+                                                        child: CircleAvatar(
+                                                          backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                          radius:25,
+                                                        ),
+                                                      );
+                                                    }
+                                                  }
+
+                                                  return Container();
+                                                },
+                                              ),
+                                              const SizedBox(
+                                                width: 15,
+                                              ),
+                                              Column(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 0.0),
+                                                    child: Text(
+                                                      // 'Gender: ${childData['gender']}',
+                                                     '${widget.name}',
+                                                      style: TextStyle(
+                                                        color: Color(0xff442B72),
+                                                        fontSize: 17,
+                                                        fontFamily: 'Poppins-SemiBold',
+                                                        fontWeight: FontWeight.w600,
+                                                        height: 0.94,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 4,
+                                                  ),
+                                                  Text.rich(
+                                                    TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'Grade: '.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF919191),
+                                                            fontSize: 12,
+                                                            fontFamily: 'Poppins-Light',
+                                                            fontWeight: FontWeight.w400,
+                                                            // height: 1.33,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:'${widget.grade}',
+                                                          style: TextStyle(
+                                                            color: Color(0xFF442B72),
+                                                            fontSize: 12,
+                                                            fontFamily: 'Poppins-Light',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.33,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Text.rich(
+                                                    TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'Address: '.tr,
+                                                          style: TextStyle(
+                                                            color: Color(0xFF919191),
+                                                            fontSize: 12,
+                                                            fontFamily: 'Poppins-Light',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.33,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: '${widget.address}',
+                                                          style: TextStyle(
+                                                            color: Color(0xFF442B72),
+                                                            fontSize: 12,
+                                                            fontFamily: 'Poppins-Light',
+                                                            fontWeight: FontWeight.w400,
+                                                            height: 1.33,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              ),
+
+                                            ],
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              ),
+                                  // StudentCardInStudent(childData: {},),
+                                  SizedBox(height:10),
+                                ],
+                              );
+                            },
+                          )
+
+                        ),
+                        SizedBox(height: 50,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                      child: Text('Parent'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF771F98),
+                          fontSize: 19,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                        ),),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 1,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                            SizedBox(
+                            width: double.infinity,
+                            height:125,
+                            child: Card(
+                              elevation: 10,
+                              color: Colors.white,
+                              surfaceTintColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14.0),
+                              ),
+                              child: Padding(
+                                  padding:(sharedpref?.getString('lang') == 'ar')?
+                                  EdgeInsets.only(right: 10.0 ):
+                                  EdgeInsets.only(left: 10.0 ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          FutureBuilder(
+                                            future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                              if (snapshot.hasError) {
+                                                return Text('Something went wrong');
+                                              }
+
+                                              if (snapshot.connectionState == ConnectionState.done) {
+                                                if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                  return CircleAvatar(
+                                                    radius: 25,
+                                                    backgroundColor: Color(0xff442B72),
+                                                    child: CircleAvatar(
+                                                      backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                      radius: 25,
+                                                    ),
+                                                  );
+                                                }
+
+                                                Map<String, dynamic>? data = snapshot.data?.data();
+                                                if (data != null && data['busphoto'] != null) {
+                                                  return CircleAvatar(
+                                                    radius: 25,
+                                                    backgroundColor: Color(0xff442B72),
+                                                    child: CircleAvatar(
+                                                      backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                      radius:25,
+                                                    ),
+                                                  );
+                                                }
+                                              }
+
+                                              return Container();
+                                            },
+                                          ),
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 8.0),
+                                                child: Text(
+                                                  '${widget.ParentName}',
+                                                  style: TextStyle(
+                                                    color: Color(0xff442B72),
+                                                    fontSize: 17,
+                                                    fontFamily: 'Poppins-SemiBold',
+                                                    fontWeight: FontWeight.w600,
+                                                    height: 0.94,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: 4,
-                                            ),
-                                            Text.rich(
-                                              TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: 'Number: '.tr,
-                                                    style: TextStyle(
-                                                      color: Color(0xFF919191),
-                                                      fontSize: 12,
-                                                      fontFamily: 'Poppins-Light',
-                                                      fontWeight: FontWeight.w400,
-                                                      // height: 1.33,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: '${widget.phonenumber}',
-                                                    style: TextStyle(
-                                                      color: Color(0xFF442B72),
-                                                      fontSize: 12,
-                                                      fontFamily: 'Poppins-Light',
-                                                      fontWeight: FontWeight.w400,
-                                                      // height: 1.33,
-                                                    ),
-                                                  ),
-                                                ],
+                                              SizedBox(
+                                                height: 4,
                                               ),
-                                            ),
-                                            Text.rich(
-                                              TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: 'Address: '.tr,
-                                                    style: TextStyle(
-                                                      color: Color(0xFF919191),
-                                                      fontSize: 12,
-                                                      fontFamily: 'Poppins-Light',
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 1.33,
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: 'Number: '.tr,
+                                                      style: TextStyle(
+                                                        color: Color(0xFF919191),
+                                                        fontSize: 12,
+                                                        fontFamily: 'Poppins-Light',
+                                                        fontWeight: FontWeight.w400,
+                                                        // height: 1.33,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: '${widget.address}',
-                                                    style: TextStyle(
-                                                      color: Color(0xFF442B72),
-                                                      fontSize: 12,
-                                                      fontFamily: 'Poppins-Light',
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 1.33,
+                                                    TextSpan(
+                                                      text: '${widget.phonenumber}',
+                                                      style: TextStyle(
+                                                        color: Color(0xFF442B72),
+                                                        fontSize: 12,
+                                                        fontFamily: 'Poppins-Light',
+                                                        fontWeight: FontWeight.w400,
+                                                        // height: 1.33,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: (sharedpref?.getString('lang') == 'ar')?
-                                              EdgeInsets.only(top: 8.0 , right: 150):
-                                              EdgeInsets.only(top: 8.0 , left: 150),
-                                              child: Row(
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: (){
-                                            _makePhoneCall();
-                                                       },
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: 'Address: '.tr,
+                                                      style: TextStyle(
+                                                        color: Color(0xFF919191),
+                                                        fontSize: 12,
+                                                        fontFamily: 'Poppins-Light',
+                                                        fontWeight: FontWeight.w400,
+                                                        height: 1.33,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '${widget.address}',
+                                                      style: TextStyle(
+                                                        color: Color(0xFF442B72),
+                                                        fontSize: 12,
+                                                        fontFamily: 'Poppins-Light',
+                                                        fontWeight: FontWeight.w400,
+                                                        height: 1.33,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: (sharedpref?.getString('lang') == 'ar')?
+                                                EdgeInsets.only(top: 8.0 , right: 150):
+                                                EdgeInsets.only(top: 8.0 , left: 150),
+                                                child: Row(
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: (){
+                                              _makePhoneCall();
+                                                         },
 
 
-                                                    child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                      color: Color(0xff442B72),
-                                                      width: 28,
-                                                      height: 28,),
-                                                  ),
-                                                  SizedBox(width: 9),
-                                                  GestureDetector(
-                                                    child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                      color: Color(0xff442B72),
-                                                      width: 26,
-                                                      height: 26,),
-                                                    onTap: () {
-                                                      print('object');
-                                                      Navigator.of(context).push(
-                                                          MaterialPageRoute(builder: (context) =>
-                                                              ChatScreen(
-                                                                receiverName: data[index]['name'],
-                                                                receiverPhone: data[index]['phoneNumber'],
-                                                                receiverId : data[index].id,
-                                                              )));
-                                                    },
-                                                  ),
-                                                ],
+                                                      child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                        color: Color(0xff442B72),
+                                                        width: 28,
+                                                        height: 28,),
+                                                    ),
+                                                    SizedBox(width: 9),
+                                                    GestureDetector(
+                                                      child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                        color: Color(0xff442B72),
+                                                        width: 26,
+                                                        height: 26,),
+                                                      onTap: () {
+                                                        print('object');
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(builder: (context) =>
+                                                                ChatScreen(
+                                                                  receiverName: widget.ParentName!,
+                                                                  receiverPhone: data[index]['phoneNumber'],
+                                                                  receiverId : data[index].id,
+                                                                )));
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
+                                            ],
+                                          ),
 
-                                      ],
-                                    ),
-                                  ],
-                                )),
+                                        ],
+                                      ),
+                                    ],
+                                  )),
+                            ),
                           ),
+                              // ParentCardInStudent(),
+                              SizedBox(height:10),
+                            ],
+                          );
+                        },
+                      ),),
+
+
+                        const SizedBox(
+                          height: 44,
                         ),
-                            // ParentCardInStudent(),
-                            SizedBox(height:10),
-                          ],
-                        );
-                      },
-                    ),),
 
-
-                      const SizedBox(
-                        height: 44,
-                      ),
-
-                    ],
-                  )
+                      ],
+                    )
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         // extendBody: true,
         resizeToAvoidBottomInset: false,

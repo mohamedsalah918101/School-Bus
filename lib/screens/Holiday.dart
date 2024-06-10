@@ -23,20 +23,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Holiday {
   final String name;
- // final Timestamp fromDate;
+
+  // final Timestamp fromDate;
   final String fromDate;
   final String toDate;
+
   //final Timestamp toDate;
   //final List<Timestamp> selectedDates;
   final List<String> selectedDates;
-  Holiday({required this.name, required this.fromDate, required this.toDate, required this.selectedDates});
+  final String schoolid;
+
+  Holiday(
+      {required this.name,
+      required this.fromDate,
+      required this.toDate,
+      required this.selectedDates,
+      required this.schoolid
+      });
 
   factory Holiday.fromJson(Map<String, dynamic> json) {
     return Holiday(
       name: json['name'],
       fromDate: json['fromDate'],
       toDate: json['toDate'],
-      selectedDates: List<String>.from(json['selectedDates']),
+      selectedDates:
+          List<String>.from(json['selectedDates'])
+        , schoolid: json['SchoolId']
     );
   }
 
@@ -46,6 +58,7 @@ class Holiday {
       'fromDate': fromDate,
       'toDate': toDate,
       'selectedDates': selectedDates,
+      'schoolid': schoolid,
     };
   }
 }

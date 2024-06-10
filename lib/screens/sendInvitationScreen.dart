@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/components/home_drawer.dart';
+import 'package:school_account/main.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
@@ -22,7 +23,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SendInvitation extends StatefulWidget{
   const SendInvitation({super.key});
@@ -54,6 +55,26 @@ class _SendInvitationState extends State<SendInvitation> {
   bool phoneerror= true;
   final _firestore = FirebaseFirestore.instance;
   String enteredPhoneNumber='';
+
+//fun to get current schoolid
+  String? _schoolId;
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLID$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
       // Define the data to add
@@ -63,7 +84,10 @@ class _SendInvitationState extends State<SendInvitation> {
         'phoneNumber': enteredPhoneNumber,
         'state':0,
         'invite':1,
-        'busphoto': ' ',
+        'busphoto': '',
+        'schoolid':_schoolId,
+        'schoolname':sharedpref!.getString('nameEnglish'),
+         'photo':sharedpref!.getString('photo')
       };
       print('phonenum');
       print( _phoneNumberController.text);
@@ -141,10 +165,18 @@ bool _nameEntered =true;
     });
     return isValid;
   }
+
+  bool isValidEmail(String email) {
+    // Use a regular expression to check the email format
+    String pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
 // to lock in landscape view
   @override
   void initState() {
     super.initState();
+    getSchoolId();
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -655,6 +687,15 @@ bool _nameEntered =true;
                               width: constrains.maxWidth / 1.2,
                               height: 44,
                               child: TextFormField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return null; // allow empty email field
+                                  }
+                                  if (!isValidEmail(value)) {
+                                    return 'Invalid email address';
+                                  }
+                                  return null;
+                                },
                                 controller: _emailController,
                                 focusNode: _emailSupervisorFocus,
                                 cursorColor: const Color(0xFF442B72),
@@ -714,7 +755,7 @@ bool _nameEntered =true;
                                  async {
 
                                    setState(() {
-                                     if (_nameController.text.isEmpty) {
+                                     if (_nameController.text.trim().isEmpty) {
                                        nameerror = false;
                                      } else {
                                        nameerror = true;
@@ -727,9 +768,9 @@ bool _nameEntered =true;
                                      // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
                                      // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
                                    });
-                                   if(nameerror
+                                   if(nameerror &&
                                   // ! _nameController.text.isEmpty
-                                       &&
+
                                        //! _phoneNumberController.text.isEmpty
                                    _phoneNumberController.text.length == 10 && phoneerror){
                                      _addDataToFirestore();
@@ -743,7 +784,7 @@ bool _nameEntered =true;
                                      }
                                    }
                                    else{
-                                     SnackBar(content: Text('Please,enter valid number'));
+                                     SnackBar(content: Text('Please,enter valid name and phone number'));
                                    }
                                 //   _addDataToFirestore();
                                   },

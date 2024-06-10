@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart' as FDB;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -11,6 +14,8 @@ import 'package:http/http.dart' as http;
 import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
 import '../model/ParentModel.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
+
 dynamic platform;
 
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
@@ -116,6 +121,9 @@ Future<bool> checkIfNumberExists(String phoneNumber) async {
     if(snapshot.size > 0){
       loginType = 'schooldata';
       id =snapshot.docs[0].id;
+      sharedpref!.setString('nameEnglish',snapshot.docs[0].get('nameEnglish'));
+      sharedpref!.setString('photo',snapshot.docs[0].get('photo'));
+
       if(snapshot.docs[0].get('state') == 0)
        {
          print(snapshot.docs[0].get('state').toString()+'ghghgh');
@@ -410,3 +418,39 @@ class PointLatLng {
     return "lat: $latitude / longitude: $longitude";
   }
 }
+
+
+
+dynamic center;
+dynamic last;
+
+//supervisir track
+addPoints(){
+  Timer.periodic(const Duration(seconds: 15), (timer) async {
+    var locs = await geolocator.Geolocator.getLastKnownPosition();
+    if (locs != null) {
+      center = LatLng(locs.latitude, locs.longitude);
+    } else {
+      var loc = await geolocator.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocator.LocationAccuracy.low);
+      center = LatLng(double.parse(loc.latitude.toString()),
+          double.parse(loc.longitude.toString()));
+    }
+
+    if (last == null || last.latitude != center.latitude || last.longitude != center.longitude) {
+      last = center;
+      FDB.FirebaseDatabase.instance
+          .ref()
+          .child('supervisors').child(sharedpref!.getString("id").toString()).push().set({
+        'lat': center.latitude, 'lang': center.longitude
+      });
+      FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString("id").toString()).update({
+        'lat': center.latitude, 'lang': center.longitude
+      });
+
+    }
+  });
+}
+
+
+

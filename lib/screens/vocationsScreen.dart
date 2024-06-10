@@ -9,6 +9,7 @@ import '../classes/custom_month_cell.dart';
 import '../components/elevated_icon_button.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/home_drawer.dart';
+import '../main.dart';
 import 'Holiday.dart';
 import 'busesScreen.dart';
 import 'calenderadd.dart';
@@ -99,6 +100,10 @@ String newDocId='';
         fromDate: _selectedHolidayDates.first.toIso8601String(),
         toDate: _selectedHolidayDates.last.toIso8601String(),
         selectedDates: selectedDates,
+        schoolid: sharedpref!.getString('id').toString(),
+
+
+
       );
 
       try {
@@ -176,7 +181,11 @@ String newDocId='';
 
     List<String> selectedDays = days.where((day) => day.isChecked).map((day) => day.name).toList();
 
-    await _weekendCollection.add({'days': selectedDays});
+    await _weekendCollection.add({'days': selectedDays,
+      'schoolid':sharedpref!.getString('id')
+    });
+
+
   }
   bool color = false;
   bool isVisible = false;
@@ -195,7 +204,7 @@ String newDocId='';
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
 
-    QuerySnapshot querySnapshot = await _weekendCollection.get();
+    QuerySnapshot querySnapshot = await _weekendCollection.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     if (querySnapshot.docs.isNotEmpty) {
       var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
       print("WEEKEND TEST");
@@ -313,7 +322,7 @@ String newDocId='';
 
   void retrieveAllData() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolId', isEqualTo: sharedpref!.getString('id')).get();
 
       if (querySnapshot.size > 0) {
         for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
@@ -343,7 +352,7 @@ String newDocId='';
               List<String> selectedDatesStrings = dates.map((date) => date.toString()).toList();
 
               // Create a new Holiday object and add it to the list
-              Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings);
+              Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings,schoolid:sharedpref!.getString('id').toString(),);
               _holidays.add(holiday);
 
               // Print extracted data
@@ -506,7 +515,7 @@ String newDocId='';
                       ),
                     ),
 
-                    //SizedBox(width: 80,),
+                    SizedBox(width: 40,),
                     Row(
                       //mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -1050,11 +1059,11 @@ String newDocId='';
                           child: IgnorePointer(
                             ignoring: !isAddingHoliday,
                             child: SfDateRangePicker(
-
+                              allowViewNavigation: true,
                               //new
                              // onSelectionChanged: _onDateRangeSelected,
 
-                              navigationMode: DateRangePickerNavigationMode.none,
+                              navigationMode: DateRangePickerNavigationMode.snap,
                               showNavigationArrow: true,
                               headerStyle: DateRangePickerHeaderStyle(
                                 textStyle: TextStyle(
@@ -1068,8 +1077,10 @@ String newDocId='';
 
                               monthViewSettings: DateRangePickerMonthViewSettings(
 
+                                enableSwipeSelection:true,
+
                                 //monthCellStyle: CustomMonthCellStyle(_selectedWeekendDays),
-                                showTrailingAndLeadingDates: false,
+                                showTrailingAndLeadingDates: true,
                                 viewHeaderStyle:
                                     const DateRangePickerViewHeaderStyle(
 
@@ -1081,7 +1092,7 @@ String newDocId='';
                                   ),
                                 ),
                                specialDates: highlightedDates,
-
+                              //weekendDays: _selectedHolidayDates,
                                 // weekendDays: const [5, 6],
                                 // specialDates: [
                                 //   DateTime(2024, 03, 3),
@@ -1200,6 +1211,15 @@ String newDocId='';
                                   ),
                                   shape: BoxShape.circle,
                                 ),
+                                //لون الويكند بالموف
+                                // weekendDatesDecoration: BoxDecoration(
+                                //   color: const Color(0xFF7A12FF),
+                                //   border: Border.all(
+                                //     color: const Color(0xFF7A12FF),
+                                //     width: 1,
+                                //   ),
+                                //   shape: BoxShape.circle,
+                                // ),
 
                                 // specialDatesDecoration: addAbsentDay
                                 //     ? BoxDecoration(
@@ -1433,7 +1453,7 @@ String newDocId='';
                               children: [
                                 Container(
                                   width: 3,
-                                  height: 55,
+                                  height: 48,
                                   color: const Color(0xFF442B72),
                                 ),
                                 const SizedBox(
@@ -1444,7 +1464,9 @@ String newDocId='';
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))} - ${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.toDate))}',
+                                      holiday.fromDate == holiday.toDate
+                                          ? '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))}'
+                                          : '${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.fromDate))} to ${DateFormat('dd MMM yyyy').format(DateTime.parse(holiday.toDate))}',
                                       style: TextStyle(
                                         color: Color(0xFF505050),
                                         fontSize: 20,
