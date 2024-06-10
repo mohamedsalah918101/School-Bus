@@ -23,20 +23,17 @@ import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-
-class AddBus extends StatefulWidget{
+class AddBus extends StatefulWidget {
   const AddBus({super.key});
+
   @override
   State<AddBus> createState() => _AddBusState();
 }
 
-
 class _AddBusState extends State<AddBus> {
-
-
-
 //fun to get current schoolid
   String? _schoolId;
+
   Future<void> getSchoolId() async {
     try {
       // Get the SharedPreferences instance
@@ -56,52 +53,53 @@ class _AddBusState extends State<AddBus> {
     }
   }
 
-
   MyLocalController ControllerLang = Get.find();
   String? _selectedSupervisor;
   List<String> _supervisors = ['Supervisor 1', 'Supervisor 2', 'Supervisor 3'];
-  TextEditingController _driverName=TextEditingController();
-  TextEditingController _driverNumber=TextEditingController();
-  TextEditingController _busNumber=TextEditingController();
-  TextEditingController _supervisor=TextEditingController();
+  TextEditingController _driverName = TextEditingController();
+  TextEditingController _driverNumber = TextEditingController();
+  TextEditingController _busNumber = TextEditingController();
+  TextEditingController _supervisor = TextEditingController();
   TextEditingController _supervisorController = TextEditingController();
   final _driverNameFocus = FocusNode();
   final _driverNumberFocus = FocusNode();
   final _busNumberFocus = FocusNode();
   final _supervisorFocus = FocusNode();
+
 // add to firestore
   final _firestore = FirebaseFirestore.instance;
-  File ? _selectedImagedriver;
-  File ? _selectedImagebus;
+  File? _selectedImagedriver;
+  File? _selectedImagebus;
   String? imageUrl;
   String? busimage;
   bool _validateDriverName = false;
   bool _validateDriverNumber = false;
   bool _validateBusNumber = false;
-  bool namedrivererror=true;
-  bool drivernumbererror=true;
-  bool busnumbererror=true;
-  bool supervisorerror=true;
-  bool driverphotoerror= true;
+  bool namedrivererror = true;
+  bool drivernumbererror = true;
+  bool busnumbererror = true;
+  bool supervisorerror = true;
+  bool driverphotoerror = true;
 
   //function choose photo from gallery
-  Future _pickImageFromGallery() async{
-    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage ==null) return;
+  Future _pickImageFromGallery() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) return;
     setState(() {
-      _selectedImagedriver=File(returnedImage.path);
+      _selectedImagedriver = File(returnedImage.path);
     });
 
     //Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('photo');
+    Reference referenceDirImages =
+        FirebaseStorage.instance.ref().child('photo');
     // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
-    Reference referenceImageToUpload =referenceDirImages.child('driver');
+    Reference referenceImageToUpload = referenceDirImages.child('driver');
     // Reference referenceDirImages =
     // referenceRoot.child('images');
     //
     // //Create a reference for the image to be stored
-
 
     //Handle errors/success
     try {
@@ -119,7 +117,8 @@ class _AddBusState extends State<AddBus> {
   }
 
   List<QueryDocumentSnapshot> data = [];
-  List<DropdownCheckboxItem> items=[];
+  List<DropdownCheckboxItem> items = [];
+
   // getData()async{
   //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
   //       .get();
@@ -134,7 +133,7 @@ class _AddBusState extends State<AddBus> {
   //   });
   // }
   getData() async {
-     // Get the current school ID from SharedPreferences
+    // Get the current school ID from SharedPreferences
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('supervisor')
         .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
@@ -149,24 +148,25 @@ class _AddBusState extends State<AddBus> {
     }
     setState(() {});
   }
+
   //fun image bus from gallery
-  Future _pickBusImageFromGallery() async{
-    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage ==null) return;
+  Future _pickBusImageFromGallery() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) return;
     setState(() {
-      _selectedImagebus=File(returnedImage.path);
+      _selectedImagebus = File(returnedImage.path);
     });
 
     //Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = FirebaseStorage.instance.ref().child('img');
     // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
-    Reference referenceImageToUpload =referenceDirImages.child('bus');
+    Reference referenceImageToUpload = referenceDirImages.child('bus');
     // Reference referenceDirImages =
     // referenceRoot.child('images');
     //
     // //Create a reference for the image to be stored
-
 
     //Handle errors/success
     try {
@@ -182,6 +182,7 @@ class _AddBusState extends State<AddBus> {
       //Some error occurred
     }
   }
+
   void _addDataToFirestore() async {
     // if (_driverName.text.isEmpty || _driverNumber.text.isEmpty || _busNumber.text.isEmpty || _selectedImage == null || _selectedImagebus == null) {
     //   // Show an error message or do something else if any of the required fields are empty or null
@@ -192,34 +193,31 @@ class _AddBusState extends State<AddBus> {
 
     List<Map<String, dynamic>> supervisorsList = List.generate(
       selectedItems.length,
-          (index) => {
+      (index) => {
         'name': selectedItems[index].label,
         'phone': selectedItems[index].phone,
-         'id': selectedItems[index].docID,
-
-          },
+        'id': selectedItems[index].docID,
+      },
     );
     Map<String, dynamic> data = {
       'namedriver': _driverName.text,
       'phonedriver': _driverNumber.text,
       'busnumber': _busNumber.text,
-      'supervisors':supervisorsList,
-      'imagedriver':imageUrl ??'',
-      'busphoto':busimage ??'',
-      'schoolid':_schoolId
+      'supervisors': supervisorsList,
+      'imagedriver': imageUrl ?? '',
+      'busphoto': busimage ?? '',
+      'schoolid': _schoolId
     };
     // Add the data to the Firestore collection
     await _firestore.collection('busdata').add(data).then((docRef) {
       print('Data added with document ID: ${docRef.id}');
       List.generate(
         selectedItems.length,
-            (index) {return
-          FirebaseFirestore.instance
+        (index) {
+          return FirebaseFirestore.instance
               .collection('supervisor')
               .doc(selectedItems[index].docID)
-              .update({'bus_id':docRef.id
-          });
-
+              .update({'bus_id': docRef.id});
         },
       );
     }).catchError((error) {
@@ -235,6 +233,7 @@ class _AddBusState extends State<AddBus> {
     //   _selectedImagebus = null;
     // });
   }
+
 // to lock in landscape view
   @override
   void initState() {
@@ -248,11 +247,12 @@ class _AddBusState extends State<AddBus> {
     selectedItems.clear();
     getData();
   }
+
   OutlineInputBorder myInputBorder() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
         borderSide: BorderSide(
-          color:  Color(0xFFFFC53E),
+          color: Color(0xFFFFC53E),
           width: 0.5,
         ));
   }
@@ -261,7 +261,7 @@ class _AddBusState extends State<AddBus> {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
         borderSide: BorderSide(
-          color:  Color(0xFFFFC53E),
+          color: Color(0xFFFFC53E),
           width: 0.5,
         ));
   }
@@ -278,8 +278,7 @@ class _AddBusState extends State<AddBus> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async{
-
+      onWillPop: () async {
         return false;
       },
       child: SafeArea(
@@ -294,60 +293,62 @@ class _AddBusState extends State<AddBus> {
                   height: 15,
                 ),
                 Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: AlignmentDirectional.topStart,
-                      child: InkWell(
-                        // onTap: ()=>exit(0),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          // Navigate back to the previous page
-                          Navigator.pop(context);
-
-                        },
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          size: 23,
-                          color: Color(0xff442B72),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          "Buses".tr,
-                          style: TextStyle(
-                            color: Color(0xFF993D9A),
-                            fontSize: 16,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.bold,
-                            height: 0.64,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: InkWell(onTap: (){
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                        child: Align(
-                          alignment: AlignmentDirectional.topEnd,
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: AlignmentDirectional.topStart,
+                        child: InkWell(
+                          // onTap: ()=>exit(0),
+                          onTap: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            // Navigate back to the previous page
+                            Navigator.pop(context);
+                          },
                           child: const Icon(
-                            Icons.menu_rounded,
-                            size: 40,
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 23,
                             color: Color(0xff442B72),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Buses".tr,
+                            style: TextStyle(
+                              color: Color(0xFF993D9A),
+                              fontSize: 16,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.bold,
+                              height: 0.64,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: InkWell(
+                          onTap: () {
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                          child: Align(
+                            alignment: AlignmentDirectional.topEnd,
+                            child: const Icon(
+                              Icons.menu_rounded,
+                              size: 40,
+                              color: Color(0xff442B72),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
                 Expanded(
                   child: SingleChildScrollView(
                     //reverse: true,
@@ -355,9 +356,6 @@ class _AddBusState extends State<AddBus> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
-
-
                         // const SizedBox(
                         //   height: 10,
                         // ),
@@ -369,93 +367,138 @@ class _AddBusState extends State<AddBus> {
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Stack(
                             children: [
-
                               Padding(
-                                padding: const EdgeInsets.only(top:5),
+                                padding: const EdgeInsets.only(top: 5),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-
                                     Column(
                                       children: [
                                         Row(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(left: 12),
+                                              padding: const EdgeInsets.only(
+                                                  left: 12),
                                               // child:Image.asset("assets/imgs/school/Frame 154.png",width: 65,height: 65,),
                                               // CircleAvatar( radius:30, // Set the radius of the circle
                                               //   backgroundImage: AssetImage('assets/imgs/school/Frame 154.png'),
                                               // ),
-                                              child: Stack(children: [
-                                                GestureDetector(
-                                                  onTap:()async {
-                        await _pickImageFromGallery();}  , // Call function when tapped
-                          child: _selectedImagedriver != null
-                              ? Image.file(
-                            _selectedImagedriver!,  // Display the uploaded image
-                            width: 83,  // Set width as per your preference
-                            height: 78.5,  // Set height as per your preference
-                            fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                          )
-                                                 :
-                          Container(
-
-                                                    width: 65, // Adjust size as needed
-                                                    height: 65,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-
-                                                      border: Border.all(
-                                                        color: Color(0xffCCCCCC), // Adjust border color
-                                                        width: 2, // Adjust border width
-                                                      ),
-                                                    ),
-                                                    child: Align(alignment: Alignment.bottomCenter,
-                                                      child: CircleAvatar(radius: 20,
-
-                                                      backgroundImage: AssetImage("assets/imgs/school/Vector (14).png",)
-                                                        ,backgroundColor: Colors.white,
-                                                      ),
-                                                    ),
+                                              child: Stack(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () async {
+                                                      await _pickImageFromGallery();
+                                                    },
+                                                    // Call function when tapped
+                                                    child:
+                                                        ClipOval(
+                                                          child: _selectedImagedriver !=
+                                                                  null
+                                                              ? Image.file(
+                                                                  _selectedImagedriver!,
+                                                                  // Display the uploaded image
+                                                                  width: 83,
+                                                                  // Set width as per your preference
+                                                                  height: 78.5,
+                                                                  // Set height as per your preference
+                                                                  fit: BoxFit
+                                                                      .cover, // Adjusts how the image fits in the container
+                                                                )
+                                                              : Container(
+                                                                  width: 65,
+                                                                  // Adjust size as needed
+                                                                  height: 65,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    border: Border
+                                                                        .all(
+                                                                      color: Color(
+                                                                          0xffCCCCCC),
+                                                                      // Adjust border color
+                                                                      width:
+                                                                          2, // Adjust border width
+                                                                    ),
+                                                                  ),
+                                                                  child: Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .bottomCenter,
+                                                                    child:
+                                                                        CircleAvatar(
+                                                                      radius: 20,
+                                                                      backgroundImage:
+                                                                          AssetImage(
+                                                                        "assets/imgs/school/Vector (14).png",
+                                                                      ),
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                        ),
                                                   ),
-
-                                                ),
-                                                Positioned(
-
+                                                  Positioned(
                                                     child: Container(
-                                                        width: 20, // Adjust size as needed
+                                                        width: 20,
+                                                        // Adjust size as needed
                                                         height: 20,
-                                                        decoration: BoxDecoration(
-
-                                                          shape: BoxShape.circle,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
                                                           border: Border.all(
-                                                            color: Color(0xffCCCCCC), // Adjust border color
-                                                            width: 2, // Adjust border width
+                                                            color: Color(
+                                                                0xffCCCCCC),
+                                                            // Adjust border color
+                                                            width:
+                                                                2, // Adjust border width
                                                           ),
                                                         ),
-                                                        child: Image.asset("assets/imgs/school/image-editing 1 1.png",width:11,height: 11,)),
-                                                  bottom: -10,
-                                                  left: 80,
-
-                                                )
-                                              ],
+                                                        child: Image.asset(
+                                                          "assets/imgs/school/image-editing 1 1.png",
+                                                          width: 11,
+                                                          height: 11,
+                                                        )),
+                                                    bottom: -10,
+                                                    left: 80,
+                                                  )
+                                                ],
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal:15,vertical: 0 ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 0),
                                               child: Align(
-                                                alignment: AlignmentDirectional.topStart,
-                                                child:
-                                                  RichText(
-                                                    text: TextSpan(
-                                                      children: [
-                                                        TextSpan(text:"Driver photo",style: TextStyle(color: Color(0xff442B72),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold' )),
-                                                        TextSpan(text: " *",style: TextStyle(color: Color(0xffDB4446),fontSize: 15,height: 1.07,fontFamily:'Poppins-Bold'))
-                                                      ]
-                                                    ),
-                                                  ),
-
+                                                alignment: AlignmentDirectional
+                                                    .topStart,
+                                                child: RichText(
+                                                  text: TextSpan(children: [
+                                                    TextSpan(
+                                                        text: "Driver photo",
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xff442B72),
+                                                            fontSize: 15,
+                                                            height: 1.07,
+                                                            fontFamily:
+                                                                'Poppins-Bold')),
+                                                    TextSpan(
+                                                        text: " *",
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xffDB4446),
+                                                            fontSize: 15,
+                                                            height: 1.07,
+                                                            fontFamily:
+                                                                'Poppins-Bold'))
+                                                  ]),
+                                                ),
                                               ),
                                             ),
                                             //error message on null photo
@@ -467,19 +510,25 @@ class _AddBusState extends State<AddBus> {
                                             //       style: TextStyle(color: Colors.red),
                                             //     ),
                                             //   ),
-
                                           ],
-
                                         ),
-                                        driverphotoerror?Container(): Padding(
-                                          padding: const EdgeInsets.only(left: 32),
-                                          child: Align( alignment: AlignmentDirectional.topStart,
-                                            child: Text(
-                                              "Please enter driver photo".tr,
-                                              style: TextStyle(color: Colors.red),
-                                            ),
-                                          ),
-                                        ),
+                                        driverphotoerror
+                                            ? Container()
+                                            : Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 32),
+                                                child: Align(
+                                                  alignment:
+                                                      AlignmentDirectional
+                                                          .topStart,
+                                                  child: Text(
+                                                    "Please enter driver photo"
+                                                        .tr,
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  ),
+                                                ),
+                                              ),
                                       ],
                                     ),
                                     // Padding(
@@ -489,11 +538,12 @@ class _AddBusState extends State<AddBus> {
                                     ),
 
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 35, vertical: 0),
                                       child: Align(
-                                        alignment: AlignmentDirectional.topStart,
-                                        child:
-                                        RichText(
+                                        alignment:
+                                            AlignmentDirectional.topStart,
+                                        child: RichText(
                                           text: TextSpan(
                                             style: TextStyle(
                                               //color: Colors.black, // Setting default text color to black
@@ -504,11 +554,13 @@ class _AddBusState extends State<AddBus> {
                                             children: [
                                               TextSpan(
                                                 text: "Driver Name".tr,
-                                                style: TextStyle(color: Color(0xFF442B72)),
+                                                style: TextStyle(
+                                                    color: Color(0xFF442B72)),
                                               ),
                                               TextSpan(
                                                 text: " *".tr,
-                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                                style: TextStyle(
+                                                    color: Color(0xFFAD1519)),
                                               ),
                                             ],
                                           ),
@@ -525,33 +577,41 @@ class _AddBusState extends State<AddBus> {
                                         // ),
                                       ),
                                     ),
-                                    SizedBox(height: 10,),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Container(
                                       width: constrains.maxWidth / 1.3,
                                       height: 40,
                                       child: TextFormField(
-                                       controller: _driverName,
+                                        controller: _driverName,
                                         focusNode: _driverNameFocus,
                                         cursorColor: const Color(0xFF442B72),
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                        textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                        style:
+                                            TextStyle(color: Color(0xFF442B72)),
+                                        textInputAction: TextInputAction.next,
+                                        // Move to the next field when "Done" is pressed
                                         onFieldSubmitted: (value) {
                                           // move to the next field when the user presses the "Done" button
-                                          FocusScope.of(context).requestFocus(_driverNumberFocus);
+                                          FocusScope.of(context)
+                                              .requestFocus(_driverNumberFocus);
                                         },
                                         //textDirection: TextDirection.ltr,
-                                        scrollPadding: const EdgeInsets.symmetric(
-                                            vertical: 40),
-                                        decoration:  InputDecoration(
-                                         // errorText: _validateDriverName ? "Please Enter Name" : null,
+                                        scrollPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 40),
+                                        decoration: InputDecoration(
+                                          // errorText: _validateDriverName ? "Please Enter Name" : null,
                                           alignLabelWithHint: true,
                                           counterText: "",
                                           fillColor: const Color(0xFFF1F1F1),
                                           filled: true,
-                                          contentPadding: const EdgeInsets.fromLTRB(
-                                              8, 30, 10, 5),
-                                          hintText:"Your Name".tr,
-                                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  8, 30, 10, 5),
+                                          hintText: "Your Name".tr,
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
                                           hintStyle: const TextStyle(
                                             color: Color(0xFFC2C2C2),
                                             fontSize: 12,
@@ -570,15 +630,21 @@ class _AddBusState extends State<AddBus> {
                                         // },
                                       ),
                                     ),
-                                    namedrivererror?Container(): Padding(
-                                      padding: const EdgeInsets.only(left: 32),
-                                      child: Align( alignment: AlignmentDirectional.topStart,
-                                        child: Text(
-                                          "Please enter your name".tr,
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ),
+                                    namedrivererror
+                                        ? Container()
+                                        : Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 32),
+                                            child: Align(
+                                              alignment:
+                                                  AlignmentDirectional.topStart,
+                                              child: Text(
+                                                "Please enter your name".tr,
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            ),
+                                          ),
                                     // TextFormFieldCustom(
                                     //   width: constrains.maxWidth / 1.3,
                                     //   hintTxt: 'Your Name'.tr,
@@ -587,11 +653,12 @@ class _AddBusState extends State<AddBus> {
                                       height: 20,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 35, vertical: 0),
                                       child: Align(
-                                        alignment: AlignmentDirectional.topStart,
-                                        child:
-                                        RichText(
+                                        alignment:
+                                            AlignmentDirectional.topStart,
+                                        child: RichText(
                                           text: TextSpan(
                                             style: TextStyle(
                                               //color: Colors.black, // Setting default text color to black
@@ -602,18 +669,22 @@ class _AddBusState extends State<AddBus> {
                                             children: [
                                               TextSpan(
                                                 text: "Driver Number".tr,
-                                                style: TextStyle(color: Color(0xFF442B72)),
+                                                style: TextStyle(
+                                                    color: Color(0xFF442B72)),
                                               ),
                                               TextSpan(
                                                 text: " *".tr,
-                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                                style: TextStyle(
+                                                    color: Color(0xFFAD1519)),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(height: 10,),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Container(
                                       width: constrains.maxWidth / 1.3,
                                       height: 38,
@@ -622,24 +693,30 @@ class _AddBusState extends State<AddBus> {
                                         focusNode: _driverNumberFocus,
                                         onFieldSubmitted: (value) {
                                           // move to the next field when the user presses the "Done" button
-                                          FocusScope.of(context).requestFocus(_busNumberFocus);
+                                          FocusScope.of(context)
+                                              .requestFocus(_busNumberFocus);
                                         },
-                                        style: TextStyle(color: Color(0xFF442B72)),
+                                        style:
+                                            TextStyle(color: Color(0xFF442B72)),
                                         // controller: _namesupervisor,
                                         cursorColor: const Color(0xFF442B72),
                                         //textDirection: TextDirection.ltr,
-                                        scrollPadding: const EdgeInsets.symmetric(
-                                            vertical: 40),
+                                        scrollPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 40),
                                         keyboardType: TextInputType.number,
                                         maxLength: 11,
                                         inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
-                                          LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'[0-9]')),
+                                          // Allow only numbers
+                                          LengthLimitingTextInputFormatter(11),
+                                          // Limit the length programmatically
                                         ],
-                                        decoration:  InputDecoration(
+                                        decoration: InputDecoration(
                                           //errorText: _validateDriverNumber ? "Please Enter Phone Number" : null,
                                           // labelText: 'Shady Ayman'.tr,
-                                          hintText:'Your Number'.tr ,
+                                          hintText: 'Your Number'.tr,
                                           hintStyle: const TextStyle(
                                             color: Color(0xFFC2C2C2),
                                             fontSize: 12,
@@ -651,24 +728,31 @@ class _AddBusState extends State<AddBus> {
                                           counterText: "",
                                           fillColor: const Color(0xFFF1F1F1),
                                           filled: true,
-                                          contentPadding: const EdgeInsets.fromLTRB(
-                                              8,20, 10, 5),
-                                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  8, 20, 10, 5),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
                                           enabledBorder: myInputBorder(),
                                           focusedBorder: myFocusBorder(),
                                         ),
-
                                       ),
                                     ),
-                                    drivernumbererror?Container(): Padding(
-                                      padding: const EdgeInsets.only(left: 32),
-                                      child: Align( alignment: AlignmentDirectional.topStart,
-                                        child: Text(
-                                          "Please enter phone number".tr,
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ),
+                                    drivernumbererror
+                                        ? Container()
+                                        : Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 32),
+                                            child: Align(
+                                              alignment:
+                                                  AlignmentDirectional.topStart,
+                                              child: Text(
+                                                "Please enter phone number".tr,
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            ),
+                                          ),
                                     // TextFormFieldCustom(
                                     //   width: constrains.maxWidth / 1.3,
                                     //   hintTxt: 'Your Number'.tr,
@@ -677,9 +761,11 @@ class _AddBusState extends State<AddBus> {
                                       height: 25,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 35, vertical: 0),
                                       child: Align(
-                                        alignment: AlignmentDirectional.topStart,
+                                        alignment:
+                                            AlignmentDirectional.topStart,
                                         child: Text(
                                           'Bus Photos'.tr,
                                           style: TextStyle(
@@ -702,51 +788,65 @@ class _AddBusState extends State<AddBus> {
                                     SizedBox(
                                       height: 15,
                                     ),
-                                    Align(alignment: AlignmentDirectional.center,
-                                      child:
-                                      GestureDetector(
-                                        onTap:()async {
-                                          await _pickBusImageFromGallery();}  , // Call function when tapped
+                                    Align(
+                                      alignment: AlignmentDirectional.center,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          await _pickBusImageFromGallery();
+                                        }, // Call function when tapped
                                         child: _selectedImagebus != null
                                             ? Image.file(
-                                          _selectedImagebus!,  // Display the uploaded image
-                                          width: 275,  // Set width as per your preference
-                                          height: 75,  // Set height as per your preference
-                                          fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                                        )
+                                                _selectedImagebus!,
+                                                // Display the uploaded image
+                                                width: 275,
+                                                // Set width as per your preference
+                                                height: 75,
+                                                // Set height as per your preference
+                                                fit: BoxFit
+                                                    .cover, // Adjusts how the image fits in the container
+                                              )
                                             : FDottedLine(
-                                          color: Color(0xFF442B72),
-                                          strokeWidth: 0.8,
-                                          dottedLength: 10,
-                                          space: 5.0,
-                                          corner: FDottedLineCorner.all(6.0),
+                                                color: Color(0xFF442B72),
+                                                strokeWidth: 0.8,
+                                                dottedLength: 10,
+                                                space: 5.0,
+                                                corner:
+                                                    FDottedLineCorner.all(6.0),
 
-                                          // Child widget
-                                          child: Container(
-                                            width: 275,
-                                            height: 75,
-                                            alignment: Alignment.center,
-                                            child: Row(
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: 80),
-                                                  child: Image.asset("assets/imgs/school/icons8_image_document_1 1.png",width: 24,height: 24,),
-                                                ),
-                                                SizedBox(width: 10,),
-                                                Text(
-                                                  "upload image",
-                                                  style: TextStyle(
-                                                    color: Color(0xFF442B72),
-                                                    fontSize: 14,
-                                                    fontFamily: 'Poppins-Regular',
+                                                // Child widget
+                                                child: Container(
+                                                  width: 275,
+                                                  height: 75,
+                                                  alignment: Alignment.center,
+                                                  child: Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 80),
+                                                        child: Image.asset(
+                                                          "assets/imgs/school/icons8_image_document_1 1.png",
+                                                          width: 24,
+                                                          height: 24,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Text(
+                                                        "upload image",
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF442B72),
+                                                          fontSize: 14,
+                                                          fontFamily:
+                                                              'Poppins-Regular',
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-
+                                              ),
                                       ),
                                       // Container(
                                       //   width: 290, // Adjust width as needed
@@ -793,16 +893,16 @@ class _AddBusState extends State<AddBus> {
                                     //   ),
                                     // ),
 
-
                                     const SizedBox(
                                       height: 25,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 35, vertical: 0),
                                       child: Align(
-                                        alignment: AlignmentDirectional.topStart,
-                                        child:
-                                        RichText(
+                                        alignment:
+                                            AlignmentDirectional.topStart,
+                                        child: RichText(
                                           text: TextSpan(
                                             style: TextStyle(
                                               //color: Colors.black, // Setting default text color to black
@@ -813,18 +913,22 @@ class _AddBusState extends State<AddBus> {
                                             children: [
                                               TextSpan(
                                                 text: "Bus Number".tr,
-                                                style: TextStyle(color: Color(0xFF442B72)),
+                                                style: TextStyle(
+                                                    color: Color(0xFF442B72)),
                                               ),
                                               TextSpan(
                                                 text: " *".tr,
-                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                                style: TextStyle(
+                                                    color: Color(0xFFAD1519)),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(height: 10,),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Container(
                                       width: constrains.maxWidth / 1.3,
                                       height: 40,
@@ -832,25 +936,30 @@ class _AddBusState extends State<AddBus> {
                                         controller: _busNumber,
                                         focusNode: _busNumberFocus,
                                         cursorColor: const Color(0xFF442B72),
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                        textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                        style:
+                                            TextStyle(color: Color(0xFF442B72)),
+                                        textInputAction: TextInputAction.next,
+                                        // Move to the next field when "Done" is pressed
                                         onFieldSubmitted: (value) {
                                           // move to the next field when the user presses the "Done" button
-                                        //  FocusScope.of(context).requestFocus(_driverNumberFocus);
+                                          //  FocusScope.of(context).requestFocus(_driverNumberFocus);
                                         },
                                         //textDirection: TextDirection.ltr,
-                                        scrollPadding: const EdgeInsets.symmetric(
-                                            vertical: 40),
-                                        decoration:  InputDecoration(
+                                        scrollPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 40),
+                                        decoration: InputDecoration(
                                           //errorText: _validateBusNumber ? "Please Enter Bus Number" : null,
                                           alignLabelWithHint: true,
                                           counterText: "",
                                           fillColor: const Color(0xFFF1F1F1),
                                           filled: true,
-                                          contentPadding: const EdgeInsets.fromLTRB(
-                                              8, 30, 10, 5),
-                                          hintText:"Your Number".tr,
-                                          floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  8, 30, 10, 5),
+                                          hintText: "Your Number".tr,
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
                                           hintStyle: const TextStyle(
                                             color: Color(0xFFC2C2C2),
                                             fontSize: 12,
@@ -869,15 +978,21 @@ class _AddBusState extends State<AddBus> {
                                         // },
                                       ),
                                     ),
-                                    busnumbererror?Container(): Padding(
-                                      padding: const EdgeInsets.only(left: 32),
-                                      child: Align( alignment: AlignmentDirectional.topStart,
-                                        child: Text(
-                                          "Please enter bus number".tr,
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ),
+                                    busnumbererror
+                                        ? Container()
+                                        : Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 32),
+                                            child: Align(
+                                              alignment:
+                                                  AlignmentDirectional.topStart,
+                                              child: Text(
+                                                "Please enter bus number".tr,
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            ),
+                                          ),
                                     // TextFormFieldCustom(
                                     //   width: constrains.maxWidth / 1.3,
                                     //   hintTxt: "Your Number".tr,
@@ -886,11 +1001,12 @@ class _AddBusState extends State<AddBus> {
                                       height: 20,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal:35,vertical: 0 ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 35, vertical: 0),
                                       child: Align(
-                                        alignment: AlignmentDirectional.topStart,
-                                        child:
-                                        RichText(
+                                        alignment:
+                                            AlignmentDirectional.topStart,
+                                        child: RichText(
                                           text: TextSpan(
                                             style: TextStyle(
                                               //color: Colors.black, // Setting default text color to black
@@ -901,11 +1017,13 @@ class _AddBusState extends State<AddBus> {
                                             children: [
                                               TextSpan(
                                                 text: "Supervisor".tr,
-                                                style: TextStyle(color: Color(0xFF442B72)),
+                                                style: TextStyle(
+                                                    color: Color(0xFF442B72)),
                                               ),
                                               TextSpan(
                                                 text: " *".tr,
-                                                style: TextStyle(color: Color(0xFFAD1519)),
+                                                style: TextStyle(
+                                                    color: Color(0xFFAD1519)),
                                               ),
                                             ],
                                           ),
@@ -916,7 +1034,9 @@ class _AddBusState extends State<AddBus> {
                                     //   width: constrains.maxWidth / 1.3,
                                     //   hintTxt: "Supervisor".tr,
                                     // ),
-                                    SizedBox(height: 15,),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
 
                                     // Container(
                                     //   width: constrains.maxWidth / 1.3,
@@ -953,60 +1073,58 @@ class _AddBusState extends State<AddBus> {
                                     //   ),
                                     // ),
                                     // old container
-                          // Container(
-                          //   width: MediaQuery.of(context).size.width / 1.3,
-                          //   height: 45,
-                          //   child: DropdownButtonFormField<String>(
-                          //     value: _selectedSupervisor,
-                          //     onChanged: (String? newValue) {
-                          //       setState(() {
-                          //         _selectedSupervisor = newValue;
-                          //       });
-                          //     },
-                          //     items: _supervisors.map((String supervisor) {
-                          //       return DropdownMenuItem<String>(
-                          //         value: supervisor,
-                          //         child: Text(supervisor),
-                          //       );
-                          //     }
-                          //     ).toList(),
-                          //     decoration: InputDecoration(
-                          //       // suffixIcon: Icon(
-                          //       //   Icons.keyboard_arrow_down,
-                          //       //   color: Color(0xFF442B72),
-                          //       //   size: 40,
-                          //       // ),
-                          //       alignLabelWithHint: true,
-                          //       counterText: "",
-                          //       fillColor: const Color(0xFFF1F1F1),
-                          //       filled: true,
-                          //       contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
-                          //       hintText: "Supervisor",
-                          //       floatingLabelBehavior: FloatingLabelBehavior.never,
-                          //       hintStyle: const TextStyle(
-                          //         color: Color(0xFFC2C2C2),
-                          //         fontSize: 12,
-                          //         fontFamily: 'Inter-Bold',
-                          //         fontWeight: FontWeight.w700,
-                          //         height: 1.33,
-                          //       ),
-                          //       enabledBorder: OutlineInputBorder(
-                          //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
-                          //       ),
-                          //       focusedBorder: OutlineInputBorder(
-                          //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
-                          //       ),
-                          //     ),
-                          //
-                          //   ),
-                          // ),
+                                    // Container(
+                                    //   width: MediaQuery.of(context).size.width / 1.3,
+                                    //   height: 45,
+                                    //   child: DropdownButtonFormField<String>(
+                                    //     value: _selectedSupervisor,
+                                    //     onChanged: (String? newValue) {
+                                    //       setState(() {
+                                    //         _selectedSupervisor = newValue;
+                                    //       });
+                                    //     },
+                                    //     items: _supervisors.map((String supervisor) {
+                                    //       return DropdownMenuItem<String>(
+                                    //         value: supervisor,
+                                    //         child: Text(supervisor),
+                                    //       );
+                                    //     }
+                                    //     ).toList(),
+                                    //     decoration: InputDecoration(
+                                    //       // suffixIcon: Icon(
+                                    //       //   Icons.keyboard_arrow_down,
+                                    //       //   color: Color(0xFF442B72),
+                                    //       //   size: 40,
+                                    //       // ),
+                                    //       alignLabelWithHint: true,
+                                    //       counterText: "",
+                                    //       fillColor: const Color(0xFFF1F1F1),
+                                    //       filled: true,
+                                    //       contentPadding: const EdgeInsets.fromLTRB(8, 30, 10, 5),
+                                    //       hintText: "Supervisor",
+                                    //       floatingLabelBehavior: FloatingLabelBehavior.never,
+                                    //       hintStyle: const TextStyle(
+                                    //         color: Color(0xFFC2C2C2),
+                                    //         fontSize: 12,
+                                    //         fontFamily: 'Inter-Bold',
+                                    //         fontWeight: FontWeight.w700,
+                                    //         height: 1.33,
+                                    //       ),
+                                    //       enabledBorder: OutlineInputBorder(
+                                    //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
+                                    //       ),
+                                    //       focusedBorder: OutlineInputBorder(
+                                    //         borderSide: BorderSide(color: Color(0xFFFFC53E)),
+                                    //       ),
+                                    //     ),
+                                    //
+                                    //   ),
+                                    // ),
                                     Container(
-                                      child:
-                                      DropdownCheckbox(
+                                      child: DropdownCheckbox(
                                           controller: _supervisorController,
-                                      items:
-                                        items
-                                       ),),
+                                          items: items),
+                                    ),
 
                                     // supervisorerror?Container(): Padding(
                                     //   padding: const EdgeInsets.only(left: 32),
@@ -1035,8 +1153,7 @@ class _AddBusState extends State<AddBus> {
                                       child: Center(
                                         child: ElevatedSimpleButton(
                                           txt: "Add".tr,
-
-                                          onPress: (){
+                                          onPress: () {
                                             setState(() {
                                               // _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
                                               // _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
@@ -1057,53 +1174,59 @@ class _AddBusState extends State<AddBus> {
                                               } else {
                                                 busnumbererror = true;
                                               }
-                                              if (_supervisorController.text.isEmpty) {
+                                              if (_supervisorController
+                                                  .text.isEmpty) {
                                                 supervisorerror = false;
                                               } else {
                                                 supervisorerror = true;
                                               }
-                                              if (_selectedImagedriver == null) {
+                                              if (_selectedImagedriver ==
+                                                  null) {
                                                 driverphotoerror = false;
                                               } else {
                                                 driverphotoerror = true;
                                               }
                                             });
-                                            if (_driverNumber.text.length ==11 && namedrivererror && drivernumbererror
-                                              // ! _driverNumber.text.isEmpty
-                                                && busnumbererror
-                                                //&& supervisorerror
-                                                && _selectedImagedriver != null && driverphotoerror && items != null
+                                            if (_driverNumber.text.length ==
+                                                        11 &&
+                                                    namedrivererror &&
+                                                    drivernumbererror
+                                                    // ! _driverNumber.text.isEmpty
+                                                    &&
+                                                    busnumbererror
+                                                    //&& supervisorerror
+                                                    &&
+                                                    _selectedImagedriver !=
+                                                        null &&
+                                                    driverphotoerror &&
+                                                    items != null
                                                 //_selectedImage != null && _selectedImagebus != null
-                                                ){
-
+                                                ) {
                                               _addDataToFirestore();
                                               Navigator.push(
-                                                  context ,
+                                                  context,
                                                   MaterialPageRoute(
-                                                      builder: (context) =>  BusScreen(),
+                                                      builder: (context) =>
+                                                          BusScreen(),
                                                       maintainState: false));
-                                            }else{
-                                              SnackBar(content: Text('Please,enter valid number'));
-
+                                            } else {
+                                              SnackBar(
+                                                  content: Text(
+                                                      'Please,enter valid number'));
                                             }
-
                                           },
-                                          width: constrains.maxWidth /1.2,
+                                          width: constrains.maxWidth / 1.2,
                                           hight: 48,
                                           color: const Color(0xFF442B72),
                                           fontSize: 16,
-
-
                                         ),
                                         // end of comment
                                       ),
-                                    ) ,
+                                    ),
 
                                     const SizedBox(
                                       height: 40,
                                     ),
-
-
                                   ],
                                 ),
                               )
@@ -1113,19 +1236,20 @@ class _AddBusState extends State<AddBus> {
                         // const SizedBox(
                         //   height: 20,
                         // ),
-                        Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)),
+                        Padding(
+                            padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom)),
                       ],
                     ),
                   ),
                 ),
               ],
             );
-          }
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-          floatingActionButton:
-          Padding(
+          }),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: Padding(
             padding: const EdgeInsets.all(1.0),
             child: SizedBox(
               //height: 100,
@@ -1143,28 +1267,23 @@ class _AddBusState extends State<AddBus> {
               ),
             ),
           ),
-
-
-          bottomNavigationBar:
-          Directionality(
+          bottomNavigationBar: Directionality(
             textDirection: TextDirection.ltr,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(25),
                 topRight: Radius.circular(25),
               ),
-
               child: BottomAppBar(
-
                 color: const Color(0xFF442B72),
                 clipBehavior: Clip.antiAlias,
-                shape: const AutomaticNotchedShape( RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(38.5),
-                        topRight: Radius.circular(38.5))),
+                shape: const AutomaticNotchedShape(
                     RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.all(Radius.circular(50)))),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(38.5),
+                            topRight: Radius.circular(38.5))),
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(50)))),
                 //CircularNotchedRectangle(),
                 //shape of notch
                 notchMargin: 7,
@@ -1213,15 +1332,15 @@ class _AddBusState extends State<AddBus> {
                           // ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 2.0,
-                                vertical:5),
+                                horizontal: 2.0, vertical: 5),
                             child: GestureDetector(
                               onTap: () {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
                                 Navigator.push(
-                                  context ,
+                                  context,
                                   MaterialPageRoute(
-                                      builder: (context) =>  HomeScreen(),
+                                      builder: (context) => HomeScreen(),
                                       maintainState: false),
                                 );
                               },
@@ -1229,8 +1348,10 @@ class _AddBusState extends State<AddBus> {
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   direction: Axis.vertical,
                                   children: [
-                                    Image.asset('assets/imgs/school/icons8_home_1 1.png',
-                                        height: 21, width: 21),
+                                    Image.asset(
+                                        'assets/imgs/school/icons8_home_1 1.png',
+                                        height: 21,
+                                        width: 21),
                                     Text("Home".tr,
                                         style: TextStyle(
                                             color: Colors.white, fontSize: 10)),
@@ -1241,19 +1362,23 @@ class _AddBusState extends State<AddBus> {
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: GestureDetector(
                               onTap: () {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
                                 Navigator.push(
-                                    context ,
+                                    context,
                                     MaterialPageRoute(
-                                        builder: (context) =>  NotificationScreen(),
+                                        builder: (context) =>
+                                            NotificationScreen(),
                                         maintainState: false));
                               },
                               child: Wrap(
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   direction: Axis.vertical,
                                   children: [
-                                    Image.asset('assets/imgs/school/clarity_notification-line (1).png',
-                                        height: 22, width: 22),
+                                    Image.asset(
+                                        'assets/imgs/school/clarity_notification-line (1).png',
+                                        height: 22,
+                                        width: 22),
                                     Text('Notification'.tr,
                                         style: TextStyle(
                                             color: Colors.white, fontSize: 10)),
@@ -1261,37 +1386,41 @@ class _AddBusState extends State<AddBus> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left:100),
+                            padding: const EdgeInsets.only(left: 100),
                             child: GestureDetector(
                               onTap: () {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
                                 Navigator.push(
-                                    context ,
+                                    context,
                                     MaterialPageRoute(
-                                        builder: (context) =>  SupervisorScreen(),
+                                        builder: (context) =>
+                                            SupervisorScreen(),
                                         maintainState: false));
                               },
                               child: Wrap(
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   direction: Axis.vertical,
                                   children: [
-                                    Image.asset('assets/imgs/school/empty_supervisor.png',
-                                        height: 22, width: 22),
+                                    Image.asset(
+                                        'assets/imgs/school/empty_supervisor.png',
+                                        height: 22,
+                                        width: 22),
                                     Text("Supervisor".tr,
                                         style: TextStyle(
-                                            color: Colors.white, fontSize:10)),
-                                  ]
-                              ),
+                                            color: Colors.white, fontSize: 10)),
+                                  ]),
                             ),
                           ),
                           Padding(
-                            padding:
-                            const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 0),
                             child: GestureDetector(
                               onTap: () {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
                                 Navigator.push(
-                                    context ,
+                                    context,
                                     MaterialPageRoute(
                                         builder: (context) => BusScreen(),
                                         maintainState: false));
@@ -1301,8 +1430,10 @@ class _AddBusState extends State<AddBus> {
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   direction: Axis.vertical,
                                   children: [
-                                    Image.asset('assets/imgs/school/fillbus.png',
-                                        height: 20, width: 20),
+                                    Image.asset(
+                                        'assets/imgs/school/fillbus.png',
+                                        height: 20,
+                                        width: 20),
                                     Text("Buses".tr,
                                         style: TextStyle(
                                             color: Colors.white, fontSize: 10)),
@@ -1322,7 +1453,3 @@ class _AddBusState extends State<AddBus> {
     );
   }
 }
-
-
-
-

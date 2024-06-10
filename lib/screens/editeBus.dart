@@ -125,8 +125,6 @@ class _EditeBusState extends State<EditeBus> {
     if(returnedImage ==null) return;
     setState(() {
       _selectedImagedriverEdite=File(returnedImage.path);
-
-
     });
 
     //Get a reference to storage root
@@ -139,7 +137,6 @@ class _EditeBusState extends State<EditeBus> {
     //
     // //Create a reference for the image to be stored
 
-
     //Handle errors/success
     try {
       //Store the file
@@ -149,8 +146,12 @@ class _EditeBusState extends State<EditeBus> {
       print('Image uploaded successfully. URL: $imageUrldriver');
 
       print('Image uploaded successfully. URL: $imageUrldbus');
-      await Bus.doc(widget.docid).update({
-        'imagedriver': imageUrldriver,
+      // await Bus.doc(widget.docid).update({
+      //   'imagedriver': imageUrldriver,
+      // });
+
+      setState(() {
+        _selectedImagedriverEdite = File(returnedImage.path);
       });
       return imageUrldriver;
     } catch (error) {
@@ -402,7 +403,9 @@ class _EditeBusState extends State<EditeBus> {
                                       child:
                                       CircleAvatar(
                                         radius: 30,
-                                        backgroundImage:(widget.oldphotodriver == null || widget.oldphotodriver == '') ? _selectedImagedriverEdite!= null
+                                        backgroundImage:
+                                        (widget.oldphotodriver == null || widget.oldphotodriver == '') ?
+                                        _selectedImagedriverEdite!= null
                                             ? Image.file(_selectedImagedriverEdite!, width: 83, height: 78.5, fit: BoxFit.cover).image
                                             : AssetImage('assets/imgs/school/Ellipse 2 (1).png'):
                                         NetworkImage(widget.oldphotodriver!),

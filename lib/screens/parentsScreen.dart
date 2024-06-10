@@ -53,6 +53,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
   }
 
   //functions of filter
+  String selectedFilter = '';
   List<QueryDocumentSnapshot> filteredData = [];
   bool isAcceptFiltered = false;
   bool isDeclineFiltered = false;
@@ -407,6 +408,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                                                 null) {
                                                               currentFilter =
                                                                   'Accepted';
+                                                              selectedFilter='Accepted';
                                                               getDataForAcceptFilter();
                                                               Navigator.pop(
                                                                   context);
@@ -415,6 +417,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                                                 null) {
                                                               currentFilter =
                                                                   'Declined';
+                                                              selectedFilter='Declined';
                                                               getDataForDeclinedFilter();
                                                               Navigator.pop(
                                                                   context);
@@ -423,6 +426,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                                                 null) {
                                                               currentFilter =
                                                                   'Waiting';
+                                                              selectedFilter='Waiting';
                                                               getDataForWaitingFilter();
                                                               Navigator.pop(
                                                                   context);
@@ -435,15 +439,15 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                                     SizedBox(
                                                       width: 3,
                                                     ),
-
                                                     Padding(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               5.0),
                                                       child: GestureDetector(
-                                                        onTap:(){
+                                                        onTap: () {
                                                           getData();
-                                                          Navigator.pop(context);
+                                                          Navigator.pop(
+                                                              context);
                                                         },
                                                         child: Text(
                                                           "Reset",
@@ -518,89 +522,93 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                 children: [
                                   if (filteredData.isEmpty)
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 30),
-                                      child: Text('No data available', style: TextStyle(color: Colors.grey)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 30),
+                                      child: Text('No data available',
+                                          style: TextStyle(color: Colors.grey)),
                                     ),
-                                  if(filteredData.isNotEmpty)
-          SizedBox(
-          height: 500,
-          child: ListView.builder(
-          // shrinkWrap: true,
-          itemCount: filteredData.length,
-          itemBuilder: (context, index) {
-          int state = filteredData[index][
-          'state']; // Assuming 'state' is the field from Firestore
-          Color statusColor;
-          String statusText;
+                                  if (filteredData.isNotEmpty)
+                                    SizedBox(
+                                        height: 500,
+                                        child: ListView.builder(
+                                            // shrinkWrap: true,
+                                            itemCount: filteredData.length,
+                                            itemBuilder: (context, index) {
+                                              int state = filteredData[index][
+                                                  'state']; // Assuming 'state' is the field from Firestore
+                                              Color statusColor;
+                                              String statusText;
 
-          // Determine status color and text based on state
-          switch (state) {
-          case 2: //0
-          statusColor = Color(
-          0xffAD1519); // Declined (State = 0)
-          statusText = 'Not joined yet';
-          break;
+                                              // Determine status color and text based on state
+                                              switch (state) {
+                                                case 2: //0
+                                                  statusColor = Color(
+                                                      0xffAD1519); // Declined (State = 0)
+                                                  statusText = 'Not joined yet';
+                                                  break;
 
-          case 0: //1
-          statusColor = Color(
-          0xffFFC53E); // Waiting (State = 1)
-          statusText = 'Waiting for response';
-          break;
+                                                case 0: //1
+                                                  statusColor = Color(
+                                                      0xffFFC53E); // Waiting (State = 1)
+                                                  statusText =
+                                                      'Waiting for response';
+                                                  break;
 
-          case 1: //2
-          statusColor = Color(
-          0xff0E8113); // Accepted (State = 2)
-          statusText = 'Joined';
-          break;
-          default:
-          statusColor = Colors
-              .grey; // Default color if state is unknown
-          statusText = 'Unknown';
-          break;
-          }
-          return ListTile(
-          leading: Container(
-          width: 50,
-          height: 40,
-          decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-          color: Color(0xffCCCCCC),
-          width: 2.0,
-          ),
-          ),
-          child: Padding(
-          padding: const EdgeInsets.only(
-          top: 10, bottom: 3),
-          child: Image.asset(
-          "assets/imgs/school/Vector (16).png",
-          width: 15,
-          height: 15,
-          ),
-          )),
-          title: Text(
-          '${filteredData[index]['name']}',
-          style: TextStyle(
-          color: Color(0xFF442B72),
-          fontSize: 17,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Poppins-Bold',
-          ),
-          ),
-          subtitle: Text(
-          //  '${filteredData[index]['state']}',
-          statusText,
-          style: TextStyle(
-          color: statusColor,
-          fontSize: 13,
-          fontFamily: 'Poppins',
-          ),
-          ),
-          //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
-          );
-          }
-          )
-          ),
+                                                case 1: //2
+                                                  statusColor = Color(
+                                                      0xff0E8113); // Accepted (State = 2)
+                                                  statusText = 'Joined';
+                                                  break;
+                                                default:
+                                                  statusColor = Colors
+                                                      .grey; // Default color if state is unknown
+                                                  statusText = 'Unknown';
+                                                  break;
+                                              }
+                                              return ListTile(
+                                                leading: Container(
+                                                    width: 50,
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color:
+                                                            Color(0xffCCCCCC),
+                                                        width: 2.0,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 10,
+                                                              bottom: 3),
+                                                      child: Image.asset(
+                                                        "assets/imgs/school/Vector (16).png",
+                                                        width: 15,
+                                                        height: 15,
+                                                      ),
+                                                    )),
+                                                title: Text(
+                                                  '${filteredData[index]['name']}',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                    fontSize: 17,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Poppins-Bold',
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                  //  '${filteredData[index]['state']}',
+                                                  statusText,
+                                                  style: TextStyle(
+                                                    color: statusColor,
+                                                    fontSize: 13,
+                                                    fontFamily: 'Poppins',
+                                                  ),
+                                                ),
+                                                //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
+                                              );
+                                            })),
                                 ],
                               ),
 

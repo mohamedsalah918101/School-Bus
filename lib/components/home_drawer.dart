@@ -1,6 +1,7 @@
 //
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/screens/busesScreen.dart';
 import 'package:school_account/screens/faqScreen.dart';
@@ -88,8 +89,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                           ),
                           minLeadingWidth: 27,
-                          title: const Text(
-                            "Home",
+                          title:  Text(
+                            "Home".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,
@@ -123,8 +124,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                           ),
                           minLeadingWidth: 27,
-                          title: const Text(
-                            "School Profile",
+                          title:  Text(
+                            "School Profile".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,
@@ -157,8 +158,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                             color: Colors.white,
                           ),
-                          title: const Text(
-                            "Vacations",
+                          title:  Text(
+                            "Vacations".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,
@@ -186,8 +187,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             width: 21.90,
                             height: 21.90,
                           ),
-                          title: const Text(
-                            "Buses",
+                          title:  Text(
+                            "Buses".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,
@@ -228,8 +229,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             width: 21.90,
                             height: 21.90,
                           ),
-                          title: const Text(
-                            "Notifications",
+                          title:  Text(
+                            "Notifications".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14.5,
@@ -258,8 +259,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                           ),
                           minLeadingWidth: 27,
-                          title: const Text(
-                            "Settings",
+                          title:  Text(
+                            "Settings".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,
@@ -287,8 +288,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                           ),
                           minLeadingWidth: 27,
-                          title: const Text(
-                            "FAQ",
+                          title:  Text(
+                            "FAQ".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,
@@ -316,8 +317,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                           ),
                           minLeadingWidth: 27,
-                          title: const Text(
-                            "Logout",
+                          title:  Text(
+                            "Logout".tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.52,

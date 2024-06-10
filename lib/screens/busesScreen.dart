@@ -44,7 +44,11 @@ import 'homeScreen.dart';
 import 'dart:math' as math;
 
 
+class Supervisor {
+  String name;
 
+  Supervisor({required this.name});
+}
 class BusScreen extends StatefulWidget{
 
   // const EditeSupervisor({super.key});
@@ -182,7 +186,7 @@ class BusScreenSate extends State<BusScreen> {
   String? selectedValueWaiting;
   getDataForBusNumberFilter()async{
     CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('busnumber').get();
+    QuerySnapshot BusData = await Bus.where('busnumber').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -195,7 +199,7 @@ class BusScreenSate extends State<BusScreen> {
 
   getDataForDriverNameFilter()async{
     CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('namedriver' ).get();
+    QuerySnapshot BusData = await Bus.where('namedriver' ).where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -206,16 +210,40 @@ class BusScreenSate extends State<BusScreen> {
     });
   }
 
-  getDataForSupervisorFilter()async{
-    CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
-    QuerySnapshot BusData = await Bus.where('supervisorname').get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
+  // getDataForSupervisorFilter()async{
+  //   CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+  //   QuerySnapshot BusData = await Bus.where('supervisorname').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
+  //   // parentData.docs.forEach((element) {
+  //   //   data.add(element);
+  //   // }
+  //   // );
+  //   setState(() {
+  //     data = BusData.docs;
+  //     isFiltered = true;
+  //   });
+  // }
+  Future<void> getDataForSupervisorFilter() async {
+    CollectionReference busDataCollection = FirebaseFirestore.instance.collection('busdata');
+    QuerySnapshot busDataQuerySnapshot = await busDataCollection.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
+    List<QueryDocumentSnapshot> filteredData = busDataQuerySnapshot.docs;
+
     setState(() {
-      data = BusData.docs;
+      data = filteredData;
       isFiltered = true;
+    });
+
+    // Extract the supervisors from the filtered data
+    List<Supervisor> supervisors = [];
+    for (QueryDocumentSnapshot doc in filteredData) {
+      List<dynamic> docSupervisors = doc.get('supervisors');
+      for (dynamic supervisor in docSupervisors) {
+        supervisors.add(Supervisor(name: supervisor['name']));
+      }
+    }
+
+    // Update the _supervisors list with the extracted supervisors
+    setState(() {
+      _supervisors = supervisors;
     });
   }
 
@@ -239,6 +267,25 @@ class BusScreenSate extends State<BusScreen> {
   //new
   List<DropdownCheckboxItem> selectedItems = [];
 
+  //new
+  List<Supervisor> _supervisors = [];
+  Future<void> _getSupervisorName() async {
+    final firestore = FirebaseFirestore.instance;
+    final busDataCollection = firestore.collection('busdata');
+    final busDataDoc = busDataCollection.doc('LHYs0SGoFtBM9H4dUr4X'); // Replace with the actual document ID
+    final busData = await busDataDoc.get();
+    final supervisors = busData.get('supervisors');
+
+    if (supervisors.isNotEmpty) {
+      final supervisorDoc = await firestore.collection('supervisor').doc(supervisors[0]['id']).get();
+      final supervisorName = supervisorDoc.get('name');
+      setState(() {
+        _supervisorName = supervisorName;
+      });
+    }
+  }
+  String _supervisorName = '';
+
 // to lock in landscape view
   @override
   void initState() {
@@ -246,6 +293,7 @@ class BusScreenSate extends State<BusScreen> {
     super.initState();
     getSchoolId();
     getData();
+    _getSupervisorName();
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -378,7 +426,8 @@ class BusScreenSate extends State<BusScreen> {
                                                     ),
                                                     child: Padding(
                                                       padding: const EdgeInsets.only(left: 10),
-                                                      child: SearchBar(
+                                                      child:
+                                                      SearchBar(
                                                         leading: Padding(
                                                           padding: const EdgeInsets.only(left: 4.0),
                                                           child: Image.asset("assets/imgs/school/icons8_search 1.png",width: 22,height: 22,),
@@ -394,11 +443,23 @@ class BusScreenSate extends State<BusScreen> {
                                                                 // Filter by bus number
                                                                 String busNumber = item['busnumber'] as String;
                                                                 return busNumber.toLowerCase().contains(query.toLowerCase());
-                                                              } else if (selectedFilter == 'Driver Name') {
+                                                              } else if (selectedFilter == 'Driver Name')
+                                                              {
                                                                 // Filter by driver name
                                                                 String driverName = item['namedriver'] as String;
                                                                 return driverName.toLowerCase().contains(query.toLowerCase());
                                                               }
+                                                              else if (selectedFilter == 'Supervisor') {
+                                                                // Filter by supervisor name
+                                                                List<dynamic> supervisors = item['supervisors'];
+                                                                for (var supervisor in supervisors) {
+                                                                  if (supervisor['name'].toLowerCase().contains(query.toLowerCase())) {
+                                                                    return true;
+                                                                  }
+                                                                }
+                                                                return false;
+                                                              }
+
                                                               return false; // Default case
                                                             }).toList().cast<QueryDocumentSnapshot<Object?>>();
                                                           });
@@ -516,6 +577,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                           print('0');
                                                                         }else  if (selectedValueWaiting != null) {
                                                                           currentFilter = 'Supervisor';
+                                                                          selectedFilter='Supervisor';
                                                                           getDataForSupervisorFilter();
                                                                           Navigator.pop(context);
                                                                           print('1');
@@ -629,7 +691,7 @@ class BusScreenSate extends State<BusScreen> {
                                                   // shrinkWrap: true,
                                                   //itemCount: filteredData.length,
                                                   //itemCount: data.length,
-                                                    itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' ?  filteredData.length : data.length,
+                                                    itemCount: selectedFilter == 'Driver Name'|| selectedFilter == 'Bus Number' || selectedFilter =='Supervisor' ?  filteredData.length : data.length,
                                                     itemBuilder: (context, index) {
 
 
@@ -646,27 +708,25 @@ class BusScreenSate extends State<BusScreen> {
                                                         Column(
                                                           children: [
                                                             ListTile(
-                                                              leading:imageUrl.isNotEmpty
+                                                              leading: imageUrl.isNotEmpty
                                                                   ? ClipOval(
-                                                                    child: Image.network(
-                                                                imageUrl,
-                                                                width: 61,
-                                                                height: 61,
-                                                                      fit: BoxFit.cover,
-                                                                errorBuilder: (context, error, stackTrace) {
-                                                                    // Display a default image if loading fails
-                                                                    return Image.asset(
-                                                                      defaultImageAsset,
-                                                                      width: 61,
-                                                                      height: 61,
-                                                                      fit: BoxFit.cover,
-                                                                    );
-                                                                },
-                                                                //fit: BoxFit.cover,
-                                                              ),
-                                                                  )
+                                                                  child: Image.network(
+                                                                    imageUrl,
+                                                                    width: 61,
+                                                                    height: 61,
+                                                                    fit: BoxFit.cover,
+                                                                    errorBuilder: (context, error, stackTrace) {
+                                                                      // Display a default image if loading fails
+                                                                      return Image.asset(
+                                                                        defaultImageAsset,
+                                                                        width: 61,
+                                                                        height: 61,
+                                                                        fit: BoxFit.cover,
+                                                                      );
+                                                                    },
+                                                                  ))
                                                                   : Image.asset(
-                                                                defaultImageAsset,
+                                                                'assets/imgs/school/empty_supervisor.png',
                                                                 width: 61,
                                                                 height: 61,
                                                                 fit: BoxFit.cover,
@@ -676,9 +736,11 @@ class BusScreenSate extends State<BusScreen> {
                                                               //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
                                                               //               },),
                                                               title: Text(
-                                                                selectedFilter == 'Bus Number' ? '${filteredData[index]['busnumber']}' : '${filteredData[index]['namedriver']}', // Display bus number if busnumber filter is selected, otherwise display driver name
-
-                                                                //'${data[index]['busnumber'] }',
+                                                                selectedFilter == 'Bus Number'
+                                                                    ? '${filteredData[index]['busnumber']}'
+                                                                    : selectedFilter == 'Supervisor'
+                                                                    ? '${filteredData[index]['supervisors'][0]['name']}'
+                                                                    : '${filteredData[index]['namedriver']}',
                                                                 style: TextStyle(
                                                                   color: Color(0xFF442B72),
                                                                   fontSize: 17,
@@ -687,8 +749,11 @@ class BusScreenSate extends State<BusScreen> {
                                                                 ),
                                                               ),
                                                               subtitle: Text(
-                                                                selectedFilter == 'Bus Number' ?'Driver Name : ${filteredData[index]['namedriver']}' :'Bus number : ${data[index]['busnumber']}',
-                                                                //"Driver Name : "+data[index]['namedriver'],
+                                                                selectedFilter == 'Bus Number'
+                                                                    ? 'Driver Name: ${filteredData[index]['namedriver']}'
+                                                                    : selectedFilter == 'Supervisor'
+                                                                    ? 'Bus Number: ${filteredData[index]['busnumber']}'
+                                                                    : 'Bus number: ${data[index]['busnumber']}',
                                                                 style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
                                                               ),
                                                               trailing:
@@ -835,10 +900,10 @@ class BusScreenSate extends State<BusScreen> {
                                                               tileColor: Colors.white,
                                                               onTap: (){
 
-                                                                List<DropdownCheckboxItem>allSupervisors=[];
-                                                                for(int i=0;i<data[index]['supervisors'].length;i++){
-                                                                  allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
-                                                                }
+                                                                // List<DropdownCheckboxItem>allSupervisors=[];
+                                                                // for(int i=0;i<data[index]['supervisors'].length;i++){
+                                                                //   allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
+                                                                // }
                                                                 showModalBottomSheet(
                                                                   shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -924,16 +989,18 @@ class BusScreenSate extends State<BusScreen> {
                                                                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                               children: [
                                                                                 SizedBox(
-                                                                                  width: 80,
-                                                                                  height: 80,
-                                                                                  child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
-                                                                                      ? Image.network(
-                                                                                    data[index]['busphoto'],
-                                                                                    fit: BoxFit.scaleDown,
-                                                                                  )
-                                                                                      : Image.asset(
-                                                                                    'assets/imgs/school/ph_bus-light (1).png',
-                                                                                    fit: BoxFit.scaleDown,
+                                                                                  width: 70,
+                                                                                  height: 70,
+                                                                                  child: ClipOval(
+                                                                                    child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                                        ? Image.network(
+                                                                                      data[index]['busphoto'],
+                                                                                      fit: BoxFit.cover,
+                                                                                    )
+                                                                                        : Image.asset(
+                                                                                      'assets/imgs/school/ph_bus-light (1).png',
+                                                                                      fit: BoxFit.cover,
+                                                                                    ),
                                                                                   ),
                                                                                 ),
                                                                                 // SizedBox(
@@ -962,16 +1029,18 @@ class BusScreenSate extends State<BusScreen> {
                                                                                 //   ),
                                                                                 // ),
                                                                                 SizedBox(
-                                                                                  width: 80,
-                                                                                  height: 80,
-                                                                                  child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
-                                                                                      ? Image.network(
-                                                                                    data[index]['imagedriver'],
-                                                                                    fit: BoxFit.scaleDown,
-                                                                                  )
-                                                                                      : Image.asset(
-                                                                                    'assets/imgs/school/empty_supervisor.png',
-                                                                                    fit: BoxFit.scaleDown,
+                                                                                  width: 60,
+                                                                                  height: 60,
+                                                                                  child: ClipOval(
+                                                                                    child: data[index]['imagedriver'] != null && data[index]['imagedriver'].isNotEmpty
+                                                                                        ? Image.network(
+                                                                                      data[index]['imagedriver'],
+                                                                                      fit: BoxFit.cover,
+                                                                                    )
+                                                                                        : Image.asset(
+                                                                                      'assets/imgs/school/empty_supervisor.png',
+                                                                                      fit: BoxFit.cover,
+                                                                                    ),
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: 20,),
@@ -1033,7 +1102,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                             Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
                                                                             SizedBox(height: 10),
 
-
+                                                                        for(int i=0;i<data[index]['supervisors'].length;i++)
                                                                             Padding(
                                                                               padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                               child: Row(
@@ -1050,7 +1119,7 @@ class BusScreenSate extends State<BusScreen> {
 
 
                                                                                   Text(
-                                                                                    'Ahmed Atef',
+                                                                                    data[index]['supervisors'][i]['name'],
                                                                                     style: TextStyle(
                                                                                         fontSize: 14,
                                                                                         color: Color(0xFF442B72),
@@ -1060,30 +1129,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                                 ],
                                                                               ),
                                                                             ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                                              child: Row(
-                                                                                children: [
-                                                                                  Container(
-                                                                                    width: 7,
-                                                                                    height: 7,
-                                                                                    decoration: BoxDecoration(
-                                                                                      shape: BoxShape.circle,
-                                                                                      color: Color(0xFF442B72),
-                                                                                    ),
-                                                                                  ),
-                                                                                  SizedBox(width: 10),
-                                                                                  Text(
-                                                                                    'Kariem atif',
-                                                                                    style: TextStyle(
-                                                                                        fontSize: 14,
-                                                                                        color: Color(0xFF442B72),
-                                                                                        fontFamily: "Poppins-Regular"
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
+
 
                                                                           ],
                                                                         ),
