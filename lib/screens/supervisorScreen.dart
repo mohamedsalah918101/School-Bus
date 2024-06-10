@@ -874,7 +874,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                         //             EditeSupervisor()));
                                                       } else if (value == 'delete') {
                                                         isdelete=true;
-                                                        _deleteSupervisorDocument(data[index].id);
+                                                        deletePhotoDialog(context, data[index].id);
+
                                                         // setState(() {
                                                         //
                                                         //   //showSnackBarFun(context);
@@ -1170,8 +1171,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
             child: FloatingActionButton(
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (context) => ProfileScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
               child: Image.asset(
                 'assets/imgs/school/busbottombar.png',
@@ -1413,7 +1414,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   //     widget.selectedItems.clear();
   //   });
   // }
-  deletePhotoDialog(context) {
+  deletePhotoDialog(context,String supervisorId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1435,7 +1436,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                   Center(
                     child: Align(alignment: AlignmentDirectional.topCenter,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
                               'Are you sure you want to',
@@ -1472,8 +1473,9 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                         txt: 'Delete',
                         width: 120,
                         hight: 38,
-                        onPress: () => {
-
+                        onPress: ()  {
+                        Navigator.pop(context);
+                        _deleteSupervisorDocument(supervisorId);
                         }
 
                         // Navigator.of(context).pushAndRemoveUntil(

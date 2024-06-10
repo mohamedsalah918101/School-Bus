@@ -16,6 +16,7 @@ import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
 import '../main.dart';
+import '../supervisor_parent/screens/accept_invitation_supervisor.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -141,6 +142,12 @@ class _SchoolDataState extends State<SchoolData> {
       print('Failed to add data: $error');
     }
     );
+
+    // String? schoolDataDocumentId = sharedpref?.getString('id');
+    // if (userId != null && schoolDataDocumentId != null) {
+    //   // Pass the documentId to the SupervisorClass
+    //   AcceptInvitationSupervisor(schoolDataDocumentId: schoolDataDocumentId);
+    // }
     // Clear the text fields
     _nameEnglish.clear();
     _nameArabic.clear();

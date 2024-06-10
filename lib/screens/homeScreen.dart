@@ -68,12 +68,88 @@ class _HomeScreenState extends State<HomeScreen> {
   List<QueryDocumentSnapshot> data = [];
 
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:0) .get();
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:1) .get();
     data.addAll(querySnapshot.docs);
     setState(() {
 
     });
   }
+  String? _schoolId;
+  Future<void> getSchoolId() async {
+    try {
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLID$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
+
+  int numberbuses=0;
+  // Future<int> getNumberOfBuses(String schoolId) async {
+  //   try {
+  //     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //         .collection('busdata')
+  //         .where('schoolid', isEqualTo: schoolId)
+  //         .get();
+  //
+  //     return querySnapshot.docs.length;
+  //   } catch (e) {
+  //     print("Error getting number of buses: $e");
+  //     return 0; // Return 0 or handle error as needed
+  //   }
+  // }
+  Future<int> getNumberOfBuses(String schoolId) async {
+    try {
+      final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('busdata')
+          .where('schoolid', isEqualTo: schoolId)
+          .get();
+
+      print('Number of buses: ${querySnapshot.docs.length}');
+
+      return querySnapshot.docs.length;
+    } catch (e) {
+      print("Error getting number of buses: $e");
+      return 0; // Return 0 or handle error as needed
+    }
+  }
+
+  int numbersupervisors=0;
+  // Future<int> getNumberOfSupervisors(String schoolId) async {
+  //   try {
+  //     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //         .collection('supervisor')
+  //         .where('schoolid', isEqualTo: schoolId)
+  //         .get();
+  //
+  //     return querySnapshot.docs.length;
+  //   } catch (e) {
+  //     print("Error getting number of supervisors: $e");
+  //     return 0; // Return 0 or handle error as needed
+  //   }
+  // }
+  Future<int> getNumberOfSupervisors(String schoolId) async {
+    try {
+      final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('supervisor')
+          .where('schoolid', isEqualTo: schoolId)
+          .get();
+
+      print('Number of supervisors: ${querySnapshot.docs.length}');
+
+      return querySnapshot.docs.length;
+    } catch (e) {
+      print("Error getting number of supervisors: $e");
+      return 0; // Return 0 or handle error as needed
+    }
+  }
+
 //  late Future<List<DocumentSnapshot>> _parentData;
 //   Future<List<DocumentSnapshot>> _getParentData() async {
 //     QuerySnapshot querySnapshot =
@@ -82,12 +158,21 @@ class _HomeScreenState extends State<HomeScreen> {
 //   }
 
 // to lock in landscape view
+  Future<int>? _numberOfBuses;
+  Future<int>? _numberOfSupervisors;
   @override
   void initState() {
     super.initState();
     // responsible
     getData();
-
+    getSchoolId().then((_) {
+      if (_schoolId!= null) {
+        _numberOfBuses = getNumberOfBuses(_schoolId!);
+        _numberOfSupervisors = getNumberOfSupervisors(_schoolId!);
+      } else {
+        print('School ID is null');
+      }
+    });
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -353,7 +438,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Align(alignment: AlignmentDirectional.bottomStart,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(left: 10),
-                                                    child: Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
+                                                    child:  FutureBuilder<int>(
+                                                      future: _numberOfBuses,
+                                                      builder: (context, snapshot) {
+                                                        if (snapshot.hasData) {
+                                                          return Text('# ${snapshot.data}',style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),);
+                                                        } else if (snapshot.hasError) {
+                                                          return Text('Error: ${snapshot.error}');
+                                                        } else {
+                                                          return Text('Loading...');
+                                                        }
+                                                      },
+                                                    ),
+                                                    //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
                                                   )),
                                               Align(alignment: AlignmentDirectional.bottomEnd,
                                                 child: GestureDetector(
@@ -425,7 +522,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Align(alignment: AlignmentDirectional.bottomStart,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(left: 10),
-                                                    child: Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
+                                                    child:
+                                                    FutureBuilder<int>(
+                                                      future: _numberOfSupervisors,
+                                                      builder: (context, snapshot) {
+                                                        if (snapshot.hasData) {
+                                                          return Text('# ${snapshot.data}',style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),);
+                                                        } else if (snapshot.hasError) {
+                                                          return Text('Error: ${snapshot.error}');
+                                                        } else {
+                                                          return Text('Loading...');
+                                                        }
+                                                      },
+                                                    ),
+                                                    //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
                                                   )),
                                               Align(alignment: AlignmentDirectional.bottomEnd,
                                                 child: GestureDetector(
@@ -805,7 +915,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FloatingActionButton(
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                // Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+                 Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
               child: Image.asset(
 

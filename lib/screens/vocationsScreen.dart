@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../classes/classDay.dart';
@@ -23,7 +24,12 @@ class VacationsScreen extends StatefulWidget {
 }
 
 class _VacationsScreenState extends State<VacationsScreen> {
-
+  // Callback to prevent date selection
+  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    setState(() {
+      // No-op: Do nothing to prevent selection
+    });
+  }
   bool _isHoliday(DateTime date) {
     for (Holiday holiday in _holidays) {
       if (date.isAtSameMomentAs(DateTime.parse(holiday.fromDate)) ||
@@ -1058,7 +1064,7 @@ String newDocId='';
                           ),
 
                           child: SfDateRangePicker(
-
+                            onSelectionChanged: _onSelectionChanged, // Prevent selection
                             allowViewNavigation: true,
                             //new
                            // onSelectionChanged: _onDateRangeSelected,
@@ -1713,8 +1719,8 @@ String newDocId='';
             child: FloatingActionButton(
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (context) => ProfileScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
               child: Image.asset(
                 'assets/imgs/school/busbottombar.png',

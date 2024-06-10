@@ -1261,7 +1261,7 @@ class _EditeProfileState extends State<EditeProfile> {
             child: FloatingActionButton(
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                //Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
               child: Image.asset(
                 'assets/imgs/school/busbottombar.png',
