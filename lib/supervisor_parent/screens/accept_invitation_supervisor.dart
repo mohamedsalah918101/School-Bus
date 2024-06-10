@@ -8,7 +8,11 @@ import 'package:school_account/supervisor_parent/screens/final_invitation_superv
 import '../components/elevated_simple_button.dart';
 
 class AcceptInvitationSupervisor extends StatefulWidget {
-  const AcceptInvitationSupervisor({super.key});
+  final String? schoolDataDocumentId;
+  // String schoolDataDocumentId = sharedpref?.getString('id') ?? '';
+
+
+  const AcceptInvitationSupervisor({super.key,  this.schoolDataDocumentId});
 
   @override
   State<AcceptInvitationSupervisor> createState() => _AcceptInvitationSupervisorState();
@@ -17,6 +21,13 @@ class AcceptInvitationSupervisor extends StatefulWidget {
 class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor> {
 
   final _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use the schoolDataDocumentId in the initState method
+    print('Supervisor class received document ID: ${widget.schoolDataDocumentId}');
+  }
 
   String? _schoolId;
   Future<void> getSchoolId() async {
@@ -135,7 +146,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                                             await _firestore.collection('notification').add({
                                               'item': 'accept Invitation',
                                               'timestamp': FieldValue.serverTimestamp(),
-                                              'SchoolId': _schoolId,
+                                              'SchoolId': widget.schoolDataDocumentId ?? 'N/A',
                                             });
 
 

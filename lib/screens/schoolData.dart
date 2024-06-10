@@ -10,6 +10,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
+import 'package:school_account/supervisor_parent/screens/accept_invitation_supervisor.dart';
 import '../components/bottom_bar_item.dart';
 import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
@@ -31,13 +32,7 @@ class SchoolData extends StatefulWidget{
   State<SchoolData> createState() => _SchoolDataState();
 }
 
-
 class _SchoolDataState extends State<SchoolData> {
-  bool _validateNameEnglish = false;
-  bool _validateNameArabic = false;
-  bool _validateAddress = false;
-  bool _validateCoordinatorName = false;
-  bool _validateSupportNumber = false;
 
   bool logoerror =true;
   bool namearabicerror=true;
@@ -45,8 +40,6 @@ class _SchoolDataState extends State<SchoolData> {
   bool addresserror=true;
   bool coordinateerror=true;
   bool supporterror=true;
-
-
   MyLocalController ControllerLang = Get.find();
   TextEditingController _nameEnglish = TextEditingController();
   TextEditingController _nameArabic = TextEditingController();
@@ -71,13 +64,7 @@ class _SchoolDataState extends State<SchoolData> {
     Reference referenceDirImages = FirebaseStorage.instance.ref().child('images');
     // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
     Reference referenceImageToUpload =referenceDirImages.child('name');
-    // Reference referenceDirImages =
-    // referenceRoot.child('images');
-    //
-    // //Create a reference for the image to be stored
 
-
-    //Handle errors/success
     try {
       //Store the file
       await referenceImageToUpload.putFile(File(returnedImage.path));
@@ -92,27 +79,13 @@ class _SchoolDataState extends State<SchoolData> {
     }
   }
 
-
-
-//   Future _pickImageFromGallery() async{
-//  final returnedImage=
-//  await ImagePicker().pickImage(source: ImageSource.gallery);
-//  if(returnedImage ==null) return;
-//  setState(() {
-//    _selectedImage=File(returnedImage!.path);
-//  });
-//  // String uniqueFileName=DateTime.now().microsecondsSinceEpoch.toString();
-//  // Reference referenceRoot=FirebaseStorage.instance.ref();
-//  // Reference referenceDirImages = referenceRoot.child('images');
-//  // Reference referenceImageToUpload= referenceDirImages.child(uniqueFileName);
-//
-// }
-// add to firestore schooldata
   final _firestore = FirebaseFirestore.instance;
   void _addDataToFirestore() async {
     //if (_formKey.currentState!.validate()) {
     // Define the data to add
     String userId = FirebaseAuth.instance.currentUser!.uid;
+    String? schoolDataDocumentId = sharedpref?.getString('id');
+
     print("sss"+userId);
    // String documentId = FirebaseFirestore.instance.collection('schooldata').doc(FirebaseAuth.instance.currentUser!.uid).id;
     Map<String, dynamic> data = {
@@ -141,6 +114,18 @@ class _SchoolDataState extends State<SchoolData> {
       print('Failed to add data: $error');
     }
     );
+
+    // String? schoolDataDocumentId = sharedpref?.getString('id');
+    if (userId != null && schoolDataDocumentId != null) {
+      // Pass the documentId to the SupervisorClass
+      AcceptInvitationSupervisor(schoolDataDocumentId: userId);
+    }
+
+    // if (userId != null) {
+    //   // Pass the documentId to the SupervisorClass
+    //   AcceptInvitationSupervisor( schoolDataDocumentId: sharedpref!.getString('id').toString(),);
+    // };
+
     // Clear the text fields
     _nameEnglish.clear();
     _nameArabic.clear();
