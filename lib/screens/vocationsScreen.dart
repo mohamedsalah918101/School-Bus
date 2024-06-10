@@ -873,8 +873,9 @@ String newDocId='';
                             child: SfDateRangePicker(
 
                               onSelectionChanged: _onDateRangeSelected,
-                              //navigationMode: DateRangePickerNavigationMode.none,
-                              showNavigationArrow: true,
+                              allowViewNavigation: true,
+
+                              //navigationMode: DateRangePickerNavigationMode.snap,
 
                               headerStyle: DateRangePickerHeaderStyle(
                                 textStyle: TextStyle(
@@ -886,6 +887,7 @@ String newDocId='';
                               ),
                               view: DateRangePickerView.month,
                               monthViewSettings: DateRangePickerMonthViewSettings(
+                              //enableSwipeSelection:true,
                                 //showTrailingAndLeadingDates: false,
                                 viewHeaderStyle:
                                     const DateRangePickerViewHeaderStyle(
@@ -1056,202 +1058,198 @@ String newDocId='';
                             ],
                           ),
 
-                          child: IgnorePointer(
-                            ignoring: !isAddingHoliday,
-                            child: SfDateRangePicker(
-                              allowViewNavigation: true,
-                              //new
-                             // onSelectionChanged: _onDateRangeSelected,
+                          child: SfDateRangePicker(
+                            allowViewNavigation: true,
+                            //new
+                           // onSelectionChanged: _onDateRangeSelected,
 
-                              navigationMode: DateRangePickerNavigationMode.snap,
-                              showNavigationArrow: true,
-                              headerStyle: DateRangePickerHeaderStyle(
+                            navigationMode: DateRangePickerNavigationMode.snap,
+                            showNavigationArrow: true,
+                            headerStyle: DateRangePickerHeaderStyle(
+                              textStyle: TextStyle(
+                                color: Color(0xFF771F98),
+                                fontSize: 19,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            view: DateRangePickerView.month,
+
+                            monthViewSettings: DateRangePickerMonthViewSettings(
+
+                              enableSwipeSelection:true,
+
+                              //monthCellStyle: CustomMonthCellStyle(_selectedWeekendDays),
+                              showTrailingAndLeadingDates: true,
+                              viewHeaderStyle:
+                                  const DateRangePickerViewHeaderStyle(
+
                                 textStyle: TextStyle(
-                                  color: Color(0xFF771F98),
-                                  fontSize: 19,
+                                  color: Color(0xFF5F5F5F),
+                                  fontSize: 17,
                                   fontFamily: 'Poppins-Bold',
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              view: DateRangePickerView.month,
-
-                              monthViewSettings: DateRangePickerMonthViewSettings(
-
-                                enableSwipeSelection:true,
-
-                                //monthCellStyle: CustomMonthCellStyle(_selectedWeekendDays),
-                                showTrailingAndLeadingDates: true,
-                                viewHeaderStyle:
-                                    const DateRangePickerViewHeaderStyle(
-
-                                  textStyle: TextStyle(
-                                    color: Color(0xFF5F5F5F),
-                                    fontSize: 17,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                               specialDates: highlightedDates,
-                              //weekendDays: _selectedHolidayDates,
-                                // weekendDays: const [5, 6],
-                                // specialDates: [
-                                //   DateTime(2024, 03, 3),
-                                //   DateTime(2023, 08, 16),
-                                //   DateTime(2023, 08, 17),
-                                //   DateTime(2023, 09, 17)
-                                // ],
-                              ),
-
-                              // monthCellStyle: DateRangePickerMonthCellStyle(
-                              //   weekendDatesDecoration: BoxDecoration(
-                              //       color: const Color(0xFFFEDF96),
-                              //       border: Border.all(
-                              //           color: const Color(0xFFFEDF96), width: 1),
-                              //       shape: BoxShape.circle),
-                              //   weekendTextStyle: const TextStyle(
-                              //     color: Colors.black,
-                              //     fontSize: 16,
-                              //     fontFamily: 'Poppins-Bold',
-                              //     fontWeight: FontWeight.w400,
-                              //   ),
-                              //   disabledDatesTextStyle: const TextStyle(
-                              //     color: Colors.black,
-                              //     fontSize: 15,
-                              //     fontFamily: 'Poppins-Regular',
-                              //     fontWeight: FontWeight.w400,
-                              //   ),
-                              //   todayCellDecoration: BoxDecoration(
-                              //       color: Colors.transparent,
-                              //       border: Border.all(
-                              //           color: Colors.transparent, width: 1),
-                              //       shape: BoxShape.circle),
-                              //   todayTextStyle:
-                              //       const TextStyle(color: Color(0xFF5F5F5F)),
-                              //   specialDatesDecoration: BoxDecoration(
-                              //       color: const Color(0xFF7A12FF),
-                              //       border: Border.all(
-                              //           color: const Color(0xFF7A12FF), width: 1),
-                              //       shape: BoxShape.circle),
-                              //   specialDatesTextStyle: const TextStyle(
-                              //     color: Colors.white,
-                              //     fontSize: 16,
-                              //     fontFamily: 'Poppins-Bold',
-                              //     // fontWeight: FontWeight.w400,
-                              //   ),
-                              // ),
-                              // selectableDayPredicate: (val) {
-                              //   return false;
-                              // },
-
-                              monthCellStyle: DateRangePickerMonthCellStyle(
-
-                                  // weekendDatesDecoration: BoxDecoration(
-                                  //     color: const Color(0xFFFEDF96),
-                                  //     border: Border.all(
-                                  //         color: const Color(0xFFFEDF96), width: 1),
-                                  //     shape: BoxShape.circle),
-                                  // weekendTextStyle: const TextStyle(
-                                  //   color: Colors.black,
-                                  //   fontSize: 16,
-                                  //   fontFamily: 'Poppins-Bold',
-                                  //   fontWeight: FontWeight.w400,
-                                  // ), cellDecoration: (DateTime date) {
-                                //                     if (_isHoliday(date)) {
-                                //                       return BoxDecoration(
-                                //                         color: const Color(0xFF7A12FF),
-                                //                         shape: BoxShape.circle,
-                                //                       );
-                                //                     } else if (_isSpecialDate(date)) {
-                                //                       return BoxDecoration(
-                                //                         color: const Color(0xFFFEDF96),
-                                //                         shape: BoxShape.circle,
-                                //                       );
-                                //                     }
-                                //                     return null;
-                                //                   },
-                                //                   cellTextStyle: (DateTime date) {
-                                //                     if (_isHoliday(date)) {
-                                //                       return TextStyle(
-                                //                         color: Colors.white,
-                                //                         fontFamily: 'Poppins-SemiBold',
-                                //                         fontSize: 15,
-                                //                       );
-                                //                     } else if (_isSpecialDate(date)) {
-                                //                       return TextStyle(
-                                //                         color: Colors.white,
-                                //                         fontFamily: 'Poppins-SemiBold',
-                                //                         fontSize: 15,
-                                //                       );
-                                //                     }
-                                //                     return TextStyle(
-                                //                       color: Colors.black,
-                                //                       fontFamily: 'Poppins-Regular',
-                                //                       fontSize: 15,
-                                //                     );
-                                //                   },
-
-                                  disabledDatesTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontFamily: 'Poppins-Regular',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  todayCellDecoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      border: Border.all(
-                                          color: Colors.transparent, width: 1),
-                                      shape: BoxShape.circle),
-                                  todayTextStyle:
-                                      const TextStyle(color: Color(0xFF5F5F5F)),
-                                specialDatesDecoration: BoxDecoration(
-                                  color: const Color(0xFFFEDF96),
-                                  border: Border.all(
-                                    color: const Color(0xFFFEDF96),
-                                    width: 1,
-                                  ),
-                                  shape: BoxShape.circle,
-                                ),
-                                //لون الويكند بالموف
-                                // weekendDatesDecoration: BoxDecoration(
-                                //   color: const Color(0xFF7A12FF),
-                                //   border: Border.all(
-                                //     color: const Color(0xFF7A12FF),
-                                //     width: 1,
-                                //   ),
-                                //   shape: BoxShape.circle,
-                                // ),
-
-                                // specialDatesDecoration: addAbsentDay
-                                //     ? BoxDecoration(
-                                //   color: const Color(0xFF7A12FF),
-                                //   border: Border.all(color: const Color(0xFF7A12FF), width: 1),
-                                //   shape: BoxShape.circle,
-                                // )
-                                //     : null,
-                                // specialDatesTextStyle: addAbsentDay
-                                //     ? const TextStyle(
-                                //   color: Colors.white,
-                                //   fontSize: 16,
-                                //   fontFamily: 'Poppins-Bold',
-                                // )
-                                //     : null,
-                              ),
-
-                              selectionMode: DateRangePickerSelectionMode.multiple,
-                              selectionColor: const Color(0xFF7A12FF),
-                              rangeSelectionColor: const Color(0xFF7A12FF),
-                              rangeTextStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: 'Poppins-SemiBold',
-                                fontWeight: FontWeight.w400,
-                              ),
-
-                              initialSelectedRange: PickerDateRange(
-                                  DateTime.now().subtract(const Duration(days: 4)),
-                                  DateTime.now().add(const Duration(days: 3))),
+                             specialDates: highlightedDates,
+                            //weekendDays: _selectedHolidayDates,
+                              // weekendDays: const [5, 6],
+                              // specialDates: [
+                              //   DateTime(2024, 03, 3),
+                              //   DateTime(2023, 08, 16),
+                              //   DateTime(2023, 08, 17),
+                              //   DateTime(2023, 09, 17)
+                              // ],
                             ),
 
+                            // monthCellStyle: DateRangePickerMonthCellStyle(
+                            //   weekendDatesDecoration: BoxDecoration(
+                            //       color: const Color(0xFFFEDF96),
+                            //       border: Border.all(
+                            //           color: const Color(0xFFFEDF96), width: 1),
+                            //       shape: BoxShape.circle),
+                            //   weekendTextStyle: const TextStyle(
+                            //     color: Colors.black,
+                            //     fontSize: 16,
+                            //     fontFamily: 'Poppins-Bold',
+                            //     fontWeight: FontWeight.w400,
+                            //   ),
+                            //   disabledDatesTextStyle: const TextStyle(
+                            //     color: Colors.black,
+                            //     fontSize: 15,
+                            //     fontFamily: 'Poppins-Regular',
+                            //     fontWeight: FontWeight.w400,
+                            //   ),
+                            //   todayCellDecoration: BoxDecoration(
+                            //       color: Colors.transparent,
+                            //       border: Border.all(
+                            //           color: Colors.transparent, width: 1),
+                            //       shape: BoxShape.circle),
+                            //   todayTextStyle:
+                            //       const TextStyle(color: Color(0xFF5F5F5F)),
+                            //   specialDatesDecoration: BoxDecoration(
+                            //       color: const Color(0xFF7A12FF),
+                            //       border: Border.all(
+                            //           color: const Color(0xFF7A12FF), width: 1),
+                            //       shape: BoxShape.circle),
+                            //   specialDatesTextStyle: const TextStyle(
+                            //     color: Colors.white,
+                            //     fontSize: 16,
+                            //     fontFamily: 'Poppins-Bold',
+                            //     // fontWeight: FontWeight.w400,
+                            //   ),
+                            // ),
+                            // selectableDayPredicate: (val) {
+                            //   return false;
+                            // },
+
+                            monthCellStyle: DateRangePickerMonthCellStyle(
+
+                                // weekendDatesDecoration: BoxDecoration(
+                                //     color: const Color(0xFFFEDF96),
+                                //     border: Border.all(
+                                //         color: const Color(0xFFFEDF96), width: 1),
+                                //     shape: BoxShape.circle),
+                                // weekendTextStyle: const TextStyle(
+                                //   color: Colors.black,
+                                //   fontSize: 16,
+                                //   fontFamily: 'Poppins-Bold',
+                                //   fontWeight: FontWeight.w400,
+                                // ), cellDecoration: (DateTime date) {
+                              //                     if (_isHoliday(date)) {
+                              //                       return BoxDecoration(
+                              //                         color: const Color(0xFF7A12FF),
+                              //                         shape: BoxShape.circle,
+                              //                       );
+                              //                     } else if (_isSpecialDate(date)) {
+                              //                       return BoxDecoration(
+                              //                         color: const Color(0xFFFEDF96),
+                              //                         shape: BoxShape.circle,
+                              //                       );
+                              //                     }
+                              //                     return null;
+                              //                   },
+                              //                   cellTextStyle: (DateTime date) {
+                              //                     if (_isHoliday(date)) {
+                              //                       return TextStyle(
+                              //                         color: Colors.white,
+                              //                         fontFamily: 'Poppins-SemiBold',
+                              //                         fontSize: 15,
+                              //                       );
+                              //                     } else if (_isSpecialDate(date)) {
+                              //                       return TextStyle(
+                              //                         color: Colors.white,
+                              //                         fontFamily: 'Poppins-SemiBold',
+                              //                         fontSize: 15,
+                              //                       );
+                              //                     }
+                              //                     return TextStyle(
+                              //                       color: Colors.black,
+                              //                       fontFamily: 'Poppins-Regular',
+                              //                       fontSize: 15,
+                              //                     );
+                              //                   },
+
+                                disabledDatesTextStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontFamily: 'Poppins-Regular',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                todayCellDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    border: Border.all(
+                                        color: Colors.transparent, width: 1),
+                                    shape: BoxShape.circle),
+                                todayTextStyle:
+                                    const TextStyle(color: Color(0xFF5F5F5F)),
+                              specialDatesDecoration: BoxDecoration(
+                                color: const Color(0xFFFEDF96),
+                                border: Border.all(
+                                  color: const Color(0xFFFEDF96),
+                                  width: 1,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              //لون الويكند بالموف
+                              // weekendDatesDecoration: BoxDecoration(
+                              //   color: const Color(0xFF7A12FF),
+                              //   border: Border.all(
+                              //     color: const Color(0xFF7A12FF),
+                              //     width: 1,
+                              //   ),
+                              //   shape: BoxShape.circle,
+                              // ),
+
+                              // specialDatesDecoration: addAbsentDay
+                              //     ? BoxDecoration(
+                              //   color: const Color(0xFF7A12FF),
+                              //   border: Border.all(color: const Color(0xFF7A12FF), width: 1),
+                              //   shape: BoxShape.circle,
+                              // )
+                              //     : null,
+                              // specialDatesTextStyle: addAbsentDay
+                              //     ? const TextStyle(
+                              //   color: Colors.white,
+                              //   fontSize: 16,
+                              //   fontFamily: 'Poppins-Bold',
+                              // )
+                              //     : null,
+                            ),
+
+                            selectionMode: DateRangePickerSelectionMode.single,
+                            selectionColor: const Color(0xFF7A12FF),
+                            rangeSelectionColor: const Color(0xFF7A12FF),
+                            rangeTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontFamily: 'Poppins-SemiBold',
+                              fontWeight: FontWeight.w400,
+                            ),
+
+                            initialSelectedRange: PickerDateRange(
+                                DateTime.now().subtract(const Duration(days: 4)),
+                                DateTime.now().add(const Duration(days: 3))),
                           ),
                         ),
                       ),
@@ -1374,15 +1372,16 @@ String newDocId='';
                           width: 200,
                           hight: 42,
                           onPress: () {
-                            AddAbsentDay = true;
+                            //AddAbsentDay = true;
                             //addAbsentDay=true;
                             setState(() {
+                              AddAbsentDay = true;
                               isAddingHoliday = true;
                               //isAddingHoliday = !isAddingHoliday;
                               //_selectedDates = [];
 
                             });
-                            _addHolidayToFirestore();
+                           // _addHolidayToFirestore();
                             isLoading ? Center(child: CircularProgressIndicator()) : Container();
                             if (_addedHoliday != null)
                               HolidayDetails(
