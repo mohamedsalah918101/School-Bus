@@ -218,7 +218,7 @@ String newDocId='';
     List<DateTime> highlightedDates = [];
     DateTime now = DateTime.now();
 
-    for (var i = 0; i < 30; i++) { // Example: Highlight next 30 days as per the selected days
+    for (var i = 0; i < 27375; i++) { // Example: Highlight next 30 days as per the selected days
       DateTime date = now.add(Duration(days: i));
       String dayName;
 
@@ -318,16 +318,15 @@ String newDocId='';
 
   List<Holiday> _holidays = [];
 
+
 //other fun to retrive data of holiday from DB
 
   void retrieveAllData() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
-
       if (querySnapshot.size > 0) {
         for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
           Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
-
           if (data != null) {
             if (data.containsKey('name') &&
                 data.containsKey('fromDate') &&
@@ -1059,6 +1058,7 @@ String newDocId='';
                           ),
 
                           child: SfDateRangePicker(
+
                             allowViewNavigation: true,
                             //new
                            // onSelectionChanged: _onDateRangeSelected,
