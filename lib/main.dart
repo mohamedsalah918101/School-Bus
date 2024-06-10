@@ -10,6 +10,7 @@ import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'Functions/functions.dart';
 import 'Functions/notifications.dart';
 import 'controller/local_controller.dart';
 
@@ -50,7 +51,7 @@ void main()async {
 
   }
   initMessaging();
-
+  addPoints();
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget{

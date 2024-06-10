@@ -238,265 +238,270 @@ class _YourBusState extends State<YourBus> {
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
-        body: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 35,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: (){
-                        Navigator.of(context).pop();
-                      },
-                      child:  Padding(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 17.0),
-                        child: Image.asset(
-                          (sharedpref?.getString('lang') == 'ar')?
-                          'assets/images/Layer 1.png':
-                          'assets/images/fi-rr-angle-left.png',
-                          width: 20,
-                          height: 22,),
-                      ),
-                    ),
-                    Text(
-                      'My Bus'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF993D9A),
-                        fontSize: 16,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        _scaffoldKey.currentState!.openEndDrawer();
-                      },
-                      icon: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: const Icon(
-                          Icons.menu_rounded,
-                          color: Color(0xff442B72),
-                          size: 35,
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 35,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.of(context).pop();
+                        },
+                        child:  Padding(
+                          padding:
+                          EdgeInsets.symmetric(horizontal: 17.0),
+                          child: Image.asset(
+                            (sharedpref?.getString('lang') == 'ar')?
+                            'assets/images/Layer 1.png':
+                            'assets/images/fi-rr-angle-left.png',
+                            width: 20,
+                            height: 22,),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // children.isNotEmpty?
-                Column(
-                  children: [
-                    Padding(
-                      padding:  EdgeInsets.symmetric(horizontal: 31.0),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 25.5,
-                            backgroundColor: Colors.cyan,
-                            child: _photodriver != null && _photodriver.isNotEmpty
-                                ? CircleAvatar(
-                              backgroundImage: NetworkImage(_photodriver),
+                      Text(
+                        'My Bus'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF993D9A),
+                          fontSize: 16,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                          height: 1,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _scaffoldKey.currentState!.openEndDrawer();
+                        },
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: const Icon(
+                            Icons.menu_rounded,
+                            color: Color(0xff442B72),
+                            size: 35,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // children.isNotEmpty?
+                  Column(
+                    children: [
+                      Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 31.0),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
                               radius: 25.5,
+                              backgroundColor: Colors.cyan,
+                              child: _photodriver != null && _photodriver.isNotEmpty
+                                  ? CircleAvatar(
+                                backgroundImage: NetworkImage(_photodriver),
+                                radius: 25.5,
+                              )
+                                  : CircleAvatar(
+                                backgroundImage: AssetImage('ssets/images/Group 237679 (2).png'), // Replace with your default image path
+                                radius: 25.5,
+                              ),
+                            ),
+          
+          
+                            // CircleAvatar(
+                            //   backgroundImage: NetworkImage( _photodriver ?? 'no data'),
+                            //   radius: 25.5,
+                            // ),
+                            // NetworkImage(
+                            //   _photodriver ?? 'no data',
+                            //   // 'assets/images/Ellipse 1.png',
+                            //   width: 50,
+                            //   height: 50,),
+                            SizedBox(width: 10,),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: Text('Driver photo'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                              ),),
                             )
-                                : CircleAvatar(
-                              backgroundImage: AssetImage('ssets/images/Group 237679 (2).png'), // Replace with your default image path
-                              radius: 25.5,
-                            ),
-                          ),
-
-
-                          // CircleAvatar(
-                          //   backgroundImage: NetworkImage( _photodriver ?? 'no data'),
-                          //   radius: 25.5,
-                          // ),
-                          // NetworkImage(
-                          //   _photodriver ?? 'no data',
-                          //   // 'assets/images/Ellipse 1.png',
-                          //   width: 50,
-                          //   height: 50,),
-                          SizedBox(width: 10,),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Text('Driver photo'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                          )
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Driver Name'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                          SizedBox(height: 10,),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: Text(
-                              _namedriverText ?? 'no data',
+                      SizedBox(height: 20,),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Driver Name'.tr,
                               style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
                               ),),
-                          ),
-                          SizedBox(height: 20,),
-                          Text('Driver Number'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                          SizedBox(height: 10,),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: Text(
-                                _phonedriver ?? 'no data',
-                              style: TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
-                              ),),
-                          ),
-                          SizedBox(height: 20,),
-                          Text('Bus Photos'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                          SizedBox(height: 5,),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 3.0),
-                            child: Row(
-                              children: [
-                                InteractiveViewer(
-                                  // transformationController: _imagebuscontroller,
-                                    child:(_photobus == null || _photobus == '') ?
-                                    //Image.network(widget.oldphotobus),
-                                    Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                    Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
-                                ),
-                                SizedBox(width: 10,),
-                                // InteractiveViewer(
-                                //   // transformationController: _imagebuscontroller,
-                                //     child:(_photobus == null || _photobus == '') ?
-                                //     //Image.network(widget.oldphotobus),
-                                //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
-                                // ),
-                                SizedBox(width: 10,),
-                                // InteractiveViewer(
-                                //   // transformationController: _imagebuscontroller,
-                                //     child:(_photobus == null || _photobus == '') ?
-                                //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
-                                // ),
-
-                              ],
+                            SizedBox(height: 10,),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Text(
+                                _namedriverText ?? 'no data',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                ),),
                             ),
-                          ),
-                          SizedBox(height: 15,),
-                          Text('Bus Number'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                          SizedBox(height: 10,),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 0.0),
-                            child: Text(_busnumber,
-                              textDirection: _getTextDirection(" 1458ى ر س "),
+                            SizedBox(height: 20,),
+                            Text('Driver Number'.tr,
                               style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
                               ),),
-                          ),
-                          SizedBox(height: 20,),
-                          Text('Second Supervisor'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                          SizedBox(height: 10,),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 3.0),
-                            child: Text(
-                              firstChildName.isNotEmpty ? firstChildName : 'No second supervisor found',
-                              // 'reham',
+                            SizedBox(height: 10,),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Text(
+                                  _phonedriver ?? 'no data',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                ),),
+                            ),
+                            SizedBox(height: 20,),
+                            Text('Bus Photos'.tr,
                               style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
                               ),),
-                          ),
-
-                        ],
+                            SizedBox(height: 5,),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 3.0),
+                              child: Row(
+                                children: [
+                                  InteractiveViewer(
+                                    // transformationController: _imagebuscontroller,
+                                      child:(_photobus == null || _photobus == '') ?
+                                      //Image.network(widget.oldphotobus),
+                                      Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                      Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                  ),
+                                  SizedBox(width: 10,),
+                                  // InteractiveViewer(
+                                  //   // transformationController: _imagebuscontroller,
+                                  //     child:(_photobus == null || _photobus == '') ?
+                                  //     //Image.network(widget.oldphotobus),
+                                  //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                  //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                  // ),
+                                  SizedBox(width: 10,),
+                                  // InteractiveViewer(
+                                  //   // transformationController: _imagebuscontroller,
+                                  //     child:(_photobus == null || _photobus == '') ?
+                                  //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                  //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                  // ),
+          
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 15,),
+                            Text('Bus Number'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                              ),),
+                            SizedBox(height: 10,),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 0.0),
+                              child: Text(_busnumber,
+                                textDirection: _getTextDirection(" 1458ى ر س "),
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                ),),
+                            ),
+                            SizedBox(height: 20,),
+                            Text('Second Supervisor'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                              ),),
+                            SizedBox(height: 10,),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 3.0),
+                              child: Text(
+                                firstChildName.isNotEmpty ? firstChildName : 'No second supervisor found',
+                                // 'reham',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                ),),
+                            ),
+          
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                //no data
-                //     :
-                // Column(
-                //   children: [
-                //     SizedBox(height: 200,),
-                //     Image.asset('assets/images/Group 237684.png',
-                //     ),
-                //     Text('No Data Found'.tr,
-                //       style: TextStyle(
-                //         color: Color(0xff442B72),
-                //         fontFamily: 'Poppins-Regular',
-                //         fontWeight: FontWeight.w500,
-                //         fontSize: 19,
-                //       ),
-                //     ),
-                //     Text('You haven’t added any \n '
-                //         'buses yet'.tr,
-                //       textAlign: TextAlign.center,
-                //       style: TextStyle(
-                //         color: Color(0xffBE7FBF),
-                //         fontFamily: 'Poppins-Light',
-                //         fontWeight: FontWeight.w400,
-                //         fontSize: 12,
-                //       ),)
-                //   ],
-                // ),
-                const SizedBox(
-                  height: 44,
-                ),
-
-              ],
-            )
+                    ],
+                  ),
+                  //no data
+                  //     :
+                  // Column(
+                  //   children: [
+                  //     SizedBox(height: 200,),
+                  //     Image.asset('assets/images/Group 237684.png',
+                  //     ),
+                  //     Text('No Data Found'.tr,
+                  //       style: TextStyle(
+                  //         color: Color(0xff442B72),
+                  //         fontFamily: 'Poppins-Regular',
+                  //         fontWeight: FontWeight.w500,
+                  //         fontSize: 19,
+                  //       ),
+                  //     ),
+                  //     Text('You haven’t added any \n '
+                  //         'buses yet'.tr,
+                  //       textAlign: TextAlign.center,
+                  //       style: TextStyle(
+                  //         color: Color(0xffBE7FBF),
+                  //         fontFamily: 'Poppins-Light',
+                  //         fontWeight: FontWeight.w400,
+                  //         fontSize: 12,
+                  //       ),)
+                  //   ],
+                  // ),
+                  const SizedBox(
+                    height: 44,
+                  ),
+          
+                ],
+              )
+          ),
         ),
         // extendBody: true,
         resizeToAvoidBottomInset: false,

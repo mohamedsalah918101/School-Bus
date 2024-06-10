@@ -1,13 +1,19 @@
+import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart' as FDB;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:http/http.dart' as http;
 import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
+
 dynamic platform;
 
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
@@ -351,3 +357,60 @@ void makePhoneCall(String phoneNumber) async {
   }
 
 }
+
+
+dynamic center;
+dynamic last;
+
+//supervisir track
+addPoints(){
+  Timer.periodic(const Duration(seconds: 15), (timer) async {
+    var locs = await geolocator.Geolocator.getLastKnownPosition();
+    if (locs != null) {
+      center = LatLng(locs.latitude, locs.longitude);
+    } else {
+      var loc = await geolocator.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocator.LocationAccuracy.low);
+      center = LatLng(double.parse(loc.latitude.toString()),
+          double.parse(loc.longitude.toString()));
+    }
+
+    if (last == null || last.latitude != center.latitude || last.longitude != center.longitude) {
+      last = center;
+      FDB.FirebaseDatabase.instance
+          .ref()
+          .child('supervisors').child(sharedpref!.getString("id").toString()).push().set({
+        'lat': center.latitude, 'lang': center.longitude
+      });
+    }
+  });
+}
+
+
+
+
+// dynamic center;
+//
+// //supervisir track
+// addPoints(){
+//
+//   Timer.periodic(const Duration(seconds: 15), (timer) async {
+//     var locs = await geolocator.Geolocator.getLastKnownPosition();
+//     if (locs != null) {
+//       center = LatLng(locs.latitude, locs.longitude);
+//     } else {
+//     var  loc = await geolocator.Geolocator.getCurrentPosition(
+//           desiredAccuracy: geolocator.LocationAccuracy.low);
+//       center = LatLng(double.parse(loc.latitude.toString()),
+//           double.parse(loc.longitude.toString()));
+//     }
+//
+//     FDB.FirebaseDatabase.instance
+//         .ref()
+//         .child('supervisors').child(sharedpref!.getString("id").toString()).push().set({
+//       'lat': center.latitude, 'lang': center.longitude
+//
+//     });
+//   });
+//
+// }

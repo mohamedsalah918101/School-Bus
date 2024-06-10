@@ -340,207 +340,333 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
           preferredSize: Size.fromHeight(70),
         ),
         // Custom().customAppBar(context, 'Profile'.tr),
-        body: Form(
-          key: formState,
-          child: SingleChildScrollView(
-              child:
-              // children.isNotEmpty?
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30.0),
-                    child: SizedBox(
-                      width: 230,
-                      child: Padding(
-                        padding:(sharedpref?.getString('lang') == 'ar')?
-                        EdgeInsets.only(right: 120.0 ):
-                        EdgeInsets.only(left: 120.0 ),
-                        child: Stack(
-                          children: [
-                            // CircleAvatar(
-                            //     radius: 52.5,
-                            //     backgroundColor: Color(0xff442B72),
-                            //     child: CircleAvatar(
-                            //       backgroundImage: NetworkImage( '$imageUrl',),
-                            //       radius: 50.5,)
-                            // ),
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Form(
+            key: formState,
+            child: SingleChildScrollView(
+                child:
+                // children.isNotEmpty?
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30.0),
+                      child: SizedBox(
+                        width: 230,
+                        child: Padding(
+                          padding:(sharedpref?.getString('lang') == 'ar')?
+                          EdgeInsets.only(right: 120.0 ):
+                          EdgeInsets.only(left: 120.0 ),
+                          child: Stack(
+                            children: [
+                              // CircleAvatar(
+                              //     radius: 52.5,
+                              //     backgroundColor: Color(0xff442B72),
+                              //     child: CircleAvatar(
+                              //       backgroundImage: NetworkImage( '$imageUrl',),
+                              //       radius: 50.5,)
+                              // ),
 
 
-                            GestureDetector(
-                              onTap: (){
-                                print('object');
-                                _pickImageFromGallery();
-                              },
-                              child: FutureBuilder(
-                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text('Something went wrong');
-                                  }
+                              GestureDetector(
+                                onTap: (){
+                                  print('object');
+                                  _pickImageFromGallery();
+                                },
+                                child: FutureBuilder(
+                                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Text('Something went wrong');
+                                    }
 
-                                  if (snapshot.connectionState == ConnectionState.done) {
-                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                                      return Text(
-                                        'No data available',
-                                        style: TextStyle(
-                                          color: Color(0xff442B72),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w400,
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                                        return Text(
+                                          'No data available',
+                                          style: TextStyle(
+                                            color: Color(0xff442B72),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        );
+                                      }
+
+                                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                      String? busphoto = data['busphoto'] as String?;
+                                      String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
+                                      return CircleAvatar(
+                                        radius: 52.5,
+                                        backgroundColor: Color(0xff442B72),
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage(imageUrl) ,
+                                          radius: 50.5,
                                         ),
                                       );
                                     }
 
-                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                    String? busphoto = data['busphoto'] as String?;
-                                    String imageUrl = busphoto ?? 'assets/images/Logo (4).png';
-                                    return CircleAvatar(
-                                      radius: 52.5,
-                                      backgroundColor: Color(0xff442B72),
-                                      child: CircleAvatar(
-                                        backgroundImage: NetworkImage(imageUrl) ,
-                                        radius: 50.5,
+                                    return CircularProgressIndicator();
+                                  },
+                                ),
+                              ),
+                              (sharedpref?.getString('lang') == 'ar')?
+                              Positioned(
+                                bottom: 2,
+                                left: 10,
+                                child:  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      // shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Color(0xff442B72),
+                                        width: 2.0,
                                       ),
-                                    );
-                                  }
-
-                                  return CircularProgressIndicator();
-                                },
-                              ),
-                            ),
-                            (sharedpref?.getString('lang') == 'ar')?
-                            Positioned(
-                              bottom: 2,
-                              left: 10,
-                              child:  Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    // shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Color(0xff442B72),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(50.0),),),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: Image.asset(
-                                      'assets/images/image-editing 1.png' ,),
-                                  )
-                              ),
-                            ):
-                            Positioned(
-                              bottom: 2,
-                              right: 10,
-                              child:  Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    // shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Color(0xff442B72),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.all(Radius.circular(50.0),),),
-                                  child: GestureDetector(
-                                    onTap: (){
-                                      print('test');
-                                      _pickImageFromGallery();
-                                    },
+                                      borderRadius: BorderRadius.all(Radius.circular(50.0),),),
                                     child: Padding(
                                       padding: const EdgeInsets.all(3.0),
                                       child: Image.asset(
                                         'assets/images/image-editing 1.png' ,),
-                                    ),
-                                  )
+                                    )
+                                ),
+                              ):
+                              Positioned(
+                                bottom: 2,
+                                right: 10,
+                                child:  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      // shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Color(0xff442B72),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(50.0),),),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        print('test');
+                                        _pickImageFromGallery();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(3.0),
+                                        child: Image.asset(
+                                          'assets/images/image-editing 1.png' ,),
+                                      ),
+                                    )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 18,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                      child:
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Name'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.07,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.07,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 18,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                    child:
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Name'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                              height: 1.07,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' *',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                              height: 1.07,
-                            ),
-                          ),
-                        ],
+                    ) ,
+                    SizedBox(height: 10,),
+                    Center(
+                      child: SizedBox(
+                        width: 277,
+                        height: 38,
+                        child:
+                        FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                          future: _future,
+                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
+
+                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                              return Text('No data available');
+                            }
+
+                            Map<String, dynamic>? data = snapshot.data!.data();
+                            String name = data?['name'] ?? '';
+
+                            // Update the text field with the retrieved data
+                            _nameController.text = name;
+
+                            return TextFormField(
+                              controller:  _nameController,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 14,
+                                //fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins-Regular',
+                              ),
+                            scrollPadding:  EdgeInsets.symmetric(
+                                  vertical: 30),
+                              textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                                TextDirection.rtl:
+                                TextDirection.ltr,
+                              cursorColor: const Color(0xFF442B72),
+                              decoration: InputDecoration(
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFF442B72),
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins-Light',
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.33,
+                                  ),
+                                alignLabelWithHint: true,
+                                counterText: "",
+                                fillColor: const Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding:
+                                (sharedpref?.getString('lang') == 'ar') ?
+                                    EdgeInsets.fromLTRB(0, 15, 17, 50):
+                                    EdgeInsets.fromLTRB(17, 15, 0, 50),
+                                // const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                                floatingLabelBehavior: FloatingLabelBehavior.never,
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF442B72),
+                                    width: 0.5,
+                                  ),),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF442B72),
+                                    width: 0.5,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ) ,
-                  SizedBox(height: 10,),
-                  Center(
-                    child: SizedBox(
-                      width: 277,
-                      height: 38,
+                    nameError ? Container(): Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
+                      child: Text(
+                        "Please enter your name".tr,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 18,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
                       child:
-                      FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        future: _future,
-                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          if (snapshot.hasError) {
-                            return Text('Something went wrong');
-                          }
-
-                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                            return Text('No data available');
-                          }
-
-                          Map<String, dynamic>? data = snapshot.data!.data();
-                          String name = data?['name'] ?? '';
-
-                          // Update the text field with the retrieved data
-                          _nameController.text = name;
-
-                          return TextFormField(
-                            controller:  _nameController,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 14,
-                              //fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins-Regular',
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Number'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.07,
+                              ),
                             ),
-                          scrollPadding:  EdgeInsets.symmetric(
-                                vertical: 30),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                            TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.07,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ) ,
+                    SizedBox(height: 10,),
+                    Center(
+                      child: SizedBox(
+                        width: 277,
+                        height: 38,
+                        child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                          future: _future,
+                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
+
+                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                              return Text('No data available');
+                            }
+
+                            Map<String, dynamic>? data = snapshot.data!.data();
+                            String PhoneNumber = data?['phoneNumber'] ?? '';
+
+                            // Update the text field with the retrieved data
+                            _phoneNumberController.text = PhoneNumber;
+                            return TextFormField(
+                              controller:  _phoneNumberController,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 14,
+                                //fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins-Regular',
+                              ),
+                              scrollPadding:  EdgeInsets.symmetric(
+                                  vertical: 30),
+                              textDirection: (sharedpref?.getString('lang') == 'ar') ?
                               TextDirection.rtl:
                               TextDirection.ltr,
-                            cursorColor: const Color(0xFF442B72),
-                            decoration: InputDecoration(
+                              keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  LengthLimitingTextInputFormatter(11),
+                                  FilteringTextInputFormatter.digitsOnly],
+                              cursorColor: const Color(0xFF442B72),
+                              decoration: InputDecoration(
                                 hintStyle: const TextStyle(
                                   color: Color(0xFF442B72),
                                   fontSize: 12,
@@ -548,370 +674,249 @@ class _EditProfileSupervisorScreenState extends State<EditProfileSupervisorScree
                                   fontWeight: FontWeight.w400,
                                   height: 1.33,
                                 ),
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                                  EdgeInsets.fromLTRB(0, 15, 17, 50):
-                                  EdgeInsets.fromLTRB(17, 15, 0, 50),
-                              // const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFF442B72),
-                                  width: 0.5,
-                                ),),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFF442B72),
-                                  width: 0.5,
+                                alignLabelWithHint: true,
+                                counterText: "",
+                                fillColor: const Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding:
+                                (sharedpref?.getString('lang') == 'ar') ?
+                                EdgeInsets.fromLTRB(0, 15, 17, 50):
+                                EdgeInsets.fromLTRB(17, 15, 0, 50),
+                                // const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                                floatingLabelBehavior: FloatingLabelBehavior.never,
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF442B72),
+                                    width: 0.5,
+                                  ),),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF442B72),
+                                    width: 0.5,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  nameError ? Container(): Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    child: Text(
-                      "Please enter your name".tr,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 18,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                    child:
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Number'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                              height: 1.07,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' *',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 15,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                              height: 1.07,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ) ,
-                  SizedBox(height: 10,),
-                  Center(
-                    child: SizedBox(
-                      width: 277,
-                      height: 38,
-                      child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        future: _future,
-                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
                             );
-                          }
+                          },
+                        ),
+                      ),
+                    ),
+                    phoneError ? Container(): Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
+                      child: Text(
+                        "Please enter your phone Number".tr,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 18,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                      child:
+                      Text(
+                        'Email'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                          height: 1.07,
+                        ),
+                      ),
+                    ) ,
+                    SizedBox(height: 10,),
+                    Center(
+                      child: SizedBox(
+                        width: 277,
+                        height: 38,
+                        child:  FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                          future: _future,
+                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
-                          if (snapshot.hasError) {
-                            return Text('Something went wrong');
-                          }
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
 
-                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                            return Text('No data available');
-                          }
+                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+                              return Text('No data available');
+                            }
 
-                          Map<String, dynamic>? data = snapshot.data!.data();
-                          String PhoneNumber = data?['phoneNumber'] ?? '';
+                            Map<String, dynamic>? data = snapshot.data!.data();
+                            String email = data?['email'] ?? '';
 
-                          // Update the text field with the retrieved data
-                          _phoneNumberController.text = PhoneNumber;
-                          return TextFormField(
-                            controller:  _phoneNumberController,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 14,
-                              //fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins-Regular',
-                            ),
-                            scrollPadding:  EdgeInsets.symmetric(
-                                vertical: 30),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                LengthLimitingTextInputFormatter(11),
-                                FilteringTextInputFormatter.digitsOnly],
-                            cursorColor: const Color(0xFF442B72),
-                            decoration: InputDecoration(
-                              hintStyle: const TextStyle(
+                            // Update the text field with the retrieved data
+                            _emailController.text = email;
+
+                            return TextFormField(
+                              controller:  _emailController,
+                              style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
-                                height: 1.33,
+                                fontSize: 14,
+                                //fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins-Regular',
                               ),
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(0, 15, 17, 50):
-                              EdgeInsets.fromLTRB(17, 15, 0, 50),
-                              // const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
+                              scrollPadding:  EdgeInsets.symmetric(
+                                  vertical: 30),
+                              textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                              TextDirection.rtl:
+                              TextDirection.ltr,
+                              cursorColor: const Color(0xFF442B72),
+                              decoration: InputDecoration(
+                                hintStyle: const TextStyle(
                                   color: Color(0xFF442B72),
-                                  width: 0.5,
-                                ),),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFF442B72),
-                                  width: 0.5,
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.33,
+                                ),
+                                alignLabelWithHint: true,
+                                counterText: "",
+                                fillColor: const Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding:
+                                (sharedpref?.getString('lang') == 'ar') ?
+                                EdgeInsets.fromLTRB(0, 15, 17, 50):
+                                EdgeInsets.fromLTRB(17, 15, 0, 50),
+                                // const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                                floatingLabelBehavior: FloatingLabelBehavior.never,
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF442B72),
+                                    width: 0.5,
+                                  ),),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF442B72),
+                                    width: 0.5,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  phoneError ? Container(): Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    child: Text(
-                      "Please enter your phone Number".tr,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 18,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                    child:
-                    Text(
-                      'Email'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1.07,
-                      ),
-                    ),
-                  ) ,
-                  SizedBox(height: 10,),
-                  Center(
-                    child: SizedBox(
-                      width: 277,
-                      height: 38,
-                      child:  FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        future: _future,
-                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
                             );
-                          }
+                          },
+                        ),
 
-                          if (snapshot.hasError) {
-                            return Text('Something went wrong');
-                          }
-
-                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                            return Text('No data available');
-                          }
-
-                          Map<String, dynamic>? data = snapshot.data!.data();
-                          String email = data?['email'] ?? '';
-
-                          // Update the text field with the retrieved data
-                          _emailController.text = email;
-
-                          return TextFormField(
-                            controller:  _emailController,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 14,
-                              //fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins-Regular',
-                            ),
-                            scrollPadding:  EdgeInsets.symmetric(
-                                vertical: 30),
-                            textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                            TextDirection.rtl:
-                            TextDirection.ltr,
-                            cursorColor: const Color(0xFF442B72),
-                            decoration: InputDecoration(
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
-                                height: 1.33,
-                              ),
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar') ?
-                              EdgeInsets.fromLTRB(0, 15, 17, 50):
-                              EdgeInsets.fromLTRB(17, 15, 0, 50),
-                              // const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFF442B72),
-                                  width: 0.5,
-                                ),),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFF442B72),
-                                  width: 0.5,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                        // TextFormField(
+                        //   style: TextStyle(
+                        //     color: Color(0xFF442B72),
+                        //   ),
+                        //   controller: _emailController,
+                        //   cursorColor: const Color(0xFF442B72),
+                        //   textDirection: (sharedpref?.getString('lang') == 'ar') ?
+                        //   TextDirection.rtl:
+                        //   TextDirection.ltr,
+                        //   scrollPadding:  EdgeInsets.symmetric(
+                        //       vertical: 30),
+                        //   decoration:  InputDecoration(
+                        //     alignLabelWithHint: true,
+                        //     counterText: "",
+                        //     fillColor: const Color(0xFFF1F1F1),
+                        //     filled: true,
+                        //     contentPadding:
+                        //     (sharedpref?.getString('lang') == 'ar') ?
+                        //     EdgeInsets.fromLTRB(0, 0, 17, 40):
+                        //     EdgeInsets.fromLTRB(17, 0, 0, 40),
+                        //     hintText:''.tr,
+                        //     floatingLabelBehavior:  FloatingLabelBehavior.never,
+                        //     hintStyle: const TextStyle(
+                        //       color: Color(0xFF442B72),
+                        //       fontSize: 12,
+                        //       fontFamily: 'Poppins-Light',
+                        //       fontWeight: FontWeight.w400,
+                        //       height: 1.33,
+                        //     ),
+                        //     focusedBorder: OutlineInputBorder(
+                        //       borderRadius: BorderRadius.all(Radius.circular(7)),
+                        //       borderSide: BorderSide(
+                        //         color: Color(0xFF442B72),
+                        //         width: 0.5,
+                        //       ),),
+                        //     enabledBorder: OutlineInputBorder(
+                        //       borderRadius: BorderRadius.all(Radius.circular(7)),
+                        //       borderSide: BorderSide(
+                        //         color: Color(0xFF442B72),
+                        //         width: 0.5,
+                        //       ),
+                        //     ),
+                        //     // enabledBorder: myInputBorder(),
+                        //     // focusedBorder: myFocusBorder(),
+                        //   ),
+                        // ),
                       ),
-
-                      // TextFormField(
-                      //   style: TextStyle(
-                      //     color: Color(0xFF442B72),
-                      //   ),
-                      //   controller: _emailController,
-                      //   cursorColor: const Color(0xFF442B72),
-                      //   textDirection: (sharedpref?.getString('lang') == 'ar') ?
-                      //   TextDirection.rtl:
-                      //   TextDirection.ltr,
-                      //   scrollPadding:  EdgeInsets.symmetric(
-                      //       vertical: 30),
-                      //   decoration:  InputDecoration(
-                      //     alignLabelWithHint: true,
-                      //     counterText: "",
-                      //     fillColor: const Color(0xFFF1F1F1),
-                      //     filled: true,
-                      //     contentPadding:
-                      //     (sharedpref?.getString('lang') == 'ar') ?
-                      //     EdgeInsets.fromLTRB(0, 0, 17, 40):
-                      //     EdgeInsets.fromLTRB(17, 0, 0, 40),
-                      //     hintText:''.tr,
-                      //     floatingLabelBehavior:  FloatingLabelBehavior.never,
-                      //     hintStyle: const TextStyle(
-                      //       color: Color(0xFF442B72),
-                      //       fontSize: 12,
-                      //       fontFamily: 'Poppins-Light',
-                      //       fontWeight: FontWeight.w400,
-                      //       height: 1.33,
-                      //     ),
-                      //     focusedBorder: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.all(Radius.circular(7)),
-                      //       borderSide: BorderSide(
-                      //         color: Color(0xFF442B72),
-                      //         width: 0.5,
-                      //       ),),
-                      //     enabledBorder: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.all(Radius.circular(7)),
-                      //       borderSide: BorderSide(
-                      //         color: Color(0xFF442B72),
-                      //         width: 0.5,
-                      //       ),
-                      //     ),
-                      //     // enabledBorder: myInputBorder(),
-                      //     // focusedBorder: myFocusBorder(),
-                      //   ),
-                      // ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  Center(
-                    child: ElevatedSimpleButton(
-                        txt: 'Save'.tr,
-                        fontFamily: 'Poppins-Regular',
-                        width: 278,
-                        hight: 48,
-                        onPress: (){
-                          if (_nameController.text.length == 0) {
-                            nameError = false;
-                            setState(() {
+                    SizedBox(
+                      height: 35,
+                    ),
+                    Center(
+                      child: ElevatedSimpleButton(
+                          txt: 'Save'.tr,
+                          fontFamily: 'Poppins-Regular',
+                          width: 278,
+                          hight: 48,
+                          onPress: (){
+                            if (_nameController.text.length == 0) {
+                              nameError = false;
+                              setState(() {
 
-                            });
-                          } else if (_nameController.text.length > 0) {
-                            nameError = true;
-                            setState(() {
+                              });
+                            } else if (_nameController.text.length > 0) {
+                              nameError = true;
+                              setState(() {
 
-                            });
-                          }
-                          if (_phoneNumberController.text.length < 11) {
-                            phoneError = false;
-                            setState(() {
+                              });
+                            }
+                            if (_phoneNumberController.text.length < 11) {
+                              phoneError = false;
+                              setState(() {
 
-                            });
-                          } else if (_phoneNumberController.text.length > 10) {
-                            phoneError = true;
-                            setState(() {
+                              });
+                            } else if (_phoneNumberController.text.length > 10) {
+                              phoneError = true;
+                              setState(() {
 
-                            });
-                          }
-                          // if (_emailController.text.length < 1) {
-                          //   emailError = false;
-                          //   setState(() {
-                          //
-                          //   });
-                          // } else if (_emailController.text.length > 0) {
-                          //   emailError = true;
-                          //   setState(() {
-                          //
-                          //   });
-                          // }
-                          if(
+                              });
+                            }
+                            // if (_emailController.text.length < 1) {
+                            //   emailError = false;
+                            //   setState(() {
+                            //
+                            //   });
+                            // } else if (_emailController.text.length > 0) {
+                            //   emailError = true;
+                            //   setState(() {
+                            //
+                            //   });
+                            // }
+                            if(
 
-                          nameError &&
-                              // emailError &&
-                              phoneError){
-                            editProfile();
-                            setState(() {
+                            nameError &&
+                                // emailError &&
+                                phoneError){
+                              editProfile();
+                              setState(() {
 
-                            });
-                            DataSavedSnackBar(context, 'Data saved successfully');
-                            Navigator.pop(context , true);
-                          }
-                        },
-                        color: Color(0xFF442B72),
-                        fontSize: 16),
-                  ),
+                              });
+                              DataSavedSnackBar(context, 'Data saved successfully');
+                              Navigator.pop(context , true);
+                            }
+                          },
+                          color: Color(0xFF442B72),
+                          fontSize: 16),
+                    ),
 
 
-                ],
-              )
+                  ],
+                )
+            ),
           ),
         ),
         resizeToAvoidBottomInset: false,

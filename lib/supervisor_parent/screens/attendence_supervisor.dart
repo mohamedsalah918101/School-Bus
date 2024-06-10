@@ -144,585 +144,583 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 35,
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).pop();
-                    },
-                    child:  Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 17.0),
-                      child: Image.asset(
-                        (sharedpref?.getString('lang') == 'ar')?
-                        'assets/images/Layer 1.png':
-                        'assets/images/fi-rr-angle-left.png',
-                        width: 20,
-                        height: 22,),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 0.0),//28
-                    child: Text(
-                      'Attendance'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF993D9A),
-                        fontSize: 16,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _scaffoldKey.currentState!.openEndDrawer();
-                    },
-                    icon: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 17.0),
-                      child: const Icon(
-                        Icons.menu_rounded,
-                        color: Color(0xff442B72),
-                        size: 35,
-                      ),
-                    ),
-                  ),
-                ],
+        body:GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Column(
+            children: [
+              SizedBox(
+                height: 35,
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).pop();
+                      },
+                      child:  Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 17.0),
+                        child: Image.asset(
+                          (sharedpref?.getString('lang') == 'ar')?
+                          'assets/images/Layer 1.png':
+                          'assets/images/fi-rr-angle-left.png',
+                          width: 20,
+                          height: 22,),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0.0),//28
+                      child: Text(
+                        'Attendance'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF993D9A),
+                          fontSize: 16,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openEndDrawer();
+                      },
+                      icon: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 17.0),
+                        child: const Icon(
+                          Icons.menu_rounded,
+                          color: Color(0xff442B72),
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
 
-                      SizedBox(height: 20,),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 20.0),
-                                  child: FutureBuilder(
+                        SizedBox(height: 20,),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 20.0),
+                                    child: FutureBuilder(
+                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                        if (snapshot.hasError) {
+                                          return Text('Something went wrong');
+                                        }
+
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
+                                            return CircleAvatar(
+                                              radius: 30,
+                                              backgroundColor: Color(0xff442B72),
+                                              child: CircleAvatar(
+                                                backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                radius: 30,
+                                              ),
+                                            );
+                                          }
+
+                                          Map<String, dynamic>? data = snapshot.data?.data();
+                                          if (data != null && data['photo'] != null) {
+                                            return CircleAvatar(
+                                              radius: 30,
+                                              backgroundColor: Color(0xff442B72),
+                                              child: CircleAvatar(
+                                                backgroundImage: NetworkImage('${data['photo']}'),
+                                                radius:30,
+                                              ),
+                                            );
+                                          }
+                                        }
+
+                                        return Container();
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: 10,),
+                                  FutureBuilder(
                                     future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                                       if (snapshot.hasError) {
                                         return Text('Something went wrong');
                                       }
 
                                       if (snapshot.connectionState == ConnectionState.done) {
-                                        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                          return CircleAvatar(
-                                            radius: 30,
-                                            backgroundColor: Color(0xff442B72),
-                                            child: CircleAvatar(
-                                              backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                              radius: 30,
+                                        if (snapshot.data?.data() == null) {
+                                          return Text(
+                                            'No data available',
+                                            style: TextStyle(
+                                              color: Color(0xff442B72),
+                                              fontSize: 12,
+                                              fontFamily: 'Poppins-Regular',
+                                              fontWeight: FontWeight.w400,
                                             ),
                                           );
                                         }
 
-                                        Map<String, dynamic>? data = snapshot.data?.data();
-                                        if (data != null && data['busphoto'] != null) {
-                                          return CircleAvatar(
-                                            radius: 30,
-                                            backgroundColor: Color(0xff442B72),
-                                            child: CircleAvatar(
-                                              backgroundImage: NetworkImage('${data['busphoto']}'),
-                                              radius:30,
-                                            ),
-                                          );
-                                        }
-                                      }
+                                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
 
-                                      return Container();
-                                    },
-                                  ),
-                                  // child: Image.asset('assets/images/Ellipse 2.png',
-                                  // width: 60,
-                                  // height: 60,),
-                                ),
-                                SizedBox(width: 10,),
-                                FutureBuilder(
-                                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                    if (snapshot.hasError) {
-                                      return Text('Something went wrong');
-                                    }
+                                        String schoolName = data['schoolname']?.toString() ?? 'no school';
+                                        List<String> words = schoolName.split(' ');
 
-                                    if (snapshot.connectionState == ConnectionState.done) {
-                                      if (snapshot.data?.data() == null) {
-                                        return Text(
-                                          'No data available',
-                                          style: TextStyle(
-                                            color: Color(0xff442B72),
-                                            fontSize: 12,
-                                            fontFamily: 'Poppins-Regular',
-                                            fontWeight: FontWeight.w400,
+                                        return Text.rich(
+                                          TextSpan(
+                                            children: [
+                                              for (String word in words) ...[
+                                                TextSpan(
+                                                  text: '$word\n',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF993D9A),
+                                                    fontSize: 20,
+                                                    fontFamily: 'Poppins-Bold',
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
                                           ),
                                         );
                                       }
 
-                                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                      String schoolName = data['schoolname']?.toString() ?? 'no school';
-                                      List<String> words = schoolName.split(' ');
-
-                                      return Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            for (String word in words) ...[
-                                              TextSpan(
-                                                text: '$word\n',
-                                                style: TextStyle(
-                                                  color: Color(0xFF993D9A),
-                                                  fontSize: 20,
-                                                  fontFamily: 'Poppins-Bold',
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      );
-                                    }
-
-                                    return CircularProgressIndicator();
-                                  },
-                                )
+                                      return CircularProgressIndicator();
+                                    },
+                                  )
 
 
-                                // SizedBox(width: 25,),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 25.0),
-                              child: SizedBox(
-                                width: 119,
-                                height: 40,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      padding:  EdgeInsets.all(0),
-                                      backgroundColor: Color(0xFF442B72),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(5)
-                                      )
-                                  ),
-                                  onPressed: () async {
-                                    if (sharedpref!.getInt('invit') == 1) {
-                                      isStarting = true;
-                                      // sendNotify('tittle', 'body', 'id');
-                                    } else {
-                                      isStarting = false;
-                                    }
-                                    isStarting =
-                                    // children.isNotEmpty?
-                                    true;
-
-                                    // no data
-                                    // : false;
-                                    setState(() {
-                                    });
-                                    // // Send a notification
-                                    // final message = {
-                                    // 'notification': {
-                                    // 'title': 'Trip Started',
-                                    // 'body': 'Your trip has started',
-                                    // },
-                                    // 'token': 'your_device_token_here', // replace with the actual device token
-                                    // };
-                                    //
-                                    // try {
-                                    // await FirebaseMessaging.instance.send(message);
-                                    // } catch (e) {
-                                    // print('Error sending notification: $e');
-                                    // }
-                                    // },
-                                    //                                 getToken();
-
-                                  },
-                                  child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,
-                                    style: TextStyle(
-                                        fontFamily: 'Poppins-SemiBold',
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                        fontSize: 13
-                                    ),),
-                                ),
+                                  // SizedBox(width: 25,),
+                                ],
                               ),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 15,),
-                      // GestureDetector(
-                      //     onTap: (){
-                      //
-                      //     },
-                      //     child: Text('datatest' , style: TextStyle(fontSize: 60),)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                        child: Text('Attendances'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF771F98),
-                            fontSize: 19,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                          ),),
-                      ),
-
-                      sharedpref!.getInt('invit') == 1 ?
-                      Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: SizedBox(
-                          height: data.length*180,
-                          width: double.infinity,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: data.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              List children = data[index]['children'];
-                              return Column(
-                                  children: [
-                                    for (var child in children)
-                                  SizedBox(
-                                  width: double.infinity,
-                                  // height:122,
-                                  child: Card(
-                                    elevation: 10,
-                                    color: Colors.white,
-                                    surfaceTintColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14.0),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 25.0),
+                                child: SizedBox(
+                                  width: 119,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        padding:  EdgeInsets.all(0),
+                                        backgroundColor: Color(0xFF442B72),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(5)
+                                        )
                                     ),
-                                    child: Padding(
-                                        padding: (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(right: 10.0 , left: 10) :
-                                        EdgeInsets.only(left: 10.0 , right: 10 , bottom: 0),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(bottom: 20.0),
-                                                  child: Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                      FutureBuilder(
-                                                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                          if (snapshot.hasError) {
-                                                            return Text('Something went wrong');
-                                                          }
+                                    onPressed: () async {
+                                      if (sharedpref!.getInt('invit') == 1) {
+                                        isStarting = true;
+                                        // sendNotify('tittle', 'body', 'id');
+                                      } else {
+                                        isStarting = false;
+                                      }
+                                      isStarting =
+                                      // children.isNotEmpty?
+                                      true;
 
-                                                          if (snapshot.connectionState == ConnectionState.done) {
-                                                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                              return CircleAvatar(
-                                                                radius: 25,
-                                                                backgroundColor: Color(0xff442B72),
-                                                                child: CircleAvatar(
-                                                                  backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                  radius: 25,
-                                                                ),
-                                                              );
-                                                            }
+                                      // no data
+                                      // : false;
+                                      setState(() {
+                                      });
+                                      // // Send a notification
+                                      // final message = {
+                                      // 'notification': {
+                                      // 'title': 'Trip Started',
+                                      // 'body': 'Your trip has started',
+                                      // },
+                                      // 'token': 'your_device_token_here', // replace with the actual device token
+                                      // };
+                                      //
+                                      // try {
+                                      // await FirebaseMessaging.instance.send(message);
+                                      // } catch (e) {
+                                      // print('Error sending notification: $e');
+                                      // }
+                                      // },
+                                      //                                 getToken();
 
-                                                            Map<String, dynamic>? data = snapshot.data?.data();
-                                                            if (data != null && data['busphoto'] != null) {
-                                                              return CircleAvatar(
-                                                                radius: 25,
-                                                                backgroundColor: Color(0xff442B72),
-                                                                child: CircleAvatar(
-                                                                  backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                  radius:25,
-                                                                ),
-                                                              );
-                                                            }
-                                                          }
+                                    },
+                                    child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,
+                                      style: TextStyle(
+                                          fontFamily: 'Poppins-SemiBold',
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontSize: 13
+                                      ),),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 15,),
+                        // GestureDetector(
+                        //     onTap: (){
+                        //
+                        //     },
+                        //     child: Text('datatest' , style: TextStyle(fontSize: 60),)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                          child: Text('Attendances'.tr,
+                            style: TextStyle(
+                              color: Color(0xFF771F98),
+                              fontSize: 19,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                            ),),
+                        ),
 
-                                                          return Container();
-                                                        },
-                                                      ),
-                                                      // Image.asset(
-                                                      //   'assets/images/Ellipse 6.png',
-                                                      //   height: 50,
-                                                      //   width: 50,
-                                                      // ),
-                                                      const SizedBox(
-                                                        width: 7,
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(top: 10.0),
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Text(
-                                                              '${child['name']}',
-                                                              style: TextStyle(
-                                                                color: Color(0xff442B72),
-                                                                fontSize: 17,
-                                                                fontFamily: 'Poppins-SemiBold',
-                                                                fontWeight: FontWeight.w600,
-                                                                height: 0.94,
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height: 4,
-                                                            ),
-                                                            Text.rich(
-                                                              TextSpan(
-                                                                children: [
-                                                                  TextSpan(
-                                                                    text: 'Grade: '.tr,
-                                                                    style: TextStyle(
-                                                                      color: Color(0xFF919191),
-                                                                      fontSize: 12,
-                                                                      fontFamily: 'Poppins-Light',
-                                                                      fontWeight: FontWeight.w400,
-                                                                      // height: 1.33,
-                                                                    ),
-                                                                  ),
-                                                                  TextSpan(
-                                                                    text: '${child['grade']}',
-                                                                    // '${data[index]['children']?[0]['grade'] }',
-                                                                    style: TextStyle(
-                                                                      color: Color(0xFF442B72),
-                                                                      fontSize: 12,
-                                                                      fontFamily: 'Poppins-Light',
-                                                                      fontWeight: FontWeight.w400,
-                                                                      // height: 1.33,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Column(
-                                                  children: [
-                                                    SizedBox(height: 20),
-                                                    Column(
+                        sharedpref!.getInt('invit') == 1 ?
+                        Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: SizedBox(
+                            height: data.length*180,
+                            width: double.infinity,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                List children = data[index]['children'];
+                                return Column(
+                                    children: [
+                                      for (var child in children)
+                                    SizedBox(
+                                    width: double.infinity,
+                                    // height:122,
+                                    child: Card(
+                                      elevation: 10,
+                                      color: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14.0),
+                                      ),
+                                      child: Padding(
+                                          padding: (sharedpref?.getString('lang') == 'ar')?
+                                          EdgeInsets.only(right: 10.0 , left: 10) :
+                                          EdgeInsets.only(left: 10.0 , right: 10 , bottom: 0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(bottom: 20.0),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisAlignment: MainAxisAlignment.start,
                                                       children: [
-                                                        SizedBox(
-                                                          height: 40,
-                                                          width: 80,
-                                                          child: ElevatedButton(
-                                                            style: ElevatedButton.styleFrom(
-                                                                padding:  EdgeInsets.all(0),
-                                                                backgroundColor: Color(0xFF442B72),
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius: BorderRadius.circular(5)
-                                                                )
-                                                            ),
-                                                            onPressed: (){
-                                                              Checkin = !Checkin;
-                                                              setState(() {
-                                                              });
-                                                            },
-                                                            child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
-                                                              style: TextStyle(
+                                                        FutureBuilder(
+                                                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                            if (snapshot.hasError) {
+                                                              return Text('Something went wrong');
+                                                            }
+
+                                                            if (snapshot.connectionState == ConnectionState.done) {
+                                                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                                return CircleAvatar(
+                                                                  radius: 25,
+                                                                  backgroundColor: Color(0xff442B72),
+                                                                  child: CircleAvatar(
+                                                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                                    radius: 25,
+                                                                  ),
+                                                                );
+                                                              }
+
+                                                              Map<String, dynamic>? data = snapshot.data?.data();
+                                                              if (data != null && data['busphoto'] != null) {
+                                                                return CircleAvatar(
+                                                                  radius: 25,
+                                                                  backgroundColor: Color(0xff442B72),
+                                                                  child: CircleAvatar(
+                                                                    backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                                    radius:25,
+                                                                  ),
+                                                                );
+                                                              }
+                                                            }
+
+                                                            return Container();
+                                                          },
+                                                        ),
+
+                                                        const SizedBox(
+                                                          width: 7,
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 10.0),
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                '${child['name']}',
+                                                                style: TextStyle(
+                                                                  color: Color(0xff442B72),
+                                                                  fontSize: 17,
                                                                   fontFamily: 'Poppins-SemiBold',
                                                                   fontWeight: FontWeight.w600,
-                                                                  color: Colors.white,
-                                                                  fontSize: 13
-                                                              ),),
-
-
+                                                                  height: 0.94,
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                height: 4,
+                                                              ),
+                                                              Text.rich(
+                                                                TextSpan(
+                                                                  children: [
+                                                                    TextSpan(
+                                                                      text: 'Grade: '.tr,
+                                                                      style: TextStyle(
+                                                                        color: Color(0xFF919191),
+                                                                        fontSize: 12,
+                                                                        fontFamily: 'Poppins-Light',
+                                                                        fontWeight: FontWeight.w400,
+                                                                        // height: 1.33,
+                                                                      ),
+                                                                    ),
+                                                                    TextSpan(
+                                                                      text: '${child['grade']}',
+                                                                      // '${data[index]['children']?[0]['grade'] }',
+                                                                      style: TextStyle(
+                                                                        color: Color(0xFF442B72),
+                                                                        fontSize: 12,
+                                                                        fontFamily: 'Poppins-Light',
+                                                                        fontWeight: FontWeight.w400,
+                                                                        // height: 1.33,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                        ),
-                                                        SizedBox(height: 15,),
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                              color: Color(0xff442B72),
-                                                              width: 28,
-                                                              height: 28,),
-                                                            SizedBox(width: 9),
-                                                            GestureDetector(
-                                                              child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                                color: Color(0xff442B72),
-                                                                width: 26,
-                                                                height: 26,),
-                                                              onTap: () {
-                                                                print('object');
-                                                                Navigator.of(context).push(
-                                                                    MaterialPageRoute(builder: (context) =>
-                                                                        ChatScreen(
-                                                                          receiverName: data[index]['name'],
-                                                                          receiverPhone: data[index]['phoneNumber'],
-                                                                          receiverId : data[index].id,
-                                                                        )));
-                                                              },
-                                                            ),
-                                                          ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
-                                                )
-                                                // Column(
-                                                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                //   children: [
-                                                //     Padding(
-                                                //       padding: const EdgeInsets.only(top: 5.0),
-                                                //       child: SizedBox(
-                                                //         width: 80,
-                                                //         height: 40,
-                                                //         child: ElevatedButton(
-                                                //           style: ElevatedButton.styleFrom(
-                                                //               padding:  EdgeInsets.all(0),
-                                                //               backgroundColor: Color(0xFF442B72),
-                                                //               shape: RoundedRectangleBorder(
-                                                //                   borderRadius: BorderRadius.circular(5)
-                                                //               )
-                                                //           ),
-                                                //           onPressed: (){
-                                                //             Checkin = !Checkin;
-                                                //             setState(() {
-                                                //             });
-                                                //           },
-                                                //           child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
-                                                //             style: TextStyle(
-                                                //                 fontFamily: 'Poppins-SemiBold',
-                                                //                 fontWeight: FontWeight.w600,
-                                                //                 color: Colors.white,
-                                                //                 fontSize: 13
-                                                //             ),),
-                                                //
-                                                //
-                                                //         ),
-                                                //       ),
-                                                //     ),
-                                                //     Padding(
-                                                //       padding: (sharedpref?.getString('lang') == 'ar')?
-                                                //       EdgeInsets.only(top: 12, right:220 ):
-                                                //       EdgeInsets.only(top: 12, left:220 ),
-                                                //       child: Row(
-                                                //         mainAxisAlignment: MainAxisAlignment.start,
-                                                //         crossAxisAlignment: CrossAxisAlignment.start,
-                                                //         children: [
-                                                //           Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                //             color: Color(0xff442B72),
-                                                //             width: 28,
-                                                //             height: 28,),
-                                                //           SizedBox(width: 9),
-                                                //           GestureDetector(
-                                                //             child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                //               color: Color(0xff442B72),
-                                                //               width: 26,
-                                                //               height: 26,),
-                                                //             onTap: () {
-                                                //               Navigator.of(context).push(
-                                                //                   MaterialPageRoute(builder: (context) =>
-                                                //                       ChatScreen()));
-                                                //             },
-                                                //           ),
-                                                //         ],
-                                                //       ),
-                                                //     ),
-                                                //   ],
-                                                // ),
-                                              ],
-                                            ),
-                                            // Padding(
-                                            //   padding: (sharedpref?.getString('lang') == 'ar')?
-                                            //   EdgeInsets.only(top: 12, right:220 ):
-                                            //   EdgeInsets.only(top: 12, left:220 ),
-                                            //   child: Row(
-                                            //     mainAxisAlignment: MainAxisAlignment.start,
-                                            //     crossAxisAlignment: CrossAxisAlignment.start,
-                                            //     children: [
-                                            //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                            //         color: Color(0xff442B72),
-                                            //         width: 28,
-                                            //         height: 28,),
-                                            //       SizedBox(width: 9),
-                                            //       GestureDetector(
-                                            //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                            //           color: Color(0xff442B72),
-                                            //           width: 26,
-                                            //           height: 26,),
-                                            //         onTap: () {
-                                            //           Navigator.of(context).push(
-                                            //               MaterialPageRoute(builder: (context) =>
-                                            //                   ChatScreen()));
-                                            //         },
-                                            //       ),
-                                            //     ],
-                                            //   ),
-                                            // ),
+                                                  ),
+                                                  Column(
+                                                    children: [
+                                                      SizedBox(height: 20),
+                                                      Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            height: 40,
+                                                            width: 80,
+                                                            child: ElevatedButton(
+                                                              style: ElevatedButton.styleFrom(
+                                                                  padding:  EdgeInsets.all(0),
+                                                                  backgroundColor: Color(0xFF442B72),
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.circular(5)
+                                                                  )
+                                                              ),
+                                                              onPressed: (){
+                                                                Checkin = !Checkin;
+                                                                setState(() {
+                                                                });
+                                                              },
+                                                              child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                                                                style: TextStyle(
+                                                                    fontFamily: 'Poppins-SemiBold',
+                                                                    fontWeight: FontWeight.w600,
+                                                                    color: Colors.white,
+                                                                    fontSize: 13
+                                                                ),),
 
-                                          ],
-                                        )),
+
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 15,),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                                color: Color(0xff442B72),
+                                                                width: 28,
+                                                                height: 28,),
+                                                              SizedBox(width: 9),
+                                                              GestureDetector(
+                                                                child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                                  color: Color(0xff442B72),
+                                                                  width: 26,
+                                                                  height: 26,),
+                                                                onTap: () {
+                                                                  print('object');
+                                                                  Navigator.of(context).push(
+                                                                      MaterialPageRoute(builder: (context) =>
+                                                                          ChatScreen(
+                                                                            receiverName: data[index]['name'],
+                                                                            receiverPhone: data[index]['phoneNumber'],
+                                                                            receiverId : data[index].id,
+                                                                          )));
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
+                                                  // Column(
+                                                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  //   children: [
+                                                  //     Padding(
+                                                  //       padding: const EdgeInsets.only(top: 5.0),
+                                                  //       child: SizedBox(
+                                                  //         width: 80,
+                                                  //         height: 40,
+                                                  //         child: ElevatedButton(
+                                                  //           style: ElevatedButton.styleFrom(
+                                                  //               padding:  EdgeInsets.all(0),
+                                                  //               backgroundColor: Color(0xFF442B72),
+                                                  //               shape: RoundedRectangleBorder(
+                                                  //                   borderRadius: BorderRadius.circular(5)
+                                                  //               )
+                                                  //           ),
+                                                  //           onPressed: (){
+                                                  //             Checkin = !Checkin;
+                                                  //             setState(() {
+                                                  //             });
+                                                  //           },
+                                                  //           child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                                                  //             style: TextStyle(
+                                                  //                 fontFamily: 'Poppins-SemiBold',
+                                                  //                 fontWeight: FontWeight.w600,
+                                                  //                 color: Colors.white,
+                                                  //                 fontSize: 13
+                                                  //             ),),
+                                                  //
+                                                  //
+                                                  //         ),
+                                                  //       ),
+                                                  //     ),
+                                                  //     Padding(
+                                                  //       padding: (sharedpref?.getString('lang') == 'ar')?
+                                                  //       EdgeInsets.only(top: 12, right:220 ):
+                                                  //       EdgeInsets.only(top: 12, left:220 ),
+                                                  //       child: Row(
+                                                  //         mainAxisAlignment: MainAxisAlignment.start,
+                                                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                                                  //         children: [
+                                                  //           Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                  //             color: Color(0xff442B72),
+                                                  //             width: 28,
+                                                  //             height: 28,),
+                                                  //           SizedBox(width: 9),
+                                                  //           GestureDetector(
+                                                  //             child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                  //               color: Color(0xff442B72),
+                                                  //               width: 26,
+                                                  //               height: 26,),
+                                                  //             onTap: () {
+                                                  //               Navigator.of(context).push(
+                                                  //                   MaterialPageRoute(builder: (context) =>
+                                                  //                       ChatScreen()));
+                                                  //             },
+                                                  //           ),
+                                                  //         ],
+                                                  //       ),
+                                                  //     ),
+                                                  //   ],
+                                                  // ),
+                                                ],
+                                              ),
+                                              // Padding(
+                                              //   padding: (sharedpref?.getString('lang') == 'ar')?
+                                              //   EdgeInsets.only(top: 12, right:220 ):
+                                              //   EdgeInsets.only(top: 12, left:220 ),
+                                              //   child: Row(
+                                              //     mainAxisAlignment: MainAxisAlignment.start,
+                                              //     crossAxisAlignment: CrossAxisAlignment.start,
+                                              //     children: [
+                                              //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                              //         color: Color(0xff442B72),
+                                              //         width: 28,
+                                              //         height: 28,),
+                                              //       SizedBox(width: 9),
+                                              //       GestureDetector(
+                                              //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                              //           color: Color(0xff442B72),
+                                              //           width: 26,
+                                              //           height: 26,),
+                                              //         onTap: () {
+                                              //           Navigator.of(context).push(
+                                              //               MaterialPageRoute(builder: (context) =>
+                                              //                   ChatScreen()));
+                                              //         },
+                                              //       ),
+                                              //     ],
+                                              //   ),
+                                              // ),
+
+                                            ],
+                                          )),
+                                    ),
                                   ),
-                                ),
-                                    // CheckInCard(),
-                                    SizedBox(height: 0,)
-                                  ],
-                                );
-                            },
-                          ),
-                        ),
-                      )
-                      //no data
-                          :
-                      Column(
-                        children: [
-                          SizedBox(height: 50,),
-                          Image.asset('assets/images/Group 237684.png',
-                          ),
-                          Text('No Data Found'.tr,
-                            style: TextStyle(
-                              color: Color(0xff442B72),
-                              fontFamily: 'Poppins-Regular',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 19,
+                                      // CheckInCard(),
+                                      SizedBox(height: 0,)
+                                    ],
+                                  );
+                              },
                             ),
                           ),
-                          Text('You haven’t added any \n '
-                              'dates yet'.tr,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xffBE7FBF),
-                              fontFamily: 'Poppins-Light',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                            ),)
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 44,
-                      ),
+                        )
+                        //no data
+                            :
+                        Column(
+                          children: [
+                            SizedBox(height: 50,),
+                            Image.asset('assets/images/Group 237684.png',
+                            ),
+                            Text('No Data Found'.tr,
+                              style: TextStyle(
+                                color: Color(0xff442B72),
+                                fontFamily: 'Poppins-Regular',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 19,
+                              ),
+                            ),
+                            Text('You haven’t added any \n '
+                                'dates yet'.tr,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xffBE7FBF),
+                                fontFamily: 'Poppins-Light',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                              ),)
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 44,
+                        ),
 
-                    ],
-                  )
+                      ],
+                    )
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         // extendBody: true,
         resizeToAvoidBottomInset: false,

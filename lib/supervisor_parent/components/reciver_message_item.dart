@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:school_account/main.dart';
 
 class ReciverMessageItem extends StatelessWidget {
-  String messageContent, time;
+  String messageContent, time, voice;
 
   ReciverMessageItem(
-      {super.key, required this.messageContent, required this.time});
+      {super.key, required this.messageContent, required this.time, required this.voice});
 
   @override
   Widget build(BuildContext context) {

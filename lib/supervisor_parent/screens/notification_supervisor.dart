@@ -120,103 +120,108 @@ class _NotificationsSupervisorState extends State<NotificationsSupervisor> {
           preferredSize: Size.fromHeight(70),
         ),
         // Custom().customAppBar(context,'Notifications'.tr),
-        body: SingleChildScrollView(
-
-            child:
-            sharedpref!.getInt('invit') == 1 ?
-            ListView.separated(
-              itemBuilder: (context, index) {
-                return Padding(
-                    padding:
-                    (sharedpref?.getString('lang') == 'ar')?
-                    EdgeInsets.symmetric(horizontal: 22.0):
-                    EdgeInsets.symmetric(horizontal: 17.0),
-                    child:
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: 25,
-                        ),
-                        Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Text(
-                              dates[index],
-                              style: const TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 18,
-                                fontFamily: 'Poppins-SemiBold',
-                                fontWeight: FontWeight.w600,
-                                height: 0.89,
-                              ),
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0.0, vertical: 0),
-                          child: ListView.separated(
-                            itemCount: notifications.length,
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.only(top: 10, bottom: 10),
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index2) {
-                              return NotificationItem(
-                                messageContent: notifications[index2].messageContent,
-                                time: notifications[index2].messageTime,
-                                type: notifications[index2].messageType,
-                                times: notifications[index2].messageTimes,
-                              );
-                            },
-                            separatorBuilder: (BuildContext context, int index2) {
-                              return SizedBox(
-                                height: 11,
-                              );
-                            },
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+          
+              child:
+              sharedpref!.getInt('invit') == 1 ?
+              ListView.separated(
+                itemBuilder: (context, index) {
+                  return Padding(
+                      padding:
+                      (sharedpref?.getString('lang') == 'ar')?
+                      EdgeInsets.symmetric(horizontal: 22.0):
+                      EdgeInsets.symmetric(horizontal: 17.0),
+                      child:
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 25,
                           ),
-                        ),
-                        SizedBox(
-                          height:0,
-                        ),
-                      ],
-                    )
-
-
-                );
-              },
-              separatorBuilder: (context, index) {
-                return SizedBox(
-                  height: 0,
-                );
-              },
-              itemCount: dates.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+                          Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Text(
+                                dates[index],
+                                style: const TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 18,
+                                  fontFamily: 'Poppins-SemiBold',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0.89,
+                                ),
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 0.0, vertical: 0),
+                            child: ListView.separated(
+                              itemCount: notifications.length,
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.only(top: 10, bottom: 10),
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index2) {
+                                return NotificationItem(
+                                  messageContent: notifications[index2].messageContent,
+                                  time: notifications[index2].messageTime,
+                                  type: notifications[index2].messageType,
+                                  times: notifications[index2].messageTimes,
+                                );
+                              },
+                              separatorBuilder: (BuildContext context, int index2) {
+                                return SizedBox(
+                                  height: 11,
+                                );
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height:0,
+                          ),
+                        ],
+                      )
+          
+          
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return SizedBox(
+                    height: 0,
+                  );
+                },
+                itemCount: dates.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+              )
+            //no data
+                :
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 70,),
+                  Image.asset('assets/images/Group 237685.png',
+                  width: 322,),
+                  Text('No Notification Found'.tr,
+                    style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 19,
+                        fontFamily: 'Poppins-Regular',
+                        fontWeight: FontWeight.w500,
+                    ),),
+                  Text('You haven’t received any \n'
+                      'notification yet'.tr,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xffBE7FBF),
+                      fontFamily: 'Poppins-Light',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                    ),),
+                ]),
             )
-          //no data
-              :
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 70,),
-                Image.asset('assets/images/Group 237685.png',
-                width: 322,),
-                Text('No Notification Found'.tr,
-                  style: TextStyle(
-                      color: Color(0xFF442B72),
-                      fontSize: 19,
-                      fontFamily: 'Poppins-Regular',
-                      fontWeight: FontWeight.w500,
-                  ),),
-                Text('You haven’t received any \n'
-                    'notification yet'.tr,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xffBE7FBF),
-                    fontFamily: 'Poppins-Light',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                  ),),
-              ]),
-          )
+          ),
         ),
 
         // extendBody: true,
