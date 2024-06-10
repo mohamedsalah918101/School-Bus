@@ -230,7 +230,7 @@ class _ChildrenCardState extends State<ChildrenCard> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          EditChildren(),
+                                          EditChildren(widget.childrenData!),
                                     ),
                                   );
                                 } else if (value == 'item2') {

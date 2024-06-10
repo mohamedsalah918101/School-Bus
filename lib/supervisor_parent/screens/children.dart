@@ -53,7 +53,7 @@ class _childrenState extends State<children> {
             busNumber =  busSnapshot.get('busnumber');
 
             for(int x =0; x<supervisors.length ;x++){
-              supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id']));
+              supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id'],lat: supervisors[x]['lat'],lang:supervisors[x]['lang']));
             }
             childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: busNumber,supervisors: supervisorsData));
 

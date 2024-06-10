@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
@@ -44,6 +45,7 @@ class _TrackParentState extends State<TrackParent> {
   void initState() {
     super.initState();
     loadCustomIcon();
+
   }
   //
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
@@ -143,7 +145,10 @@ class _TrackParentState extends State<TrackParent> {
           ),
           preferredSize: Size.fromHeight(70),
         ),
-        body: SingleChildScrollView(
+        body:Material(
+            child: ValueListenableBuilder(
+                valueListenable: valueNotifierHome.value,
+                builder: (context, value, child) {return  SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +164,7 @@ class _TrackParentState extends State<TrackParent> {
                     target: LatLng(27.180134, 31.189283),
                     zoom: 12,
                   ),
-                  markers: markers,
+                  markers: markers,polylines: polyline,
                   onMapCreated: ((mapController) {
                     setState(() {
                       controller = mapController;
@@ -802,7 +807,7 @@ class _TrackParentState extends State<TrackParent> {
               ),
             ],
           ),
-        ),
+        );})),
         extendBody: true,
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation:

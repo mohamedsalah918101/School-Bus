@@ -379,7 +379,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                             "txt": msgText.text.toString(),
                             "time": formattedTime,
                           });
-                          sendNotification("","");
+                          //sendNotification("","");
                           msgText.clear();
                         },
                         child: Icon(

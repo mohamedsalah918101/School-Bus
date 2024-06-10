@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:school_account/model/ParentModel.dart';
 import 'package:school_account/supervisor_parent/components/children_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
@@ -20,8 +21,8 @@ import 'notification_parent.dart';
 
 class EditChildren extends StatefulWidget {
   // Function() onTapMenu;
-
-  EditChildren({
+  ParentModel? parentModel;
+  EditChildren(this.parentModel, {
     Key? key,
     // required this.onTapMenu,
   }) : super(key: key);
@@ -33,12 +34,23 @@ class EditChildren extends StatefulWidget {
 class _EditChildrenState extends State<EditChildren> {
   bool isMale = false;
   bool isFemale = false;
+  TextEditingController name=TextEditingController();
+  TextEditingController grade=TextEditingController();
+  TextEditingController location=TextEditingController();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+@override
+  void initState() {
+    super.initState();
+    name.text = widget.parentModel!.child_name.toString();
+    grade.text = widget.parentModel!.class_name.toString();
+ //   name.text = widget.parentModel!.child_name.toString();
 
+}
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         endDrawer: ParentDrawer(),
         key: _scaffoldKey,
@@ -195,7 +207,7 @@ class _EditChildrenState extends State<EditChildren> {
                            child: SizedBox(
                              width: 322,
                              height: 38,
-                             child: TextFormField(
+                             child: TextFormField(controller:name ,
                                cursorColor: const Color(0xFF442B72),
                                textDirection: (sharedpref?.getString('lang') == 'ar') ?
                                TextDirection.rtl:
@@ -211,7 +223,7 @@ class _EditChildrenState extends State<EditChildren> {
                                  (sharedpref?.getString('lang') == 'ar') ?
                                  EdgeInsets.fromLTRB(166, 0, 17, 40):
                                  EdgeInsets.fromLTRB(17, 0, 166, 40),
-                                 hintText:'Mariam Atef'.tr,
+                                 hintText:'Child name'.tr,
                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
                                  hintStyle: const TextStyle(
                                    color: Color(0xFF442B72),
@@ -280,7 +292,7 @@ class _EditChildrenState extends State<EditChildren> {
                            child: SizedBox(
                              width: 322,
                              height: 36,
-                             child: TextFormField(
+                             child: TextFormField(controller: grade,
                                cursorColor: const Color(0xFF442B72),
                                textDirection: (sharedpref?.getString('lang') == 'ar') ?
                                TextDirection.rtl:
