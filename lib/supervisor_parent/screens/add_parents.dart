@@ -1750,13 +1750,13 @@ class _AddParentsState extends State<AddParents> {
                                             print('failed');
                                             break;
                                           }
-                                          //
-                                          // else {
-                                          //   allChildFieldsFilled = true;
-                                          //   GradeError = true;
-                                          //   nameChildeError = true;
-                                          //   print('done');
-                                          // }
+
+                                          else {
+                                            allChildFieldsFilled = true;
+                                            GradeError = true;
+                                            nameChildeError = true;
+                                            print('done');
+                                          }
                                         }
 
                                         GradeError = allChildFieldsFilled;

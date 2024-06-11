@@ -434,12 +434,12 @@ class _ParentsViewState extends State<ParentsView> {
                             ListView.builder(
                               shrinkWrap: true,
                               itemCount: data.length,
-                              // itemCount: data.length,
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
                                 final joinDate = DateTime.now();
-          
-                                return Column(
+                                if (data[index]['supervisor'] == sharedpref!.getString('id').toString())
+
+                                  return Column(
                                   children: [
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -455,7 +455,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                   if (snapshot.hasError) {
                                                     return Text('Something went wrong');
                                                   }
-          
+
                                                   if (snapshot.connectionState == ConnectionState.done) {
                                                     if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
                                                       return CircleAvatar(
@@ -467,7 +467,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                         ),
                                                       );
                                                     }
-          
+
                                                     Map<String, dynamic>? data = snapshot.data?.data();
                                                     if (data != null && data['busphoto'] != null) {
                                                       return CircleAvatar(
@@ -480,7 +480,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                       );
                                                     }
                                                   }
-          
+
                                                   return Container();
                                                 },
                                               ),
@@ -496,7 +496,7 @@ class _ParentsViewState extends State<ParentsView> {
                                             Column(
                                               mainAxisAlignment: MainAxisAlignment.start,
                                               crossAxisAlignment: CrossAxisAlignment.start,
-          
+
                                               children: [
                                                 Text('${data[index]['name'] }',
                                                   style: TextStyle(
@@ -510,8 +510,8 @@ class _ParentsViewState extends State<ParentsView> {
                                                 SizedBox(
                                                   height: 5,
                                                 ),
-          
-          
+
+
                                                 Padding(
                                                   padding: (sharedpref?.getString('lang') == 'ar')
                                                       ? EdgeInsets.only(right: 3.0)
@@ -519,7 +519,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                   child: Text(
                                                     'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
                                                    // '${data[index]['joinDate']}',
-          
+
                                                     style: TextStyle(
                                                       color: Color(0xFF0E8113),
                                                       fontSize: 13,
@@ -734,7 +734,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                                   },
                                                                   ),
                                                                 ),
-          
+
                                                               ],
                                                             ),
                                                           ],

@@ -271,7 +271,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                             SizedBox(height: 20),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 25.0),
-                              child: ParentsCard( dataLength: data.length,),
+                              child: ParentsCard(),
+                              // child: ParentsCard( dataLength: data.length,),
                             ),
                             SizedBox(height: 25),
                             Container(
@@ -362,7 +363,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                       return Column(
                                         children: [
                                           for (var child in children)
-                                            SizedBox(
+                                            if (child['supervisor'] == sharedpref!.getString('id').toString())
+                                              SizedBox(
                                               width: double.infinity,
                                               height: 98, //92
                                               child: Card(
