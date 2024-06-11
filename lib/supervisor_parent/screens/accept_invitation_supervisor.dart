@@ -9,6 +9,8 @@ import '../components/elevated_simple_button.dart';
 
 class AcceptInvitationSupervisor extends StatefulWidget {
   final String? schoolDataDocumentId;
+  // String schoolDataDocumentId = sharedpref?.getString('id') ?? '';
+
 
   const AcceptInvitationSupervisor({super.key,  this.schoolDataDocumentId});
 
@@ -17,52 +19,56 @@ class AcceptInvitationSupervisor extends StatefulWidget {
 }
 
 class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor> {
-
+  String _schoolIdText = 'Loading...';
+  String _schoolNameText = 'Loading...';
+  String NameText = 'Loading...';
   final _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-
-    getSchoolId();
+    _getSchoolIdFromSupervisor(sharedpref!.getString('id').toString());
     // Use the schoolDataDocumentId in the initState method
     print('Supervisor class received document ID: ${widget.schoolDataDocumentId}');
   }
 
-  Future<String?> _getSchoolIdFromSupervisor(String supervisorId) async {
+  Future<void> _getSchoolIdFromSupervisor(String supervisorId) async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    final DocumentReference supervisorDocRef = _firestore.collection('supervior').doc(supervisorId);
+    final DocumentReference supervisorDocRef = _firestore.collection('supervisor').doc(sharedpref!.getString('id').toString());
 
     DocumentSnapshot supervisorDoc = await supervisorDocRef.get();
     if (supervisorDoc.exists) {
       var data = supervisorDoc.data() as Map<String, dynamic>;
-      return data['schoolid'] as String?;
+      String? schoolId = data['schoolid'] as String?;
+      String? schoolName = data['schoolname'] as String?;
+      String? SupervisorName = data['name'] as String?;
+
+      // Display the values in a Text widget
+      setState(() {
+        _schoolIdText = schoolId ?? 'No school ID found';
+        _schoolNameText = schoolName ?? 'No school name found';
+        NameText = SupervisorName ?? 'No Supervisor name found';
+      });
     } else {
       print("Supervisor document does not exist.");
-      return null;
     }
   }
 
-  String? _schoolId;
-  Future<void> getSchoolId() async {
-    try {
-      // Get the SharedPreferences instance
-      // final prefs = await SharedPreferences.getInstance();
-
-      // Retrieve the school ID from SharedPreferences
-      _schoolId = sharedpref!.getString('id');
-
-      print("SCHOOLID$_schoolId");
-      // If the school ID is not found in SharedPreferences, you can handle this case
-      if (_schoolId == null) {
-        // You can either throw an exception or set a default value
-        throw Exception('School ID not found in SharedPreferences');
-      }
-    } catch (e) {
-      // Handle any errors that occur
-      print('Error retrieving school ID: $e');
-    }
-  }
+  // Future<String?> _getSchoolIdFromSupervisor(String supervisorId) async {
+  //   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //   final DocumentReference supervisorDocRef = _firestore.collection('supervior').doc(supervisorId);
+  //
+  //   DocumentSnapshot supervisorDoc = await supervisorDocRef.get();
+  //   if (supervisorDoc.exists) {
+  //     var data = supervisorDoc.data() as Map<String, dynamic>;
+  //      data['schoolid'] as String?;
+  //      data['schoolname'] as String?;
+  //     // print($ata['schoolid'] as String?)
+  //   } else {
+  //     print("Supervisor document does not exist.");
+  //     return null;
+  //   }
+  // }
 
 
   @override
@@ -120,7 +126,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                               ),
                             ),
                             TextSpan(
-                              text: 'from El Salam School to \n '
+                              text: 'from $_schoolNameText School to \n '
                                   'join the application as a bus \n '
                                   'supervisor for your school'.tr,
                               style: TextStyle(
@@ -159,9 +165,12 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
 
 
                               await _firestore.collection('notification').add({
-                                'item': 'accept Invitation',
+                                'item': 'Invitation Accepted',
                                 'timestamp': FieldValue.serverTimestamp(),
-                                'SchoolId': _schoolId,
+                                'SchoolId': _schoolIdText ,
+                                'SupervisorId': sharedpref!.getString('id') ,
+                                'SchoolName': _schoolNameText ,
+                                'SupervisorName': NameText ,
                               });
 
 
