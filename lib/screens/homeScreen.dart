@@ -409,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Align(alignment: AlignmentDirectional.topStart,
                                           child: Column(
                                             children: [
-                                              SizedBox(height: 18,),
+                                              SizedBox(height: 10,),
                                               Row(
                                                 children: [
                                                   Padding(
@@ -495,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Align(alignment: AlignmentDirectional.topStart,
                                           child: Column(
                                             children: [
-                                              SizedBox(height: 18,),
+                                              SizedBox(height: 10,),
                                               Row(
                                                 children: [
                                                   Padding(
