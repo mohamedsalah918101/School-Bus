@@ -127,18 +127,19 @@ String newDocId='';
         AddAbsentDay = false;
         isAddingHoliday = false;
        // _holidayNameController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Holiday added successfully')),
-        );
+       //  ScaffoldMessenger.of(context).showSnackBar(
+       //    SnackBar(content: Text('Holiday added successfully')
+       //    ),
+       //  );
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add holiday: $e')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to add holiday: $e')),
+        // );
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter a holiday name and select dates')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Please enter a holiday name and select dates')),
+      // );
     }
   }
 
@@ -172,13 +173,13 @@ String newDocId='';
   bool isAddingHoliday = false;
   List<DateTime> _selectedDates = [];
   List<Day> days = [
-    Day(name: 'Su',weekdayIndex:0, isChecked: false),
-    Day(name: 'M',weekdayIndex:1, isChecked: false),
-    Day(name: 'T', weekdayIndex:2,isChecked: false),
-    Day(name: 'W',weekdayIndex:3, isChecked: false),
-    Day(name: 'Th', weekdayIndex:4,isChecked: false),
-    Day(name: 'F', weekdayIndex:5,isChecked: false),
-    Day(name: 'Sa', weekdayIndex:6,isChecked: false),
+    Day(name: 'Sun',weekdayIndex:0, isChecked: false),
+    Day(name: 'Mon',weekdayIndex:1, isChecked: false),
+    Day(name: 'Tues', weekdayIndex:2,isChecked: false),
+    Day(name: 'Wed',weekdayIndex:3, isChecked: false),
+    Day(name: 'Thur', weekdayIndex:4,isChecked: false),
+    Day(name: 'Fri', weekdayIndex:5,isChecked: false),
+    Day(name: 'Sat', weekdayIndex:6,isChecked: false),
   ];
 
   Future<void> _saveDaysToFirestore() async {
@@ -230,25 +231,25 @@ String newDocId='';
 
       switch (date.weekday) {
         case DateTime.sunday:
-          dayName = 'Su';
+          dayName = 'Sun';
           break;
         case DateTime.monday:
-          dayName = 'M';
+          dayName = 'Mon';
           break;
         case DateTime.tuesday:
-          dayName = 'T';
+          dayName = 'Tues';
           break;
         case DateTime.wednesday:
-          dayName = 'W';
+          dayName = 'Wed';
           break;
         case DateTime.thursday:
-          dayName = 'Th';
+          dayName = 'Thur';
           break;
         case DateTime.friday:
-          dayName = 'F';
+          dayName = 'Fri';
           break;
         case DateTime.saturday:
-          dayName = 'Sa';
+          dayName = 'Sat';
           break;
         default:
           dayName = '';
@@ -270,6 +271,9 @@ String newDocId='';
       highlightedDates = _getHighlightedDates(selectedDays);
     });
   }
+
+
+
   OutlineInputBorder myFocusBorder() {
     return const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(7)),
@@ -384,7 +388,7 @@ String newDocId='';
     }
   }
 
-
+  List<Day> _selectedDays = [];
 
 
   @override
@@ -618,25 +622,38 @@ String newDocId='';
                                   SizedBox(height: 5,),
                                   Center(
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 25.0),
+                                      padding: const EdgeInsets.only(left: 10.0),
                                       child: Container(
                                         height: 41,
-                                        child: ListView(
+                                        child:
+                                        ListView(
                                           scrollDirection: Axis.horizontal,
                                           children:
                                           days.map((day) {
                                             return GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  day.toggleCheck();
-
-
-                                                });
+                                              onTap: ()
+                                              {
+                                                if (_selectedDays.length < 2) {
+                                                  setState(() {
+                                                    day.toggleCheck();
+                                                    if (day.isChecked) {
+                                                      _selectedDays.add(day);
+                                                    } else {
+                                                      _selectedDays.remove(day);
+                                                    }
+                                                  });
+                                                }
                                               },
+                                              // {
+                                              //   setState(() {
+                                              //     day.toggleCheck();
+                                              //
+                                              //   });
+                                              // },
                                               child: Padding(
                                                 padding: const EdgeInsets.symmetric(horizontal: 2),
                                                 child: Container(
-                                                  width: 26,
+                                                  width:35,
                                                   decoration: BoxDecoration(
                                                     shape: BoxShape.rectangle,
                                                     color: day.isChecked
@@ -646,12 +663,12 @@ String newDocId='';
                                                   ),
                                                   padding: EdgeInsets.all(5.0),
                                                   margin: EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
+                                                      horizontal: 3.0),
                                                   child: Center(
                                                     child: Text(
                                                       day.name,
                                                       style: TextStyle(
-                                                        fontSize: 16.0,
+                                                        fontSize: 12.0,
                                                         fontFamily: 'Poppins-SemiBold',
                                                         color: day.isChecked
                                                             ? Colors.white
@@ -679,6 +696,9 @@ String newDocId='';
                                           onPressed: () async {
                                             await _saveDaysToFirestore();
                                             await _loadSelectedDays(); // Update calendar after saving
+                                            showSnackBarFun(
+                                                context, 'Weekend saved successfully',Color(0xFF4CAF50),
+                                                'assets/imgs/school/Vector (4).png');
                                             setState(() {
                                               isVisible = false;
                                             });
@@ -1866,5 +1886,44 @@ String newDocId='';
         ),
       ),
     );
+  }
+  showSnackBarFun(context,msg,color,photo) {
+    SnackBar snackBar = SnackBar(
+
+      // content: const Text('Invitation sent successfully',
+      //     style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color: Color(0xff442B72))
+      // ),
+      content: Row(
+        children: [
+          // Add your image here
+          Padding(
+            padding: const EdgeInsets.only(left: 50),
+            child: Image.asset(
+              photo,
+              // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
+              width: 30, // Adjust width as needed
+              height: 30, // Adjust height as needed
+            ),
+          ),
+          SizedBox(width: 10), // Add some space between the image and the text
+          Text(
+            msg,
+            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),
+          ),
+        ],
+      ),
+      backgroundColor: Color(0xffFFFFFF),
+      duration: Duration(seconds: 2),
+
+      dismissDirection: DismissDirection.up,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 165,
+          left: 10,
+          right: 10),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

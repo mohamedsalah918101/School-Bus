@@ -146,7 +146,9 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                                  fontWeight: FontWeight.w600 ,
                                    fontSize: 16)
                                  ),
-                               ), onPressed: () {
+                               ), onPressed: () async {
+                               await  FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).update(
+                                   {'invite': 1,'state':2});
                                sharedpref!.setInt('invitstate',0);
                                sharedpref!.setInt('invit',0);
                                Dialoge.declinedInvitationDialog(context);

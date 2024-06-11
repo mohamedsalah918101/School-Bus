@@ -155,20 +155,29 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
 
 
-  void _deleteSupervisorDocument(String documentId) {
-    FirebaseFirestore.instance
+  void _deleteSupervisorDocument(String documentId) async {
+  await  FirebaseFirestore.instance
         .collection('supervisor')
         .doc(documentId)
         .delete()
-        .then((_) {
+        .then((_) async {
       setState(() {
         // Update UI by removing the deleted document from the data list
         data.removeWhere((document) => document.id == documentId);
-
         //new
         filteredData = List.from(data);
-
       });
+      // Delete the related notifications
+      QuerySnapshot notificationSnapshot = await FirebaseFirestore.instance
+          .collection('notification')
+          .where('SupervisorId', isEqualTo: documentId)
+          .get();
+
+      for (DocumentSnapshot notificationDoc in notificationSnapshot.docs) {
+        await notificationDoc.reference.delete();
+      }
+
+
       ScaffoldMessenger.of(context).showSnackBar(
           showSnackBarFun(context),
        // SnackBar(content: Text('Document deleted successfully')),

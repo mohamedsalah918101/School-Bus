@@ -654,6 +654,9 @@ class _EditeProfileState extends State<EditeProfile> {
                             // move to the next field when the user presses the "Done" button
                             FocusScope.of(context).requestFocus(_NameArabicFocus);
                           },
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]+')), // Allow only English characters and spaces
+                          ],
                           cursorColor: const Color(0xFF442B72),
                           decoration: InputDecoration(
                             hintStyle: TextStyle(color: Color(0xFF442B72)),
@@ -767,7 +770,9 @@ class _EditeProfileState extends State<EditeProfile> {
                             // move to the next field when the user presses the "Done" button
                             FocusScope.of(context).requestFocus(_AddressFocus);
                           },
-
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
+                          ],
                           cursorColor: const Color(0xFF442B72),
                           decoration: InputDecoration(
                             hintStyle: TextStyle(color: Color(0xFF442B72)),

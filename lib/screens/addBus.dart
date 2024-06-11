@@ -146,6 +146,10 @@ class _AddBusState extends State<AddBus> {
           docID: querySnapshot.docs[i].id,
           phone: querySnapshot.docs[i].get('phoneNumber')));
     }
+    // if (items.isEmpty) {
+    //   showSnackBarFun(context, 'You must add a supervisor first', Colors.red, 'assets/imgs/school/icons8_cancel 2.png');
+    // }
+
     setState(() {});
   }
 
@@ -405,7 +409,8 @@ class _AddBusState extends State<AddBus> {
                                                                   fit: BoxFit
                                                                       .cover, // Adjusts how the image fits in the container
                                                                 )
-                                                              : Container(
+                                                              :
+                                                          Container(
                                                                   width: 65,
                                                                   // Adjust size as needed
                                                                   height: 65,
@@ -1199,7 +1204,7 @@ class _AddBusState extends State<AddBus> {
                                                     _selectedImagedriver !=
                                                         null &&
                                                     driverphotoerror &&
-                                                    items != null
+                                                    items != null && items.isNotEmpty
                                                 //_selectedImage != null && _selectedImagebus != null
                                                 ) {
                                               _addDataToFirestore();
@@ -1210,9 +1215,10 @@ class _AddBusState extends State<AddBus> {
                                                           BusScreen(),
                                                       maintainState: false));
                                             } else {
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Please,enter valid number'));
+                                                showSnackBarFun(context, 'You must add a supervisor first', Colors.red, 'assets/imgs/school/icons8_cancel 2.png');
+                                              // SnackBar(
+                                              //     content: Text(
+                                              //         'Please,enter valid number'));
                                             }
                                           },
                                           width: constrains.maxWidth / 1.2,
@@ -1451,5 +1457,44 @@ class _AddBusState extends State<AddBus> {
         ),
       ),
     );
+  }
+  showSnackBarFun(context,msg,color,photo) {
+    SnackBar snackBar = SnackBar(
+
+      // content: const Text('Invitation sent successfully',
+      //     style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color: Color(0xff442B72))
+      // ),
+      content: Row(
+        children: [
+          // Add your image here
+          Padding(
+            padding: const EdgeInsets.only(left: 50),
+            child: Image.asset(
+              photo,
+              // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
+              width: 30, // Adjust width as needed
+              height: 30, // Adjust height as needed
+            ),
+          ),
+          SizedBox(width: 10), // Add some space between the image and the text
+          Text(
+            msg,
+            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),
+          ),
+        ],
+      ),
+      backgroundColor: Color(0xffFFFFFF),
+      duration: Duration(seconds: 2),
+
+      dismissDirection: DismissDirection.up,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 165,
+          left: 10,
+          right: 10),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

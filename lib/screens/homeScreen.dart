@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<QueryDocumentSnapshot> data = [];
 
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:1) .get();
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:1).where('schoolid',isEqualTo:sharedpref!.getString('id') ).get();
     data.addAll(querySnapshot.docs);
     setState(() {
 
@@ -409,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Align(alignment: AlignmentDirectional.topStart,
                                           child: Column(
                                             children: [
-                                              SizedBox(height: 10,),
+                                              SizedBox(height: 18,),
                                               Row(
                                                 children: [
                                                   Padding(
@@ -452,7 +452,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ),
                                                     //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
                                                   )),
-                                              Align(alignment: AlignmentDirectional.bottomEnd,
+                                              Align(
+                                                alignment: AlignmentDirectional.bottomEnd,
                                                 child: GestureDetector(
                                                   onTap: (){
                                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>BusScreen()));
@@ -467,7 +468,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       bottomRight: Radius.circular(7)),
 
                                                     ),
-                                                    child: Align(alignment: AlignmentDirectional.bottomCenter,
+                                                    child: Align(
+                                                        alignment: AlignmentDirectional.bottomCenter,
                                                       child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
                                                   //     FaIcon(
                                                   //     FontAwesomeIcons.arrowRight,
@@ -493,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Align(alignment: AlignmentDirectional.topStart,
                                           child: Column(
                                             children: [
-                                              SizedBox(height: 10,),
+                                              SizedBox(height: 18,),
                                               Row(
                                                 children: [
                                                   Padding(

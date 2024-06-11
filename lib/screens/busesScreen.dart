@@ -725,12 +725,48 @@ class BusScreenSate extends State<BusScreen> {
                                                                       );
                                                                     },
                                                                   ))
-                                                                  : Image.asset(
-                                                                'assets/imgs/school/empty_supervisor.png',
-                                                                width: 61,
-                                                                height: 61,
-                                                                fit: BoxFit.cover,
+                                                                  :       Container(
+                                                                width: 65,
+                                                                // Adjust size as needed
+                                                                height: 65,
+                                                                decoration:
+                                                                BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Color(
+                                                                        0xffCCCCCC),
+                                                                    // Adjust border color
+                                                                    width:
+                                                                    2, // Adjust border width
+                                                                  ),
+                                                                ),
+                                                                child: Align(
+                                                                  alignment:
+                                                                  Alignment
+                                                                      .bottomCenter,
+                                                                  child:
+                                                                  CircleAvatar(
+                                                                    radius: 20,
+                                                                    backgroundImage:
+                                                                    AssetImage(
+                                                                      "assets/imgs/school/Vector (14).png",
+                                                                    ),
+                                                                    backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
                                                               ),
+                                                          //new
+                                                              // Image.asset(
+                                                              //   'assets/imgs/school/empty_supervisor.png',
+                                                              //   width: 61,
+                                                              //   height: 61,
+                                                              //   fit: BoxFit.cover,
+                                                              // ),
+                                                      //old
                                                               // Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
                                                               //               errorBuilder: (context, error, stackTrace) {
                                                               //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
@@ -1037,10 +1073,44 @@ class BusScreenSate extends State<BusScreen> {
                                                                                       data[index]['imagedriver'],
                                                                                       fit: BoxFit.cover,
                                                                                     )
-                                                                                        : Image.asset(
-                                                                                      'assets/imgs/school/empty_supervisor.png',
-                                                                                      fit: BoxFit.cover,
+                                                                                        :       Container(
+                                                                                      width: 65,
+                                                                                      // Adjust size as needed
+                                                                                      height: 65,
+                                                                                      decoration:
+                                                                                      BoxDecoration(
+                                                                                        shape: BoxShape
+                                                                                            .circle,
+                                                                                        border: Border
+                                                                                            .all(
+                                                                                          color: Color(
+                                                                                              0xffCCCCCC),
+                                                                                          // Adjust border color
+                                                                                          width:
+                                                                                          2, // Adjust border width
+                                                                                        ),
+                                                                                      ),
+                                                                                      child: Align(
+                                                                                        alignment:
+                                                                                        Alignment
+                                                                                            .bottomCenter,
+                                                                                        child:
+                                                                                        CircleAvatar(
+                                                                                          radius: 20,
+                                                                                          backgroundImage:
+                                                                                          AssetImage(
+                                                                                            "assets/imgs/school/Vector (14).png",
+                                                                                          ),
+                                                                                          backgroundColor:
+                                                                                          Colors
+                                                                                              .white,
+                                                                                        ),
+                                                                                      ),
                                                                                     ),
+                                                                                    // Image.asset(
+                                                                                    //   'assets/imgs/school/empty_supervisor.png',
+                                                                                    //   fit: BoxFit.cover,
+                                                                                    // ),
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: 20,),
