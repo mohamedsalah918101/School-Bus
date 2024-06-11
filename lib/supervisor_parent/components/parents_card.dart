@@ -16,6 +16,8 @@ class ParentsCard extends StatefulWidget {
 
 class _ParentsCardState extends State<ParentsCard> {
   int? updatedDataLength;
+  int? numberOfNames;
+
   final _firestore = FirebaseFirestore.instance;
 
   @override

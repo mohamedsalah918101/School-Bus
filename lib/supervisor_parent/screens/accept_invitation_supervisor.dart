@@ -164,6 +164,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                               });
 
 
+<<<<<<< HEAD
                                             await _firestore.collection('notification').add({
                                               'item': 'accept Invitation',
                                               'timestamp': FieldValue.serverTimestamp(),
@@ -172,6 +173,16 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                                               'SchoolName': _schoolNameText ,
                                               'SupervisorName': NameText ,
                                             });
+=======
+                              await _firestore.collection('notification').add({
+                                'item': 'Invitation Accepted',
+                                'timestamp': FieldValue.serverTimestamp(),
+                                'SchoolId': _schoolIdText ,
+                                'SupervisorId': sharedpref!.getString('id') ,
+                                'SchoolName': _schoolNameText ,
+                                'SupervisorName': NameText ,
+                              });
+>>>>>>> e5ce204ddc8c801098cd623cfbe432496367421c
 
 
                             },
@@ -210,7 +221,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                                 ), onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => DeclineInvitationForSupervisor(
-                                        )));
+                                    )));
                               },
                               ),
                             ))

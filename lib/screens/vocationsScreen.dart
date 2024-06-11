@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:school_account/screens/profileScreen.dart';
 import 'package:school_account/screens/supervisorScreen.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../classes/classDay.dart';
@@ -23,7 +24,12 @@ class VacationsScreen extends StatefulWidget {
 }
 
 class _VacationsScreenState extends State<VacationsScreen> {
-
+  // Callback to prevent date selection
+  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    setState(() {
+      // No-op: Do nothing to prevent selection
+    });
+  }
   bool _isHoliday(DateTime date) {
     for (Holiday holiday in _holidays) {
       if (date.isAtSameMomentAs(DateTime.parse(holiday.fromDate)) ||
@@ -218,7 +224,7 @@ String newDocId='';
     List<DateTime> highlightedDates = [];
     DateTime now = DateTime.now();
 
-    for (var i = 0; i < 30; i++) { // Example: Highlight next 30 days as per the selected days
+    for (var i = 0; i < 27375; i++) { // Example: Highlight next 30 days as per the selected days
       DateTime date = now.add(Duration(days: i));
       String dayName;
 
@@ -318,16 +324,15 @@ String newDocId='';
 
   List<Holiday> _holidays = [];
 
+
 //other fun to retrive data of holiday from DB
 
   void retrieveAllData() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
-
       if (querySnapshot.size > 0) {
         for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
           Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
-
           if (data != null) {
             if (data.containsKey('name') &&
                 data.containsKey('fromDate') &&
@@ -1059,6 +1064,7 @@ String newDocId='';
                           ),
 
                           child: SfDateRangePicker(
+                            onSelectionChanged: _onSelectionChanged, // Prevent selection
                             allowViewNavigation: true,
                             //new
                            // onSelectionChanged: _onDateRangeSelected,
@@ -1713,8 +1719,8 @@ String newDocId='';
             child: FloatingActionButton(
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (context) => ProfileScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
               child: Image.asset(
                 'assets/imgs/school/busbottombar.png',

@@ -1017,7 +1017,7 @@ class _EditeBusState extends State<EditeBus> {
               // shape: RoundedRectangleBorder(
               //     borderRadius: BorderRadius.circular(100)),
               onPressed: () async {
-               //Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
               child: Image.asset(
                 'assets/imgs/school/busbottombar.png',

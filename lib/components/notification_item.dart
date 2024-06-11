@@ -35,12 +35,23 @@ class NotificationItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
+                    // Image.asset(
+                    //   type == 'Taken From School'
+                    //       ? 'assets/imgs/school/house2.png'
+                    //       : type == 'Arrival Reminder'
+                    //       ? 'assets/imgs/school/locationtick.png'
+                    //       : 'assets/imgs/school/alarm.png',
+                    //
+                    //   width: 16,
+                    //   height: 16,
+                    // ),
                     Image.asset(
-                      type == 'Taken From School'
-                          ? 'assets/imgs/school/house2.png'
-                          : type == 'Arrival Reminder'
-                          ? 'assets/imgs/school/locationtick.png'
-                          : 'assets/imgs/school/alarm.png',
+                      {
+                        'Taken From School': 'assets/imgs/school/house2.png',
+                        'Arrival Reminder': 'assets/imgs/school/locationtick.png',
+                        'Invitation Accepted': 'assets/imgs/school/Vector (4).png',
+                        'Invitation Declined': 'assets/imgs/school/image (3).png',
+                      }[type]?? 'assets/imgs/school/alarm.png', // default image
                       width: 16,
                       height: 16,
                     ),
@@ -50,11 +61,12 @@ class NotificationItem extends StatelessWidget {
                     Text(
                       type,
                       style: TextStyle(
-                        color: type == 'Taken From School'
-                            ? const Color(0xFFFFC53D)
-                            : type == 'Arrival Reminder'
-                            ? const Color(0xFF771F98)
-                            : const Color(0xFFDA1622),
+                        color: {
+                          'Taken From School': Color(0xFFFFC53D),
+                          'Arrival Reminder': Color(0xFF771F98),
+                          'Invitation Accepted': Color(0xff0E8113),
+                          'Invitation Declined': Color(0xFFDA1622),
+                        }[type] ?? Color(0xFFDA1622), // default color
                         fontSize: 15,
                         fontFamily: 'Poppins-Regular',
                         fontWeight: FontWeight.w500,

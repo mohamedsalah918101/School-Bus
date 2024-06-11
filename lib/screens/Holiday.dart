@@ -23,11 +23,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Holiday {
   final String name;
-
   // final Timestamp fromDate;
   final String fromDate;
   final String toDate;
-
   //final Timestamp toDate;
   //final List<Timestamp> selectedDates;
   final List<String> selectedDates;

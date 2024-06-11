@@ -19,10 +19,11 @@ class ParentsView extends StatefulWidget {
 
   @override
   _ParentsViewState createState() => _ParentsViewState();
-}
+  }
 
-class _ParentsViewState extends State<ParentsView> {
+  class _ParentsViewState extends State<ParentsView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int numberOfNames = 0; // declare the variable here
   bool Accepted = false;
   bool Declined = false;
   bool Waiting = false;
@@ -428,6 +429,7 @@ class _ParentsViewState extends State<ParentsView> {
                               ],
                             ),
                           ),
+
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 28.0),
                             child:
@@ -437,8 +439,9 @@ class _ParentsViewState extends State<ParentsView> {
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
                                 final joinDate = DateTime.now();
-                                if (data[index]['supervisor'] == sharedpref!.getString('id').toString())
-
+                                if (data[index]['supervisor'] == sharedpref!.getString('id').toString()) {
+                                  numberOfNames = data.where((element) => element['supervisor'] == sharedpref!.getString('id').toString()).length;
+                                }
                                   return Column(
                                   children: [
                                     Row(
