@@ -644,7 +644,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                         if(filteredData.isNotEmpty)
                                           SizedBox(
                                             height: 500,
-                                            child: ListView.builder(
+                                            child:
+                                            ListView.builder(
                                               itemCount: isdelete ? data.length:filteredData.length,
                                               //data.length,
                                               //itemCount: filteredData.length,

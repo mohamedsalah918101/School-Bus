@@ -95,42 +95,110 @@ String newDocId='';
   //     );
   //   }
   // }
-
+// func add holidays to firestore without restrict on same holiday add more than one
+  // Future<void> _addHolidayToFirestore() async {
+  //   if (_holidayNameController.text.isNotEmpty && _selectedHolidayDates.isNotEmpty) {
+  //     final List<String> selectedDates = _selectedHolidayDates.map((date)
+  //     => date.toIso8601String()).toList();
+  //
+  //     final holiday = Holiday(
+  //       name: _holidayNameController.text,
+  //       fromDate: _selectedHolidayDates.first.toIso8601String(),
+  //       toDate: _selectedHolidayDates.last.toIso8601String(),
+  //       selectedDates: selectedDates,
+  //       schoolid: sharedpref!.getString('id').toString(),
+  //
+  //
+  //
+  //     );
+  //
+  //     try {
+  //       DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+  //
+  //       newDocId = docRef.id; // Get the ID of the newly created document
+  //       print('New holiday added with ID: $newDocId');  // Update the state with the new holiday details
+  //       setState(() {
+  //         _addedHoliday = holiday;
+  //         _holidays.add(holiday); // Add the holiday to the list NEW
+  //         _holidayNameController.clear();
+  //         _selectedHolidayDates.clear();
+  //         isLoading = false;
+  //       });
+  //       AddAbsentDay = false;
+  //       isAddingHoliday = false;
+  //      // _holidayNameController.clear();
+  //      //  ScaffoldMessenger.of(context).showSnackBar(
+  //      //    SnackBar(content: Text('Holiday added successfully')
+  //      //    ),
+  //      //  );
+  //     } catch (e) {
+  //       // ScaffoldMessenger.of(context).showSnackBar(
+  //       //   SnackBar(content: Text('Failed to add holiday: $e')),
+  //       // );
+  //     }
+  //   } else {
+  //     // ScaffoldMessenger.of(context).showSnackBar(
+  //     //   SnackBar(content: Text('Please enter a holiday name and select dates')),
+  //     // );
+  //   }
+  // }
+  //func add holidays to firestore with restrict on same holiday  not to add more than one
   Future<void> _addHolidayToFirestore() async {
     if (_holidayNameController.text.isNotEmpty && _selectedHolidayDates.isNotEmpty) {
-      final List<String> selectedDates = _selectedHolidayDates.map((date)
-      => date.toIso8601String()).toList();
-
-      final holiday = Holiday(
-        name: _holidayNameController.text,
-        fromDate: _selectedHolidayDates.first.toIso8601String(),
-        toDate: _selectedHolidayDates.last.toIso8601String(),
-        selectedDates: selectedDates,
-        schoolid: sharedpref!.getString('id').toString(),
-
-
-
-      );
-
       try {
-        DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+        // Fetch existing holidays from Firestore
+        QuerySnapshot querySnapshot = await _firestore.collection('schoolholiday').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
 
-        newDocId = docRef.id; // Get the ID of the newly created document
-        print('New holiday added with ID: $newDocId');  // Update the state with the new holiday details
-        setState(() {
-          _addedHoliday = holiday;
-          _holidays.add(holiday); // Add the holiday to the list NEW
-          _holidayNameController.clear();
-          _selectedHolidayDates.clear();
-          isLoading = false;
-        });
-        AddAbsentDay = false;
-        isAddingHoliday = false;
-       // _holidayNameController.clear();
-       //  ScaffoldMessenger.of(context).showSnackBar(
-       //    SnackBar(content: Text('Holiday added successfully')
-       //    ),
-       //  );
+        // Extract all already chosen dates from the fetched holidays
+        List<String> alreadyChosenDates = [];
+        for (var doc in querySnapshot.docs) {
+          var holidayData = doc.data() as Map<String, dynamic>;
+          List<String> holidayDates = List<String>.from(holidayData['selectedDates']);
+          alreadyChosenDates.addAll(holidayDates);
+        }
+
+        // Check if any of the new selected dates are already chosen
+        List<String> newSelectedDates = _selectedHolidayDates.map((date) => date.toIso8601String()).toList();
+        bool hasOverlap = newSelectedDates.any((date) => alreadyChosenDates.contains(date));
+
+        if (!hasOverlap) {
+          final holiday = Holiday(
+            name: _holidayNameController.text,
+            fromDate: _selectedHolidayDates.first.toIso8601String(),
+            toDate: _selectedHolidayDates.last.toIso8601String(),
+            selectedDates: newSelectedDates,
+            schoolid: sharedpref!.getString('id').toString(),
+          );
+
+          DocumentReference docRef = await _firestore.collection('schoolholiday').add(holiday.toJson());
+
+          newDocId = docRef.id; // Get the ID of the newly created document
+          print('New holiday added with ID: $newDocId'); // Update the state with the new holiday details
+          setState(() {
+            _addedHoliday = holiday;
+            // _holidays.add(holiday); // Add the holiday to the list NEW
+            _holidays.insert(0, holiday); // Add the holiday at the beginning of the list
+            _holidayNameController.clear();
+            _selectedHolidayDates.clear();
+            isLoading = false;
+          });
+          AddAbsentDay = false;
+          isAddingHoliday = false;
+          showSnackBarFun(
+              context, 'Holiday added successfully',Color(0xFF4CAF50),
+              'assets/imgs/school/Vector (4).png');
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text('Holiday added successfully')
+          //   ),
+          // );
+        } else {
+          showSnackBarFun(
+              context, 'These days are already choosen',Color(0xFFDB4446),
+              'assets/imgs/school/icons8_cancel 2.png');
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text('The selected dates are already chosen')),
+          // );
+        }
       } catch (e) {
         // ScaffoldMessenger.of(context).showSnackBar(
         //   SnackBar(content: Text('Failed to add holiday: $e')),
@@ -173,13 +241,13 @@ String newDocId='';
   bool isAddingHoliday = false;
   List<DateTime> _selectedDates = [];
   List<Day> days = [
-    Day(name: 'Sun',weekdayIndex:0, isChecked: false),
-    Day(name: 'Mon',weekdayIndex:1, isChecked: false),
-    Day(name: 'Tues', weekdayIndex:2,isChecked: false),
-    Day(name: 'Wed',weekdayIndex:3, isChecked: false),
-    Day(name: 'Thur', weekdayIndex:4,isChecked: false),
-    Day(name: 'Fri', weekdayIndex:5,isChecked: false),
-    Day(name: 'Sat', weekdayIndex:6,isChecked: false),
+    Day(name: 'Su',weekdayIndex:0, isChecked: false),
+    Day(name: 'Mo',weekdayIndex:1, isChecked: false),
+    Day(name: 'Tu', weekdayIndex:2,isChecked: false),
+    Day(name: 'We',weekdayIndex:3, isChecked: false),
+    Day(name: 'Th', weekdayIndex:4,isChecked: false),
+    Day(name: 'Fr', weekdayIndex:5,isChecked: false),
+    Day(name: 'Sa', weekdayIndex:6,isChecked: false),
   ];
 
   Future<void> _saveDaysToFirestore() async {
@@ -187,12 +255,9 @@ String newDocId='';
     final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
 
     List<String> selectedDays = days.where((day) => day.isChecked).map((day) => day.name).toList();
-
     await _weekendCollection.add({'days': selectedDays,
       'schoolid':sharedpref!.getString('id')
     });
-
-
   }
   bool color = false;
   bool isVisible = false;
@@ -231,25 +296,25 @@ String newDocId='';
 
       switch (date.weekday) {
         case DateTime.sunday:
-          dayName = 'Sun';
+          dayName = 'Su';
           break;
         case DateTime.monday:
-          dayName = 'Mon';
+          dayName = 'Mo';
           break;
         case DateTime.tuesday:
-          dayName = 'Tues';
+          dayName = 'Tu';
           break;
         case DateTime.wednesday:
-          dayName = 'Wed';
+          dayName = 'We';
           break;
         case DateTime.thursday:
-          dayName = 'Thur';
+          dayName = 'Th';
           break;
         case DateTime.friday:
-          dayName = 'Fri';
+          dayName = 'Fr';
           break;
         case DateTime.saturday:
-          dayName = 'Sat';
+          dayName = 'Sa';
           break;
         default:
           dayName = '';
@@ -328,13 +393,14 @@ String newDocId='';
 
   List<Holiday> _holidays = [];
 
-
+  List<Holiday> retrievedHolidays = [];
 //other fun to retrive data of holiday from DB
 
   void retrieveAllData() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
       if (querySnapshot.size > 0) {
+
         for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
           Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
           if (data != null) {
@@ -363,7 +429,7 @@ String newDocId='';
               // Create a new Holiday object and add it to the list
               Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings,schoolid:sharedpref!.getString('id').toString(),);
               _holidays.add(holiday);
-
+              retrievedHolidays.add(holiday);
               // Print extracted data
               print('Name: $name');
               print('From Date: ${fromDate.toLocal()}');
@@ -380,6 +446,12 @@ String newDocId='';
             print("Document data is null");
           }
         }
+        // Sort the holidays by fromDate in descending order
+        retrievedHolidays.sort((a, b) => DateTime.parse(b.fromDate).compareTo(DateTime.parse(a.fromDate)));
+        // Update the state with the sorted holidays
+        setState(() {
+          _holidays = retrievedHolidays;
+        });
       } else {
         print("No documents exist");
       }
@@ -668,7 +740,7 @@ String newDocId='';
                                                     child: Text(
                                                       day.name,
                                                       style: TextStyle(
-                                                        fontSize: 12.0,
+                                                        fontSize: 14.0,
                                                         fontFamily: 'Poppins-SemiBold',
                                                         color: day.isChecked
                                                             ? Colors.white
@@ -1440,7 +1512,8 @@ String newDocId='';
                   //     :
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Column(
+                    child:
+                    Column(
                       children: [
 
 
@@ -1897,7 +1970,7 @@ String newDocId='';
         children: [
           // Add your image here
           Padding(
-            padding: const EdgeInsets.only(left: 50),
+            padding: const EdgeInsets.only(left: 40),
             child: Image.asset(
               photo,
               // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
