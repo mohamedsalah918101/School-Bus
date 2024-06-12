@@ -1173,6 +1173,12 @@ class _EditeProfileState extends State<EditeProfile> {
                         return TextFormField(
                           controller: _supportNumber,
                           focusNode: _SupporterFocus,
+                          maxLength: 11,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                            LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                          ],
                           style: TextStyle(
                             color: Color(0xFF442B72),
                             fontSize: 14,

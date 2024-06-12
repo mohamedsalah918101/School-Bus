@@ -148,29 +148,81 @@ class BusScreenSate extends State<BusScreen> {
     );
   }
 //fun delete bus
-  void _deletebusDocument(String documentId) {
+//   void _deletebusDocument(String documentId) {
+//     FirebaseFirestore.instance
+//         .collection('busdata')
+//         .doc(documentId)
+//         .delete()
+//         .then((_) {
+//       setState(() {
+//         // Update UI by removing the deleted document from the data list
+//         data.removeWhere((document) => document.id == documentId);
+//         filteredData = List.from(data);
+//       });
+//
+//     });
+//
+//   }
+  void _deleteBusDocument(String documentId) {
     FirebaseFirestore.instance
         .collection('busdata')
         .doc(documentId)
-        .delete()
-        .then((_) {
-      setState(() {
-        // Update UI by removing the deleted document from the data list
-        data.removeWhere((document) => document.id == documentId);
-        filteredData = List.from(data);
-      });
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   showSnackBarFun(context),
-      //   // SnackBar(content: Text('Document deleted successfully')),
-      // );
+        .collection('supervisors')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        var supervisorDocId = querySnapshot.docs.first.id;
+        print('Supervisor document found with ID: $supervisorDocId');
+
+        FirebaseFirestore.instance
+            .collection('supervisor')
+            .doc(supervisorDocId)
+            .delete()
+            .then((_) {
+          print('Supervisor document deleted: $supervisorDocId');
+
+          FirebaseFirestore.instance
+              .collection('busdata')
+              .doc(documentId)
+              .delete()
+              .then((_) {
+            print('Bus document deleted: $documentId');
+
+            setState(() {
+              data.removeWhere((document) => document.id == documentId);
+              filteredData = List.from(data);
+            });
+          }).catchError((error) {
+            print('Error deleting bus document: $error');
+          });
+        }).catchError((error) {
+          print('Error deleting supervisor document: $error');
+        });
+      } else {
+        print('No supervisor document found for bus document ID: $documentId');
+
+        FirebaseFirestore.instance
+            .collection('busdata')
+            .doc(documentId)
+            .delete()
+            .then((_) {
+          print('Bus document deleted: $documentId');
+
+          setState(() {
+            data.removeWhere((document) => document.id == documentId);
+            filteredData = List.from(data);
+          });
+        }).catchError((error) {
+          print('Error deleting bus document: $error');
+        });
+      }
+    }).catchError((error) {
+      print('Error retrieving supervisor subcollection: $error');
     });
-    //     .catchError((error) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text('Failed to delete document: $error')),
-    //   );
-    // }
-    // );
   }
+
+
+
   //fun filter
   String selectedFilter = '';
   bool isAcceptFiltered = false;
@@ -917,19 +969,16 @@ class BusScreenSate extends State<BusScreen> {
                                                                     //         builder: (context) =>
                                                                     //             EditeSupervisor()));
                                                                   } else if (value == 'delete') {
-                                                                    //deletePhotoDialog(context);
-                                                                    //وقفت delete function علشان لما بسمح بيعمل error
 
-                                                                    //  _deletebusDocument(data[index].id);
-                                                                    if (index < filteredData.length) {
-                                                                      _deletebusDocument(filteredData[index].id);
-                                                                    } else {
-                                                                      print('Invalid index: $index');
-                                                                    }
-                                                                    // setState(() {
-                                                                    //
-                                                                    //   //showSnackBarFun(context);
-                                                                    // });
+                                                                    deletePhotoDialog(context, data[index].id);
+
+
+                                                                    // if (index < filteredData.length) {
+                                                                    //   _deletebusDocument(filteredData[index].id);
+                                                                    // } else {
+                                                                    //   print('Invalid index: $index');
+                                                                    // }
+
                                                                   }
                                                                 },
                                                               ),
@@ -1496,7 +1545,7 @@ class BusScreenSate extends State<BusScreen> {
       ),
     );
   }
-  deletePhotoDialog(context) {
+  deletePhotoDialog(context,String supervisorId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1515,16 +1564,18 @@ class BusScreenSate extends State<BusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Center(child: Text("Delete Bus",style: TextStyle(fontSize: 18,fontFamily: 'Poppins-SemiBold', color: Color(0xFF442B72),),)),
+                SizedBox(height: 10,),
                   Center(
-                    child: Align(alignment: AlignmentDirectional.topCenter,
+                    child: Align(alignment: AlignmentDirectional.center,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              'Are you sure you want to',
+                              'There are supervisors and parents',
                               style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 20,
+                                fontSize: 16,
                                 fontFamily: 'Poppins-Regular',
                                 //fontWeight: FontWeight.w400,
                                 height: 1.23,
@@ -1532,10 +1583,22 @@ class BusScreenSate extends State<BusScreen> {
                             ),
                             Center(
                               child: Text(
-                                'delete this bus?',
+                                'on this bus all will be deleted',
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
-                                  fontSize: 20,
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins-Regular',
+                                  // fontWeight: FontWeight.w400,
+                                  height: 1.23,
+                                ),
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'once you delete the bus',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 16,
                                   fontFamily: 'Poppins-Regular',
                                   // fontWeight: FontWeight.w400,
                                   height: 1.23,
@@ -1547,7 +1610,7 @@ class BusScreenSate extends State<BusScreen> {
                     ),
                   ),
                   const SizedBox(
-                    height: 25,
+                    height: 20,
                   ),
                   Row(
                     children: [
@@ -1556,6 +1619,8 @@ class BusScreenSate extends State<BusScreen> {
                         width: 120,
                         hight: 38,
                         onPress: () => {
+                        Navigator.pop(context),
+                          _deleteBusDocument(supervisorId)
                           //_deletebusDocument(documentId)
                         }
 

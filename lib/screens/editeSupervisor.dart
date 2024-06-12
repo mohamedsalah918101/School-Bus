@@ -402,6 +402,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                 child: TextFormField(
                                   controller: _phonenumber,
                                   focusNode: _PhoneNumberFocus,
+
                                   inputFormatters: <TextInputFormatter>[
                                     //FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
                                     LengthLimitingTextInputFormatter(13), // Limit the length programmatically
@@ -416,7 +417,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                   //textDirection: TextDirection.ltr,
                                   scrollPadding: const EdgeInsets.symmetric(
                                       vertical: 40),
-                                  keyboardType: TextInputType.number,
+                                  keyboardType: TextInputType.phone,
                                   decoration:  InputDecoration(
                                    // labelText: 'Shady Ayman'.tr,
                                     //hintText:'01028765006'.tr ,

@@ -45,7 +45,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
 
   getData() async {
     QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:1).where('schoolid',isEqualTo:sharedpref!.getString('id') ).get();
+        await FirebaseFirestore.instance.collection('parent').where('schoolid',isEqualTo:sharedpref!.getString('id') ).get();
     data.addAll(querySnapshot.docs);
     setState(() {
       data = querySnapshot.docs;
