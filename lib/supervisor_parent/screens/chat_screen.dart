@@ -47,6 +47,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
+  // File? _selectedImage;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController msgText = TextEditingController();
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
@@ -192,6 +193,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   //     print('Error uploading file: $e');
   //   }
   // }
+  // File? _selectedImage;
+  // String? imageUrl;
+
   Future<void> _pickImageFromGallery() async {
     final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
     if (returnedImage == null) return;
@@ -202,17 +206,26 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages = referenceRoot.child('images');
-    Reference referenceImageToUpload = referenceDirImages.child('name');
+    Reference referenceImageToUpload = referenceDirImages.child(basename(returnedImage.path));
 
     try {
       await referenceImageToUpload.putFile(File(returnedImage.path));
       imageUrl = await referenceImageToUpload.getDownloadURL();
       print('Image uploaded successfully. URL: $imageUrl');
+
+      String formattedTime = DateFormat('HH:mm:ss').format(DateTime.now());
+      _fireStore.collection("msg").add({
+        "sender": currentUserID,
+        "receiver": widget.receiverId,
+        "txt": "",
+        "imageUrl": imageUrl,
+        "time": formattedTime,
+      });
+
     } catch (error) {
       print('Error uploading image: $error');
     }
   }
-
   void _makePhoneCall() async {
     bool? res = await FlutterPhoneDirectCaller.callNumber(widget.receiverPhone);
     if (!res!) {
@@ -316,121 +329,238 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(90),
-        child: AppBar(
-          toolbarHeight: 90,
-          centerTitle: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(16.49),
-            ),
-          ),
-          elevation: 0.0,
-          leading: GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
+        child: SizedBox(
+          height: 110,
+          child: Container(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 17.0),
-              child: Image.asset(
-                (sharedpref?.getString('lang') == 'ar')
-                    ? 'assets/images/Layer 1.png'
-                    : 'assets/images/fi-rr-angle-left.png',
-                width: 20,
-                height: 22,
-              ),
-            ),
-          ),
-          actions: [
-            GestureDetector(
-              onTap: () {
-                _makePhoneCall();
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Image.asset(
-                  'assets/images/Call.png',
-                  height: 24,
-                  width: 24,
-                ),
-              ),
-            ),
-          ],
-          title: Padding(
-            padding: const EdgeInsets.only(right: 0.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FutureBuilder(
-                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Something went wrong');
-                    }
+              padding: const EdgeInsets.only(top: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                        return CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Color(0xff442B72),
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                            radius: 25,
-                          ),
-                        );
-                      }
-
-                      Map<String, dynamic>? data = snapshot.data?.data();
-                      if (data != null && data['busphoto'] != null) {
-                        return CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Color(0xff442B72),
-                          child: CircleAvatar(
-                            backgroundImage: NetworkImage('${data['busphoto']}'),
-                            radius:25,
-                          ),
-                        );
-                      }
-                    }
-
-                    return Container();
-                  },
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        widget.receiverName,
-                        style: TextStyle(
-                          color: Color(0xFF181818),
-                          fontSize: 14.70,
-                          fontFamily: 'Poppins-SemiBold',
-                          fontWeight: FontWeight.w600,
+                    GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 17.0),
+                          child: Image.asset(
+                            (sharedpref?.getString('lang') == 'ar')
+                                ? 'assets/images/Layer 1.png'
+                                : 'assets/images/fi-rr-angle-left.png',
+                            width: 20,
+                            height: 22,
+                          ),
                         ),
                       ),
-                      Text(
-                        _isOnline ? 'online' : 'offline',
-                          // _connectionStatus,
-                        // 'online',
-                        style: TextStyle(
-                          color: Color(0xFF771F98),
-                          fontSize: 12.86,
-                          fontFamily: 'Poppins-Light',
-                          fontWeight: FontWeight.w400,
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FutureBuilder(
+                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                return CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: Color(0xff442B72),
+                                  child: CircleAvatar(
+                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                    radius: 25,
+                                  ),
+                                );
+                              }
+
+                              Map<String, dynamic>? data = snapshot.data?.data();
+                              if (data != null && data['busphoto'] != null) {
+                                return CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: Color(0xff442B72),
+                                  child: CircleAvatar(
+                                    backgroundImage: NetworkImage('${data['busphoto']}'),
+                                    radius:25,
+                                  ),
+                                );
+                              }
+                            }
+
+                            return Container();
+                          },
                         ),
-                      ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.receiverName,
+                                style: TextStyle(
+                                  color: Color(0xFF181818),
+                                  fontSize: 14.70,
+                                  fontFamily: 'Poppins-SemiBold',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                _isOnline ? 'online' : 'offline',
+                                  // _connectionStatus,
+                                // 'online',
+                                style: TextStyle(
+                                  color: Color(0xFF771F98),
+                                  fontSize: 12.86,
+                                  fontFamily: 'Poppins-Light',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+
                     ],
                   ),
-                )
-              ],
+                  GestureDetector(
+                    onTap: () {
+                      _makePhoneCall();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      child: Image.asset(
+                        'assets/images/Call.png',
+                        height: 24,
+                        width: 24,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          backgroundColor: Color(0xffF8F8F8),
-          surfaceTintColor: Colors.transparent,
-        ),
+        )
+        // AppBar(
+        //   toolbarHeight: 90,
+        //   centerTitle: true,
+        //   shape: const RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.vertical(
+        //       bottom: Radius.circular(16.49),
+        //     ),
+        //   ),
+        //   elevation: 0.0,
+        //   leading: GestureDetector(
+        //     onTap: () => Navigator.of(context).pop(),
+        //     child: Padding(
+        //       padding: const EdgeInsets.symmetric(horizontal: 17.0),
+        //       child: Image.asset(
+        //         (sharedpref?.getString('lang') == 'ar')
+        //             ? 'assets/images/Layer 1.png'
+        //             : 'assets/images/fi-rr-angle-left.png',
+        //         width: 20,
+        //         height: 22,
+        //       ),
+        //     ),
+        //   ),
+        //   actions: [
+        //     GestureDetector(
+        //       onTap: () {
+        //         _makePhoneCall();
+        //       },
+        //       child: Padding(
+        //         padding: const EdgeInsets.symmetric(horizontal: 25.0),
+        //         child: Image.asset(
+        //           'assets/images/Call.png',
+        //           height: 24,
+        //           width: 24,
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        //   title: Padding(
+        //     padding: const EdgeInsets.only(right: 0.0),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       crossAxisAlignment: CrossAxisAlignment.center,
+        //       children: [
+        //         FutureBuilder(
+        //           future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+        //           builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+        //             if (snapshot.hasError) {
+        //               return Text('Something went wrong');
+        //             }
+        //
+        //             if (snapshot.connectionState == ConnectionState.done) {
+        //               if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+        //                 return CircleAvatar(
+        //                   radius: 25,
+        //                   backgroundColor: Color(0xff442B72),
+        //                   child: CircleAvatar(
+        //                     backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+        //                     radius: 25,
+        //                   ),
+        //                 );
+        //               }
+        //
+        //               Map<String, dynamic>? data = snapshot.data?.data();
+        //               if (data != null && data['busphoto'] != null) {
+        //                 return CircleAvatar(
+        //                   radius: 25,
+        //                   backgroundColor: Color(0xff442B72),
+        //                   child: CircleAvatar(
+        //                     backgroundImage: NetworkImage('${data['busphoto']}'),
+        //                     radius:25,
+        //                   ),
+        //                 );
+        //               }
+        //             }
+        //
+        //             return Container();
+        //           },
+        //         ),
+        //         const SizedBox(
+        //           width: 20,
+        //         ),
+        //         SingleChildScrollView(
+        //           child: Column(
+        //             mainAxisAlignment: MainAxisAlignment.center,
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             children: [
+        //               Text(
+        //                 widget.receiverName,
+        //                 style: TextStyle(
+        //                   color: Color(0xFF181818),
+        //                   fontSize: 14.70,
+        //                   fontFamily: 'Poppins-SemiBold',
+        //                   fontWeight: FontWeight.w600,
+        //                 ),
+        //               ),
+        //               Text(
+        //                 _isOnline ? 'online' : 'offline',
+        //                   // _connectionStatus,
+        //                 // 'online',
+        //                 style: TextStyle(
+        //                   color: Color(0xFF771F98),
+        //                   fontSize: 12.86,
+        //                   fontFamily: 'Poppins-Light',
+        //                   fontWeight: FontWeight.w400,
+        //                 ),
+        //               ),
+        //             ],
+        //           ),
+        //         )
+        //       ],
+        //     ),
+        //   ),
+        //   backgroundColor: Color(0xffF8F8F8),
+        //   surfaceTintColor: Colors.transparent,
+        // ),
       ),
       body: GestureDetector(
         onTap: () {
@@ -464,7 +594,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           String time = responseMessages[i].get('time');
 
                           var messageWidget = (sender == currentUserID)
-                              ? SenderMessageItem(messageContent: txt, time: time, voice: voiceUrl, isSeen: true,)
+                              ? SenderMessageItem(messageContent: txt, time: time, voice: voiceUrl, isSeen: true,image: responseMessages[i].data().toString().contains('imageUrl') ?  responseMessages[i].get('imageUrl'):'',
+                          )
                               : ReciverMessageItem(messageContent: txt, time: time, voice: voiceUrl!);
                           allMessages.add(messageWidget);
                         }
@@ -606,6 +737,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                     SizedBox(
                                       width: 14,
                                     ),
+                                    // if (_selectedImage != null)
+                                    //   Image.file(
+                                    //     _selectedImage!,
+                                    //     width: 100,
+                                    //     height: 100,
+                                    //   ),
                                     GestureDetector(
                                       onTap: () async {
                                         if(!is_record){

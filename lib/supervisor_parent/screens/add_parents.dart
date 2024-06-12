@@ -59,10 +59,15 @@ class _AddParentsState extends State<AddParents> {
 
     int numberOfChildren = int.parse(_numberOfChildrenController.text);
     String busID = '';
+    String SchoolID = '';
     DocumentSnapshot documentSnapshot = await _firestore
         .collection('supervisor')
         .doc(sharedpref!.getString('id'))
         .get();
+
+    if (documentSnapshot.exists) {
+      SchoolID = documentSnapshot.get('schoolid');
+    }
 
     if (documentSnapshot.exists) {
       busID = documentSnapshot.get('bus_id');
@@ -79,12 +84,14 @@ class _AddParentsState extends State<AddParents> {
         'supervisor': sharedpref!.getString('id'),
         'supervisor_name': sharedpref!.getString('name'),
         'bus_id': busID,
+        'schoolid': SchoolID,
         'joinDateChild': currentTimestamp,
       },
     );
 
     Map<String, dynamic> data = {
       'typeOfParent': selectedValue,
+      'schoolid': SchoolID,
       'name': _nameController.text,
       'numberOfChildren': _numberOfChildrenController.text,
       'phoneNumber': enteredPhoneNumber,
@@ -153,7 +160,8 @@ class _AddParentsState extends State<AddParents> {
               'supervisor': sharedpref!.getString('id'),
               'supervisor_name': sharedpref!.getString('name'),
               'joinDate': FieldValue.serverTimestamp(),
-              'bus_id': busID
+              'bus_id': busID,
+              'schoolid': SchoolID
             });
           }
           if (invitCheck == 0) {

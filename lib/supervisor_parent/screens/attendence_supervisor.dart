@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
+import 'package:loadmore/loadmore.dart';
 import 'package:school_account/supervisor_parent/components/parents_card.dart';
 import 'package:school_account/supervisor_parent/components/check_in_card.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
@@ -40,7 +42,38 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   bool dataLoading=false;
   final _firestore = FirebaseFirestore.instance;
   String _nameSchool = ' ';
+  int _currentPage = 1;
+  List<int> _list = List.generate(6, (v) => v);
+  bool _isLoading = false;
 
+  Future<bool> _loadMore() async {
+    if (_isLoading) return false; // If loading is in progress, return false
+    _isLoading = true; // Set loading flag to true
+    print("onLoadMore");
+    await Future.delayed(Duration(seconds: 2)); // Simulate network delay
+    setState(() {
+      _list.addAll(List.generate(5, (v) => v + _list.length)); // Add 5 more items
+    });
+    _isLoading = false;
+    print('falseeeeeeeeeee');// Set loading flag to false
+    return true;
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      _list.clear();
+      _list.addAll(List.generate(6, (v) => v));
+      _currentPage = 1;
+    });
+  }
+
+
+  // void _makePhoneCall() async {
+  //   bool? res = await FlutterPhoneDirectCaller.callNumber(widget.receiverPhone);
+  //   if (!res!) {
+  //     print("Failed to make the call");
+  //   }
+  // }
 
   Future<void> getDataForattendance() async {
     setState(() {
@@ -84,12 +117,6 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
     });
   }
 
-
-
-
-
-
-
   getData()async{
     setState(() {
       dataLoading =true;
@@ -105,6 +132,7 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
 
   @override
   void initState() {
+    _list = List.generate(6, (v) => v); // Initialize with 6 items
 
     // getMassege();
     getDataForattendance();
@@ -219,13 +247,14 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 20.0),
-                                    child: FutureBuilder(
+                                    child:
+
+                                    FutureBuilder(
                                       future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
                                       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
                                         if (snapshot.hasError) {
                                           return Text('Something went wrong');
                                         }
-
                                         if (snapshot.connectionState == ConnectionState.done) {
                                           if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
                                             return CircleAvatar(
@@ -322,15 +351,17 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                         )
                                     ),
                                     onPressed: () async {
-                                      if (sharedpref!.getInt('invit') == 1) {
-                                        isStarting = true;
-                                        // sendNotify('tittle', 'body', 'id');
-                                      } else {
-                                        isStarting = false;
-                                      }
-                                      isStarting =
-                                      // children.isNotEmpty?
-                                      true;
+                                      // if (sharedpref!.getInt('invit') == 1) {
+                                      //   isStarting = true;
+                                      //   // sendNotify('tittle', 'body', 'id');
+                                      // } else {
+                                      //   isStarting = false;
+                                      // }
+                                      // isStarting =
+                                      // // children.isNotEmpty?
+                                      // true;
+
+                                      isStarting =! isStarting;
 
                                       // no data
                                       // : false;
@@ -388,300 +419,324 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                         Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: SizedBox(
-                            height: data.length*180,
+                            height: data.length*135,
                             width: double.infinity,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: data.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                List children = data[index]['children'];
-                                return Column(
-                                    children: [
-                                      for (var child in children)
-                                    SizedBox(
-                                    width: double.infinity,
-                                    // height:122,
-                                    child: Card(
-                                      elevation: 10,
-                                      color: Colors.white,
-                                      surfaceTintColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(14.0),
-                                      ),
-                                      child: Padding(
-                                          padding: (sharedpref?.getString('lang') == 'ar')?
-                                          EdgeInsets.only(right: 10.0 , left: 10) :
-                                          EdgeInsets.only(left: 10.0 , right: 10 , bottom: 0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            child: RefreshIndicator(
+                              onRefresh: _refresh,
+                              child: LoadMore(
+                                isFinish: _list.length >= 51, // لضمان الاستمرار حتى 50 عنصر
+                                onLoadMore: _isLoading ? () async => false : _loadMore,
+                                whenEmptyLoad: true,
+                                delegate: const DefaultLoadMoreDelegate(),
+                                // textBuilder: DefaultLoadMoreTextBuilder.chinese,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: _list.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    if (index >= data.length) {
+                                      return SizedBox(); // Return an empty widget if the index is out of range
+                                    }
+                                    List children = data[index]['children'];
+                                    List<bool> checkinStates = List.generate(children.length, (i) => false);
+                                    return Column(
+                                        children: [
+                                          for (var child in children)
+                                            // if (child['supervisor'] == sharedpref!.getString('id').toString())
+                                              SizedBox(
+                                        width: double.infinity,
+                                        height:122,
+                                        child: Card(
+                                          elevation: 10,
+                                          color: Colors.white,
+                                          surfaceTintColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(14.0),
+                                          ),
+                                          child: Padding(
+                                              padding: (sharedpref?.getString('lang') == 'ar')?
+                                              EdgeInsets.only(right: 10.0 , left: 10) :
+                                              EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(bottom: 20.0),
-                                                    child: Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        FutureBuilder(
-                                                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                            if (snapshot.hasError) {
-                                                              return Text('Something went wrong');
-                                                            }
-
-                                                            if (snapshot.connectionState == ConnectionState.done) {
-                                                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                                return CircleAvatar(
-                                                                  radius: 25,
-                                                                  backgroundColor: Color(0xff442B72),
-                                                                  child: CircleAvatar(
-                                                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                    radius: 25,
-                                                                  ),
-                                                                );
-                                                              }
-
-                                                              Map<String, dynamic>? data = snapshot.data?.data();
-                                                              if (data != null && data['busphoto'] != null) {
-                                                                return CircleAvatar(
-                                                                  radius: 25,
-                                                                  backgroundColor: Color(0xff442B72),
-                                                                  child: CircleAvatar(
-                                                                    backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                    radius:25,
-                                                                  ),
-                                                                );
-                                                              }
-                                                            }
-
-                                                            return Container();
-                                                          },
-                                                        ),
-
-                                                        const SizedBox(
-                                                          width: 7,
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 10.0),
-                                                          child: Column(
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              Text(
-                                                                '${child['name']}',
-                                                                style: TextStyle(
-                                                                  color: Color(0xff442B72),
-                                                                  fontSize: 17,
-                                                                  fontFamily: 'Poppins-SemiBold',
-                                                                  fontWeight: FontWeight.w600,
-                                                                  height: 0.94,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 4,
-                                                              ),
-                                                              Text.rich(
-                                                                TextSpan(
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text: 'Grade: '.tr,
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF919191),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: '${child['grade']}',
-                                                                      // '${data[index]['children']?[0]['grade'] }',
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF442B72),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Column(
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      SizedBox(height: 20),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(bottom: 20.0),
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          children: [
+                                                            FutureBuilder(
+                                                              future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                                if (snapshot.hasError) {
+                                                                  return Text('Something went wrong');
+                                                                }
+
+                                                                if (snapshot.connectionState == ConnectionState.done) {
+                                                                  if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                                    return CircleAvatar(
+                                                                      radius: 25,
+                                                                      backgroundColor: Color(0xff442B72),
+                                                                      child: CircleAvatar(
+                                                                        backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                                        radius: 25,
+                                                                      ),
+                                                                    );
+                                                                  }
+
+                                                                  Map<String, dynamic>? data = snapshot.data?.data();
+                                                                  if (data != null && data['busphoto'] != null) {
+                                                                    return CircleAvatar(
+                                                                      radius: 25,
+                                                                      backgroundColor: Color(0xff442B72),
+                                                                      child: CircleAvatar(
+                                                                        backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                                        radius:25,
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                }
+
+                                                                return Container();
+                                                              },
+                                                            ),
+
+                                                            const SizedBox(
+                                                              width: 7,
+                                                            ),
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 10.0),
+                                                              child: Column(
+                                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    '${child['name']}',
+                                                                    style: TextStyle(
+                                                                      color: Color(0xff442B72),
+                                                                      fontSize: 17,
+                                                                      fontFamily: 'Poppins-SemiBold',
+                                                                      fontWeight: FontWeight.w600,
+                                                                      height: 0.94,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 4,
+                                                                  ),
+                                                                  Text.rich(
+                                                                    TextSpan(
+                                                                      children: [
+                                                                        TextSpan(
+                                                                          text: 'Grade: '.tr,
+                                                                          style: TextStyle(
+                                                                            color: Color(0xFF919191),
+                                                                            fontSize: 12,
+                                                                            fontFamily: 'Poppins-Light',
+                                                                            fontWeight: FontWeight.w400,
+                                                                            // height: 1.33,
+                                                                          ),
+                                                                        ),
+                                                                        TextSpan(
+                                                                          text: '${child['grade']}',
+                                                                          // '${data[index]['children']?[0]['grade'] }',
+                                                                          style: TextStyle(
+                                                                            color: Color(0xFF442B72),
+                                                                            fontSize: 12,
+                                                                            fontFamily: 'Poppins-Light',
+                                                                            fontWeight: FontWeight.w400,
+                                                                            // height: 1.33,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
                                                       Column(
                                                         children: [
-                                                          SizedBox(
-                                                            height: 40,
-                                                            width: 80,
-                                                            child: ElevatedButton(
-                                                              style: ElevatedButton.styleFrom(
-                                                                  padding:  EdgeInsets.all(0),
-                                                                  backgroundColor: Color(0xFF442B72),
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(5)
-                                                                  )
-                                                              ),
-                                                              onPressed: (){
-                                                                Checkin = !Checkin;
-                                                                setState(() {
-                                                                });
-                                                              },
-                                                              child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
-                                                                style: TextStyle(
-                                                                    fontFamily: 'Poppins-SemiBold',
-                                                                    fontWeight: FontWeight.w600,
-                                                                    color: Colors.white,
-                                                                    fontSize: 13
-                                                                ),),
-
-
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 15,),
-                                                          Row(
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                          SizedBox(height: 20),
+                                                          Column(
                                                             children: [
-                                                              Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                                color: Color(0xff442B72),
-                                                                width: 28,
-                                                                height: 28,),
-                                                              SizedBox(width: 9),
-                                                              GestureDetector(
-                                                                child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                                  color: Color(0xff442B72),
-                                                                  width: 26,
-                                                                  height: 26,),
-                                                                onTap: () {
-                                                                  print('object');
-                                                                  Navigator.of(context).push(
-                                                                      MaterialPageRoute(builder: (context) =>
-                                                                          ChatScreen(
-                                                                            receiverName: data[index]['name'],
-                                                                            receiverPhone: data[index]['phoneNumber'],
-                                                                            receiverId : data[index].id,
-                                                                          )));
-                                                                },
+                                                              SizedBox(
+                                                                height: 40,
+                                                                width: 80,
+                                                                child: ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      padding:  EdgeInsets.all(0),
+                                                                      backgroundColor: Color(0xFF442B72),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(5)
+                                                                      )
+                                                                  ),
+                                                                  onPressed: (){
+                                                                    checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
+
+                                                                    Checkin = !Checkin;
+                                                                    setState(() {
+                                                                    });
+                                                                  },
+                                                                  child: Text(
+                                                                    Checkin? 'Check out'.tr : 'Check in'.tr,
+                                                                    style: TextStyle(
+                                                                        fontFamily: 'Poppins-SemiBold',
+                                                                        fontWeight: FontWeight.w600,
+                                                                        color: Colors.white,
+                                                                        fontSize: 13
+                                                                    ),),
+
+
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 15,),
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  GestureDetector(
+                                                                    onTap:(){
+                                                                      // _makePhoneCall();
+
+                                                                    },
+                                                                    child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                                      color: Color(0xff442B72),
+                                                                      width: 28,
+                                                                      height: 28,),
+                                                                  ),
+                                                                  SizedBox(width: 9),
+                                                                  GestureDetector(
+                                                                    child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                                      color: Color(0xff442B72),
+                                                                      width: 26,
+                                                                      height: 26,),
+                                                                    onTap: () {
+                                                                      print('object');
+                                                                      Navigator.of(context).push(
+                                                                          MaterialPageRoute(builder: (context) =>
+                                                                              ChatScreen(
+                                                                                receiverName: data[index]['name'],
+                                                                                receiverPhone: data[index]['phoneNumber'],
+                                                                                receiverId : data[index].id,
+                                                                              )));
+                                                                    },
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ],
                                                           ),
                                                         ],
-                                                      ),
+                                                      )
+                                                      // Column(
+                                                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      //   children: [
+                                                      //     Padding(
+                                                      //       padding: const EdgeInsets.only(top: 5.0),
+                                                      //       child: SizedBox(
+                                                      //         width: 80,
+                                                      //         height: 40,
+                                                      //         child: ElevatedButton(
+                                                      //           style: ElevatedButton.styleFrom(
+                                                      //               padding:  EdgeInsets.all(0),
+                                                      //               backgroundColor: Color(0xFF442B72),
+                                                      //               shape: RoundedRectangleBorder(
+                                                      //                   borderRadius: BorderRadius.circular(5)
+                                                      //               )
+                                                      //           ),
+                                                      //           onPressed: (){
+                                                      //             Checkin = !Checkin;
+                                                      //             setState(() {
+                                                      //             });
+                                                      //           },
+                                                      //           child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
+                                                      //             style: TextStyle(
+                                                      //                 fontFamily: 'Poppins-SemiBold',
+                                                      //                 fontWeight: FontWeight.w600,
+                                                      //                 color: Colors.white,
+                                                      //                 fontSize: 13
+                                                      //             ),),
+                                                      //
+                                                      //
+                                                      //         ),
+                                                      //       ),
+                                                      //     ),
+                                                      //     Padding(
+                                                      //       padding: (sharedpref?.getString('lang') == 'ar')?
+                                                      //       EdgeInsets.only(top: 12, right:220 ):
+                                                      //       EdgeInsets.only(top: 12, left:220 ),
+                                                      //       child: Row(
+                                                      //         mainAxisAlignment: MainAxisAlignment.start,
+                                                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                                                      //         children: [
+                                                      //           Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                      //             color: Color(0xff442B72),
+                                                      //             width: 28,
+                                                      //             height: 28,),
+                                                      //           SizedBox(width: 9),
+                                                      //           GestureDetector(
+                                                      //             child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                      //               color: Color(0xff442B72),
+                                                      //               width: 26,
+                                                      //               height: 26,),
+                                                      //             onTap: () {
+                                                      //               Navigator.of(context).push(
+                                                      //                   MaterialPageRoute(builder: (context) =>
+                                                      //                       ChatScreen()));
+                                                      //             },
+                                                      //           ),
+                                                      //         ],
+                                                      //       ),
+                                                      //     ),
+                                                      //   ],
+                                                      // ),
                                                     ],
-                                                  )
-                                                  // Column(
-                                                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  //   children: [
-                                                  //     Padding(
-                                                  //       padding: const EdgeInsets.only(top: 5.0),
-                                                  //       child: SizedBox(
-                                                  //         width: 80,
-                                                  //         height: 40,
-                                                  //         child: ElevatedButton(
-                                                  //           style: ElevatedButton.styleFrom(
-                                                  //               padding:  EdgeInsets.all(0),
-                                                  //               backgroundColor: Color(0xFF442B72),
-                                                  //               shape: RoundedRectangleBorder(
-                                                  //                   borderRadius: BorderRadius.circular(5)
-                                                  //               )
-                                                  //           ),
-                                                  //           onPressed: (){
-                                                  //             Checkin = !Checkin;
-                                                  //             setState(() {
-                                                  //             });
-                                                  //           },
-                                                  //           child: Text( Checkin? 'Check out'.tr : 'Check in'.tr,
-                                                  //             style: TextStyle(
-                                                  //                 fontFamily: 'Poppins-SemiBold',
-                                                  //                 fontWeight: FontWeight.w600,
-                                                  //                 color: Colors.white,
-                                                  //                 fontSize: 13
-                                                  //             ),),
-                                                  //
-                                                  //
-                                                  //         ),
+                                                  ),
+                                                  // Padding(
+                                                  //   padding: (sharedpref?.getString('lang') == 'ar')?
+                                                  //   EdgeInsets.only(top: 12, right:220 ):
+                                                  //   EdgeInsets.only(top: 12, left:220 ),
+                                                  //   child: Row(
+                                                  //     mainAxisAlignment: MainAxisAlignment.start,
+                                                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                                                  //     children: [
+                                                  //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                  //         color: Color(0xff442B72),
+                                                  //         width: 28,
+                                                  //         height: 28,),
+                                                  //       SizedBox(width: 9),
+                                                  //       GestureDetector(
+                                                  //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                  //           color: Color(0xff442B72),
+                                                  //           width: 26,
+                                                  //           height: 26,),
+                                                  //         onTap: () {
+                                                  //           Navigator.of(context).push(
+                                                  //               MaterialPageRoute(builder: (context) =>
+                                                  //                   ChatScreen()));
+                                                  //         },
                                                   //       ),
-                                                  //     ),
-                                                  //     Padding(
-                                                  //       padding: (sharedpref?.getString('lang') == 'ar')?
-                                                  //       EdgeInsets.only(top: 12, right:220 ):
-                                                  //       EdgeInsets.only(top: 12, left:220 ),
-                                                  //       child: Row(
-                                                  //         mainAxisAlignment: MainAxisAlignment.start,
-                                                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                                                  //         children: [
-                                                  //           Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                  //             color: Color(0xff442B72),
-                                                  //             width: 28,
-                                                  //             height: 28,),
-                                                  //           SizedBox(width: 9),
-                                                  //           GestureDetector(
-                                                  //             child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                  //               color: Color(0xff442B72),
-                                                  //               width: 26,
-                                                  //               height: 26,),
-                                                  //             onTap: () {
-                                                  //               Navigator.of(context).push(
-                                                  //                   MaterialPageRoute(builder: (context) =>
-                                                  //                       ChatScreen()));
-                                                  //             },
-                                                  //           ),
-                                                  //         ],
-                                                  //       ),
-                                                  //     ),
-                                                  //   ],
+                                                  //     ],
+                                                  //   ),
                                                   // ),
-                                                ],
-                                              ),
-                                              // Padding(
-                                              //   padding: (sharedpref?.getString('lang') == 'ar')?
-                                              //   EdgeInsets.only(top: 12, right:220 ):
-                                              //   EdgeInsets.only(top: 12, left:220 ),
-                                              //   child: Row(
-                                              //     mainAxisAlignment: MainAxisAlignment.start,
-                                              //     crossAxisAlignment: CrossAxisAlignment.start,
-                                              //     children: [
-                                              //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                              //         color: Color(0xff442B72),
-                                              //         width: 28,
-                                              //         height: 28,),
-                                              //       SizedBox(width: 9),
-                                              //       GestureDetector(
-                                              //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                              //           color: Color(0xff442B72),
-                                              //           width: 26,
-                                              //           height: 26,),
-                                              //         onTap: () {
-                                              //           Navigator.of(context).push(
-                                              //               MaterialPageRoute(builder: (context) =>
-                                              //                   ChatScreen()));
-                                              //         },
-                                              //       ),
-                                              //     ],
-                                              //   ),
-                                              // ),
 
-                                            ],
-                                          )),
-                                    ),
-                                  ),
-                                      // CheckInCard(),
-                                      SizedBox(height: 0,)
-                                    ],
-                                  );
-                              },
+                                                ],
+                                              )),
+                                        ),
+                                      ),
+                                          // CheckInCard(),
+                                          SizedBox(height: 0,)
+                                        ],
+                                      );
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                         )

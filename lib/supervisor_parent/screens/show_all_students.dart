@@ -204,7 +204,8 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               var child = childrenData[index];
-                              Timestamp? joinDateTimestamp = child['joinDateChild'] as Timestamp?;
+                                Timestamp? joinDateTimestamp = child['joinDateChild'] as Timestamp?;
+                              if (child['supervisor'] == sharedpref!.getString('id').toString())
                               return Column(
                                 children: [
                                   Row(

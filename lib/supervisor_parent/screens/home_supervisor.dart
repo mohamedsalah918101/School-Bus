@@ -18,14 +18,26 @@ import 'package:school_account/supervisor_parent/screens/student_screen.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 
 class HomeForSupervisor extends StatefulWidget {
-  HomeForSupervisor({
-    Key? key,
-  }) : super(key: key);
+  int? numberOfNames;
 
   @override
-  _HomeForSupervisor createState() => _HomeForSupervisor();
+  _HomeForSupervisor createState() => _HomeForSupervisor(numberOfNames: 0);
 }
+
+//   HomeForSupervisor({
+//     Key? key,
+//   }) : super(key: key);
+//
+//   @override
+//   _HomeForSupervisor createState() => _HomeForSupervisor(numberOfNames: 0); // تمرير numberOfNames هنا
+// }
 class _HomeForSupervisor extends State<HomeForSupervisor> {
+  final int numberOfNames;
+
+  _HomeForSupervisor({required this.numberOfNames});
+
+
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<ChildDataItem> children = [];
   List<QueryDocumentSnapshot> data = [];
@@ -271,7 +283,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                             SizedBox(height: 20),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 25.0),
-                              child: ParentsCard(),
+                              child: ParentsCard(
+                              ),
                               // child: ParentsCard( dataLength: data.length,),
                             ),
                             SizedBox(height: 25),
@@ -343,17 +356,16 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 318, //300
+                                height: 325, //300
                                 width: double.infinity,
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: data.length,
+                                  itemCount: data.length-1,
                                   // data?[0]['childern'].length,
                                   // data.length,
                                   itemBuilder: (BuildContext context, int index) {
-                                    List children = data[index]['children'];
-                                    String address = data[index]['address'];
+                                    List<dynamic>? children = data[index]['children'];                                    String address = data[index]['address'];
                                     List<String> words = address.split(' ');
                                     String firstLine = words.take(3).join(' ');
                                     String secondLine = words.skip(3).join(' ');
@@ -362,7 +374,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     } else {
                                       return Column(
                                         children: [
-                                          for (var child in children)
+                                          for (var child in children ?? [])
                                             if (child['supervisor'] == sharedpref!.getString('id').toString())
                                               SizedBox(
                                               width: double.infinity,

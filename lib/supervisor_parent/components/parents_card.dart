@@ -10,13 +10,18 @@ import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'elevated_simple_button.dart';
 
 class ParentsCard extends StatefulWidget {
+  int? numberOfNames;
+
   @override
-  State<ParentsCard> createState() => _ParentsCardState();
+  State<ParentsCard> createState() => _ParentsCardState(numberOfNames: 0);
 }
 
 class _ParentsCardState extends State<ParentsCard> {
   int? updatedDataLength;
-  int? numberOfNames;
+  final int numberOfNames;
+
+  _ParentsCardState({required this.numberOfNames});
+
 
   final _firestore = FirebaseFirestore.instance;
 
@@ -81,7 +86,7 @@ class _ParentsCardState extends State<ParentsCard> {
                         ),
                       ),
                       Text(
-                        '#${updatedDataLength ?? 0}', // Displaying the length of the list
+                        '#${numberOfNames ?? 0}', // Displaying the length of the list
                         style: TextStyle(
                           color: Color(0xff442B72),
                           fontSize: 12,

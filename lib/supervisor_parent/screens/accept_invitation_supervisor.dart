@@ -164,7 +164,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                               });
 
 
-<<<<<<< HEAD
+
                                             await _firestore.collection('notification').add({
                                               'item': 'accept Invitation',
                                               'timestamp': FieldValue.serverTimestamp(),
@@ -173,18 +173,6 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                                               'SchoolName': _schoolNameText ,
                                               'SupervisorName': NameText ,
                                             });
-=======
-                              await _firestore.collection('notification').add({
-                                'item': 'Invitation Accepted',
-                                'timestamp': FieldValue.serverTimestamp(),
-                                'SchoolId': _schoolIdText ,
-                                'SupervisorId': sharedpref!.getString('id') ,
-                                'SchoolName': _schoolNameText ,
-                                'SupervisorName': NameText ,
-                              });
->>>>>>> e5ce204ddc8c801098cd623cfbe432496367421c
-
-
                             },
                             color: Color(0xFF442B72),
                             fontSize: 16),
@@ -218,10 +206,25 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                                             fontSize: 16)
                                     ),
                                   ),
-                                ), onPressed: () {
+                                ), onPressed: () async{
+
+    await  FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString('id')).update(
+    {'invite': 1,'state':2});
+    sharedpref!.setInt('invitstate',2);
+    sharedpref!.setInt('invit',1);
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => DeclineInvitationForSupervisor(
                                     )));
+                                setState(() {});
+                                  await _firestore.collection('notification').add({
+                                    'item': 'Decline Invitation',
+                                    'timestamp': FieldValue.serverTimestamp(),
+                                    'SchoolId': _schoolIdText ,
+                                    'SupervisorId': sharedpref!.getString('id') ,
+                                    'SchoolName': _schoolNameText ,
+                                    'SupervisorName': NameText ,
+                                  });
+
                               },
                               ),
                             ))

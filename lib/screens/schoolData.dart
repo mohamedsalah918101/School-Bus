@@ -117,23 +117,19 @@ class _SchoolDataState extends State<SchoolData> {
     );
 
     // String? schoolDataDocumentId = sharedpref?.getString('id');
-<<<<<<< HEAD
-    if (userId != null && schoolDataDocumentId != null) {
-      // Pass the documentId to the SupervisorClass
-      AcceptInvitationSupervisor(schoolDataDocumentId: userId);
-    }
+
 
     // if (userId != null) {
     //   // Pass the documentId to the SupervisorClass
     //   AcceptInvitationSupervisor( schoolDataDocumentId: sharedpref!.getString('id').toString(),);
     // };
 
-=======
+
     // if (userId != null && schoolDataDocumentId != null) {
     //   // Pass the documentId to the SupervisorClass
     //   AcceptInvitationSupervisor(schoolDataDocumentId: schoolDataDocumentId);
     // }
->>>>>>> e5ce204ddc8c801098cd623cfbe432496367421c
+
     // Clear the text fields
     _nameEnglish.clear();
     _nameArabic.clear();

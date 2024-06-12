@@ -389,14 +389,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Here, value will be true if the switch is turned on and false if it's turned off
                       if (value) {
                         // Add to Firestore
-                        FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).set({
-                          'alarm': true,
-                        }, SetOptions(merge: true));
-                      } else {
-                        // Remove from Firestore
-                        FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).set({
-                          'alarm': false,
-                        }, SetOptions(merge: true));
+                      //   FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).set({
+                      //     'alarm': true,
+                      //   }, SetOptions(merge: true));
+                      // } else {
+                      //   // Remove from Firestore
+                      //   FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).set({
+                      //     'alarm': false,
+                      //   }, SetOptions(merge: true));
                       }
                     },
                   ),

@@ -15,15 +15,18 @@ import 'package:school_account/supervisor_parent/screens/notification_supervisor
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 class ParentsView extends StatefulWidget {
+  // int? numberOfNames;
 
 
   @override
   _ParentsViewState createState() => _ParentsViewState();
   }
 
-  class _ParentsViewState extends State<ParentsView> {
+class _ParentsViewState extends State<ParentsView> {
+
+  _ParentsViewState();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int numberOfNames = 0; // declare the variable here
+  // int numberOfNames = 0; // declare the variable here
   bool Accepted = false;
   bool Declined = false;
   bool Waiting = false;
@@ -77,6 +80,8 @@ class ParentsView extends StatefulWidget {
   //     return 'joined $difference days ago';
   //   }
   // }
+
+
 
 
   void _deleteSupervisorDocument(String documentId) {
@@ -223,7 +228,7 @@ class ParentsView extends StatefulWidget {
           },
           child: Stack(
             children: [
-          
+
               Column(
                 children: [
                   SizedBox(
@@ -331,7 +336,7 @@ class ParentsView extends StatefulWidget {
                                     height: 29,
                                     color: Color(0xFF442B72), // Optionally, you can set the color of the image
                                   ),
-          
+
                                   itemBuilder: (BuildContext context) {
                                     return [
                                       PopupMenuItem<String>(
@@ -373,7 +378,7 @@ class ParentsView extends StatefulWidget {
                                                 SizedBox(
                                                   width:100,
                                                   child: ElevatedButton(
-          
+
                                                     onPressed: () {
                                                       // Handle cancel action
                                                       Navigator.pop(context);
@@ -424,7 +429,7 @@ class ParentsView extends StatefulWidget {
                                       ),
                                     ];
                                   },
-          
+
                                 ),
                               ],
                             ),
@@ -439,9 +444,11 @@ class ParentsView extends StatefulWidget {
                               physics: NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
                                 final joinDate = DateTime.now();
-                                if (data[index]['supervisor'] == sharedpref!.getString('id').toString()) {
-                                  numberOfNames = data.where((element) => element['supervisor'] == sharedpref!.getString('id').toString()).length;
-                                }
+                                // String state = 'waiting';
+
+                                if (data[index]['supervisor'] == sharedpref!.getString('id').toString())
+                                  // numberOfNames = data.where((element) => element['supervisor'] == sharedpref!.getString('id').toString()).length;
+
                                   return Column(
                                   children: [
                                     Row(
@@ -487,11 +494,6 @@ class ParentsView extends StatefulWidget {
                                                   return Container();
                                                 },
                                               ),
-                                              // Image.asset(
-                                              //   'assets/images/Ellipse 6.png',
-                                              //   width: 50,
-                                              //   height: 50,
-                                              // ),
                                             ),
                                             const SizedBox(
                                               width: 5,
@@ -501,7 +503,7 @@ class ParentsView extends StatefulWidget {
                                               crossAxisAlignment: CrossAxisAlignment.start,
 
                                               children: [
-                                                Text('${data[index]['name'] }',
+                                                Text('${data[index]['name'] ?? '' }',
                                                   style: TextStyle(
                                                     color: Color(0xFF442B72),
                                                     fontSize: 17,
@@ -513,22 +515,34 @@ class ParentsView extends StatefulWidget {
                                                 SizedBox(
                                                   height: 5,
                                                 ),
-
-
                                                 Padding(
                                                   padding: (sharedpref?.getString('lang') == 'ar')
                                                       ? EdgeInsets.only(right: 3.0)
                                                       : EdgeInsets.all(0.0),
-                                                  child: Text(
-                                                    'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
-                                                   // '${data[index]['joinDate']}',
-
-                                                    style: TextStyle(
-                                                      color: Color(0xFF0E8113),
-                                                      fontSize: 13,
-                                                      fontFamily: 'Poppins-Regular',
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 1.23,),),),],),
+                                                  child:
+                                Text(
+                                // state == 'waiting'
+                                // ? 'Waiting'
+                                //     :
+                                'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                                style: TextStyle(
+                                color: Color(0xFF0E8113),
+                                fontSize: 13,
+                                fontFamily: 'Poppins-Regular',
+                                fontWeight: FontWeight.w400,
+                                height: 1.23,
+                                ),),
+                                                  // Text(
+                                                  //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                                                  //  // '${data[index]['joinDate']}',
+                                                  //
+                                                  //   style: TextStyle(
+                                                  //     color: Color(0xFF0E8113),
+                                                  //     fontSize: 13,
+                                                  //     fontFamily: 'Poppins-Regular',
+                                                  //     fontWeight: FontWeight.w400,
+                                                  //     height: 1.23,),),
+                                                ),],),
                                             // SizedBox(width: 103,),
                                           ],),
                                         PopupMenuButton<String>(
@@ -786,7 +800,7 @@ class ParentsView extends StatefulWidget {
                   shape: const CircleBorder(),
                   onPressed: () {
                     setState(() {
-          
+
                     });
                     print('object');
                     Navigator.push(
@@ -861,7 +875,7 @@ class ParentsView extends StatefulWidget {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              HomeForSupervisor()),
+                                              HomeForSupervisor( )),
                                     );
                                   });
                                 },
