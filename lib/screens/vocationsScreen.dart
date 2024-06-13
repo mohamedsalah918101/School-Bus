@@ -253,11 +253,21 @@ String newDocId='';
   Future<void> _saveDaysToFirestore() async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final CollectionReference _weekendCollection = _firestore.collection('schoolweekend');
-
+    Query queryOfNumber = _weekendCollection.where('schoolid', isEqualTo: sharedpref!.getString('id'));
+    QuerySnapshot snapshot = await queryOfNumber.get();
+    print(snapshot.docs.toString()+'dataaasupervisor');
     List<String> selectedDays = days.where((day) => day.isChecked).map((day) => day.name).toList();
-    await _weekendCollection.add({'days': selectedDays,
+
+    if(snapshot.size > 0){
+      await _weekendCollection.doc(snapshot.docs[0].id).delete().then((value) async =>  await _weekendCollection.add({'days': selectedDays,
       'schoolid':sharedpref!.getString('id')
-    });
+      }));
+
+    } else{
+      print('tetegeet');
+      await _weekendCollection.add({'days': selectedDays,
+      'schoolid':sharedpref!.getString('id')
+    });}
   }
   bool color = false;
   bool isVisible = false;
@@ -278,7 +288,28 @@ String newDocId='';
 
     QuerySnapshot querySnapshot = await _weekendCollection.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
     if (querySnapshot.docs.isNotEmpty) {
+      String docNameFirst=''; String docNameSecond='';
+      var weekend=[];
+      for (var doc in querySnapshot.docs) {
+        weekend=doc['days'];
+        if( weekend.length > 0){
+
+       //   _selectedDays.add( Day(name: doc['days'][0],weekdayIndex:0, isChecked: true));
+        docNameFirst= doc['days'][0];
+        if( weekend.length > 1){
+          docNameSecond= doc['days'][1];
+         // _selectedDays.add( Day(name: doc['days'][1],weekdayIndex:1, isChecked: true));
+
+        }}
+        // String docName = doc['days'][0];
+        for (var day in days) {
+          if (day.name == docNameFirst || day.name == docNameSecond) {
+            day.isChecked = true;
+          }
+        }
+      }
       var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+
       print("WEEKEND TEST");
       return List<String>.from(data['days']);
     } else {

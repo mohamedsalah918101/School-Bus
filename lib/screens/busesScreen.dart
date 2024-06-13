@@ -163,63 +163,45 @@ class BusScreenSate extends State<BusScreen> {
 //     });
 //
 //   }
-  void _deleteBusDocument(String documentId) {
-    FirebaseFirestore.instance
-        .collection('busdata')
-        .doc(documentId)
-        .collection('supervisors')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      if (querySnapshot.docs.isNotEmpty) {
-        var supervisorDocId = querySnapshot.docs.first.id;
-        print('Supervisor document found with ID: $supervisorDocId');
+  void _deleteBusDocument(String documentId) async {
+    try {
+      // Step 1: Get the bus document to retrieve the list of supervisors
+      DocumentSnapshot busDoc = await FirebaseFirestore.instance.collection('busdata').doc(documentId).get();
 
-        FirebaseFirestore.instance
-            .collection('supervisor')
-            .doc(supervisorDocId)
-            .delete()
-            .then((_) {
-          print('Supervisor document deleted: $supervisorDocId');
+      if (busDoc.exists) {
+        List<dynamic> supervisors = busDoc['supervisors'];
 
-          FirebaseFirestore.instance
-              .collection('busdata')
-              .doc(documentId)
-              .delete()
-              .then((_) {
-            print('Bus document deleted: $documentId');
-
-            setState(() {
-              data.removeWhere((document) => document.id == documentId);
-              filteredData = List.from(data);
+        if (supervisors != null && supervisors.isNotEmpty) {
+          // Step 2: Delete supervisor documents from 'supervisor' collection
+          for (var supervisor in supervisors) {
+            String supervisorId = supervisor['id'];
+            await FirebaseFirestore.instance.collection('supervisor').doc(supervisorId).delete().then((_) {
+              print('Supervisor document deleted: $supervisorId');
+            }).catchError((error) {
+              print('Error deleting supervisor document: $supervisorId, $error');
             });
-          }).catchError((error) {
-            print('Error deleting bus document: $error');
-          });
-        }).catchError((error) {
-          print('Error deleting supervisor document: $error');
-        });
-      } else {
-        print('No supervisor document found for bus document ID: $documentId');
+          }
+        }
 
-        FirebaseFirestore.instance
-            .collection('busdata')
-            .doc(documentId)
-            .delete()
-            .then((_) {
+        // Step 3: Delete the bus document
+        await FirebaseFirestore.instance.collection('busdata').doc(documentId).delete().then((_) {
           print('Bus document deleted: $documentId');
-
           setState(() {
+            // Update UI by removing the deleted document from the data list
             data.removeWhere((document) => document.id == documentId);
             filteredData = List.from(data);
           });
         }).catchError((error) {
           print('Error deleting bus document: $error');
         });
+      } else {
+        print('Bus document not found: $documentId');
       }
-    }).catchError((error) {
-      print('Error retrieving supervisor subcollection: $error');
-    });
+    } catch (error) {
+      print('Error in _deleteBusDocument: $error');
+    }
   }
+
 
 
 

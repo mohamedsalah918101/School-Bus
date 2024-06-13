@@ -91,6 +91,7 @@ class _AddBusState extends State<AddBus> {
     });
 
     //Get a reference to storage root
+
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages =
         FirebaseStorage.instance.ref().child('photo');
@@ -1208,7 +1209,7 @@ class _AddBusState extends State<AddBus> {
                                                 //_selectedImage != null && _selectedImagebus != null
                                                 ) {
                                               _addDataToFirestore();
-                                              Navigator.push(
+                                              Navigator.pushReplacement(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
