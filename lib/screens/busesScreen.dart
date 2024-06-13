@@ -61,6 +61,11 @@ class BusScreen extends StatefulWidget{
 
 class BusScreenSate extends State<BusScreen> {
 
+
+
+  // Blend the colors with a 50-50 ratio
+  Color blendedColor = Color.lerp(Color(0xFFe6bdf0), Color(0xFFBE7FBF), 0.1)!;
+
   //func to get current schoolid
   String? _schoolId;
   Future<void> getSchoolId() async {
@@ -170,7 +175,6 @@ class BusScreenSate extends State<BusScreen> {
 
       if (busDoc.exists) {
         List<dynamic> supervisors = busDoc['supervisors'];
-
         if (supervisors != null && supervisors.isNotEmpty) {
           // Step 2: Delete supervisor documents from 'supervisor' collection
           for (var supervisor in supervisors) {
@@ -182,6 +186,21 @@ class BusScreenSate extends State<BusScreen> {
             });
           }
         }
+
+// انا ضفتها جديد علشان يمسح البارنت بس مجربتهاش لسه
+        if (busDoc.exists) {
+          List<dynamic> parents = busDoc['parent'];
+          if (parents != null && parents.isNotEmpty) {
+            // Step 2: Delete supervisor documents from 'supervisor' collection
+            for (var parent in parents) {
+              String parentId = parent['id'];
+              await FirebaseFirestore.instance.collection('parent').doc(parentId).delete().then((_) {
+                print('parent document deleted: $parentId');
+              }).catchError((error) {
+                print('Error deleting parent document: $parentId, $error');
+              });
+            }
+          }}
 
         // Step 3: Delete the bus document
         await FirebaseFirestore.instance.collection('busdata').doc(documentId).delete().then((_) {
@@ -1064,10 +1083,28 @@ class BusScreenSate extends State<BusScreen> {
                                                                                       data[index]['busphoto'],
                                                                                       fit: BoxFit.cover,
                                                                                     )
-                                                                                        : Image.asset(
-                                                                                      'assets/imgs/school/ph_bus-light (1).png',
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                        :
+                                                                                    Stack(
+                                                                                    children:[
+                                                                                      Container(
+                                                                                        decoration: BoxDecoration(
+                                                                                          shape: BoxShape.circle,
+                                                                                          color: Color(0xffe6bdf0),
+                                                                                        ),
+                                                                                        child: Center(
+                                                                                          child: Image.asset(
+                                                                                            'assets/imgs/school/image-gallery 1.png',
+                                                                                            width: 40,
+                                                                                            height: 40,
+                                                                                          ),
+                                                                                        ) ,
+                                                                                      ),
+
+
+
+
+                                                                                    ]
+                                                                                      ),
                                                                                   ),
                                                                                 ),
                                                                                 // SizedBox(

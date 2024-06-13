@@ -72,7 +72,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
     CollectionReference supervisor =
         FirebaseFirestore.instance.collection('parent');
     QuerySnapshot supervisorData =
-        await supervisor.where('state', isEqualTo: 2).get(); //0
+        await supervisor.where('state', isEqualTo: 2).where('schoolid',isEqualTo:sharedpref!.getString('id') ).get(); //0
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -87,7 +87,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
     CollectionReference supervisor =
         FirebaseFirestore.instance.collection('parent');
     QuerySnapshot supervisorData =
-        await supervisor.where('state', isEqualTo: 0).get(); //1
+        await supervisor.where('state', isEqualTo: 0).where('schoolid',isEqualTo:sharedpref!.getString('id') ).get(); //1
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -102,7 +102,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
     CollectionReference supervisor =
         FirebaseFirestore.instance.collection('parent');
     QuerySnapshot supervisorData =
-        await supervisor.where('state', isEqualTo: 1).get(); //2
+        await supervisor.where('state', isEqualTo: 1).where('schoolid',isEqualTo:sharedpref!.getString('id') ).get(); //2
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
