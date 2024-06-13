@@ -24,6 +24,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   String searchQuery = '';
   final _firestore = FirebaseFirestore.instance;
 
+
   String getJoinText(Timestamp? timestamp) {
     if (timestamp == null) {
       return 'Unknown date';
@@ -65,6 +66,8 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
 
     setState(() {
       childrenData = allChildren;
+      List<dynamic> filteredChildren = childrenData.where((child) => child['supervisor'] == sharedpref!.getString('id').toString()).toList();
+
     });
   }
 
@@ -200,12 +203,12 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                           padding: const EdgeInsets.symmetric(horizontal: 33.0),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: childrenData.length,
+                            itemCount: childrenData.where((child) => child['supervisor'] == sharedpref!.getString('id').toString()).length,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-                              var child = childrenData[index];
+                              var child = childrenData.where((child) => child['supervisor'] == sharedpref!.getString('id').toString()).elementAt(index);
                                 Timestamp? joinDateTimestamp = child['joinDateChild'] as Timestamp?;
-                              if (child['supervisor'] == sharedpref!.getString('id').toString())
+                              // if (child['supervisor'] == sharedpref!.getString('id').toString())
                               return Column(
                                 children: [
                                   Row(

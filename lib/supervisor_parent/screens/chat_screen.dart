@@ -146,7 +146,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       print('Uploaded successfully. File URL: $downloadUrl');
 
       // Store the download URL in Firestore
-      String formattedTime = DateFormat('HH:mm:ss').format(DateTime.now());
+      String formattedTime =DateFormat(' HH:mm:ss').format(DateTime.now());
       _fireStore.collection("msg").add({
         "sender": currentUserID,
         "receiver": widget.receiverId,
@@ -324,6 +324,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFFFFFFF),
@@ -357,41 +358,49 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        FutureBuilder(
-                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                            if (snapshot.hasError) {
-                              return Text('Something went wrong');
-                            }
-
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                return CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor: Color(0xff442B72),
-                                  child: CircleAvatar(
-                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                    radius: 25,
-                                  ),
-                                );
-                              }
-
-                              Map<String, dynamic>? data = snapshot.data?.data();
-                              if (data != null && data['busphoto'] != null) {
-                                return CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor: Color(0xff442B72),
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage('${data['busphoto']}'),
-                                    radius:25,
-                                  ),
-                                );
-                              }
-                            }
-
-                            return Container();
-                          },
-                        ),
+                       CircleAvatar(
+                       radius: 25,
+                       backgroundColor: Color(0xff442B72),
+                       child: CircleAvatar(
+                         backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                         radius: 25,
+                       ),
+                     ),
+                        // FutureBuilder(
+                        //   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                        //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                        //     if (snapshot.hasError) {
+                        //       return Text('Something went wrong');
+                        //     }
+                        //
+                        //     if (snapshot.connectionState == ConnectionState.done) {
+                        //       if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                        //         return CircleAvatar(
+                        //           radius: 25,
+                        //           backgroundColor: Color(0xff442B72),
+                        //           child: CircleAvatar(
+                        //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                        //             radius: 25,
+                        //           ),
+                        //         );
+                        //       }
+                        //
+                        //       Map<String, dynamic>? data = snapshot.data?.data();
+                        //       if (data != null && data['busphoto'] != null) {
+                        //         return CircleAvatar(
+                        //           radius: 25,
+                        //           backgroundColor: Color(0xff442B72),
+                        //           child: CircleAvatar(
+                        //             backgroundImage: NetworkImage('${data['busphoto']}'),
+                        //             radius:25,
+                        //           ),
+                        //         );
+                        //       }
+                        //     }
+                        //
+                        //     return Container();
+                        //   },
+                        // ),
                         const SizedBox(
                           width: 20,
                         ),
@@ -596,7 +605,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           var messageWidget = (sender == currentUserID)
                               ? SenderMessageItem(messageContent: txt, time: time, voice: voiceUrl, isSeen: true,image: responseMessages[i].data().toString().contains('imageUrl') ?  responseMessages[i].get('imageUrl'):'',
                           )
-                              : ReciverMessageItem(messageContent: txt, time: time, voice: voiceUrl!);
+                              : ReciverMessageItem(messageContent: txt, time: time, );
                           allMessages.add(messageWidget);
                         }
                       }
@@ -761,6 +770,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                             ? Icons.stop
                                             : Icons.mic,
                                         size: 24,
+                                        color: Color(0xFF8D8D8D),
                                       ),
                                     ),
                                     SizedBox(width: 14),

@@ -995,6 +995,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                   physics: NeverScrollableScrollPhysics(),
                                   itemCount: data.length,
                                   itemBuilder: (BuildContext context, int index) {
+
                                     List children = data[index]['children'];
                                     if (data.isEmpty) {
                                       Container();
@@ -1002,9 +1003,12 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                       return Column(
                                         children: [
                                           for (var child in children)
-                                            if (index == data.length - 1 ||
-                                                index == 0)
-                                              SizedBox(
+                                            // if (child['supervisor'] == sharedpref!.getString('id').toString())
+
+                                              if (index == child['supervisor'] - 1 ||
+                                                index == 0 )
+                                              // if (child['supervisor'] == sharedpref!.getString('id').toString())
+                                                SizedBox(
                                                 width: double.infinity,
                                                 height: 70, //92
                                                 child: Row(
@@ -1036,46 +1040,49 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                               ),
                                                             ),
                                                           ),
-                                                    FutureBuilder(
-                                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                        if (snapshot.hasError) {
-                                                          return Text('Something went wrong');
-                                                        }
-
-                                                        if (snapshot.connectionState == ConnectionState.done) {
-                                                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                            return CircleAvatar(
-                                                              radius: 25,
-                                                              backgroundColor: Color(0xff442B72),
-                                                              child: CircleAvatar(
-                                                                backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                radius: 25,
-                                                              ),
-                                                            );
-                                                          }
-
-                                                          Map<String, dynamic>? data = snapshot.data?.data();
-                                                          if (data != null && data['busphoto'] != null) {
-                                                            return CircleAvatar(
-                                                              radius: 25,
-                                                              backgroundColor: Color(0xff442B72),
-                                                              child: CircleAvatar(
-                                                                backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                radius:25,
-                                                              ),
-                                                            );
-                                                          }
-                                                        }
-
-                                                        return Container();
-                                                      },
-                                                    ),
-                                                    // Image.asset(
-                                                    //   'assets/images/Ellipse 6.png',
-                                                    //   width: 50,
-                                                    //   height: 50,
+                                                    // FutureBuilder(
+                                                    //   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                    //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                    //     if (snapshot.hasError) {
+                                                    //       return Text('Something went wrong');
+                                                    //     }
+                                                    //
+                                                    //     if (snapshot.connectionState == ConnectionState.done) {
+                                                    //       if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                    //         return CircleAvatar(
+                                                    //           radius: 25,
+                                                    //           backgroundColor: Color(0xff442B72),
+                                                    //           child: CircleAvatar(
+                                                    //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                    //             radius: 25,
+                                                    //           ),
+                                                    //         );
+                                                    //       }
+                                                    //
+                                                    //       Map<String, dynamic>? data = snapshot.data?.data();
+                                                    //       if (data != null && data['busphoto'] != null) {
+                                                    //         return CircleAvatar(
+                                                    //           radius: 25,
+                                                    //           backgroundColor: Color(0xff442B72),
+                                                    //           child: CircleAvatar(
+                                                    //             backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                    //             radius:25,
+                                                    //           ),
+                                                    //         );
+                                                    //       }
+                                                    //     }
+                                                    //
+                                                    //     return Container();
+                                                    //   },
                                                     // ),
+                                                    CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundColor: Color(0xff442B72),
+                                                      child: CircleAvatar(
+                                                        backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                        radius: 25,
+                                                      ),
+                                                    ),
                                                     SizedBox(
                                                       width: 15,
                                                     ),
@@ -1091,7 +1098,9 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: [
-                                                          Text(
+                                                          // for (var child in children)
+                                                          if (child['supervisor'] == sharedpref!.getString('id').toString())
+                                                            Text(
                                                             '${child['name']}',
                                                             style: TextStyle(
                                                               color: Color(
@@ -1188,46 +1197,49 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment.start,
                                                     children: [
-                                                      FutureBuilder(
-                                                        future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                          if (snapshot.hasError) {
-                                                            return Text('Something went wrong');
-                                                          }
-
-                                                          if (snapshot.connectionState == ConnectionState.done) {
-                                                            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                              return CircleAvatar(
-                                                                radius: 25,
-                                                                backgroundColor: Color(0xff442B72),
-                                                                child: CircleAvatar(
-                                                                  backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                  radius: 25,
-                                                                ),
-                                                              );
-                                                            }
-
-                                                            Map<String, dynamic>? data = snapshot.data?.data();
-                                                            if (data != null && data['busphoto'] != null) {
-                                                              return CircleAvatar(
-                                                                radius: 25,
-                                                                backgroundColor: Color(0xff442B72),
-                                                                child: CircleAvatar(
-                                                                  backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                  radius:25,
-                                                                ),
-                                                              );
-                                                            }
-                                                          }
-
-                                                          return Container();
-                                                        },
-                                                      ),
-                                                      // Image.asset(
-                                                      //   'assets/images/Ellipse 6.png',
-                                                      //   width: 50,
-                                                      //   height: 50,
+                                                      // FutureBuilder(
+                                                      //   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                      //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                      //     if (snapshot.hasError) {
+                                                      //       return Text('Something went wrong');
+                                                      //     }
+                                                      //
+                                                      //     if (snapshot.connectionState == ConnectionState.done) {
+                                                      //       if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                      //         return CircleAvatar(
+                                                      //           radius: 25,
+                                                      //           backgroundColor: Color(0xff442B72),
+                                                      //           child: CircleAvatar(
+                                                      //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                      //             radius: 25,
+                                                      //           ),
+                                                      //         );
+                                                      //       }
+                                                      //
+                                                      //       Map<String, dynamic>? data = snapshot.data?.data();
+                                                      //       if (data != null && data['busphoto'] != null) {
+                                                      //         return CircleAvatar(
+                                                      //           radius: 25,
+                                                      //           backgroundColor: Color(0xff442B72),
+                                                      //           child: CircleAvatar(
+                                                      //             backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                      //             radius:25,
+                                                      //           ),
+                                                      //         );
+                                                      //       }
+                                                      //     }
+                                                      //
+                                                      //     return Container();
+                                                      //   },
                                                       // ),
+                                                      CircleAvatar(
+                                                        radius: 25,
+                                                        backgroundColor: Color(0xff442B72),
+                                                        child: CircleAvatar(
+                                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                          radius: 25,
+                                                        ),
+                                                      ),
                                                       SizedBox(
                                                         width: 15,
                                                       ),

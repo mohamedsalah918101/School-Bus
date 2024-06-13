@@ -462,48 +462,53 @@ class _StudentScreen extends State<StudentScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              Padding(
-                                                padding: (sharedpref?.getString('lang') == 'ar')?
-                                                EdgeInsets.only(top: 8.0 , right: 150):
-                                                EdgeInsets.only(top: 8.0 , left: 150),
-                                                child: Row(
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: (){
-                                              _makePhoneCall();
-                                                         },
 
-
-                                                      child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                        color: Color(0xff442B72),
-                                                        width: 28,
-                                                        height: 28,),
-                                                    ),
-                                                    SizedBox(width: 9),
-                                                    GestureDetector(
-                                                      child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                        color: Color(0xff442B72),
-                                                        width: 26,
-                                                        height: 26,),
-                                                      onTap: () {
-                                                        print('object');
-                                                        Navigator.of(context).push(
-                                                            MaterialPageRoute(builder: (context) =>
-                                                                ChatScreen(
-                                                                  receiverName: widget.ParentName!,
-                                                                  receiverPhone: data[index]['phoneNumber'],
-                                                                  receiverId : data[index].id,
-                                                                )));
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
                                             ],
                                           ),
 
                                         ],
                                       ),
+
+                                      Padding(
+                                        padding: (sharedpref?.getString('lang') == 'ar')?
+                                        EdgeInsets.only(top: 8.0 , right: 0):
+                                        EdgeInsets.only(top: 8.0 , right: 20),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: (){
+                                                _makePhoneCall();
+                                              },
+
+
+                                              child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                color: Color(0xff442B72),
+                                                width: 28,
+                                                height: 28,),
+                                            ),
+                                            SizedBox(width: 9),
+                                            GestureDetector(
+                                              child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                color: Color(0xff442B72),
+                                                width: 26,
+                                                height: 26,),
+                                              onTap: () {
+                                                print('object');
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(builder: (context) =>
+                                                        ChatScreen(
+                                                          receiverName: widget.ParentName!,
+                                                          receiverPhone: data[index]['phoneNumber'],
+                                                          receiverId : data[index].id,
+                                                        )));
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+
                                     ],
                                   )),
                             ),

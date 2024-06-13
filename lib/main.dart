@@ -9,6 +9,7 @@ import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
+import 'package:school_account/supervisor_parent/screens/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'Functions/functions.dart';
@@ -68,8 +69,7 @@ class MyApp extends StatelessWidget{
       debugShowCheckedModeBanner: false,
 
 
-      home:
-      // AcceptInvitationSupervisor()
+      home: // AcceptInvitationSupervisor()
       // HomeForSupervisor(),
 
 
