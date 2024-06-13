@@ -416,20 +416,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 //         ),),
                 //       child: Text("Delete Account",style: TextStyle(fontSize: 16,fontFamily:"Poppins-Medium" ),)),
                 // )
-                Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                        border: Border(
-                      top: BorderSide(width: 0.4, color: Color(0xff442B72)),
-                      bottom: BorderSide(width: 0.4, color: Color(0xff442B72)),
-                      left: BorderSide.none,
-                      right: BorderSide.none,
-                    )),
-                    child: GestureDetector(
-                      onTap: () {
-                        deleteAccoubtDialog(context);
-                        // Dialoge.deleteAccoubtDialog(context);
-                      },
+                GestureDetector(
+                  onTap: (){
+                    deleteAccoubtDialog(context);
+                  },
+                  child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                          border: Border(
+                        top: BorderSide(width: 0.4, color: Color(0xff442B72)),
+                        bottom: BorderSide(width: 0.4, color: Color(0xff442B72)),
+                        left: BorderSide.none,
+                        right: BorderSide.none,
+                      )),
                       child: Row(
                         children: [
                           Padding(
@@ -449,8 +448,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 color: Color(0xffF13939)),
                           ),
                         ],
-                      ),
-                    ))
+                      )),
+                )
               ],
             ),
           )),

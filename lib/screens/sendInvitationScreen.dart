@@ -96,9 +96,18 @@ class _SendInvitationState extends State<SendInvitation> {
       if(!check) {
         var res =await checkUpdateSupervisor(enteredPhoneNumber);
         if(!res) {
-      await _firestore.collection('supervisor').add(data).then((docRef) {
+      await _firestore.collection('supervisor').add(data).then((docRef) async {
         docid=docRef.id;
         print('Data added with document ID: ${docRef.id}');
+        var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+        if (res == "success") {
+          showSnackBarFun(
+              context, 'Invitation sent successfully',Color(0xFF4CAF50),
+              'assets/imgs/school/Vector (4).png');
+        } else {
+          showSnackBarFun(
+              context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+        }
 
 
 //when put this code the invitation doesnot appear when phone number already exists but when add new supervisor the snackbar of faild appear
@@ -277,7 +286,7 @@ bool _nameEntered =true;
                                          }
                                          kPickerNumber = kPickerNumber.replaceAll(' ', '');
                                          _phoneNumberController.text = kPickerNumber;
-                                         enteredPhoneNumber=kPickerNumber;
+                                         enteredPhoneNumber='+20'+kPickerNumber;
                                        });
                                      }
                                      // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
@@ -774,14 +783,7 @@ bool _nameEntered =true;
                                        //! _phoneNumberController.text.isEmpty
                                    _phoneNumberController.text.length == 10 && phoneerror){
                                      _addDataToFirestore();
-                                     var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
-                                     if (res == "success") {
-                                       showSnackBarFun(
-                                           context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
-                                     } else {
-                                       showSnackBarFun(
-                                           context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
-                                     }
+
                                    }
                                    else{
                                      SnackBar(content: Text('Please,enter valid name and phone number'));

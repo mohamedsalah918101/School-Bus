@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/screens/busesScreen.dart';
 import 'package:school_account/screens/editeSupervisor.dart';
@@ -29,7 +30,7 @@ import 'package:flutter/services.dart';
 //import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-
+import 'package:timeago/timeago.dart' as timeago;
 
 
 class SupervisorScreen extends StatefulWidget {
@@ -155,20 +156,29 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
 
 
-  void _deleteSupervisorDocument(String documentId) {
-    FirebaseFirestore.instance
+  void _deleteSupervisorDocument(String documentId) async {
+  await  FirebaseFirestore.instance
         .collection('supervisor')
         .doc(documentId)
         .delete()
-        .then((_) {
+        .then((_) async {
       setState(() {
         // Update UI by removing the deleted document from the data list
         data.removeWhere((document) => document.id == documentId);
-
         //new
         filteredData = List.from(data);
-
       });
+      // Delete the related notifications
+      QuerySnapshot notificationSnapshot = await FirebaseFirestore.instance
+          .collection('notification')
+          .where('SupervisorId', isEqualTo: documentId)
+          .get();
+
+      for (DocumentSnapshot notificationDoc in notificationSnapshot.docs) {
+        await notificationDoc.reference.delete();
+      }
+
+
       ScaffoldMessenger.of(context).showSnackBar(
           showSnackBarFun(context),
        // SnackBar(content: Text('Document deleted successfully')),
@@ -755,15 +765,101 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                       fontFamily: 'Poppins-Bold',
                                                     ),
                                                   ),
-                                                  subtitle: Text(
-                                                    //  '${filteredData[index]['state']}',
-                                                    statusText,
-                                                    style: TextStyle(
-                                                      color: statusColor,
-                                                      fontSize: 13,
-                                                      fontFamily: 'Poppins',
-                                                    ),
-                                                  ),
+                                                  subtitle:
+                                                      state==1?
+                                                       Row(
+                                                        children: [
+                                                          Text(
+                                                            statusText,
+                                                            style: TextStyle(
+                                                              color: statusColor,
+                                                              fontSize: 13,
+                                                              fontFamily: 'Poppins',
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 10),
+                                                          FutureBuilder<QuerySnapshot>(
+                                                            future: FirebaseFirestore.instance.collection('notification').where('SupervisorId', isEqualTo: filteredData[index].id).get(),
+                                                            builder: (context, snapshot) {
+                                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                return Text(
+                                                                  'Loading...',
+                                                                  style: TextStyle(
+                                                                    color: Colors.grey,
+                                                                    fontSize: 13,
+                                                                    fontFamily: 'Poppins',
+                                                                  ),
+                                                                );
+                                                              } else if (snapshot.hasError) {
+                                                                return Text(
+                                                                  'Error: ${snapshot.error}',
+                                                                  style: TextStyle(
+                                                                    color: Colors.grey,
+                                                                    fontSize: 13,
+                                                                    fontFamily: 'Poppins',
+                                                                  ),
+                                                                );
+                                                              } else if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                                                                Timestamp notificationTimestamp = snapshot.data!.docs.first['timestamp'];
+                                                                DateTime now = DateTime.now();
+                                                                DateTime notificationDate = notificationTimestamp.toDate();
+
+                                                                if (notificationDate.year == now.year &&
+                                                                    notificationDate.month == now.month &&
+                                                                    notificationDate.day == now.day) {
+                                                                  // If the notification date is today
+                                                                  return Text(
+                                                                    'Today',
+                                                                    style: TextStyle(
+                                                                      color: statusColor,
+                                                                      fontSize: 13,
+                                                                      fontFamily: 'Poppins',
+                                                                    ),
+                                                                  );
+                                                                } else {
+                                                                  // If the notification date is not today, use timeago package to format the time difference
+                                                                  String formattedTime = timeago.format(notificationDate, locale: 'en_short');
+                                                                  return Text(
+                                                                    formattedTime,
+                                                                    style: TextStyle(
+                                                                      color: statusColor,
+                                                                      fontSize: 13,
+                                                                      fontFamily: 'Poppins',
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              } else {
+                                                                return Text(
+                                                                  'No notification',
+                                                                  style: TextStyle(
+                                                                    color: Colors.grey,
+                                                                    fontSize: 13,
+                                                                    fontFamily: 'Poppins',
+                                                                  ),
+                                                                );
+                                                              }
+                                                            },
+                                                          )
+
+                                                        ],
+
+                                                  // Text(
+                                                  //   //  '${filteredData[index]['state']}',
+                                                  //   statusText,
+                                                  //   style: TextStyle(
+                                                  //     color: statusColor,
+                                                  //     fontSize: 13,
+                                                  //     fontFamily: 'Poppins',
+                                                  //   ),
+                                                  // ),
+                                                       ): Text(
+                                                        statusText,
+                                                        style: TextStyle(
+                                                          color: statusColor,
+                                                          fontSize: 13,
+                                                          fontFamily: 'Poppins',
+                                                        ),
+                                                      ),
                                                   trailing:
                                                   PopupMenuButton<String>(
                                                     enabled: !isEditingSupervisor,
@@ -971,8 +1067,8 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                 Row(
                                                                   children: [
                                                                     SizedBox(
-                                                                      width: 80,
-                                                                      height: 80,
+                                                                      width: 60,
+                                                                      height: 60,
                                                                       child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
                                                                           ? Image.network(
                                                                         data[index]['busphoto'],
@@ -992,10 +1088,25 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                                                       //   padding: const EdgeInsets.only(top:10,bottom: 3),
                                                                       //   child: Image.asset("assets/imgs/school/Vector (16).png",width: 5,height: 5,),
                                                                       // )),
-                                                                          : Image.asset(
-                                                                        'assets/imgs/school/empty_supervisor.png',
-                                                                        fit: BoxFit.scaleDown,
-                                                                      ),
+                                                                          :
+                                                                      // Image.asset(
+                                                                      //   'assets/imgs/school/empty_supervisor.png',
+                                                                      //   fit: BoxFit.scaleDown,
+                                                                      // ),
+                                                                      Container(
+                                                                          width:40,
+                                                                          height:30,
+                                                                          decoration: BoxDecoration(
+                                                                            shape: BoxShape.circle,
+                                                                            border: Border.all(
+                                                                              color: Color(0xffCCCCCC),
+                                                                              width: 2.0,
+                                                                            ),
+                                                                          ),
+                                                                          child: Padding(
+                                                                            padding: const EdgeInsets.only(top:10,bottom: 3),
+                                                                            child: Image.asset("assets/imgs/school/Vector (16).png",width: 10,height: 10,),
+                                                                          )),
                                                                     ),
                                                                     // Align(
                                                                     //   alignment:
@@ -1183,180 +1294,177 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
             ),
           ),
         ),
-        bottomNavigationBar: Directionality(
-          textDirection: TextDirection.ltr,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            ),
-            child: BottomAppBar(
-              // padding: EdgeInsets.symmetric(vertical: 3),
-              // height: 60,
-              color: const Color(0xFF442B72),
-              clipBehavior: Clip.antiAlias,
-              shape: const AutomaticNotchedShape( RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(38.5),
-                      topRight: Radius.circular(38.5))),
-                  RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.all(Radius.circular(50)))),
-              //CircularNotchedRectangle(),
-              //shape of notch
-              notchMargin: 7,
-              child: SizedBox(
-                height: 55,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: SingleChildScrollView(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 5),
-                        //   child: GestureDetector(
-                        //     onTap: () {
-                        //       setState(() {
-                        //         selectedIconIndex = 0; // Update the index for the Home icon
-                        //       });
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //           builder: (context) => HomeScreen(),
-                        //           maintainState: false,
-                        //         ),
-                        //       );
-                        //     },
-                        //     child: Wrap(
-                        //       crossAxisAlignment: WrapCrossAlignment.center,
-                        //       direction: Axis.vertical,
-                        //       children: [
-                        //         Image.asset(
-                        //           selectedIconIndex == 0
-                        //               ? 'assets/imgs/school/icons8_home_1 1.png' // Image for selected state
-                        //               : 'assets/imgs/school/fillhome.png', // Image for unselected state
-                        //           height: 21,
-                        //           width: 21,
-                        //         ),
-                        //         Text(
-                        //           "Home".tr,
-                        //           style: TextStyle(color: Colors.white, fontSize: 10),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 2.0, vertical: 5),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
+        bottomNavigationBar: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
+          child: BottomAppBar(
+            // padding: EdgeInsets.symmetric(vertical: 3),
+            // height: 60,
+            color: const Color(0xFF442B72),
+            clipBehavior: Clip.antiAlias,
+            shape: const AutomaticNotchedShape( RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(38.5),
+                    topRight: Radius.circular(38.5))),
+                RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50)))),
+            //CircularNotchedRectangle(),
+            //shape of notch
+            notchMargin: 7,
+            child: SizedBox(
+              height: 55,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: SingleChildScrollView(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 5),
+                      //   child: GestureDetector(
+                      //     onTap: () {
+                      //       setState(() {
+                      //         selectedIconIndex = 0; // Update the index for the Home icon
+                      //       });
+                      //       Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (context) => HomeScreen(),
+                      //           maintainState: false,
+                      //         ),
+                      //       );
+                      //     },
+                      //     child: Wrap(
+                      //       crossAxisAlignment: WrapCrossAlignment.center,
+                      //       direction: Axis.vertical,
+                      //       children: [
+                      //         Image.asset(
+                      //           selectedIconIndex == 0
+                      //               ? 'assets/imgs/school/icons8_home_1 1.png' // Image for selected state
+                      //               : 'assets/imgs/school/fillhome.png', // Image for unselected state
+                      //           height: 21,
+                      //           width: 21,
+                      //         ),
+                      //         Text(
+                      //           "Home".tr,
+                      //           style: TextStyle(color: Colors.white, fontSize: 10),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 2.0, vertical: 5),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                                .hideCurrentSnackBar();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                  maintainState: false),
+                            );
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset('assets/imgs/school/icons8_home_1 1.png',
+                                    height: 21, width: 21),
+                                Text("Home".tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                                .hideCurrentSnackBar();
+                            Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => HomeScreen(),
-                                    maintainState: false),
-                              );
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset('assets/imgs/school/icons8_home_1 1.png',
-                                      height: 21, width: 21),
-                                  Text("Home".tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
+                                    builder: (context) =>
+                                        NotificationScreen(),
+                                    maintainState: false));
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset(
+                                    'assets/imgs/school/clarity_notification-line (1).png',
+                                    height: 22,
+                                    width: 22),
+                                Text('Notification'.tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          NotificationScreen(),
-                                      maintainState: false));
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset(
-                                      'assets/imgs/school/clarity_notification-line (1).png',
-                                      height: 22,
-                                      width: 22),
-                                  Text('Notification'.tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 100),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                                .hideCurrentSnackBar();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SupervisorScreen(),
+                                    maintainState: false));
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset(
+                                    'assets/imgs/school/supervisor (1) 1.png',
+                                    height: 22,
+                                    width: 22),
+                                Text("Supervisor".tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 100),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SupervisorScreen(),
-                                      maintainState: false));
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset(
-                                      'assets/imgs/school/supervisor (1) 1.png',
-                                      height: 22,
-                                      width: 22),
-                                  Text("Supervisor".tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 0),
+                        child: GestureDetector(
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                                .hideCurrentSnackBar();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BusScreen(),
+                                    maintainState: false));
+                            // _key.currentState!.openDrawer();
+                          },
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              direction: Axis.vertical,
+                              children: [
+                                Image.asset(
+                                    'assets/imgs/school/ph_bus-light (1).png',
+                                    height: 22,
+                                    width: 22),
+                                Text("Buses".tr,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 10)),
+                              ]),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 0),
-                          child: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => BusScreen(),
-                                      maintainState: false));
-                              // _key.currentState!.openDrawer();
-                            },
-                            child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                children: [
-                                  Image.asset(
-                                      'assets/imgs/school/ph_bus-light (1).png',
-                                      height: 22,
-                                      width: 22),
-                                  Text("Buses".tr,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10)),
-                                ]),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -1476,6 +1584,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                         onPress: ()  {
                         Navigator.pop(context);
                         _deleteSupervisorDocument(supervisorId);
+                        print("supervioridddd$supervisorId");
                         }
 
                         // Navigator.of(context).pushAndRemoveUntil(

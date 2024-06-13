@@ -43,6 +43,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    // if(data.isEmpty)
+    //   Text("No Notifications Avaliable", style: TextStyle(color: Colors.grey),);
+
     // List<NotificationMessage> notifications = [
     //   NotificationMessage(
     //       messageContent: "Joly’s Bus about to reach you location in 20 mins",

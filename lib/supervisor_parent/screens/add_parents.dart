@@ -1007,8 +1007,7 @@ class _AddParentsState extends State<AddParents> {
                               child: SizedBox(
                                 // width: 277,
                                 height: 40,
-                                child:
-                                TextFormField(
+                                child: TextFormField(
                                   onChanged: (val) {
                                     String input = _numberOfChildrenController.text;
                                     count = int.tryParse(input) ?? 0;
@@ -1036,7 +1035,7 @@ class _AddParentsState extends State<AddParents> {
                                   textInputAction: TextInputAction.done,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.allow(RegExp(r'^[1-9]|10$')), // Accept numbers from 1 to 10
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   textAlign: (sharedpref?.getString('lang') == 'ar')
                                       ? TextAlign.right
@@ -1044,7 +1043,7 @@ class _AddParentsState extends State<AddParents> {
                                   scrollPadding: EdgeInsets.symmetric(vertical: 30),
                                   decoration: InputDecoration(
                                     alignLabelWithHint: true,
-                                    counterText: "", // Remove the character counter
+                                    counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
                                     filled: true,
                                     contentPadding:
@@ -1077,81 +1076,8 @@ class _AddParentsState extends State<AddParents> {
                                     // enabledBorder: myInputBorder(),
                                     // focusedBorder: myFocusBorder(),
                                   ),
+                                  maxLength: 1,
                                 ),
-
-                                // TextFormField(
-                                //   onChanged: (val) {
-                                //     String input = _numberOfChildrenController.text;
-                                //     count = int.tryParse(input) ?? 0;
-                                //     // count = count - nameChildControllers.length;
-                                //     for (int i = 0; i < count; i++) {
-                                //       genderSelection.add('male');
-                                //       TextEditingController nameController =
-                                //       TextEditingController();
-                                //       TextEditingController gradeController =
-                                //       TextEditingController();
-                                //
-                                //       nameChildControllers.add(nameController);
-                                //       gradeControllers.add(gradeController);
-                                //     }
-                                //   },
-                                //   controller: _numberOfChildrenController,
-                                //   style: TextStyle(
-                                //     color: Color(0xFF442B72),
-                                //   ),
-                                //   cursorColor: Color(0xFF442B72),
-                                //   textDirection: (sharedpref?.getString('lang') == 'ar')
-                                //       ? TextDirection.rtl
-                                //       : TextDirection.ltr,
-                                //   // autofocus: true,
-                                //   textInputAction: TextInputAction.done,
-                                //   keyboardType: TextInputType.number,
-                                //   inputFormatters: <TextInputFormatter>[
-                                //     FilteringTextInputFormatter.allow(RegExp(r'^[1-9]|10$')), // Accept numbers from 1 to 10
-                                //     // FilteringTextInputFormatter.digitsOnly
-                                //   ],
-                                //   textAlign: (sharedpref?.getString('lang') == 'ar')
-                                //       ? TextAlign.right
-                                //       : TextAlign.left,
-                                //   scrollPadding: EdgeInsets.symmetric(vertical: 30),
-                                //   decoration: InputDecoration(
-                                //     alignLabelWithHint: true,
-                                //     counterText: "",
-                                //     fillColor: const Color(0xFFF1F1F1),
-                                //     filled: true,
-                                //     contentPadding:
-                                //     (sharedpref?.getString('lang') == 'ar')
-                                //         ? EdgeInsets.fromLTRB(166, 0, 17, 10)
-                                //         : EdgeInsets.fromLTRB(17, 0, 0, 10),
-                                //     hintText: 'Please enter your number children'.tr,
-                                //     floatingLabelBehavior: FloatingLabelBehavior.never,
-                                //     hintStyle: const TextStyle(
-                                //       color: Color(0xFF9E9E9E),
-                                //       fontSize: 12,
-                                //       fontFamily: 'Poppins-Bold',
-                                //       fontWeight: FontWeight.w700,
-                                //       height: 1.33,
-                                //     ),
-                                //     focusedBorder: OutlineInputBorder(
-                                //       borderRadius: BorderRadius.all(Radius.circular(7)),
-                                //       borderSide: BorderSide(
-                                //         color: Color(0xFFFFC53E),
-                                //         width: 0.5,
-                                //       ),
-                                //     ),
-                                //     enabledBorder: OutlineInputBorder(
-                                //       borderRadius: BorderRadius.all(Radius.circular(7)),
-                                //       borderSide: BorderSide(
-                                //         color: Color(0xFFFFC53E),
-                                //         width: 0.5,
-                                //       ),
-                                //     ),
-                                //     // enabledBorder: myInputBorder(),
-                                //     // focusedBorder: myFocusBorder(),
-                                //   ),
-                                //   maxLength: 2, // Set maximum length to 2 characters
-                                //
-                                // ),
                               ),
                             ),
                             numberOfChildrenError

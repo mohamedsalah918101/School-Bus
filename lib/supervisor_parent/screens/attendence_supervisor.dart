@@ -52,7 +52,17 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   final List<String> _list = List.generate(2, (index) => 'Item ${index + 1}');
   int _currentPage = 1;
   bool _isLoading = false;
+  int _currentMax = 2;//_currentMax keeps track of the number of items to display initially set to 10.
 
+
+  //_loadMoreNotifications increments _currentMax by 10 each time it is called
+  void _loadMoreNotifications() {
+    setState(() {
+      if (_currentMax < data.length) {
+        _currentMax += 3; // Increase the number of items to display by 10
+      }
+    });
+  }
 
   void _makePhoneCall([String? phoneNumber]) async {
     String? numberToCall = phoneNumber?? widget.receiverPhone;
@@ -397,14 +407,16 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: SizedBox(
-                            height: data.length * 90,
+                            height: data.length * 150,
                             width: double.infinity,
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-
                                     controller: _scrollController,
-                                    itemCount: data.length + (_isLoading? 1 : 0),
+                                    itemCount: _currentMax < data.length
+                                        ? _currentMax + 1
+                                        : _currentMax,
+                                    // itemCount: data.length + (_isLoading? 1 : 0),
                                   itemBuilder: (BuildContext context, int index) {
                                     print('Building item at index $index');
 
@@ -615,7 +627,8 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                             ),
                                           ),
                                       ],
-                                    );}
+                                    );
+    }
 
 
 

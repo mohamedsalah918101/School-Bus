@@ -1005,7 +1005,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                           for (var child in children)
                                             // if (child['supervisor'] == sharedpref!.getString('id').toString())
 
-                                              if (index == child['supervisor'] - 1 ||
+                                              if (index == data.length - 1 ||
                                                 index == 0 )
                                               // if (child['supervisor'] == sharedpref!.getString('id').toString())
                                                 SizedBox(
@@ -1099,7 +1099,7 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                                 .start,
                                                         children: [
                                                           // for (var child in children)
-                                                          if (child['supervisor'] == sharedpref!.getString('id').toString())
+                                                          // if (child['supervisor'] == sharedpref!.getString('id').toString())
                                                             Text(
                                                             '${child['name']}',
                                                             style: TextStyle(

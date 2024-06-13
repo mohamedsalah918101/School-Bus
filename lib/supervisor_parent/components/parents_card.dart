@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:school_account/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/supervisor_parent/components/supervisor_card.dart';
 import 'package:school_account/main.dart';
@@ -117,10 +118,109 @@ class _ParentsCardState extends State<ParentsCard> {
                               busID = documentSnapshot.data().toString().contains('bus_id') ? documentSnapshot.get('bus_id') : '';
                             }
                             if (busID == '') {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('This supervisor hasn\'t been added to a bus yet.'),
-                              ));
-                            } else {
+                               // CantAddNewSupervisor(context) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (ctx) => Dialog(
+                                      backgroundColor: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      // contentPadding: const EdgeInsets.all(20),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          30,
+                                        ),
+                                      ),
+                                      child: SizedBox(
+                                        height: 210,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  const SizedBox(
+                                                    width: 8,
+                                                  ),
+                                                  Flexible(
+                                                    child: Column(
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () => Navigator.pop(context),
+                                                          child: Image.asset(
+                                                            'assets/images/Vertical container.png',
+                                                            width: 27,
+                                                            height: 27,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 20,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    flex: 3,
+                                                    child: Text(
+                                                      'Alert'.tr,
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(
+                                                        color: Color(0xFF442B72),
+                                                        fontSize: 18,
+                                                        fontFamily: 'Poppins-SemiBold',
+                                                        fontWeight: FontWeight.w600,
+                                                        height: 1.23,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  textAlign: TextAlign.center,
+                                                  'This supervisor hasn\'t been added to a bus yet.',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                    fontSize: 16,
+                                                    fontFamily: 'Poppins-Light',
+                                                    fontWeight: FontWeight.w400,
+                                                    height: 1.23,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 20,
+                                              ),
+                                              // ElevatedSimpleButton(
+                                              //   txt: 'Go to parents'.tr,
+                                              //   width: 157,
+                                              //   hight: 38,
+                                              //   onPress: () async {
+                                              //     // await sharedpref!.setInt('invit', 0);
+                                              //
+                                              //     // await sharedpref!.setString('id', '');
+                                              //     Navigator.of(context).pushAndRemoveUntil(
+                                              //         MaterialPageRoute(
+                                              //             builder: (context) =>  ParentsView()),
+                                              //             (Route<dynamic> route) => false);
+                                              //   } ,
+                                              //   color: const Color(0xFF442B72),
+                                              //   fontSize: 16,
+                                              //   fontFamily: 'Poppins-Regular',
+                                              // ),
+                                            ],
+                                          ),
+                                        ),
+                                      )),
+                                );
+                              }
+                              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              //   content: Text('This supervisor hasn\'t been added to a bus yet.'),
+                              // ));
+                             else {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => AddParents()),

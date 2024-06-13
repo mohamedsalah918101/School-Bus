@@ -19,6 +19,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'homeScreen.dart';
 import 'dart:math' as math;
 
@@ -44,7 +45,7 @@ class ParentsScreenSate extends State<ParentsScreen> {
 
   getData() async {
     QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('parent').get();
+        await FirebaseFirestore.instance.collection('parent').where('schoolid',isEqualTo:sharedpref!.getString('id') ).get();
     data.addAll(querySnapshot.docs);
     setState(() {
       data = querySnapshot.docs;

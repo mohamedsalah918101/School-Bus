@@ -82,8 +82,8 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                             ),
                             TextSpan(
                               text: 'from El Salam School to \n '
-                                        'join the application as a \n '
-                                        'Parent for your child Mariam'.tr,
+                                  'join the application as a \n '
+                                  'Parent for your child Mariam'.tr,
                               style: TextStyle(
                                 color: Color(0xFF442B72),
                                 fontSize: 19,
@@ -96,7 +96,7 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                         ),
                       ),
                     ),
-      SizedBox(height: 15,),
+                    SizedBox(height: 15,),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -120,52 +120,52 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
                             },
                             color: Color(0xFF442B72),
                             fontSize: 16),
-                       SizedBox(width: 15,),
-                       SizedBox(
-                         height: 38,
-                           width: 117,
-                           child: Center(
-                             child: ElevatedButton(
-                               style: ElevatedButton.styleFrom(
-                                 backgroundColor: Colors.white,
-                                   shape: RoundedRectangleBorder(
-                                     side: BorderSide(
-                                       color: Color(0xFF442B72),
-                                     ),
-                                       borderRadius: BorderRadius.circular(10)
-                                   ),
-                               ),
-                               child: SizedBox(
-                                 width: 100,
-                                 child: Text(
-                                     'Decline'.tr,
-                                 textAlign: TextAlign.center,
-                                 style: TextStyle(
-                                 color: Color(0xFF442B72),
-                                 fontFamily: 'Poppins-Regular',
-                                 fontWeight: FontWeight.w600 ,
-                                   fontSize: 16)
-                                 ),
-                               ), onPressed: () async{
+                        SizedBox(width: 15,),
+                        SizedBox(
+                            height: 38,
+                            width: 117,
+                            child: Center(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        color: Color(0xFF442B72),
+                                      ),
+                                      borderRadius: BorderRadius.circular(10)
+                                  ),
+                                ),
+                                child: SizedBox(
+                                  width: 100,
+                                  child: Text(
+                                      'Decline'.tr,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Color(0xFF442B72),
+                                          fontFamily: 'Poppins-Regular',
+                                          fontWeight: FontWeight.w600 ,
+                                          fontSize: 16)
+                                  ),
+                                ), onPressed: () async{
 
-                                 await  FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).update(
-                                     {'invite': 1,'state':2});
-                                 sharedpref!.setInt('invitstate',1);
-                                 sharedpref!.setInt('invit',1);
-                                 Navigator.of(context).push(MaterialPageRoute(
-                                     builder: (context) => FinalAcceptInvitationParent(
-                                     )));
+                                await  FirebaseFirestore.instance.collection('parent').doc(sharedpref!.getString('id')).update(
+                                    {'invite': 1,'state':2});
+                                sharedpref!.setInt('invitstate',1);
+                                sharedpref!.setInt('invit',1);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => FinalAcceptInvitationParent(
+                                    )));
 
-                                 setState(() {
-                                 });
+                                setState(() {
+                                });
 
 
-                               sharedpref!.setInt('invitstate',0);
-                               sharedpref!.setInt('invit',0);
-                               Dialoge.declinedInvitationDialog(context);
-                             },
+                                sharedpref!.setInt('invitstate',0);
+                                sharedpref!.setInt('invit',0);
+                                Dialoge.declinedInvitationDialog(context);
+                              },
                               ),
-                           ))
+                            ))
                       ],
                     ),
 

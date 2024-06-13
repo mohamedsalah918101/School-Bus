@@ -97,58 +97,45 @@ class _YourBusState extends State<YourBus> {
         .get();
 
     if (supervisorDoc.exists) {
-      if (supervisorDoc.data().toString().contains('bus_id')) {
-        String busId = supervisorDoc['bus_id'];
+      String busId = supervisorDoc['bus_id'];
 
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('busdata')
-            .where(FieldPath.documentId, isEqualTo: busId)
-            .get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('busdata')
+          .where(FieldPath.documentId, isEqualTo: busId)
+          .get();
 
-        if (querySnapshot.docs.isNotEmpty) {
-          var busData = querySnapshot.docs.first;
-          String namedriver = busData['namedriver'];
-          String photodriver = busData['imagedriver'];
-          String photobus = busData['busphoto'];
-          String phonedriver = busData['phonedriver'];
-          String busnumber = busData['busnumber'];
+      if (querySnapshot.docs.isNotEmpty) {
+        var busData = querySnapshot.docs.first;
+        String namedriver = busData['namedriver'];
+        String photodriver = busData['imagedriver'];
+        String photobus = busData['busphoto'];
+        String phonedriver = busData['phonedriver'];
+        String busnumber = busData['busnumber'];
 
+        setState(() {
+          _namedriverText = namedriver;
+          _photodriver = photodriver;
+          _photobus = photobus;
+          _phonedriver = phonedriver;
+          _busnumber = busnumber;
+        });
+
+        List supervisors = busData['supervisors'];
+
+        if (supervisors.length > 1) {
           setState(() {
-            _namedriverText = namedriver;
-            _photodriver = photodriver;
-            _photobus = photobus;
-            _phonedriver = phonedriver;
-            _busnumber = busnumber;
+            firstChildName = supervisors[1]['name'];
           });
-
-          List supervisors = busData['supervisors'];
-
-          if (supervisors.length > 1) {
-            setState(() {
-              firstChildName = supervisors[1]['name'];
-            });
-          } else {
-            setState(() {
-              firstChildName = 'No second supervisor found';
-            });
-            print('No second supervisor found');
-          }
         } else {
           setState(() {
-            _photobus = '';
+            firstChildName = 'No second supervisor found';
           });
-          print('No bus data found');
+          print('No second supervisor found');
         }
       } else {
-        setState(() {
-          _photobus = '';
-        });
-        print('No bus_id field found in supervisor document');
+        print('No bus data found');
       }
     } else {
-      setState(() {
-        _photobus = '';
-      });
       print('Supervisor document does not exist');
     }
 
@@ -156,8 +143,6 @@ class _YourBusState extends State<YourBus> {
       dataLoading = false;
     });
   }
-
-
   @override
   void initState() {
     getDataForBus();
@@ -174,11 +159,9 @@ class _YourBusState extends State<YourBus> {
   Widget build(BuildContext context) {
     if (dataLoading) {
       return Center(
-        child:
-        sharedpref!.getInt('invit') == 1 ?
+        child: sharedpref!.getInt('invit') == 1 ?
 
-        Loading():
-        Scaffold(
+        Loading(): Scaffold(
           body: Column(
             children: [
               SizedBox(
@@ -345,12 +328,12 @@ class _YourBusState extends State<YourBus> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 12.0),
                               child: Text('Driver photo'.tr,
-                              style: TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 15,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                              ),),
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 15,
+                                  fontFamily: 'Poppins-Bold',
+                                  fontWeight: FontWeight.w700,
+                                ),),
                             )
                           ],
                         ),
@@ -392,7 +375,7 @@ class _YourBusState extends State<YourBus> {
                             Padding(
                               padding: const EdgeInsets.only(left: 5.0),
                               child: Text(
-                                  _phonedriver ?? 'no data',
+                                _phonedriver ?? 'no data',
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
                                   fontSize: 12,
@@ -413,24 +396,6 @@ class _YourBusState extends State<YourBus> {
                               padding: const EdgeInsets.only(left: 3.0),
                               child: Row(
                                 children: [
-                                  // InteractiveViewer(
-                                  //   // transformationController: _imagebuscontroller,
-                                  //   child: (_photobus == null || _photobus.isEmpty)
-                                  //       ?
-                                  //
-                                  //   Image.asset(
-                                  //     "assets/imgs/school/Frame 137.png",
-                                  //     width: 75,
-                                  //     height: 74,
-                                  //   )
-                                  //       : Image.network(
-                                  //     _photobus!,
-                                  //     width: 82,
-                                  //     height: 80,
-                                  //     fit: BoxFit.cover,
-                                  //   ),
-                                  // ),
-                                  SizedBox(width: 10,),
                                   InteractiveViewer(
                                     // transformationController: _imagebuscontroller,
                                       child:(_photobus == null || _photobus == '') ?
@@ -438,6 +403,14 @@ class _YourBusState extends State<YourBus> {
                                       Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
                                       Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
                                   ),
+                                  SizedBox(width: 10,),
+                                  // InteractiveViewer(
+                                  //   // transformationController: _imagebuscontroller,
+                                  //     child:(_photobus == null || _photobus == '') ?
+                                  //     //Image.network(widget.oldphotobus),
+                                  //     Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                  //     Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
+                                  // ),
                                   SizedBox(width: 10,),
                                   // InteractiveViewer(
                                   //   // transformationController: _imagebuscontroller,
@@ -464,7 +437,7 @@ class _YourBusState extends State<YourBus> {
                                 textDirection: _getTextDirection(" 1458ى ر س "),
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins-Light',
                                   fontWeight: FontWeight.w400,
                                 ),),
@@ -485,7 +458,7 @@ class _YourBusState extends State<YourBus> {
                                 // 'reham',
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins-Light',
                                   fontWeight: FontWeight.w400,
                                 ),),

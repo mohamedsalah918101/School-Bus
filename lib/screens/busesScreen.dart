@@ -148,29 +148,63 @@ class BusScreenSate extends State<BusScreen> {
     );
   }
 //fun delete bus
-  void _deletebusDocument(String documentId) {
-    FirebaseFirestore.instance
-        .collection('busdata')
-        .doc(documentId)
-        .delete()
-        .then((_) {
-      setState(() {
-        // Update UI by removing the deleted document from the data list
-        data.removeWhere((document) => document.id == documentId);
-        filteredData = List.from(data);
-      });
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   showSnackBarFun(context),
-      //   // SnackBar(content: Text('Document deleted successfully')),
-      // );
-    });
-    //     .catchError((error) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text('Failed to delete document: $error')),
-    //   );
-    // }
-    // );
+//   void _deletebusDocument(String documentId) {
+//     FirebaseFirestore.instance
+//         .collection('busdata')
+//         .doc(documentId)
+//         .delete()
+//         .then((_) {
+//       setState(() {
+//         // Update UI by removing the deleted document from the data list
+//         data.removeWhere((document) => document.id == documentId);
+//         filteredData = List.from(data);
+//       });
+//
+//     });
+//
+//   }
+  void _deleteBusDocument(String documentId) async {
+    try {
+      // Step 1: Get the bus document to retrieve the list of supervisors
+      DocumentSnapshot busDoc = await FirebaseFirestore.instance.collection('busdata').doc(documentId).get();
+
+      if (busDoc.exists) {
+        List<dynamic> supervisors = busDoc['supervisors'];
+
+        if (supervisors != null && supervisors.isNotEmpty) {
+          // Step 2: Delete supervisor documents from 'supervisor' collection
+          for (var supervisor in supervisors) {
+            String supervisorId = supervisor['id'];
+            await FirebaseFirestore.instance.collection('supervisor').doc(supervisorId).delete().then((_) {
+              print('Supervisor document deleted: $supervisorId');
+            }).catchError((error) {
+              print('Error deleting supervisor document: $supervisorId, $error');
+            });
+          }
+        }
+
+        // Step 3: Delete the bus document
+        await FirebaseFirestore.instance.collection('busdata').doc(documentId).delete().then((_) {
+          print('Bus document deleted: $documentId');
+          setState(() {
+            // Update UI by removing the deleted document from the data list
+            data.removeWhere((document) => document.id == documentId);
+            filteredData = List.from(data);
+          });
+        }).catchError((error) {
+          print('Error deleting bus document: $error');
+        });
+      } else {
+        print('Bus document not found: $documentId');
+      }
+    } catch (error) {
+      print('Error in _deleteBusDocument: $error');
+    }
   }
+
+
+
+
   //fun filter
   String selectedFilter = '';
   bool isAcceptFiltered = false;
@@ -725,12 +759,48 @@ class BusScreenSate extends State<BusScreen> {
                                                                       );
                                                                     },
                                                                   ))
-                                                                  : Image.asset(
-                                                                'assets/imgs/school/empty_supervisor.png',
-                                                                width: 61,
-                                                                height: 61,
-                                                                fit: BoxFit.cover,
+                                                                  :       Container(
+                                                                width: 65,
+                                                                // Adjust size as needed
+                                                                height: 65,
+                                                                decoration:
+                                                                BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Color(
+                                                                        0xffCCCCCC),
+                                                                    // Adjust border color
+                                                                    width:
+                                                                    2, // Adjust border width
+                                                                  ),
+                                                                ),
+                                                                child: Align(
+                                                                  alignment:
+                                                                  Alignment
+                                                                      .bottomCenter,
+                                                                  child:
+                                                                  CircleAvatar(
+                                                                    radius: 20,
+                                                                    backgroundImage:
+                                                                    AssetImage(
+                                                                      "assets/imgs/school/Vector (14).png",
+                                                                    ),
+                                                                    backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
                                                               ),
+                                                          //new
+                                                              // Image.asset(
+                                                              //   'assets/imgs/school/empty_supervisor.png',
+                                                              //   width: 61,
+                                                              //   height: 61,
+                                                              //   fit: BoxFit.cover,
+                                                              // ),
+                                                      //old
                                                               // Image.network(filteredData[index]['imagedriver'], width: 61, height: 61,
                                                               //               errorBuilder: (context, error, stackTrace) {
                                                               //                 return Image.asset('assets/imgs/school/default_image.png', width: 61, height: 61); // Display a default image if loading fails
@@ -881,19 +951,16 @@ class BusScreenSate extends State<BusScreen> {
                                                                     //         builder: (context) =>
                                                                     //             EditeSupervisor()));
                                                                   } else if (value == 'delete') {
-                                                                    //deletePhotoDialog(context);
-                                                                    //وقفت delete function علشان لما بسمح بيعمل error
 
-                                                                    //  _deletebusDocument(data[index].id);
-                                                                    if (index < filteredData.length) {
-                                                                      _deletebusDocument(filteredData[index].id);
-                                                                    } else {
-                                                                      print('Invalid index: $index');
-                                                                    }
-                                                                    // setState(() {
-                                                                    //
-                                                                    //   //showSnackBarFun(context);
-                                                                    // });
+                                                                    deletePhotoDialog(context, data[index].id);
+
+
+                                                                    // if (index < filteredData.length) {
+                                                                    //   _deletebusDocument(filteredData[index].id);
+                                                                    // } else {
+                                                                    //   print('Invalid index: $index');
+                                                                    // }
+
                                                                   }
                                                                 },
                                                               ),
@@ -1037,10 +1104,44 @@ class BusScreenSate extends State<BusScreen> {
                                                                                       data[index]['imagedriver'],
                                                                                       fit: BoxFit.cover,
                                                                                     )
-                                                                                        : Image.asset(
-                                                                                      'assets/imgs/school/empty_supervisor.png',
-                                                                                      fit: BoxFit.cover,
+                                                                                        :       Container(
+                                                                                      width: 65,
+                                                                                      // Adjust size as needed
+                                                                                      height: 65,
+                                                                                      decoration:
+                                                                                      BoxDecoration(
+                                                                                        shape: BoxShape
+                                                                                            .circle,
+                                                                                        border: Border
+                                                                                            .all(
+                                                                                          color: Color(
+                                                                                              0xffCCCCCC),
+                                                                                          // Adjust border color
+                                                                                          width:
+                                                                                          2, // Adjust border width
+                                                                                        ),
+                                                                                      ),
+                                                                                      child: Align(
+                                                                                        alignment:
+                                                                                        Alignment
+                                                                                            .bottomCenter,
+                                                                                        child:
+                                                                                        CircleAvatar(
+                                                                                          radius: 20,
+                                                                                          backgroundImage:
+                                                                                          AssetImage(
+                                                                                            "assets/imgs/school/Vector (14).png",
+                                                                                          ),
+                                                                                          backgroundColor:
+                                                                                          Colors
+                                                                                              .white,
+                                                                                        ),
+                                                                                      ),
                                                                                     ),
+                                                                                    // Image.asset(
+                                                                                    //   'assets/imgs/school/empty_supervisor.png',
+                                                                                    //   fit: BoxFit.cover,
+                                                                                    // ),
                                                                                   ),
                                                                                 ),
                                                                                 SizedBox(width: 20,),
@@ -1426,7 +1527,7 @@ class BusScreenSate extends State<BusScreen> {
       ),
     );
   }
-  deletePhotoDialog(context) {
+  deletePhotoDialog(context,String supervisorId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1445,16 +1546,18 @@ class BusScreenSate extends State<BusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Center(child: Text("Delete Bus",style: TextStyle(fontSize: 18,fontFamily: 'Poppins-SemiBold', color: Color(0xFF442B72),),)),
+                SizedBox(height: 10,),
                   Center(
-                    child: Align(alignment: AlignmentDirectional.topCenter,
+                    child: Align(alignment: AlignmentDirectional.center,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              'Are you sure you want to',
+                              'There are supervisors and parents',
                               style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 20,
+                                fontSize: 16,
                                 fontFamily: 'Poppins-Regular',
                                 //fontWeight: FontWeight.w400,
                                 height: 1.23,
@@ -1462,10 +1565,22 @@ class BusScreenSate extends State<BusScreen> {
                             ),
                             Center(
                               child: Text(
-                                'delete this bus?',
+                                'on this bus all will be deleted',
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
-                                  fontSize: 20,
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins-Regular',
+                                  // fontWeight: FontWeight.w400,
+                                  height: 1.23,
+                                ),
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'once you delete the bus',
+                                style: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 16,
                                   fontFamily: 'Poppins-Regular',
                                   // fontWeight: FontWeight.w400,
                                   height: 1.23,
@@ -1477,7 +1592,7 @@ class BusScreenSate extends State<BusScreen> {
                     ),
                   ),
                   const SizedBox(
-                    height: 25,
+                    height: 20,
                   ),
                   Row(
                     children: [
@@ -1486,6 +1601,8 @@ class BusScreenSate extends State<BusScreen> {
                         width: 120,
                         hight: 38,
                         onPress: () => {
+                        Navigator.pop(context),
+                          _deleteBusDocument(supervisorId)
                           //_deletebusDocument(documentId)
                         }
 
