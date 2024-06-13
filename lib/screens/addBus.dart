@@ -471,7 +471,33 @@ class _AddBusState extends State<AddBus> {
                                                         )),
                                                     bottom: -10,
                                                     left: 80,
-                                                  )
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 45, left: 50),
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(width: 2, color: Color(0xffCCCCCC)),
+                                                      ),
+                                                      child: CircleAvatar(
+                                                        backgroundColor: Colors.white,
+                                                        radius: 9,
+                                                        child:
+                                                        GestureDetector(
+                                                          onTap: (){
+                                                            _pickImageFromGallery();
+                                                            // _pickProfileImageFromGallery();
+                                                          },
+                                                          child: Image.asset(
+                                                            'assets/imgs/school/image-editing 1 1.png',
+                                                            fit: BoxFit.cover,
+                                                            width: 14,
+                                                            height: 14,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -811,7 +837,8 @@ class _AddBusState extends State<AddBus> {
                                                 fit: BoxFit
                                                     .cover, // Adjusts how the image fits in the container
                                               )
-                                            : FDottedLine(
+                                            :
+                                        FDottedLine(
                                                 color: Color(0xFF442B72),
                                                 strokeWidth: 0.8,
                                                 dottedLength: 10,

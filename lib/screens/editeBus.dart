@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -396,21 +397,77 @@ class _EditeBusState extends State<EditeBus> {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 12),
                                     child:
-                                    GestureDetector(
-                                      onTap: () {
-                                        _pickImageDriverFromGallery();
-                                      },
-                                      child:
-                                      CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        (widget.oldphotodriver == null || widget.oldphotodriver == '') ?
-                                        _selectedImagedriverEdite!= null
-                                            ? Image.file(_selectedImagedriverEdite!, width: 83, height: 78.5, fit: BoxFit.cover).image
-                                            : AssetImage('assets/imgs/school/Ellipse 2 (1).png'):
-                                        NetworkImage(widget.oldphotodriver!),
-                                       // NetworkImage(_selectedImageDriver),
+                                    Stack(
+                                      children:
+                                      [
+                                        _selectedImagedriverEdite != null
+                                            ? Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(width: 2, color: Color(0xff432B72)),
+                                          ),
+                                              child: CircleAvatar(
+                                                radius: 30,
+                                                child: ClipOval(
+                                                  child: Image.file(
+                                          _selectedImagedriverEdite!,  // Display the uploaded image
+                                          width: 83,  // Set width as per your preference
+                                          height: 78.5,  // Set height as per your preference
+                                          fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                        ),
+                                                ),
+                                              ),
+                                            ) :
+                                        GestureDetector(
+                                        onTap: () {
+                                          _pickImageDriverFromGallery();
+                                        },
+                                        child:
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(width: 2, color: Color(0xff432B72)),
+                                          ),
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage:
+                                            (widget.oldphotodriver == null || widget.oldphotodriver == '') ?
+                                            _selectedImagedriverEdite!= null
+                                                ? Image.file(_selectedImagedriverEdite!, width: 83, height: 78.5, fit: BoxFit.cover).image
+                                                : AssetImage('assets/imgs/school/Ellipse 2 (1).png'):
+                                            NetworkImage(widget.oldphotodriver!),
+                                           // NetworkImage(_selectedImageDriver),
+                                          ),
+                                        ),
+
                                       ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 40, left: 45),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(width: 2, color: Color(0xff432B72)),
+                                            ),
+                                            child: CircleAvatar(
+                                              backgroundColor: Colors.white,
+                                              radius: 8,
+                                              child:
+                                              GestureDetector(
+                                                onTap: (){
+                                                  _pickImageDriverFromGallery();
+
+                                                },
+                                                child: Image.asset(
+                                                  'assets/imgs/school/edite.png',
+                                                  fit: BoxFit.cover,
+                                                  width: 12,
+                                                  height: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ]
                                     ),
                                     // GestureDetector(
                                     //   onTap: () {
@@ -660,93 +717,185 @@ class _EditeBusState extends State<EditeBus> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
 
-                                  Stack(alignment: Alignment.topRight,
-                                      children:[
-                                        // InteractiveViewer(
-                                        //    // transformationController: _imagebuscontroller,
-                                        //     child:(widget.oldphotobus == null || widget.oldphotobus == '') ?
-                                        //     //Image.network(widget.oldphotobus),
-                                        //   Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
-                                        //         Image.network(widget.oldphotobus!,width: 75,height: 74,fit: BoxFit.cover,)
-                                        // ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            _pickImagebusFromGallery();
-                                          },
-                                          child: InteractiveViewer(
-                                            child: _selectedImageBusEdite != null
-                                                ? Image.file(_selectedImageBusEdite!, width: 75, height: 74, fit: BoxFit.cover)
-                                                : (widget.oldphotobus == null || widget.oldphotobus == '')
-                                                ? Image.asset("assets/imgs/school/Frame 137.png", width: 75, height: 74)
-                                                : Image.network(widget.oldphotobus!, width: 75, height: 74, fit: BoxFit.cover),
+                                  // Stack(alignment: Alignment.topRight,
+                                  //     children:[
+                                  //       // InteractiveViewer(
+                                  //       //    // transformationController: _imagebuscontroller,
+                                  //       //     child:(widget.oldphotobus == null || widget.oldphotobus == '') ?
+                                  //       //     //Image.network(widget.oldphotobus),
+                                  //       //   Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                  //       //         Image.network(widget.oldphotobus!,width: 75,height: 74,fit: BoxFit.cover,)
+                                  //       // ),
+                                  //       _selectedImageBusEdite != null
+                                  //           ? Image.file(
+                                  //         _selectedImageBusEdite!,  // Display the uploaded image
+                                  //         width: 83,  // Set width as per your preference
+                                  //         height: 78.5,  // Set height as per your preference
+                                  //         fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                  //       ) :
+                                  //       GestureDetector(
+                                  //         onTap: () {
+                                  //           _pickImagebusFromGallery();
+                                  //         },
+                                  //         child: InteractiveViewer(
+                                  //           child: _selectedImageBusEdite != null
+                                  //               ? Image.file(_selectedImageBusEdite!, width: 75, height: 74, fit: BoxFit.cover)
+                                  //               : (widget.oldphotobus == null || widget.oldphotobus == '')
+                                  //               ?     FDottedLine(
+                                  //             color: Color(0xFF442B72),
+                                  //             strokeWidth: 0.8,
+                                  //             dottedLength: 10,
+                                  //             space: 5.0,
+                                  //             corner:
+                                  //             FDottedLineCorner.all(6.0),
+                                  //
+                                  //             // Child widget
+                                  //             child: Container(
+                                  //               width: 275,
+                                  //               height: 75,
+                                  //               alignment: Alignment.center,
+                                  //               child: Row(
+                                  //                 children: [
+                                  //                   Padding(
+                                  //                     padding:
+                                  //                     const EdgeInsets
+                                  //                         .only(left: 80),
+                                  //                     child: Image.asset(
+                                  //                       "assets/imgs/school/icons8_image_document_1 1.png",
+                                  //                       width: 24,
+                                  //                       height: 24,
+                                  //                     ),
+                                  //                   ),
+                                  //                   SizedBox(
+                                  //                     width: 10,
+                                  //                   ),
+                                  //                   Text(
+                                  //                     "upload image",
+                                  //                     style: TextStyle(
+                                  //                       color:
+                                  //                       Color(0xFF442B72),
+                                  //                       fontSize: 14,
+                                  //                       fontFamily:
+                                  //                       'Poppins-Regular',
+                                  //                     ),
+                                  //                   ),
+                                  //                 ],
+                                  //               ),
+                                  //             ),
+                                  //           )
+                                  //           //Image.asset("assets/imgs/school/Frame 137.png", width: 75, height: 74)
+                                  //               : Image.network(widget.oldphotobus!, width: 75, height: 74, fit: BoxFit.cover),
+                                  //         ),
+                                  //       ),
+                                  //
+                                  //       Align(alignment: AlignmentDirectional.topEnd,
+                                  //         child:
+                                  //         Container(
+                                  //             width:20,
+                                  //             height: 20,
+                                  //             decoration:BoxDecoration(
+                                  //                 color: Color(0xFF442B72),
+                                  //                 borderRadius: BorderRadius.circular(20)
+                                  //             ),
+                                  //             child:
+                                  //             GestureDetector(
+                                  //                 onTap:(){
+                                  //                   deletePhotoDialog(context);
+                                  //                   //showSnackBarDeleteFun(context);
+                                  //                 },
+                                  //                 child:
+                                  //                 Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
+                                  //             )),
+                                  //       )
+                                  //     ]),
+                                Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  _selectedImageBusEdite != null
+                                      ? Image.file(
+                                    _selectedImageBusEdite!, // Display the uploaded image
+                                    width: 83, // Set width as per your preference
+                                    height: 78.5, // Set height as per your preference
+                                    fit: BoxFit.cover, // Adjusts how the image fits in the container
+                                  )
+                                      : GestureDetector(
+                                    onTap: () {
+                                      _pickImagebusFromGallery();
+                                    },
+                                    child: InteractiveViewer(
+                                      child: _selectedImageBusEdite != null
+                                          ? Image.file(_selectedImageBusEdite!,
+                                          width: 75, height: 74, fit: BoxFit.cover)
+                                          : (widget.oldphotobus == null || widget.oldphotobus == '')
+                                          ? FDottedLine(
+                                        color: Color(0xFF442B72),
+                                        strokeWidth: 1.4,
+                                        dottedLength: 10,
+                                        space: 5.0,
+                                        corner: FDottedLineCorner.all(6.0),
+
+                                        // Child widget
+                                        child: Container(
+                                          width: 275,
+                                          height: 75,
+                                          alignment: Alignment.center,
+                                          child: Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 80),
+                                                child: Image.asset(
+                                                  "assets/imgs/school/icons8_image_document_1 1.png",
+                                                  width: 24,
+                                                  height: 24,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text(
+                                                "upload image",
+                                                style: TextStyle(
+                                                  color: Color(0xFF442B72),
+                                                  fontSize: 14,
+                                                  fontFamily: 'Poppins-Regular',
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
+                                      )
+                                          : Image.network(widget.oldphotobus!,
+                                          width: 75, height: 74, fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                  if (_selectedImageBusEdite != null || (widget.oldphotobus != null && widget.oldphotobus != ''))
+                                    Align(
+                                      alignment: AlignmentDirectional.topEnd,
+                                      child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF442B72),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            deletePhotoDialog(context);
+                                            //showSnackBarDeleteFun(context);
+                                          },
+                                          child: Image.asset(
+                                            "assets/imgs/school/Vector (8).png",
+                                            width: 15,
+                                            height: 15,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              )
 
-                                        Align(alignment: AlignmentDirectional.topEnd,
-                                          child:
-                                          Container(
-                                              width:20,
-                                              height: 20,
-                                              decoration:BoxDecoration(
-                                                  color: Color(0xFF442B72),
-                                                  borderRadius: BorderRadius.circular(20)
-                                              ),
-                                              child:
-                                              GestureDetector(
-                                                  onTap:(){
-                                                    deletePhotoDialog(context);
-                                                    //showSnackBarDeleteFun(context);
-                                                  },
-                                                  child:
-                                                  Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
-                                              )),
-                                        )]),
-                                  // Stack(alignment: Alignment.topRight,
-                                  //     children:[
-                                  //       Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
-                                  //       Align(alignment: AlignmentDirectional.topEnd,
-                                  //         child:
-                                  //         Container(
-                                  //             width:20,
-                                  //             height: 20,
-                                  //             decoration:BoxDecoration(
-                                  //                 color: Color(0xFF442B72),
-                                  //                 borderRadius: BorderRadius.circular(20)
-                                  //             ),
-                                  //             child:
-                                  //             GestureDetector(
-                                  //                 onTap:(){
-                                  //                   deletePhotoDialog(context);
-                                  //                   //showSnackBarDeleteFun(context);
-                                  //                 },
-                                  //                 child:
-                                  //                 Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
-                                  //             )),
-                                  //       )]),
-                                  // Stack(alignment: Alignment.topRight,
-                                  //     children:[
-                                  //       Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,),
-                                  //       Align(alignment: AlignmentDirectional.topEnd,
-                                  //         child:
-                                  //         Container(
-                                  //             width:20,
-                                  //             height: 20,
-                                  //             decoration:BoxDecoration(
-                                  //                 color: Color(0xFF442B72),
-                                  //                 borderRadius: BorderRadius.circular(20)
-                                  //             ),
-                                  //             child:
-                                  //             GestureDetector(
-                                  //                 onTap:(){
-                                  //                   deletePhotoDialog(context);
-                                  //                   //showSnackBarDeleteFun(context);
-                                  //                 },
-                                  //                 child:
-                                  //                 Image.asset("assets/imgs/school/Vector (8).png",width:15,height: 15,)
-                                  //             )),
-                                  //       )]),
 
-                                ],),
+                    ],),
 
 
 
