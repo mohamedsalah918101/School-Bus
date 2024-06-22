@@ -99,41 +99,50 @@ class _YourBusState extends State<YourBus> {
     if (supervisorDoc.exists) {
       String busId = supervisorDoc['bus_id'];
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('busdata')
-          .where(FieldPath.documentId, isEqualTo: busId)
-          .get();
+      if (busId != null && busId.isNotEmpty) {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('busdata')
+            .where(FieldPath.documentId, isEqualTo: busId)
+            .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        var busData = querySnapshot.docs.first;
-        String namedriver = busData['namedriver'];
-        String photodriver = busData['imagedriver'];
-        String photobus = busData['busphoto'];
-        String phonedriver = busData['phonedriver'];
-        String busnumber = busData['busnumber'];
+        if (querySnapshot.docs.isNotEmpty) {
+          var busData = querySnapshot.docs.first;
+          String namedriver = busData['namedriver'];
+          String photodriver = busData['imagedriver'];
+          String photobus = busData['busphoto'];
+          String phonedriver = busData['phonedriver'];
+          String busnumber = busData['busnumber'];
 
-        setState(() {
-          _namedriverText = namedriver;
-          _photodriver = photodriver;
-          _photobus = photobus;
-          _phonedriver = phonedriver;
-          _busnumber = busnumber;
-        });
-
-        List supervisors = busData['supervisors'];
-
-        if (supervisors.length > 1) {
           setState(() {
-            firstChildName = supervisors[1]['name'];
+            _namedriverText = namedriver;
+            _photodriver = photodriver;
+            _photobus = photobus;
+            _phonedriver = phonedriver;
+            _busnumber = busnumber;
           });
+
+          // جلب قائمة المشرفين
+          List supervisors = busData['supervisors'];
+
+          if (supervisors.isNotEmpty) {
+            setState(() {
+              firstChildName = supervisors.first['name'];
+            });
+          } else {
+            print('No supervisors found');
+          }
         } else {
-          setState(() {
-            firstChildName = 'No second supervisor found';
-          });
-          print('No second supervisor found');
+          print('No bus data found');
         }
       } else {
-        print('No bus data found');
+        // If busId is null or empty, set namedriver to 'kkkkkk'
+        setState(() {
+          _namedriverText = 'kkkkkk';
+          _photodriver = '';
+          _photobus = '';
+          _phonedriver = '';
+          _busnumber = '';
+        });
       }
     } else {
       print('Supervisor document does not exist');
@@ -143,6 +152,8 @@ class _YourBusState extends State<YourBus> {
       dataLoading = false;
     });
   }
+
+
   @override
   void initState() {
     getDataForBus();
@@ -159,7 +170,7 @@ class _YourBusState extends State<YourBus> {
   Widget build(BuildContext context) {
     if (dataLoading) {
       return Center(
-        child: sharedpref!.getInt('invit') == 1 ?
+        child: sharedpref!.getInt('invit') == 0 ?
 
         Loading(): Scaffold(
           body: Column(
@@ -400,7 +411,7 @@ class _YourBusState extends State<YourBus> {
                                     // transformationController: _imagebuscontroller,
                                       child:(_photobus == null || _photobus == '') ?
                                       //Image.network(widget.oldphotobus),
-                                      Image.asset("assets/imgs/school/Frame 137.png",width: 75,height: 74,):
+                                      Image.asset("assets/imgs/school/nophotos.png",width: 75,height: 74,):
                                       Image.network(_photobus!,width: 82,height: 80,fit: BoxFit.cover,)
                                   ),
                                   SizedBox(width: 10,),

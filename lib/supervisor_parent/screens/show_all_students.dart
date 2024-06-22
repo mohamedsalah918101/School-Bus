@@ -1,16 +1,20 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:school_account/main.dart';
 
-import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
-import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:loadmore/loadmore.dart';
+
+import 'package:flutter/material.dart';
+import 'package:school_account/supervisor_parent/components/added_child_card.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
+import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
-import '../components/added_child_card.dart';
+
+import '../../main.dart';
 
 class ShowAllStudents extends StatefulWidget {
   @override
@@ -18,11 +22,19 @@ class ShowAllStudents extends StatefulWidget {
 }
 
 class _ShowAllStudentsState extends State<ShowAllStudents> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final int _limit = 8; // Number of documents to fetch per page
+  DocumentSnapshot? _lastDocument;
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  List<DocumentSnapshot> _documents = [];
+  final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Map<String, dynamic>> childrenData = [];
   TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
-  final _firestore = FirebaseFirestore.instance;
+
+  List<Map<String, dynamic>> childrenData = [];
+
 
 
   String getJoinText(Timestamp? timestamp) {
@@ -46,291 +58,332 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     }
   }
 
-  Future<void> getData({String query = ""}) async {
-    QuerySnapshot parentQuerySnapshot =
-        await _firestore.collection('parent').get();
-    List<Map<String, dynamic>> allChildren = [];
-
-    for (var parentDoc in parentQuerySnapshot.docs) {
-      List<dynamic> children = parentDoc['children'];
-      for (var child in children) {
-        if (query.isEmpty ||
-            child['name']
-                .toString()
-                .toLowerCase()
-                .contains(query.toLowerCase())) {
-          allChildren.add(child);
-        }
-      }
-    }
-
-    setState(() {
-      childrenData = allChildren;
-      List<dynamic> filteredChildren = childrenData.where((child) => child['supervisor'] == sharedpref!.getString('id').toString()).toList();
-
-    });
-  }
 
   @override
   void initState() {
-    _searchController.addListener(_onSearchChanged);
-    getData();
     super.initState();
+    _searchController.addListener(_onSearchChanged);
+    _scrollController.addListener(_scrollListener);
+    _fetchData();
   }
+
+  Future<void> _fetchData({String query = ""}) async {
+    if (_isLoading || !_hasMoreData) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Query query = _firestore.collection('parent').limit(_limit);
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    final QuerySnapshot snapshot = await query.get();
+    if (snapshot.docs.isEmpty) {
+      setState(() {
+        _hasMoreData = false;
+      });
+    } else {
+
+      // List<Map<String, dynamic>> filteredChildrenData = childrenData.where((child) {
+      //   return child['name'].toLowerCase().contains(searchQuery.toLowerCase());
+      // }).toList();
+      List<Map<String, dynamic>> allChildren = [];
+      for (var parentDoc in snapshot.docs) {
+        List<dynamic> children = parentDoc['children'];
+        allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
+      }
+
+      setState(() {
+        _lastDocument = snapshot.docs.last;
+        _documents.addAll(snapshot.docs);
+        childrenData.addAll(allChildren);
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  // Future<void> _fetchData({String query = ""}) async {
+  //   if (_isLoading || !_hasMoreData) return;
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   Query query = _firestore.collection('parent').limit(_limit);
+  //   if (_lastDocument != null) {
+  //     query = query.startAfterDocument(_lastDocument!);
+  //   }
+  //   final QuerySnapshot snapshot = await query.get();
+  //   if (snapshot.docs.isEmpty) {
+  //     setState(() {
+  //       _hasMoreData = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _lastDocument = snapshot.docs.last;
+  //       _documents.addAll(snapshot.docs);
+  //     });
+  //   }
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
+  void _onSearchChanged() {
+    setState(() {
+      searchQuery = _searchController.text.trim();
+      print('Search query changed: $searchQuery');
+    });
+    _fetchData(query: searchQuery);
+  }
+
 
   @override
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  _onSearchChanged() {
-    setState(() {
-      searchQuery = _searchController.text.trim();
-    });
-    getData(query: searchQuery);
+  void _scrollListener() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_isLoading) {
+      _fetchData();
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        endDrawer: SupervisorDrawer(),
+      // appBar: AppBar(
+      //   title: Text('Paginated List'),
+      // ),
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
           },
-          child: Stack(
+          child: Column(
             children: [
+              SizedBox(
+                height: 35,
+              ),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 17.0),
+                        child: Image.asset(
+                          (sharedpref?.getString('lang') == 'ar')
+                              ? 'assets/images/Layer 1.png'
+                              : 'assets/images/fi-rr-angle-left.png',
+                          width: 20,
+                          height: 22,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Students'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF993D9A),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openEndDrawer();
+                      },
+                      icon: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: const Icon(
+                          Icons.menu_rounded,
+                          color: Color(0xff442B72),
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               Column(
                 children: [
                   SizedBox(
-                    height: 35,
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 17.0),
-                            child: Image.asset(
-                              (sharedpref?.getString('lang') == 'ar')
-                                  ? 'assets/images/Layer 1.png'
-                                  : 'assets/images/fi-rr-angle-left.png',
-                              width: 20,
-                              height: 22,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          'Students'.tr,
-                          style: TextStyle(
-                            color: Color(0xFF993D9A),
-                            fontSize: 16,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                            height: 1,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _scaffoldKey.currentState!.openEndDrawer();
-                          },
-                          icon: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: const Icon(
-                              Icons.menu_rounded,
-                              color: Color(0xff442B72),
-                              size: 35,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 17.0),
-                          child: SizedBox(
-                            height: 42,
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Color(0xffF1F1F1),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(21),
-                                  borderSide: BorderSide.none,
-                                ),
-                                hintText: "Search Name".tr,
-                                hintStyle: TextStyle(
-                                  color: const Color(0xffC2C2C2),
-                                  fontSize: 12,
-                                  fontFamily: 'Poppins-Bold',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                prefixIcon: Padding(
-                                  padding: (sharedpref?.getString('lang') == 'ar')
-                                      ? EdgeInsets.only(
-                                          right: 6, top: 14.0, bottom: 9)
-                                      : EdgeInsets.only(
-                                          left: 3, top: 14.0, bottom: 9),
-                                  child: Image.asset(
-                                    'assets/images/Vector (12)search.png',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 33.0),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: childrenData.where((child) => child['supervisor'] == sharedpref!.getString('id').toString()).length,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              var child = childrenData.where((child) => child['supervisor'] == sharedpref!.getString('id').toString()).elementAt(index);
-                                Timestamp? joinDateTimestamp = child['joinDateChild'] as Timestamp?;
-                              // if (child['supervisor'] == sharedpref!.getString('id').toString())
-                              return Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 0.0),
-                                        child: FutureBuilder(
-                                          future: _firestore
-                                              .collection('supervisor')
-                                              .doc(sharedpref!.getString('id'))
-                                              .get(),
-                                          builder: (BuildContext context,
-                                              AsyncSnapshot<
-                                                      DocumentSnapshot<
-                                                          Map<String, dynamic>>>
-                                                  snapshot) {
-                                            if (snapshot.hasError) {
-                                              return Text('Something went wrong');
-                                            }
-          
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.done) {
-                                              if (!snapshot.hasData ||
-                                                  snapshot.data == null ||
-                                                  snapshot.data!.data() == null ||
-                                                  snapshot.data!
-                                                          .data()!['busphoto'] ==
-                                                      null ||
-                                                  snapshot.data!
-                                                      .data()!['busphoto']
-                                                      .toString()
-                                                      .trim()
-                                                      .isEmpty) {
-                                                return CircleAvatar(
-                                                  radius: 25,
-                                                  backgroundColor:
-                                                      Color(0xff442B72),
-                                                  child: CircleAvatar(
-                                                    backgroundImage: AssetImage(
-                                                        'assets/images/Group 237679 (2).png'),
-                                                    // Replace with your default image path
-                                                    radius: 25,
-                                                  ),
-                                                );
-                                              }
-          
-                                              Map<String, dynamic>? data =
-                                                  snapshot.data?.data();
-                                              if (data != null &&
-                                                  data['busphoto'] != null) {
-                                                return CircleAvatar(
-                                                  radius: 25,
-                                                  backgroundColor:
-                                                      Color(0xff442B72),
-                                                  child: CircleAvatar(
-                                                    backgroundImage: NetworkImage(
-                                                        '${data['busphoto']}'),
-                                                    radius: 25,
-                                                  ),
-                                                );
-                                              }
-                                            }
-          
-                                            return Container();
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${child['name']}',
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 17,
-                                              fontFamily: 'Poppins-SemiBold',
-                                              fontWeight: FontWeight.w600,
-                                              height: 1.07,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            '${getJoinText(joinDateTimestamp)}'.tr,
-                                            style: TextStyle(
-                                              color: Color(0xFF0E8113),
-                                              fontSize: 13,
-                                              fontFamily: 'Poppins-Regular',
-                                              fontWeight: FontWeight.w400,
-                                              height: 1.23,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  )
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 44,
-                        )
-                      ],
-                    )),
+                    height: 15,
                   ),
                 ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 17.0),
+                child: SizedBox(
+                  height: 42,
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Color(0xffF1F1F1),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(21),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: "Search Name".tr,
+                      hintStyle: TextStyle(
+                        color: const Color(0xffC2C2C2),
+                        fontSize: 12,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                      ),
+                      prefixIcon: Padding(
+                        padding: (sharedpref?.getString('lang') == 'ar')
+                            ? EdgeInsets.only(
+                            right: 6, top: 14.0, bottom: 9)
+                            : EdgeInsets.only(
+                            left: 3, top: 14.0, bottom: 9),
+                        child: Image.asset(
+                          'assets/images/Vector (12)search.png',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+
+              // SizedBox(height: 100,),
+              // SizedBox(height: 200,),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 33.0),
+                  child: ListView.builder(
+                    // physics:  NeverScrollableScrollPhysics(),
+                    controller: _scrollController,
+                    itemCount: _documents.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == _documents.length) {
+                        return _isLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : Center(child: Container()
+                        // Text('No more data')
+                        );
+                      }
+                      final DocumentSnapshot doc = _documents[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      var child = childrenData[index];
+                      Timestamp? joinDateTimestamp = child['joinDateChild'] as Timestamp?;
+
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 0.0),
+                                child:
+                                CircleAvatar(
+                                  backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                  radius: 25,
+                                ),
+                                // FutureBuilder(
+                                //   future: FirebaseFirestore.instance
+                                //       .collection('supervisor')
+                                //       .doc(sharedpref!.getString('id'))
+                                //       .get(),
+                                //   builder: (BuildContext context,
+                                //       AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                //     if (snapshot.hasError) {
+                                //       return Text('Something went wrong');
+                                //     }
+                                //
+                                //     if (snapshot.connectionState == ConnectionState.done) {
+                                //       if (!snapshot.hasData ||
+                                //           snapshot.data == null ||
+                                //           snapshot.data!.data() == null ||
+                                //           snapshot.data!.data()!['busphoto'] == null ||
+                                //           snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                //         return CircleAvatar(
+                                //           radius: 25,
+                                //           backgroundColor: Color(0xff442B72),
+                                //           child: CircleAvatar(
+                                //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                //             radius: 25,
+                                //           ),
+                                //         );
+                                //       }
+                                //
+                                //       Map<String, dynamic>? data = snapshot.data?.data();
+                                //       if (data != null && data['busphoto'] != null) {
+                                //         return CircleAvatar(
+                                //           radius: 25,
+                                //           backgroundColor: Color(0xff442B72),
+                                //           child: CircleAvatar(
+                                //             backgroundImage: NetworkImage('${data['busphoto']}'),
+                                //             radius: 25,
+                                //           ),
+                                //         );
+                                //       }
+                                //     }
+                                //
+                                //     return Container();
+                                //   },
+                                // ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${child['name']}',
+                                    style: TextStyle(
+                                      color: Color(0xFF442B72),
+                                      fontSize: 17,
+                                      fontFamily: 'Poppins-SemiBold',
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.07,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    // 'lll',
+                                    '${getJoinText(joinDateTimestamp)}',
+                                    style: TextStyle(
+                                      color: Color(0xFF0E8113),
+                                      fontSize: 13,
+                                      fontFamily: 'Poppins-Regular',
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.23,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
             ],
           ),
         ),
+
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
@@ -368,7 +421,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 topRight: Radius.circular(38.5))),
                         RoundedRectangleBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(50)))),
+                            BorderRadius.all(Radius.circular(50)))),
                     notchMargin: 7,
                     child: SizedBox(
                         height: 10,
@@ -390,9 +443,9 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(top: 7, right: 15)
-                                          : EdgeInsets.only(left: 15),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 7, right: 15)
+                                      : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -426,9 +479,9 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(top: 9, left: 50)
-                                          : EdgeInsets.only(right: 50, top: 2),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 9, left: 50)
+                                      : EdgeInsets.only(right: 50, top: 2),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -462,11 +515,11 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(
-                                              top: 12, bottom: 4, right: 10)
-                                          : EdgeInsets.only(
-                                              top: 8, bottom: 4, left: 20),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 12, bottom: 4, right: 10)
+                                      : EdgeInsets.only(
+                                      top: 8, bottom: 4, left: 20),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -503,17 +556,17 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                                 },
                                 child: Padding(
                                   padding:
-                                      (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 2,
-                                              right: 10,
-                                              left: 0)
-                                          : EdgeInsets.only(
-                                              top: 8,
-                                              bottom: 2,
-                                              left: 0,
-                                              right: 10),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 2,
+                                      right: 10,
+                                      left: 0)
+                                      : EdgeInsets.only(
+                                      top: 8,
+                                      bottom: 2,
+                                      left: 0,
+                                      right: 10),
                                   child: Column(
                                     children: [
                                       Image.asset(
@@ -536,6 +589,8 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                               ),
                             ],
                           ),
-                        ))))));
+                        )))))
+    );
   }
 }
+

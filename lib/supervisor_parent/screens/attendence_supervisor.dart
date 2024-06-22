@@ -1,80 +1,47 @@
-
-// import 'package:firebase_messaging/firebase_messaging.dart';
-import 'dart:convert';
-import 'dart:math';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:loadmore/loadmore.dart';
-import 'package:school_account/classes/loading.dart';
-import 'package:school_account/supervisor_parent/components/parents_card.dart';
-import 'package:school_account/supervisor_parent/components/check_in_card.dart';
-import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
-import 'package:school_account/main.dart';
-import 'package:school_account/supervisor_parent/screens/add_parents.dart';
+
+import 'package:flutter/material.dart';
+import 'package:school_account/supervisor_parent/components/added_child_card.dart';
+import 'package:school_account/supervisor_parent/screens/attendence_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
 import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-import 'package:school_account/supervisor_parent/screens/parents_view.dart';
+import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
-import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher_string.dart';
-import 'notification_parent.dart';
+
+import '../../main.dart';
 
 class AttendanceSupervisorScreen extends StatefulWidget {
-  final String? receiverPhone;
-
-  AttendanceSupervisorScreen({
-     this.receiverPhone,
-
-  });
-
   @override
-  _AttendanceSupervisorScreen createState() => _AttendanceSupervisorScreen();
+  _AttendanceSupervisorScreenState createState() => _AttendanceSupervisorScreenState();
 }
-class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool isStarting = false;
-  List<bool> checkin = [];
-  List<ChildDataItem> children = [];
-  List<QueryDocumentSnapshot<Object?>> data = []; // Declare data with the correct type
-  var fbm = FirebaseMessaging.instance ;
-  bool dataLoading=false;
-  final _firestore = FirebaseFirestore.instance;
-  final _scrollController = ScrollController();
-  final List<String> _list = List.generate(2, (index) => 'Item ${index + 1}');
-  int _currentPage = 1;
+
+class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final int _limit = 5; // Number of documents to fetch per page
+  DocumentSnapshot? _lastDocument;
   bool _isLoading = false;
-  int _currentMax = 2;//_currentMax keeps track of the number of items to display initially set to 10.
+  bool _hasMoreData = true;
+  List<DocumentSnapshot> _documents = [];
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
+  List<bool> checkin = [];
+  bool isStarting = false;
 
 
-  //_loadMoreNotifications increments _currentMax by 10 each time it is called
-  void _loadMoreNotifications() {
-    setState(() {
-      if (_currentMax < data.length) {
-        _currentMax += 3; // Increase the number of items to display by 10
-      }
-    });
-  }
 
-  void _makePhoneCall([String? phoneNumber]) async {
-    String? numberToCall = phoneNumber?? widget.receiverPhone;
-    if (numberToCall!= null && numberToCall.isNotEmpty) {
-      bool? res = await FlutterPhoneDirectCaller.callNumber(numberToCall);
-      if (res == null ||!res) {
-        print("Failed to make the call");
-      }
-    } else {
-      print("Receiver phone number is null or empty");
-    }
-  }
+  List<Map<String, dynamic>> childrenData = [];
+
+
   void makePhoneCall(String phoneNumber) async {
     var mobileCall = 'tel:$phoneNumber';
     if (await canLaunchUrlString(mobileCall)) {
@@ -85,117 +52,184 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
 
   }
 
-  Future<void> getDataForattendance() async {
-    setState(() {
-      dataLoading = true;
-    });
 
-    DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
-        .collection('supervisor')
-        .doc(sharedpref?.getString('id'))
-        .get();
+  String getJoinText(Timestamp? timestamp) {
+    if (timestamp == null) {
+      return 'Unknown date';
+    }
 
+    DateTime dateTime = timestamp.toDate();
+    Duration difference = DateTime.now().difference(dateTime);
 
-
-    setState(() {
-      dataLoading = false;
-    });
+    if (difference.inDays > 1) {
+      return 'Added ${difference.inDays} days ago';
+    } else if (difference.inDays == 1) {
+      return 'Added yesterday';
+    } else if (difference.inHours >= 1) {
+      return 'Added ${difference.inHours} hours ago';
+    } else if (difference.inMinutes >= 1) {
+      return 'Added ${difference.inMinutes} minutes ago';
+    } else {
+      return 'Added just now';
+    }
   }
 
-  getData() async {
+  Future<void> _fetchMoreData() async {
+    if (_isLoading || !_hasMoreData) return;
+
     setState(() {
-      dataLoading = true;
+      _isLoading = true;
     });
 
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('parent').get();
-      data.addAll(querySnapshot.docs);
-   checkin = List.filled(data.length, false);
+    print('Fetching data...');
+    Query query = _firestore.collection('your_collection')
+        .orderBy('your_field')
+        .limit(_limit);
 
-      // Get the phone number from the "phone" field
-      String phoneNumber = '';
-      for (var doc in querySnapshot.docs) {
-        phoneNumber = doc['phoneNumber'];
-        break; // assuming you only need the phone number from the first document
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+      print('Starting after document: ${_lastDocument!.id}');
+    }
+
+    try {
+      QuerySnapshot querySnapshot = await query.get();
+      print('Fetched ${querySnapshot.docs.length} documents');
+      if (querySnapshot.docs.isNotEmpty) {
+        _lastDocument = querySnapshot.docs.last;
+        setState(() {
+          _documents.addAll(querySnapshot.docs);
+          print('Total documents: ${_documents.length}');
+          if (querySnapshot.docs.length < _limit) {
+            _hasMoreData = false;
+            print('No more data to fetch');
+          }
+        });
+      } else {
+        setState(() {
+          _hasMoreData = false;
+          print('No more data to fetch');
+        });
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(() {
+        if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+          _fetchMoreData();
+        }
+      });
+
+    _searchController.addListener(_onSearchChanged);
+    // _scrollController.addListener(_scrollListener);
+    _fetchData();
+  }
+
+  Future<void> _fetchData({String query = ""}) async {
+    if (_isLoading || !_hasMoreData) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Query query = _firestore.collection('parent').limit(_limit);
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    final QuerySnapshot snapshot = await query.get();
+    if (snapshot.docs.isEmpty) {
+      setState(() {
+        _hasMoreData = false;
+      });
+    } else {
+
+      // List<Map<String, dynamic>> filteredChildrenData = childrenData.where((child) {
+      //   return child['name'].toLowerCase().contains(searchQuery.toLowerCase());
+      // }).toList();
+      List<Map<String, dynamic>> allChildren = [];
+      for (var parentDoc in snapshot.docs) {
+        List<dynamic> children = parentDoc['children'];
+        allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
       }
 
-      // Use the phone number
-      _makePhoneCall(phoneNumber);
-    } catch (e) {
-      print('Error fetching parent data: $e');
+      setState(() {
+        _lastDocument = snapshot.docs.last;
+        _documents.addAll(snapshot.docs);
+        childrenData.addAll(allChildren);
+        checkin = List.filled(_documents.length, false);
+
+      });
     }
 
     setState(() {
-      dataLoading = false;
+      _isLoading = false;
     });
   }
+
+  // Future<void> _fetchData({String query = ""}) async {
+  //   if (_isLoading || !_hasMoreData) return;
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   Query query = _firestore.collection('parent').limit(_limit);
+  //   if (_lastDocument != null) {
+  //     query = query.startAfterDocument(_lastDocument!);
+  //   }
+  //   final QuerySnapshot snapshot = await query.get();
+  //   if (snapshot.docs.isEmpty) {
+  //     setState(() {
+  //       _hasMoreData = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _lastDocument = snapshot.docs.last;
+  //       _documents.addAll(snapshot.docs);
+  //     });
+  //   }
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
+  void _onSearchChanged() {
+    setState(() {
+      searchQuery = _searchController.text.trim();
+      print('Search query changed: $searchQuery');
+    });
+    _fetchData(query: searchQuery);
+  }
+
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
-  void _loadMore() async {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-      if (!_isLoading) {
-        setState(() {
-          _isLoading = true;
-        });
 
-        try {
-          QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-              .collection('parent')
-              .startAfter([data.last.data()])
-              .limit(2)
-              .get();
-
-          setState(() {
-            data.addAll(querySnapshot.docs);
-            _isLoading = false;
-          });
-        } catch (e) {
-          print('Error fetching more data: $e');
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
+  void _scrollListener() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_isLoading) {
+      _fetchData();
     }
   }
-
-
-  @override
-  void initState() {
-    _scrollController.addListener(_loadMore);
-
-    getDataForattendance();
-    fbm.getToken().then((token) {
-      print('token===========================================');
-      print(token);
-      print('token');
-    });
-    FirebaseMessaging.onMessage.listen((event) {
-      print('notification===========================================');
-      print("${event.notification!.body}");
-      print('notification===========================================');
-    });
-    getData();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (dataLoading) {
-      return Center(
-        child: Loading(),
-      );
-    }
-
-
     return Scaffold(
-        key: _scaffoldKey,
-        endDrawer: SupervisorDrawer(),
-        body:GestureDetector(
+      // appBar: AppBar(
+      //   title: Text('Paginated List'),
+      // ),
+        body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
           },
@@ -252,457 +286,438 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                 ),
               ),
               Expanded(
-                child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        SizedBox(height: 20,),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child:
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 20,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 20.0),
-                                    child:
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child:
 
-                                    FutureBuilder(
-                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                        if (snapshot.hasError) {
-                                          return Text('Something went wrong');
-                                        }
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
-                                            return CircleAvatar(
-                                              radius: 30,
-                                              backgroundColor: Color(0xff442B72),
-                                              child: CircleAvatar(
-                                                backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                radius: 30,
-                                              ),
-                                            );
-                                          }
-
-                                          Map<String, dynamic>? data = snapshot.data?.data();
-                                          if (data != null && data['photo'] != null) {
-                                            return CircleAvatar(
-                                              radius: 30,
-                                              backgroundColor: Color(0xff442B72),
-                                              child: CircleAvatar(
-                                                backgroundImage: NetworkImage('${data['photo']}'),
-                                                radius:30,
-                                              ),
-                                            );
-                                          }
-                                        }
-
-                                        return Container();
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: 10,),
-                                  FutureBuilder(
-                                    future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                      if (snapshot.hasError) {
-                                        return Text('Something went wrong');
-                                      }
-
-                                      if (snapshot.connectionState == ConnectionState.done) {
-                                        if (snapshot.data?.data() == null) {
-                                          return Text(
-                                            'No data available',
-                                            style: TextStyle(
-                                              color: Color(0xff442B72),
-                                              fontSize: 12,
-                                              fontFamily: 'Poppins-Regular',
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          );
-                                        }
-
-                                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                        String schoolName = data['schoolname']?.toString() ?? 'no school';
-                                        List<String> words = schoolName.split(' ');
-
-                                        return Text.rich(
-                                          TextSpan(
-                                            children: [
-                                              for (String word in words) ...[
-                                                TextSpan(
-                                                  text: '$word\n',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF993D9A),
-                                                    fontSize: 20,
-                                                    fontFamily: 'Poppins-Bold',
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
+                                FutureBuilder(
+                                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Text('Something went wrong');
+                                    }
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
+                                        return CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor: Color(0xff442B72),
+                                          child: CircleAvatar(
+                                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                            radius: 30,
                                           ),
                                         );
                                       }
 
-                                      return CircularProgressIndicator();
-                                    },
-                                  )
+                                      Map<String, dynamic>? data = snapshot.data?.data();
+                                      if (data != null && data['photo'] != null) {
+                                        return CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor: Color(0xff442B72),
+                                          child: CircleAvatar(
+                                            backgroundImage: NetworkImage('${data['photo']}'),
+                                            radius:30,
+                                          ),
+                                        );
+                                      }
+                                    }
 
-
-                                  // SizedBox(width: 25,),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 25.0),
-                                child: SizedBox(
-                                  width: 119,
-                                  height: 40,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        padding:  EdgeInsets.all(0),
-                                        backgroundColor: Color(0xFF442B72),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(5)
-                                        )
-                                    ),
-                                    onPressed: () async {
-                                      isStarting =! isStarting;
-                                      setState(() {
-                                      });
-                                    },
-                                    child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,
-                                      style: TextStyle(
-                                          fontFamily: 'Poppins-SemiBold',
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                          fontSize: 13
-                                      ),),
-                                  ),
+                                    return Container();
+                                  },
                                 ),
+                              ),
+                              SizedBox(width: 10,),
+                              FutureBuilder(
+                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (snapshot.data?.data() == null) {
+                                      return Text(
+                                        'No data available',
+                                        style: TextStyle(
+                                          color: Color(0xff442B72),
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins-Regular',
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      );
+                                    }
+
+                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                                    String schoolName = data['schoolname']?.toString() ?? 'no school';
+                                    List<String> words = schoolName.split(' ');
+
+                                    return Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          for (String word in words) ...[
+                                            TextSpan(
+                                              text: '$word\n',
+                                              style: TextStyle(
+                                                color: Color(0xFF993D9A),
+                                                fontSize: 20,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  return CircularProgressIndicator();
+                                },
                               )
+
+
+                              // SizedBox(width: 25,),
                             ],
                           ),
-                        ),
-                        SizedBox(height: 15,),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                          child: Text('Attendances'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF771F98),
-                              fontSize: 19,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 25.0),
+                            child: SizedBox(
+                              width: 119,
+                              height: 40,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    padding:  EdgeInsets.all(0),
+                                    backgroundColor: Color(0xFF442B72),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5)
+                                    )
+                                ),
+                                onPressed: () async {
+                                  isStarting =! isStarting;
+                                  setState(() {
+                                  });
+                                },
+                                child: Text(
+                                  // 'test2',
+                                  isStarting? 'End Your trip'.tr:'Start your trip'.tr,
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins-SemiBold',
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      fontSize: 13
+                                  ),),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 15,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                      child: Text('Attendances'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF771F98),
+                          fontSize: 19,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                        ),),
+                    ),
+                    SizedBox(height: 15,),
 
-                        sharedpref!.getInt('invit') == 1 ?
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          child: SizedBox(
-                            height: data.length * 150,
-                            width: double.infinity,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                    controller: _scrollController,
-                                    itemCount: _currentMax < data.length
-                                        ? _currentMax + 1
-                                        : _currentMax,
-                                    // itemCount: data.length + (_isLoading? 1 : 0),
-                                  itemBuilder: (BuildContext context, int index) {
-                                    print('Building item at index $index');
+                    sharedpref!.getInt('invit') == 1 ?
 
-                                    String supervisorPhoneNumber = data[index]['phoneNumber']?? 0;
-                                    // if (index < data.length) {
-                                      List children = data[index]['children'] ?? 0;
+                    Container(
+                      height: 700,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics:  NeverScrollableScrollPhysics(),
+                          controller: _scrollController,
+                          itemCount: _documents.length + 1,
+                          itemBuilder: (context, index) {
 
-    if (index < data.length) {
-    return
-                                       Column(
-                                        children: [
-                                          for (var child in children)
-                                          if (child['supervisor'] == sharedpref!.getString('id').toString())
-                                            SizedBox(
-                                              width: double.infinity,
-                                              height:122,
-                                              child: Card(
-                                                elevation: 10,
-                                                color: Colors.white,
-                                                surfaceTintColor: Colors.transparent,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(14.0),
-                                              ),
-                                              child: Padding(
-                                                  padding: (sharedpref?.getString('lang') == 'ar')?
-                                                  EdgeInsets.only(right: 10.0 , left: 10) :
-                                                  EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(bottom: 20.0),
-                                                            child: Row(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                              children: [
-                                                                FutureBuilder(
-                                                                  future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                                    if (snapshot.hasError) {
-                                                                      return Text('Something went wrong');
-                                                                    }
+                            if (index == _documents.length) {
+                              return _isLoading
+                                  ? Center(child: CircularProgressIndicator())
+                                  : Center(child: Container()
+                                // Text('No more data')
+                              );
+                            }
+                            final DocumentSnapshot doc = _documents[index];
+                            final data = doc.data() as Map<String, dynamic>;
+                            var child = childrenData[index];
+                            String supervisorPhoneNumber = _documents[index]['phoneNumber']?? 0;
 
-                                                                    if (snapshot.connectionState == ConnectionState.done) {
-                                                                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                                        return CircleAvatar(
-                                                                          radius: 25,
-                                                                          backgroundColor: Color(0xff442B72),
-                                                                          child: CircleAvatar(
-                                                                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                            radius: 25,
-                                                                          ),
-                                                                        );
-                                                                      }
+                            return Column(
+                              children: [
+                                // for (var child in children)
+                                if (child['supervisor'] == sharedpref!.getString('id').toString())
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height:122,
+                                    child: Card(
+                                      elevation: 10,
+                                      color: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14.0),
+                                      ),
+                                      child: Padding(
+                                          padding: (sharedpref?.getString('lang') == 'ar')?
+                                          EdgeInsets.only(right: 10.0 , left: 10) :
+                                          EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(bottom: 20.0),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                        FutureBuilder(
+                                                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                            if (snapshot.hasError) {
+                                                              return Text('Something went wrong');
+                                                            }
 
-                                                                      Map<String, dynamic>? data = snapshot.data?.data();
-                                                                      if (data != null && data['busphoto'] != null) {
-                                                                        return CircleAvatar(
-                                                                          radius: 25,
-                                                                          backgroundColor: Color(0xff442B72),
-                                                                          child: CircleAvatar(
-                                                                            backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                            radius:25,
-                                                                          ),
-                                                                        );
-                                                                      }
-                                                                    }
-
-                                                                    return Container();
-                                                                  },
-                                                                ),
-
-                                                                const SizedBox(
-                                                                  width: 7,
-                                                                ),
-                                                                Padding(
-                                                                  padding: const EdgeInsets.only(top: 10.0),
-                                                                  child: Column(
-                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: [
-                                                                      Text(
-                                                                        '${child['name']}',
-                                                                        style: TextStyle(
-                                                                          color: Color(0xff442B72),
-                                                                          fontSize: 17,
-                                                                          fontFamily: 'Poppins-SemiBold',
-                                                                          fontWeight: FontWeight.w600,
-                                                                          height: 0.94,
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height: 4,
-                                                                      ),
-                                                                      Text.rich(
-                                                                        TextSpan(
-                                                                          children: [
-                                                                            TextSpan(
-                                                                              text: 'Grade: '.tr,
-                                                                              style: TextStyle(
-                                                                                color: Color(0xFF919191),
-                                                                                fontSize: 12,
-                                                                                fontFamily: 'Poppins-Light',
-                                                                                fontWeight: FontWeight.w400,
-                                                                                // height: 1.33,
-                                                                              ),
-                                                                            ),
-                                                                            TextSpan(
-                                                                              text: '${child['grade']}',
-                                                                              // '${data[index]['children']?[0]['grade'] }',
-                                                                              style: TextStyle(
-                                                                                color: Color(0xFF442B72),
-                                                                                fontSize: 12,
-                                                                                fontFamily: 'Poppins-Light',
-                                                                                fontWeight: FontWeight.w400,
-                                                                                // height: 1.33,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                            if (snapshot.connectionState == ConnectionState.done) {
+                                                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                                return CircleAvatar(
+                                                                  radius: 25,
+                                                                  backgroundColor: Color(0xff442B72),
+                                                                  child: CircleAvatar(
+                                                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                                    radius: 25,
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Column(
+                                                                );
+                                                              }
+
+                                                              Map<String, dynamic>? data = snapshot.data?.data();
+                                                              if (data != null && data['busphoto'] != null) {
+                                                                return CircleAvatar(
+                                                                  radius: 25,
+                                                                  backgroundColor: Color(0xff442B72),
+                                                                  child: CircleAvatar(
+                                                                    backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                                    radius:25,
+                                                                  ),
+                                                                );
+                                                              }
+                                                            }
+
+                                                            return Container();
+                                                          },
+                                                        ),
+
+                                                        const SizedBox(
+                                                          width: 7,
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(top: 10.0),
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [
-                                                              SizedBox(height: 20),
-                                                              Column(
-                                                                children: [
-                                                                  SizedBox(
-                                                                    height: 40,
-                                                                    width: 80,
-                                                                    child: ElevatedButton(
-                                                                      style: ElevatedButton.styleFrom(
-                                                                          padding:  EdgeInsets.all(0),
-                                                                          backgroundColor: Color(0xFF442B72),
-                                                                          shape: RoundedRectangleBorder(
-                                                                              borderRadius: BorderRadius.circular(5)
-                                                                          )
+                                                              Text(
+                                                                '${child['name']}',
+                                                                style: TextStyle(
+                                                                  color: Color(0xff442B72),
+                                                                  fontSize: 17,
+                                                                  fontFamily: 'Poppins-SemiBold',
+                                                                  fontWeight: FontWeight.w600,
+                                                                  height: 0.94,
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                height: 4,
+                                                              ),
+                                                              Text.rich(
+                                                                TextSpan(
+                                                                  children: [
+                                                                    TextSpan(
+                                                                      text: 'Grade: '.tr,
+                                                                      style: TextStyle(
+                                                                        color: Color(0xFF919191),
+                                                                        fontSize: 12,
+                                                                        fontFamily: 'Poppins-Light',
+                                                                        fontWeight: FontWeight.w400,
+                                                                        // height: 1.33,
                                                                       ),
-                                                                      onPressed: (){
-                                                                        // checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
-
-
-                                                                        setState(() {
-                                                                          checkin[index] = !checkin[index];
-                                                                        });
-                                                                      },
-                                                                      child: Text(
-                                                                        checkin[index] ? 'Check out'.tr : 'Check in'.tr,
-                                                                        style: TextStyle(
-                                                                            fontFamily: 'Poppins-SemiBold',
-                                                                            fontWeight: FontWeight.w600,
-                                                                            color: Colors.white,
-                                                                            fontSize: 13
-                                                                        ),),
                                                                     ),
-                                                                  ),
-                                                                  SizedBox(height: 15,),
-                                                                  Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: [
-                                                                      GestureDetector(
-                                                                        onTap:(){
-                                                                          makePhoneCall(supervisorPhoneNumber);
-
-                                                                        },
-                                                                        child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                                          color: Color(0xff442B72),
-                                                                          width: 28,
-                                                                          height: 28,),
+                                                                    TextSpan(
+                                                                      text: '${child['grade']}',
+                                                                      // '${data[index]['children']?[0]['grade'] }',
+                                                                      style: TextStyle(
+                                                                        color: Color(0xFF442B72),
+                                                                        fontSize: 12,
+                                                                        fontFamily: 'Poppins-Light',
+                                                                        fontWeight: FontWeight.w400,
+                                                                        // height: 1.33,
                                                                       ),
-                                                                      SizedBox(width: 9),
-                                                                      GestureDetector(
-                                                                        child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                                          color: Color(0xff442B72),
-                                                                          width: 26,
-                                                                          height: 26,),
-                                                                        onTap: () {
-                                                                          print('object');
-                                                                          Navigator.of(context).push(
-                                                                              MaterialPageRoute(builder: (context) =>
-                                                                                  ChatScreen(
-                                                                                    receiverName: data[index]['name'],
-                                                                                    receiverPhone: data[index]['phoneNumber'],
-                                                                                    receiverId : data[index].id,
-                                                                                  )));
-                                                                        },
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ],
+                                                                    ),
+                                                                  ],
+                                                                ),
                                                               ),
                                                             ],
-                                                          )
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Column(
+                                                    children: [
+                                                      SizedBox(height: 20),
+                                                      Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            height: 40,
+                                                            width: 80,
+                                                            child: ElevatedButton(
+                                                              style: ElevatedButton.styleFrom(
+                                                                  padding:  EdgeInsets.all(0),
+                                                                  backgroundColor: Color(0xFF442B72),
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.circular(5)
+                                                                  )
+                                                              ),
+                                                              onPressed: (){
+                                                                // checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
+
+
+                                                                setState(() {
+                                                                  checkin[index] = !checkin[index];
+                                                                });
+                                                              },
+                                                              child: Text(
+                                                                // 'test1',
+                                                                checkin[index] ? 'Check out'.tr : 'Check in'.tr,
+                                                                style: TextStyle(
+                                                                    fontFamily: 'Poppins-SemiBold',
+                                                                    fontWeight: FontWeight.w600,
+                                                                    color: Colors.white,
+                                                                    fontSize: 13
+                                                                ),),
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 15,),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              GestureDetector(
+                                                                onTap:(){
+                                                                  makePhoneCall(supervisorPhoneNumber);
+
+                                                                },
+                                                                child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                                  color: Color(0xff442B72),
+                                                                  width: 28,
+                                                                  height: 28,),
+                                                              ),
+                                                              SizedBox(width: 9),
+                                                              GestureDetector(
+                                                                child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                                  color: Color(0xff442B72),
+                                                                  width: 26,
+                                                                  height: 26,),
+                                                                onTap: () {
+                                                                  print('object');
+                                                                  Navigator.of(context).push(
+                                                                      MaterialPageRoute(builder: (context) =>
+                                                                          ChatScreen(
+                                                                            receiverName: data[index]['name'],
+                                                                            receiverPhone: data[index]['phoneNumber'],
+                                                                            receiverId : data[index].id,
+                                                                          )));
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ],
                                                       ),
                                                     ],
-                                                  )),
-                                            ),
-                                          ),
-                                      ],
-                                    );
-    }
-
-
-
-
-    else {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-                                  }
-
-                                ),
-
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                  ),
+                                SizedBox(height: 5,)
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ) :
+                    Column(
+                      children: [
+                        SizedBox(height: 50,),
+                        Image.asset('assets/images/Group 237684.png',
+                        ),
+                        Text('No Data Found'.tr,
+                          style: TextStyle(
+                            color: Color(0xff442B72),
+                            fontFamily: 'Poppins-Regular',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 19,
                           ),
-                        )
-                        //no data
-                            :
-                        Column(
-                          children: [
-                            SizedBox(height: 50,),
-                            Image.asset('assets/images/Group 237684.png',
-                            ),
-                            Text('No Data Found'.tr,
-                              style: TextStyle(
-                                color: Color(0xff442B72),
-                                fontFamily: 'Poppins-Regular',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 19,
-                              ),
-                            ),
-                            Text('You haven’t added any \n '
-                                'dates yet'.tr,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xffBE7FBF),
-                                fontFamily: 'Poppins-Light',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12,
-                              ),)
-                          ],
                         ),
-                        const SizedBox(
-                          height: 44,
-                        ),
-
+                        Text('You haven’t added any \n '
+                            'dates yet'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xffBE7FBF),
+                            fontFamily: 'Poppins-Light',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                          ),)
                       ],
-                    )
+                    ),
+                  ],
                 ),
-              ),
+              ))
             ],
-          ),
+          )
         ),
-        // extendBody: true,
+
         resizeToAvoidBottomInset: false,
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(100)),
             backgroundColor: Color(0xff442B72),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ProfileSupervisorScreen(
-                  )));
+                  builder: (context) => ProfileSupervisorScreen()));
             },
-            child:
-            Image.asset(
+            child: Image.asset(
               'assets/images/174237 1.png',
               height: 33,
               width: 33,
               fit: BoxFit.cover,
-            )
-        ),
+            )),
         bottomNavigationBar: Directionality(
             textDirection: Get.locale == Locale('ar')
                 ? TextDirection.rtl
@@ -746,16 +761,15 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top:7 , right: 15):
-                                  EdgeInsets.only(left: 15),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 7, right: 15)
+                                      : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (7).png',
                                           height: 20,
-                                          width: 20
-                                      ),
+                                          width: 20),
                                       SizedBox(height: 3),
                                       Text(
                                         "Home".tr,
@@ -772,27 +786,26 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  // setState(() {
-                                  //   Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) =>
-                                  //             AttendanceSupervisorScreen()),
-                                  //   );
-                                  // });
+                                  setState(() {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AttendanceSupervisorScreen()),
+                                    );
+                                  });
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 9, left: 50):
-                                  EdgeInsets.only( right: 50, top: 2 ),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 9, left: 50)
+                                      : EdgeInsets.only(right: 50, top: 2),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/icons8_checklist_1 1.png',
                                           height: 19,
-                                          width: 19
-                                      ),
+                                          width: 19),
                                       SizedBox(height: 3),
                                       Text(
                                         "Attendance".tr,
@@ -814,27 +827,27 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              NotificationsSupervisor()),
+                                              NotificationsParent()),
                                     );
                                   });
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                  EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 12, bottom: 4, right: 10)
+                                      : EdgeInsets.only(
+                                      top: 8, bottom: 4, left: 20),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (2).png',
                                           height: 17,
-                                          width: 16.2
-                                      ),
+                                          width: 16.2),
                                       Image.asset(
                                           'assets/images/Vector (5).png',
                                           height: 4,
-                                          width: 6
-                                      ),
+                                          width: 6),
                                       SizedBox(height: 2),
                                       Text(
                                         "Notifications".tr,
@@ -855,23 +868,29 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              TrackSupervisor()),
+                                          builder: (context) => TrackParent()),
                                     );
                                   });
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
-                                  EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 2,
+                                      right: 10,
+                                      left: 0)
+                                      : EdgeInsets.only(
+                                      top: 8,
+                                      bottom: 2,
+                                      left: 0,
+                                      right: 10),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (4).png',
                                           height: 18.36,
-                                          width: 23.5
-                                      ),
+                                          width: 23.5),
                                       SizedBox(height: 3),
                                       Text(
                                         "Buses".tr,
@@ -893,212 +912,11 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
   }
 }
 
-// // import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'dart:convert';
-//
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-// import 'package:get/get.dart';
-// import 'package:loadmore/loadmore.dart';
-// import 'package:school_account/supervisor_parent/components/parents_card.dart';
-// import 'package:school_account/supervisor_parent/components/check_in_card.dart';
-// import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-// import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
-// import 'package:school_account/main.dart';
-// import 'package:school_account/supervisor_parent/screens/add_parents.dart';
-// import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
-// import 'package:school_account/supervisor_parent/screens/home_supervisor.dart';
-// import 'package:school_account/supervisor_parent/screens/notification_supervisor.dart';
-// import 'package:school_account/supervisor_parent/screens/parents_view.dart';
-// import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
-// import 'package:school_account/supervisor_parent/screens/track_parent.dart';
-// import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'package:http/http.dart' as http;
-// import 'notification_parent.dart';
-//
-// class AttendanceSupervisorScreen extends StatefulWidget {
-//   AttendanceSupervisorScreen({
-//     Key? key,
-//   }) : super(key: key);
-//
-//   @override
-//   _AttendanceSupervisorScreen createState() => _AttendanceSupervisorScreen();
-// }
-// class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
-//   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-//   bool isStarting = false;
-//   bool Checkin = false;
-//   List<ChildDataItem> children = [];
-//   List<QueryDocumentSnapshot> data = [];
-//   var fbm = FirebaseMessaging.instance ;
-//   bool dataLoading=false;
-//   final _firestore = FirebaseFirestore.instance;
-//   String _nameSchool = ' ';
-//   int _currentPage = 1;
-//   int _limit = 2; // initial limit
-//   int _lastVisible = 0;
-//   List<int> _list = List.generate(6, (v) => v);
-//   bool _isLoading = false;
-//   final ScrollController _scrollController = ScrollController();
-//
-//
-//   @override
-//   void dispose() {
-//     _scrollController.removeListener(_scrollListener);
-//     super.dispose();
-//   }
-//
-//   void _scrollListener() {
-//     if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
-//         !_scrollController.position.outOfRange) {
-//       if (!_isLoading) {
-//         print("Reached end of scroll. Loading more data...");
-//         _loadMore();
-//       }
-//     }
-//   }
-//
-//   // @override
-//   // void initState() {
-//   //   super.initState();
-//   //   _scrollController.addListener(_scrollListener);
-//   // }
-//
-//
-//   Future<void> _loadMore() async {
-//     if (_isLoading) return;
-//     print("Loading more data...");
-//     setState(() {
-//       _isLoading = true;
-//     });
-//
-//     QuerySnapshot snapshot = await FirebaseFirestore.instance
-//         .collection('parent')
-//         .orderBy('createdAt', descending: true)
-//         .limit(_limit)
-//         .startAfter([_lastVisible])
-//         .get();
-//
-//     if (snapshot.docs.isNotEmpty) {
-//       _lastVisible = snapshot.docs.last['createdAt'];
-//       data.addAll(snapshot.docs);
-//     }
-//
-//     print("Loaded ${snapshot.docs.length} more items. Total items: ${data.length}");
-//
-//     setState(() {
-//       _isLoading = false;
-//     });
-//   }  //   if (_isLoading) return false; // If loading is in progress, return false
-//   //   _isLoading = true; // Set loading flag to true
-//   //   print("onLoadMore");
-//   //   await Future.delayed(Duration(seconds: 2)); // Simulate network delay
-//   //   setState(() {
-//   //     _list.addAll(List.generate(5, (v) => v + _list.length)); // Add 5 more items
-//   //   });
-//   //   _isLoading = false;
-//   //   print('falseeeeeeeeeee');// Set loading flag to false
-//   //   return true;
-//   // }
-//
-//   Future<void> _refresh() async {
-//     setState(() {
-//       _list.clear();
-//       _list.addAll(List.generate(6, (v) => v));
-//       _currentPage = 1;
-//     });
-//   }
-//
-//
-//   // void _makePhoneCall() async {
-//   //   bool? res = await FlutterPhoneDirectCaller.callNumber(widget.receiverPhone);
-//   //   if (!res!) {
-//   //     print("Failed to make the call");
-//   //   }
-//   // }
-//
-//   Future<void> getDataForattendance() async {
-//     setState(() {
-//       dataLoading = true;
-//     });
-//
-//     DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
-//         .collection('supervisor')
-//         .doc(sharedpref?.getString('id'))
-//         .get();
-//
-//
-//
-//     setState(() {
-//       dataLoading = false;
-//     });
-//   }
-//
-//   getData()async{
-//     setState(() {
-//       dataLoading =true;
-//
-//     });
-//     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
-//     data.addAll(querySnapshot.docs);
-//     setState(() {
-//       dataLoading =false;
-//
-//     });
-//   }
-//
-//   @override
-//   void initState() {
-//     _limit++;
-//     _loadMore();
-//     // _list = List.generate(6, (v) => v); // Initialize with 6 items
-//     _scrollController.addListener(_scrollListener);
-//     // getMassege();
-//     getDataForattendance();
-//     fbm.getToken().then((token) {
-//       print('token===========================================');
-//       print(token);
-//       print('token');
-//     });
-//     FirebaseMessaging.onMessage.listen((event) {
-//       print('notification===========================================');
-//       print("${event.notification!.body}");
-//       print('notification===========================================');
-//     });
-//
-//
-//
-//     getData();
-//     super.initState();
-//
-//   }
-//
-//
-//   // getToken() async{
-// //       String? myToken = await FirebaseMessaging.instance.getToken();
-// //       print('object');
-// //       print(myToken);
-// // }
-// //
-// // @override
-// //   void initState() {
-// //      getToken();
-// //      super.initState();
-// //   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         key: _scaffoldKey,
-//         endDrawer: SupervisorDrawer(),
-//         body:GestureDetector(
-//           onTap: () {
-//             FocusScope.of(context).unfocus();
-//           },
-//           child: Column(
+
+
+
+
+//Column(
 //             children: [
 //               SizedBox(
 //                 height: 35,
@@ -1150,708 +968,433 @@ class _AttendanceSupervisorScreen extends State<AttendanceSupervisorScreen> {
 //                   ],
 //                 ),
 //               ),
-//               Expanded(
-//                 child: SingleChildScrollView(
-//                     child: Column(
-//                       mainAxisAlignment: MainAxisAlignment.start,
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
 //
-//                         SizedBox(height: 20,),
-//                         Padding(
-//                           padding: const EdgeInsets.symmetric(horizontal: 25.0),
-//                           child: Row(
-//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             children: [
-//                               Row(
-//                                 crossAxisAlignment: CrossAxisAlignment.start,
-//                                 children: [
-//                                   Padding(
-//                                     padding: const EdgeInsets.only(bottom: 20.0),
-//                                     child:
+//               Column(
+//                 children: [
+//                   Expanded(
+//                     flex: 0,
+//                     child: SingleChildScrollView(
+//                       child: Column(
+//                         mainAxisAlignment: MainAxisAlignment.start,
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           SizedBox(height: 20,),
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(horizontal: 25.0),
+//                             child: Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Row(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Padding(
+//                                       padding: const EdgeInsets.only(bottom: 20.0),
+//                                       child:
 //
+//                                       FutureBuilder(
+//                                         future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+//                                         builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+//                                           if (snapshot.hasError) {
+//                                             return Text('Something went wrong');
+//                                           }
+//                                           if (snapshot.connectionState == ConnectionState.done) {
+//                                             if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
+//                                               return CircleAvatar(
+//                                                 radius: 30,
+//                                                 backgroundColor: Color(0xff442B72),
+//                                                 child: CircleAvatar(
+//                                                   backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+//                                                   radius: 30,
+//                                                 ),
+//                                               );
+//                                             }
+//
+//                                             Map<String, dynamic>? data = snapshot.data?.data();
+//                                             if (data != null && data['photo'] != null) {
+//                                               return CircleAvatar(
+//                                                 radius: 30,
+//                                                 backgroundColor: Color(0xff442B72),
+//                                                 child: CircleAvatar(
+//                                                   backgroundImage: NetworkImage('${data['photo']}'),
+//                                                   radius:30,
+//                                                 ),
+//                                               );
+//                                             }
+//                                           }
+//
+//                                           return Container();
+//                                         },
+//                                       ),
+//                                     ),
+//                                     SizedBox(width: 10,),
 //                                     FutureBuilder(
 //                                       future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-//                                       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+//                                       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
 //                                         if (snapshot.hasError) {
 //                                           return Text('Something went wrong');
 //                                         }
+//
 //                                         if (snapshot.connectionState == ConnectionState.done) {
-//                                           if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
-//                                             return CircleAvatar(
-//                                               radius: 30,
-//                                               backgroundColor: Color(0xff442B72),
-//                                               child: CircleAvatar(
-//                                                 backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-//                                                 radius: 30,
+//                                           if (snapshot.data?.data() == null) {
+//                                             return Text(
+//                                               'No data available',
+//                                               style: TextStyle(
+//                                                 color: Color(0xff442B72),
+//                                                 fontSize: 12,
+//                                                 fontFamily: 'Poppins-Regular',
+//                                                 fontWeight: FontWeight.w400,
 //                                               ),
 //                                             );
 //                                           }
 //
-//                                           Map<String, dynamic>? data = snapshot.data?.data();
-//                                           if (data != null && data['photo'] != null) {
-//                                             return CircleAvatar(
-//                                               radius: 30,
-//                                               backgroundColor: Color(0xff442B72),
-//                                               child: CircleAvatar(
-//                                                 backgroundImage: NetworkImage('${data['photo']}'),
-//                                                 radius:30,
-//                                               ),
-//                                             );
-//                                           }
-//                                         }
+//                                           Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
 //
-//                                         return Container();
-//                                       },
-//                                     ),
-//                                   ),
-//                                   SizedBox(width: 10,),
-//                                   FutureBuilder(
-//                                     future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-//                                     builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-//                                       if (snapshot.hasError) {
-//                                         return Text('Something went wrong');
-//                                       }
+//                                           String schoolName = data['schoolname']?.toString() ?? 'no school';
+//                                           List<String> words = schoolName.split(' ');
 //
-//                                       if (snapshot.connectionState == ConnectionState.done) {
-//                                         if (snapshot.data?.data() == null) {
-//                                           return Text(
-//                                             'No data available',
-//                                             style: TextStyle(
-//                                               color: Color(0xff442B72),
-//                                               fontSize: 12,
-//                                               fontFamily: 'Poppins-Regular',
-//                                               fontWeight: FontWeight.w400,
+//                                           return Text.rich(
+//                                             TextSpan(
+//                                               children: [
+//                                                 for (String word in words) ...[
+//                                                   TextSpan(
+//                                                     text: '$word\n',
+//                                                     style: TextStyle(
+//                                                       color: Color(0xFF993D9A),
+//                                                       fontSize: 20,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                     ),
+//                                                   ),
+//                                                 ],
+//                                               ],
 //                                             ),
 //                                           );
 //                                         }
 //
-//                                         Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-//
-//                                         String schoolName = data['schoolname']?.toString() ?? 'no school';
-//                                         List<String> words = schoolName.split(' ');
-//
-//                                         return Text.rich(
-//                                           TextSpan(
-//                                             children: [
-//                                               for (String word in words) ...[
-//                                                 TextSpan(
-//                                                   text: '$word\n',
-//                                                   style: TextStyle(
-//                                                     color: Color(0xFF993D9A),
-//                                                     fontSize: 20,
-//                                                     fontFamily: 'Poppins-Bold',
-//                                                     fontWeight: FontWeight.w700,
-//                                                   ),
-//                                                 ),
-//                                               ],
-//                                             ],
-//                                           ),
-//                                         );
-//                                       }
-//
-//                                       return CircularProgressIndicator();
-//                                     },
-//                                   )
+//                                         return CircularProgressIndicator();
+//                                       },
+//                                     )
 //
 //
-//                                   // SizedBox(width: 25,),
-//                                 ],
-//                               ),
-//                               Padding(
-//                                 padding: const EdgeInsets.only(bottom: 25.0),
-//                                 child: SizedBox(
-//                                   width: 119,
-//                                   height: 40,
-//                                   child: ElevatedButton(
-//                                     style: ElevatedButton.styleFrom(
-//                                         padding:  EdgeInsets.all(0),
-//                                         backgroundColor: Color(0xFF442B72),
-//                                         shape: RoundedRectangleBorder(
-//                                             borderRadius: BorderRadius.circular(5)
-//                                         )
-//                                     ),
-//                                     onPressed: () async {
-//                                       // if (sharedpref!.getInt('invit') == 1) {
-//                                       //   isStarting = true;
-//                                       //   // sendNotify('tittle', 'body', 'id');
-//                                       // } else {
-//                                       //   isStarting = false;
-//                                       // }
-//                                       // isStarting =
-//                                       // // children.isNotEmpty?
-//                                       // true;
-//
-//                                       isStarting =! isStarting;
-//
-//                                       // no data
-//                                       // : false;
-//                                       setState(() {
-//                                       });
-//                                       // // Send a notification
-//                                       // final message = {
-//                                       // 'notification': {
-//                                       // 'title': 'Trip Started',
-//                                       // 'body': 'Your trip has started',
-//                                       // },
-//                                       // 'token': 'your_device_token_here', // replace with the actual device token
-//                                       // };
-//                                       //
-//                                       // try {
-//                                       // await FirebaseMessaging.instance.send(message);
-//                                       // } catch (e) {
-//                                       // print('Error sending notification: $e');
-//                                       // }
-//                                       // },
-//                                       //                                 getToken();
-//
-//                                     },
-//                                     child: Text( isStarting? 'End Your trip'.tr:'Start your trip'.tr,
-//                                       style: TextStyle(
-//                                           fontFamily: 'Poppins-SemiBold',
-//                                           fontWeight: FontWeight.w600,
-//                                           color: Colors.white,
-//                                           fontSize: 13
-//                                       ),),
-//                                   ),
+//                                     // SizedBox(width: 25,),
+//                                   ],
 //                                 ),
-//                               )
-//                             ],
-//                           ),
-//                         ),
-//                         SizedBox(height: 15,),
-//                         // GestureDetector(
-//                         //     onTap: (){
-//                         //
-//                         //     },
-//                         //     child: Text('datatest' , style: TextStyle(fontSize: 60),)),
-//                         Padding(
-//                           padding: const EdgeInsets.symmetric(horizontal: 28.0),
-//                           child: Text('Attendances'.tr,
-//                             style: TextStyle(
-//                               color: Color(0xFF771F98),
-//                               fontSize: 19,
-//                               fontFamily: 'Poppins-Bold',
-//                               fontWeight: FontWeight.w700,
-//                             ),),
-//                         ),
-//
-//                         sharedpref!.getInt('invit') == 1 ?
-//                         Padding(
-//                             padding: EdgeInsets.symmetric(horizontal: 20.0),
-//                           child: SizedBox(
-//                             height: data.length*135,
-//                             width: double.infinity,
-//                             // child: RefreshIndicator(
-//                             //   onRefresh: _refresh,
-//                             //   child: LoadMore(
-//                             //     isFinish: _list.length >= 51, // لضمان الاستمرار حتى 50 عنصر
-//                             //     onLoadMore: _isLoading ? () async => false : _loadMore,
-//                             //     whenEmptyLoad: true,
-//                             //     delegate: const DefaultLoadMoreDelegate(),
-//                                 // textBuilder: DefaultLoadMoreTextBuilder.chinese,
-//                                 child: ListView.builder(
-//                                   controller: _scrollController,
-//                                   shrinkWrap: true,
-//                                   physics: NeverScrollableScrollPhysics(),
-//                                   itemCount: _list.length + (_isLoading ? 1 : 0),
-//                                   // itemCount: _list.length,
-//                                   itemBuilder: (BuildContext context, int index) {
-//                                     if (index >= data.length) {
-//                                       return SizedBox(); // Return an empty widget if the index is out of range
-//                                     }
-//                                     // if (index >= _list.length - 1) {
-//                                     //   // Show a loading indicator when reaching the bottom of the list
-//                                     //   return Center(child: CircularProgressIndicator());
-//                                     // }
-//                                     List children = data[index]['children'];
-//                                     List<bool> checkinStates = List.generate(children.length, (i) => false);
-//                                     return Column(
-//                                         children: [
-//                                           for (var child in children)
-//                                             // if (child['supervisor'] == sharedpref!.getString('id').toString())
-//                                               SizedBox(
-//                                         width: double.infinity,
-//                                         height:122,
-//                                         child: Card(
-//                                           elevation: 10,
-//                                           color: Colors.white,
-//                                           surfaceTintColor: Colors.transparent,
+//                                 Padding(
+//                                   padding: const EdgeInsets.only(bottom: 25.0),
+//                                   child: SizedBox(
+//                                     width: 119,
+//                                     height: 40,
+//                                     child: ElevatedButton(
+//                                       style: ElevatedButton.styleFrom(
+//                                           padding:  EdgeInsets.all(0),
+//                                           backgroundColor: Color(0xFF442B72),
 //                                           shape: RoundedRectangleBorder(
-//                                             borderRadius: BorderRadius.circular(14.0),
-//                                           ),
-//                                           child: Padding(
-//                                               padding: (sharedpref?.getString('lang') == 'ar')?
-//                                               EdgeInsets.only(right: 10.0 , left: 10) :
-//                                               EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
-//                                               child: Column(
-//                                                 mainAxisAlignment: MainAxisAlignment.start,
+//                                               borderRadius: BorderRadius.circular(5)
+//                                           )
+//                                       ),
+//                                       onPressed: () async {
+//                                         isStarting =! isStarting;
+//                                         setState(() {
+//                                         });
+//                                       },
+//                                       child: Text(
+//                                         // 'test2',
+//                                         isStarting? 'End Your trip'.tr:'Start your trip'.tr,
+//                                         style: TextStyle(
+//                                             fontFamily: 'Poppins-SemiBold',
+//                                             fontWeight: FontWeight.w600,
+//                                             color: Colors.white,
+//                                             fontSize: 13
+//                                         ),),
+//                                     ),
+//                                   ),
+//                                 )
+//                               ],
+//                             ),
+//                           ),
+//                           SizedBox(height: 15,),
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(horizontal: 28.0),
+//                             child: Text('Attendances'.tr,
+//                               style: TextStyle(
+//                                 color: Color(0xFF771F98),
+//                                 fontSize: 19,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                               ),),
+//                           ),
+//                           SizedBox(height: 15,)
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//
+//               Expanded(
+//
+//                 child:
+//                 sharedpref!.getInt('invit') == 1 ?
+//
+//                 Padding(
+//                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+//                   child: ListView.builder(
+//                     shrinkWrap: true,
+//                     // physics:  NeverScrollableScrollPhysics(),
+//                     controller: _scrollController,
+//                     itemCount: _documents.length + 1,
+//                     itemBuilder: (context, index) {
+//
+//                       if (index == _documents.length) {
+//                         return _isLoading
+//                             ? Center(child: CircularProgressIndicator())
+//                             : Center(child: Container()
+//                           // Text('No more data')
+//                         );
+//                       }
+//                       final DocumentSnapshot doc = _documents[index];
+//                       final data = doc.data() as Map<String, dynamic>;
+//                       var child = childrenData[index];
+//                       String supervisorPhoneNumber = _documents[index]['phoneNumber']?? 0;
+//
+//                       return Column(
+//                         children: [
+//                           // for (var child in children)
+//                           if (child['supervisor'] == sharedpref!.getString('id').toString())
+//                             SizedBox(
+//                               width: double.infinity,
+//                               height:122,
+//                               child: Card(
+//                                 elevation: 10,
+//                                 color: Colors.white,
+//                                 surfaceTintColor: Colors.transparent,
+//                                 shape: RoundedRectangleBorder(
+//                                   borderRadius: BorderRadius.circular(14.0),
+//                                 ),
+//                                 child: Padding(
+//                                     padding: (sharedpref?.getString('lang') == 'ar')?
+//                                     EdgeInsets.only(right: 10.0 , left: 10) :
+//                                     EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
+//                                     child: Column(
+//                                       mainAxisAlignment: MainAxisAlignment.start,
+//                                       crossAxisAlignment: CrossAxisAlignment.start,
+//                                       children: [
+//                                         Row(
+//                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                           children: [
+//                                             Padding(
+//                                               padding: const EdgeInsets.only(bottom: 20.0),
+//                                               child: Row(
 //                                                 crossAxisAlignment: CrossAxisAlignment.start,
+//                                                 mainAxisAlignment: MainAxisAlignment.start,
 //                                                 children: [
-//                                                   Row(
-//                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                                                     children: [
-//                                                       Padding(
-//                                                         padding: const EdgeInsets.only(bottom: 20.0),
-//                                                         child: Row(
-//                                                           crossAxisAlignment: CrossAxisAlignment.start,
-//                                                           mainAxisAlignment: MainAxisAlignment.start,
-//                                                           children: [
-//                                                             FutureBuilder(
-//                                                               future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-//                                                               builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-//                                                                 if (snapshot.hasError) {
-//                                                                   return Text('Something went wrong');
-//                                                                 }
+//                                                   FutureBuilder(
+//                                                     future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+//                                                     builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+//                                                       if (snapshot.hasError) {
+//                                                         return Text('Something went wrong');
+//                                                       }
 //
-//                                                                 if (snapshot.connectionState == ConnectionState.done) {
-//                                                                   if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-//                                                                     return CircleAvatar(
-//                                                                       radius: 25,
-//                                                                       backgroundColor: Color(0xff442B72),
-//                                                                       child: CircleAvatar(
-//                                                                         backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-//                                                                         radius: 25,
-//                                                                       ),
-//                                                                     );
-//                                                                   }
-//
-//                                                                   Map<String, dynamic>? data = snapshot.data?.data();
-//                                                                   if (data != null && data['busphoto'] != null) {
-//                                                                     return CircleAvatar(
-//                                                                       radius: 25,
-//                                                                       backgroundColor: Color(0xff442B72),
-//                                                                       child: CircleAvatar(
-//                                                                         backgroundImage: NetworkImage('${data['busphoto']}'),
-//                                                                         radius:25,
-//                                                                       ),
-//                                                                     );
-//                                                                   }
-//                                                                 }
-//
-//                                                                 return Container();
-//                                                               },
+//                                                       if (snapshot.connectionState == ConnectionState.done) {
+//                                                         if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+//                                                           return CircleAvatar(
+//                                                             radius: 25,
+//                                                             backgroundColor: Color(0xff442B72),
+//                                                             child: CircleAvatar(
+//                                                               backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+//                                                               radius: 25,
 //                                                             ),
+//                                                           );
+//                                                         }
 //
-//                                                             const SizedBox(
-//                                                               width: 7,
+//                                                         Map<String, dynamic>? data = snapshot.data?.data();
+//                                                         if (data != null && data['busphoto'] != null) {
+//                                                           return CircleAvatar(
+//                                                             radius: 25,
+//                                                             backgroundColor: Color(0xff442B72),
+//                                                             child: CircleAvatar(
+//                                                               backgroundImage: NetworkImage('${data['busphoto']}'),
+//                                                               radius:25,
 //                                                             ),
-//                                                             Padding(
-//                                                               padding: const EdgeInsets.only(top: 10.0),
-//                                                               child: Column(
-//                                                                 mainAxisAlignment: MainAxisAlignment.start,
-//                                                                 crossAxisAlignment: CrossAxisAlignment.start,
-//                                                                 children: [
-//                                                                   Text(
-//                                                                     '${child['name']}',
-//                                                                     style: TextStyle(
-//                                                                       color: Color(0xff442B72),
-//                                                                       fontSize: 17,
-//                                                                       fontFamily: 'Poppins-SemiBold',
-//                                                                       fontWeight: FontWeight.w600,
-//                                                                       height: 0.94,
-//                                                                     ),
-//                                                                   ),
-//                                                                   SizedBox(
-//                                                                     height: 4,
-//                                                                   ),
-//                                                                   Text.rich(
-//                                                                     TextSpan(
-//                                                                       children: [
-//                                                                         TextSpan(
-//                                                                           text: 'Grade: '.tr,
-//                                                                           style: TextStyle(
-//                                                                             color: Color(0xFF919191),
-//                                                                             fontSize: 12,
-//                                                                             fontFamily: 'Poppins-Light',
-//                                                                             fontWeight: FontWeight.w400,
-//                                                                             // height: 1.33,
-//                                                                           ),
-//                                                                         ),
-//                                                                         TextSpan(
-//                                                                           text: '${child['grade']}',
-//                                                                           // '${data[index]['children']?[0]['grade'] }',
-//                                                                           style: TextStyle(
-//                                                                             color: Color(0xFF442B72),
-//                                                                             fontSize: 12,
-//                                                                             fontFamily: 'Poppins-Light',
-//                                                                             fontWeight: FontWeight.w400,
-//                                                                             // height: 1.33,
-//                                                                           ),
-//                                                                         ),
-//                                                                       ],
-//                                                                     ),
-//                                                                   ),
-//                                                                 ],
-//                                                               ),
-//                                                             ),
-//                                                           ],
+//                                                           );
+//                                                         }
+//                                                       }
+//
+//                                                       return Container();
+//                                                     },
+//                                                   ),
+//
+//                                                   const SizedBox(
+//                                                     width: 7,
+//                                                   ),
+//                                                   Padding(
+//                                                     padding: const EdgeInsets.only(top: 10.0),
+//                                                     child: Column(
+//                                                       mainAxisAlignment: MainAxisAlignment.start,
+//                                                       crossAxisAlignment: CrossAxisAlignment.start,
+//                                                       children: [
+//                                                         Text(
+//                                                           '${child['name']}',
+//                                                           style: TextStyle(
+//                                                             color: Color(0xff442B72),
+//                                                             fontSize: 17,
+//                                                             fontFamily: 'Poppins-SemiBold',
+//                                                             fontWeight: FontWeight.w600,
+//                                                             height: 0.94,
+//                                                           ),
 //                                                         ),
-//                                                       ),
-//                                                       Column(
-//                                                         children: [
-//                                                           SizedBox(height: 20),
-//                                                           Column(
+//                                                         SizedBox(
+//                                                           height: 4,
+//                                                         ),
+//                                                         Text.rich(
+//                                                           TextSpan(
 //                                                             children: [
-//                                                               SizedBox(
-//                                                                 height: 40,
-//                                                                 width: 80,
-//                                                                 child: ElevatedButton(
-//                                                                   style: ElevatedButton.styleFrom(
-//                                                                       padding:  EdgeInsets.all(0),
-//                                                                       backgroundColor: Color(0xFF442B72),
-//                                                                       shape: RoundedRectangleBorder(
-//                                                                           borderRadius: BorderRadius.circular(5)
-//                                                                       )
-//                                                                   ),
-//                                                                   onPressed: (){
-//                                                                     checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
-//
-//                                                                     Checkin = !Checkin;
-//                                                                     setState(() {
-//                                                                     });
-//                                                                   },
-//                                                                   child: Text(
-//                                                                     Checkin? 'Check out'.tr : 'Check in'.tr,
-//                                                                     style: TextStyle(
-//                                                                         fontFamily: 'Poppins-SemiBold',
-//                                                                         fontWeight: FontWeight.w600,
-//                                                                         color: Colors.white,
-//                                                                         fontSize: 13
-//                                                                     ),),
-//
-//
+//                                                               TextSpan(
+//                                                                 text: 'Grade: '.tr,
+//                                                                 style: TextStyle(
+//                                                                   color: Color(0xFF919191),
+//                                                                   fontSize: 12,
+//                                                                   fontFamily: 'Poppins-Light',
+//                                                                   fontWeight: FontWeight.w400,
+//                                                                   // height: 1.33,
 //                                                                 ),
 //                                                               ),
-//                                                               SizedBox(height: 15,),
-//                                                               Row(
-//                                                                 mainAxisAlignment: MainAxisAlignment.start,
-//                                                                 crossAxisAlignment: CrossAxisAlignment.start,
-//                                                                 children: [
-//                                                                   GestureDetector(
-//                                                                     onTap:(){
-//                                                                       // _makePhoneCall();
-//
-//                                                                     },
-//                                                                     child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
-//                                                                       color: Color(0xff442B72),
-//                                                                       width: 28,
-//                                                                       height: 28,),
-//                                                                   ),
-//                                                                   SizedBox(width: 9),
-//                                                                   GestureDetector(
-//                                                                     child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-//                                                                       color: Color(0xff442B72),
-//                                                                       width: 26,
-//                                                                       height: 26,),
-//                                                                     onTap: () {
-//                                                                       print('object');
-//                                                                       Navigator.of(context).push(
-//                                                                           MaterialPageRoute(builder: (context) =>
-//                                                                               ChatScreen(
-//                                                                                 receiverName: data[index]['name'],
-//                                                                                 receiverPhone: data[index]['phoneNumber'],
-//                                                                                 receiverId : data[index].id,
-//                                                                               )));
-//                                                                     },
-//                                                                   ),
-//                                                                 ],
+//                                                               TextSpan(
+//                                                                 text: '${child['grade']}',
+//                                                                 // '${data[index]['children']?[0]['grade'] }',
+//                                                                 style: TextStyle(
+//                                                                   color: Color(0xFF442B72),
+//                                                                   fontSize: 12,
+//                                                                   fontFamily: 'Poppins-Light',
+//                                                                   fontWeight: FontWeight.w400,
+//                                                                   // height: 1.33,
+//                                                                 ),
 //                                                               ),
 //                                                             ],
 //                                                           ),
-//                                                         ],
-//                                                       )
-//
-//                                                     ],
+//                                                         ),
+//                                                       ],
+//                                                     ),
 //                                                   ),
-//                                                   // Padding(
-//                                                   //   padding: (sharedpref?.getString('lang') == 'ar')?
-//                                                   //   EdgeInsets.only(top: 12, right:220 ):
-//                                                   //   EdgeInsets.only(top: 12, left:220 ),
-//                                                   //   child: Row(
-//                                                   //     mainAxisAlignment: MainAxisAlignment.start,
-//                                                   //     crossAxisAlignment: CrossAxisAlignment.start,
-//                                                   //     children: [
-//                                                   //       Image.asset('assets/images/icons8_phone 1 (1).png' ,
-//                                                   //         color: Color(0xff442B72),
-//                                                   //         width: 28,
-//                                                   //         height: 28,),
-//                                                   //       SizedBox(width: 9),
-//                                                   //       GestureDetector(
-//                                                   //         child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-//                                                   //           color: Color(0xff442B72),
-//                                                   //           width: 26,
-//                                                   //           height: 26,),
-//                                                   //         onTap: () {
-//                                                   //           Navigator.of(context).push(
-//                                                   //               MaterialPageRoute(builder: (context) =>
-//                                                   //                   ChatScreen()));
-//                                                   //         },
-//                                                   //       ),
-//                                                   //     ],
-//                                                   //   ),
-//                                                   // ),
-//
 //                                                 ],
-//                                               )),
+//                                               ),
+//                                             ),
+//                                             Column(
+//                                               children: [
+//                                                 SizedBox(height: 20),
+//                                                 Column(
+//                                                   children: [
+//                                                     SizedBox(
+//                                                       height: 40,
+//                                                       width: 80,
+//                                                       child: ElevatedButton(
+//                                                         style: ElevatedButton.styleFrom(
+//                                                             padding:  EdgeInsets.all(0),
+//                                                             backgroundColor: Color(0xFF442B72),
+//                                                             shape: RoundedRectangleBorder(
+//                                                                 borderRadius: BorderRadius.circular(5)
+//                                                             )
+//                                                         ),
+//                                                         onPressed: (){
+//                                                           // checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
+//
+//
+//                                                           setState(() {
+//                                                             checkin[index] = !checkin[index];
+//                                                           });
+//                                                         },
+//                                                         child: Text(
+//                                                           // 'test1',
+//                                                           checkin[index] ? 'Check out'.tr : 'Check in'.tr,
+//                                                           style: TextStyle(
+//                                                               fontFamily: 'Poppins-SemiBold',
+//                                                               fontWeight: FontWeight.w600,
+//                                                               color: Colors.white,
+//                                                               fontSize: 13
+//                                                           ),),
+//                                                       ),
+//                                                     ),
+//                                                     SizedBox(height: 15,),
+//                                                     Row(
+//                                                       mainAxisAlignment: MainAxisAlignment.start,
+//                                                       crossAxisAlignment: CrossAxisAlignment.start,
+//                                                       children: [
+//                                                         GestureDetector(
+//                                                           onTap:(){
+//                                                             makePhoneCall(supervisorPhoneNumber);
+//
+//                                                           },
+//                                                           child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+//                                                             color: Color(0xff442B72),
+//                                                             width: 28,
+//                                                             height: 28,),
+//                                                         ),
+//                                                         SizedBox(width: 9),
+//                                                         GestureDetector(
+//                                                           child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+//                                                             color: Color(0xff442B72),
+//                                                             width: 26,
+//                                                             height: 26,),
+//                                                           onTap: () {
+//                                                             print('object');
+//                                                             Navigator.of(context).push(
+//                                                                 MaterialPageRoute(builder: (context) =>
+//                                                                     ChatScreen(
+//                                                                       receiverName: data[index]['name'],
+//                                                                       receiverPhone: data[index]['phoneNumber'],
+//                                                                       receiverId : data[index].id,
+//                                                                     )));
+//                                                           },
+//                                                         ),
+//                                                       ],
+//                                                     ),
+//                                                   ],
+//                                                 ),
+//                                               ],
+//                                             )
+//                                           ],
 //                                         ),
-//                                       ),
-//                                           // if (_isLoading) Center(child: CircularProgressIndicator()),
-//                                           // CheckInCard(),
-//                                           SizedBox(height: 0,)
-//                                         ],
-//                                       );
-//                                   },
-//                                 ),
-//                             //   ),
-//                             // ),
-//                           ),
-//                         )
-//                         //no data
-//                             :
-//                         Column(
-//                           children: [
-//                             SizedBox(height: 50,),
-//                             Image.asset('assets/images/Group 237684.png',
-//                             ),
-//                             Text('No Data Found'.tr,
-//                               style: TextStyle(
-//                                 color: Color(0xff442B72),
-//                                 fontFamily: 'Poppins-Regular',
-//                                 fontWeight: FontWeight.w500,
-//                                 fontSize: 19,
+//                                       ],
+//                                     )),
 //                               ),
 //                             ),
-//                             Text('You haven’t added any \n '
-//                                 'dates yet'.tr,
-//                               textAlign: TextAlign.center,
-//                               style: TextStyle(
-//                                 color: Color(0xffBE7FBF),
-//                                 fontFamily: 'Poppins-Light',
-//                                 fontWeight: FontWeight.w400,
-//                                 fontSize: 12,
-//                               ),)
-//                           ],
-//                         ),
-//                         const SizedBox(
-//                           height: 44,
-//                         ),
-//
-//                       ],
-//                     )
+//                           SizedBox(height: 5,)
+//                         ],
+//                       );
+//                     },
+//                   ),
+//                 ) :
+//                 Column(
+//                   children: [
+//                     SizedBox(height: 50,),
+//                     Image.asset('assets/images/Group 237684.png',
+//                     ),
+//                     Text('No Data Found'.tr,
+//                       style: TextStyle(
+//                         color: Color(0xff442B72),
+//                         fontFamily: 'Poppins-Regular',
+//                         fontWeight: FontWeight.w500,
+//                         fontSize: 19,
+//                       ),
+//                     ),
+//                     Text('You haven’t added any \n '
+//                         'dates yet'.tr,
+//                       textAlign: TextAlign.center,
+//                       style: TextStyle(
+//                         color: Color(0xffBE7FBF),
+//                         fontFamily: 'Poppins-Light',
+//                         fontWeight: FontWeight.w400,
+//                         fontSize: 12,
+//                       ),)
+//                   ],
 //                 ),
+//
 //               ),
 //             ],
 //           ),
-//         ),
-//         // extendBody: true,
-//         resizeToAvoidBottomInset: false,
-//         floatingActionButtonLocation:
-//         FloatingActionButtonLocation.centerDocked,
-//         floatingActionButton: FloatingActionButton(
-//             shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(100)),
-//             backgroundColor: Color(0xff442B72),
-//             onPressed: () {
-//               Navigator.of(context).push(MaterialPageRoute(
-//                   builder: (context) => ProfileSupervisorScreen(
-//                   )));
-//             },
-//             child:
-//             Image.asset(
-//               'assets/images/174237 1.png',
-//               height: 33,
-//               width: 33,
-//               fit: BoxFit.cover,
-//             )
-//         ),
-//         bottomNavigationBar: Directionality(
-//             textDirection: Get.locale == Locale('ar')
-//                 ? TextDirection.rtl
-//                 : TextDirection.ltr,
-//             child: ClipRRect(
-//                 borderRadius: const BorderRadius.only(
-//                   topLeft: Radius.circular(25),
-//                   topRight: Radius.circular(25),
-//                 ),
-//                 child: BottomAppBar(
-//                     padding: EdgeInsets.symmetric(vertical: 3),
-//                     height: 60,
-//                     color: const Color(0xFF442B72),
-//                     clipBehavior: Clip.antiAlias,
-//                     shape: const AutomaticNotchedShape(
-//                         RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.only(
-//                                 topLeft: Radius.circular(38.5),
-//                                 topRight: Radius.circular(38.5))),
-//                         RoundedRectangleBorder(
-//                             borderRadius:
-//                             BorderRadius.all(Radius.circular(50)))),
-//                     notchMargin: 7,
-//                     child: SizedBox(
-//                         height: 10,
-//                         child: SingleChildScrollView(
-//                           child: Row(
-//                             crossAxisAlignment: CrossAxisAlignment.center,
-//                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                             children: [
-//                               GestureDetector(
-//                                 onTap: () {
-//                                   setState(() {
-//                                     Navigator.push(
-//                                       context,
-//                                       MaterialPageRoute(
-//                                           builder: (context) =>
-//                                               HomeForSupervisor()),
-//                                     );
-//                                   });
-//                                 },
-//                                 child: Padding(
-//                                   padding:
-//                                   (sharedpref?.getString('lang') == 'ar')?
-//                                   EdgeInsets.only(top:7 , right: 15):
-//                                   EdgeInsets.only(left: 15),
-//                                   child: Column(
-//                                     children: [
-//                                       Image.asset(
-//                                           'assets/images/Vector (7).png',
-//                                           height: 20,
-//                                           width: 20
-//                                       ),
-//                                       SizedBox(height: 3),
-//                                       Text(
-//                                         "Home".tr,
-//                                         style: TextStyle(
-//                                           fontFamily: 'Poppins-Regular',
-//                                           fontWeight: FontWeight.w500,
-//                                           color: Colors.white,
-//                                           fontSize: 8,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-//                               ),
-//                               GestureDetector(
-//                                 onTap: () {
-//                                   // setState(() {
-//                                   //   Navigator.push(
-//                                   //     context,
-//                                   //     MaterialPageRoute(
-//                                   //         builder: (context) =>
-//                                   //             AttendanceSupervisorScreen()),
-//                                   //   );
-//                                   // });
-//                                 },
-//                                 child: Padding(
-//                                   padding:
-//                                   (sharedpref?.getString('lang') == 'ar')?
-//                                   EdgeInsets.only(top: 9, left: 50):
-//                                   EdgeInsets.only( right: 50, top: 2 ),
-//                                   child: Column(
-//                                     children: [
-//                                       Image.asset(
-//                                           'assets/images/icons8_checklist_1 1.png',
-//                                           height: 19,
-//                                           width: 19
-//                                       ),
-//                                       SizedBox(height: 3),
-//                                       Text(
-//                                         "Attendance".tr,
-//                                         style: TextStyle(
-//                                           fontFamily: 'Poppins-Regular',
-//                                           fontWeight: FontWeight.w500,
-//                                           color: Colors.white,
-//                                           fontSize: 8,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-//                               ),
-//                               GestureDetector(
-//                                 onTap: () {
-//                                   setState(() {
-//                                     Navigator.push(
-//                                       context,
-//                                       MaterialPageRoute(
-//                                           builder: (context) =>
-//                                               NotificationsSupervisor()),
-//                                     );
-//                                   });
-//                                 },
-//                                 child: Padding(
-//                                   padding:
-//                                   (sharedpref?.getString('lang') == 'ar')?
-//                                   EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-//                                   EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
-//                                   child: Column(
-//                                     children: [
-//                                       Image.asset(
-//                                           'assets/images/Vector (2).png',
-//                                           height: 17,
-//                                           width: 16.2
-//                                       ),
-//                                       Image.asset(
-//                                           'assets/images/Vector (5).png',
-//                                           height: 4,
-//                                           width: 6
-//                                       ),
-//                                       SizedBox(height: 2),
-//                                       Text(
-//                                         "Notifications".tr,
-//                                         style: TextStyle(
-//                                           fontFamily: 'Poppins-Regular',
-//                                           fontWeight: FontWeight.w500,
-//                                           color: Colors.white,
-//                                           fontSize: 8,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-//                               ),
-//                               GestureDetector(
-//                                 onTap: () {
-//                                   setState(() {
-//                                     Navigator.push(
-//                                       context,
-//                                       MaterialPageRoute(
-//                                           builder: (context) =>
-//                                               TrackSupervisor()),
-//                                     );
-//                                   });
-//                                 },
-//                                 child: Padding(
-//                                   padding:
-//                                   (sharedpref?.getString('lang') == 'ar')?
-//                                   EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
-//                                   EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
-//                                   child: Column(
-//                                     children: [
-//                                       Image.asset(
-//                                           'assets/images/Vector (4).png',
-//                                           height: 18.36,
-//                                           width: 23.5
-//                                       ),
-//                                       SizedBox(height: 3),
-//                                       Text(
-//                                         "Buses".tr,
-//                                         style: TextStyle(
-//                                           fontFamily: 'Poppins-Regular',
-//                                           fontWeight: FontWeight.w500,
-//                                           color: Colors.white,
-//                                           fontSize: 8,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         )))))
-//     );
-//   }
-// }
+
+
+
+
+

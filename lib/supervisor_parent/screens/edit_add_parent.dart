@@ -168,14 +168,20 @@ class _EditAddParentsState extends State<EditAddParents> {
     _numberOfChildrenController.text = widget.oldNumberOfChildren!;
     nameController.text = widget.oldNameOfChild;
     gradeController.text = widget.oldGradeOfChild;
-    // List<TextEditingController> nameChildControllers =
-    // List.generate(widget.oldNameOfChild.length, (index) => TextEditingController());
 
-// Set the text of each TextEditingController with the corresponding child name
-//     for (int i = 0; i < widget.oldNameOfChild.length; i++) {
-//       nameChildControllers[i].text = widget.oldNameOfChild[i];
-//     }
-//     gradeController.text = widget.oldGradeOfChild!;
+    // Check the number of children and set the visibility of the NumberOfChildrenCard
+    int numberOfChildren = int.parse(_numberOfChildrenController.text);
+    if (numberOfChildren > 0) {
+      NumberOfChildrenCard = true;
+    } else {
+      NumberOfChildrenCard = false;
+    }
+
+    // Initialize the nameChildControllers and gradeControllers lists
+    for (int i = 0; i < numberOfChildren; i++) {
+      nameChildControllers.add(TextEditingController());
+      gradeControllers.add(TextEditingController());
+    }
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -809,41 +815,25 @@ class _EditAddParentsState extends State<EditAddParents> {
                                   // width: 277,
                                   height: 40,
                                   child: TextFormField(
-                                    onChanged: (val) {
-                                      print('g');
-                                      setState(() {
-                                        if (val.isNotEmpty) {
-                                          NumberOfChildrenCard = true;
-                                        }
-                                        String input = _numberOfChildrenController.text;
-                                        count = int.tryParse(input) ?? 0;
-                                        // count = count - nameChildControllers.length;
-                                        for (int i = 0; i < count; i++) {
-                                          genderSelection.add('male');
-                                          TextEditingController nameController = TextEditingController();
-                                          TextEditingController gradeController = TextEditingController();
-                                          nameChildControllers.add(nameController);
-                                          gradeControllers.add(gradeController);
-                                        }
-                                      });
-                                    },
                                     // onChanged: (val) {
+                                    //   print('g');
                                     //   setState(() {
-                                    //
+                                    //     if (val.isNotEmpty) {
+                                    //       NumberOfChildrenCard = true;
+                                    //     }
+                                    //     String input = _numberOfChildrenController.text;
+                                    //     count = int.tryParse(input) ?? 0;
+                                    //     // count = count - nameChildControllers.length;
+                                    //     for (int i = 0; i < count; i++) {
+                                    //       genderSelection.add('male');
+                                    //       TextEditingController nameController = TextEditingController();
+                                    //       TextEditingController gradeController = TextEditingController();
+                                    //       nameChildControllers.add(nameController);
+                                    //       gradeControllers.add(gradeController);
+                                    //     }
                                     //   });
-                                    //   String input = _numberOfChildrenController.text;
-                                    //   count = int.tryParse(input) ?? 0;
-                                    //   // count = count - nameChildControllers.length;
-                                    //   for (int i = 0; i < count; i++) {
-                                    //     genderSelection.add('male');
-                                    //     TextEditingController nameController =
-                                    //     TextEditingController();
-                                    //     TextEditingController gradeController =
-                                    //     TextEditingController();
-                                    //     nameChildControllers.add(nameController);
-                                    //     gradeControllers.add(gradeController);
-                                    //   }
                                     // },
+
                                     controller: _numberOfChildrenController,
                                     style: TextStyle(
                                       color: Color(0xFF442B72),
@@ -897,6 +887,7 @@ class _EditAddParentsState extends State<EditAddParents> {
                                       // enabledBorder: myInputBorder(),
                                       // focusedBorder: myFocusBorder(),
                                     ),
+                                    maxLength: 1,
                                   ),
                                 ),
                               ),

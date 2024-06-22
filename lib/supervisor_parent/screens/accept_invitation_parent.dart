@@ -22,6 +22,8 @@ class AcceptInvitationParent extends StatefulWidget {
 
 class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
   // bool _isChecked = false;
+  final _firestore = FirebaseFirestore.instance;
+
 
 
   @override
@@ -117,6 +119,22 @@ class _AcceptInvitationParentState extends State<AcceptInvitationParent> {
 
                               setState(() {
                               });
+
+                              await _firestore.collection('notification').add({
+                                'item': 'accept Invitation',
+                                'timestamp': FieldValue.serverTimestamp(),
+                                // 'SchoolId': _schoolIdText ,
+                                'SupervisorId': sharedpref!.getString('id') ,
+                                // 'SchoolName': _schoolNameText ,
+                                // 'SupervisorName': NameText ,
+                              });
+
+
+
+
+
+
+
                             },
                             color: Color(0xFF442B72),
                             fontSize: 16),

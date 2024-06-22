@@ -108,7 +108,7 @@ class _ParentsViewState extends State<ParentsView> {
 
   getDataForDeclinedFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -134,7 +134,7 @@ class _ParentsViewState extends State<ParentsView> {
 
   getDataForAcceptFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0 ).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -169,6 +169,13 @@ class _ParentsViewState extends State<ParentsView> {
     super.dispose();
   }
 
+  // _onSearchChanged() {
+  //   setState(() {
+  //     SearchQuery = _searchController.text.trim();
+  //   });
+  //   getData(query: SearchQuery);
+  // }
+
   _onSearchChanged() {
     setState(() {
       SearchQuery = _searchController.text.trim();
@@ -176,21 +183,76 @@ class _ParentsViewState extends State<ParentsView> {
     getData(query: SearchQuery);
   }
 
+
   Future<void> getData({String query = ""}) async {
-    QuerySnapshot querySnapshot;
-    if (query.isEmpty) {
-      querySnapshot = await FirebaseFirestore.instance.collection('parent').get();
-    } else {
-      querySnapshot = await FirebaseFirestore.instance
-          .collection('parent')
-          .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
-          .get();
+    try {
+      String? supervisorId = sharedpref!.getString('id');
+      if (supervisorId == null) {
+        print('jessysupervisorId is null');
+        return;
+      }
+
+      print('jessysupervisorId: $supervisorId');
+      QuerySnapshot querySnapshot;
+
+      if (query.isEmpty) {
+        print('jessyQuery is empty, searching by supervisorId only');
+        querySnapshot = await FirebaseFirestore.instance.collection('parent')
+            .where('supervisor', isEqualTo: supervisorId)
+            .get();
+      } else {
+        print('jessySearching by supervisorId and name');
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('parent')
+            .where('supervisor', isEqualTo: supervisorId)
+            .where('name', isGreaterThanOrEqualTo: query)
+            .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+            .get();
+      }
+
+      setState(() {
+        data = querySnapshot.docs;
+      });
+
+      print('jessyFetched ${querySnapshot.docs.length} documents');
+      for (var doc in querySnapshot.docs) {
+        print(doc.data());
+      }
+    } catch (e) {
+      print('jessyErrorl: $e');
+      setState(() {
+        // errorMessage = e.toString();
+      });
     }
-    setState(() {
-      data = querySnapshot.docs;
-    });
   }
+  // Future<void> getData({String query = ""}) async {
+  //   try {
+  //     String? supervisorId = sharedpref!.getString('id');
+  //     QuerySnapshot querySnapshot;
+  //
+  //     if (query.isEmpty) {
+  //       print('ifdone');
+  //       querySnapshot = await FirebaseFirestore.instance.collection('parent')
+  //           .where('supervisor', isEqualTo: supervisorId)
+  //           .get();
+  //     } else {
+  //       print('elsedone');
+  //       querySnapshot = await FirebaseFirestore.instance
+  //           .collection('parent')
+  //           .where('name', isGreaterThanOrEqualTo: query)
+  //           .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+  //           .get();
+  //     }
+  //
+  //     setState(() {
+  //       data = querySnapshot.docs;
+  //     });
+  //
+  //     print('Fetched ${querySnapshot.docs.length} documents');
+  //   } catch (e) {
+  //     print('Errorggg: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -298,6 +360,9 @@ class _ParentsViewState extends State<ParentsView> {
                                   height: 42,
                                   child: TextField(
                                     controller: _searchController,
+                                    onChanged: (value) {
+                                      _onSearchChanged();
+                                    },
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: Color(0xffF1F1F1),
@@ -398,12 +463,12 @@ class _ParentsViewState extends State<ParentsView> {
                                                           currentFilter = 'Accepted';
                                                           getDataForAcceptFilter();
                                                           Navigator.pop(context);
-                                                          print('1');
+                                                          print('0');
                                                         }else  if (selectedValueDecline != null) {
                                                           currentFilter = 'Declined';
                                                           getDataForDeclinedFilter();
                                                           Navigator.pop(context);
-                                                          print('0');
+                                                          print('1');
                                                         }else  if (selectedValueWaiting != null) {
                                                           currentFilter = 'Waiting';
                                                           getDataForWaitingFilter();
@@ -446,324 +511,476 @@ class _ParentsViewState extends State<ParentsView> {
                                 final joinDate = DateTime.now();
                                 // String state = 'waiting';
 
-                                if (data[index]['supervisor'] == sharedpref!.getString('id').toString())
+                                // if (data[index]['supervisor'] == sharedpref!.getString('id').toString())
                                   // numberOfNames = data.where((element) => element['supervisor'] == sharedpref!.getString('id').toString()).length;
-
+                                    {
+                                      print('objectjj');
                                   return Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                              const EdgeInsets.only(top: 12.0),
-                                              child: FutureBuilder(
-                                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                  if (snapshot.hasError) {
-                                                    return Text('Something went wrong');
-                                                  }
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets.only(
+                                                    top: 12.0),
+                                                child: FutureBuilder(
+                                                  future: _firestore.collection(
+                                                      'supervisor').doc(
+                                                      sharedpref!.getString(
+                                                          'id')).get(),
+                                                  builder: (
+                                                      BuildContext context,
+                                                      AsyncSnapshot<
+                                                          DocumentSnapshot<Map<
+                                                              String,
+                                                              dynamic>>> snapshot) {
+                                                    if (snapshot.hasError) {
+                                                      return Text(
+                                                          'Something went wrong');
+                                                    }
 
-                                                  if (snapshot.connectionState == ConnectionState.done) {
-                                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                      return CircleAvatar(
-                                                        radius: 25,
-                                                        backgroundColor: Color(0xff442B72),
-                                                        child: CircleAvatar(
-                                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                    if (snapshot
+                                                        .connectionState ==
+                                                        ConnectionState.done) {
+                                                      if (!snapshot.hasData ||
+                                                          snapshot.data ==
+                                                              null ||
+                                                          snapshot.data!
+                                                              .data() == null ||
+                                                          snapshot.data!
+                                                              .data()!['busphoto'] ==
+                                                              null || snapshot
+                                                          .data!
+                                                          .data()!['busphoto']
+                                                          .toString()
+                                                          .trim()
+                                                          .isEmpty) {
+                                                        return CircleAvatar(
                                                           radius: 25,
-                                                        ),
-                                                      );
-                                                    }
-
-                                                    Map<String, dynamic>? data = snapshot.data?.data();
-                                                    if (data != null && data['busphoto'] != null) {
-                                                      return CircleAvatar(
-                                                        radius: 25,
-                                                        backgroundColor: Color(0xff442B72),
-                                                        child: CircleAvatar(
-                                                          backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                          radius:25,
-                                                        ),
-                                                      );
-                                                    }
-                                                  }
-
-                                                  return Container();
-                                                },
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-
-                                              children: [
-                                                Text('${data[index]['name'] ?? '' }',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF442B72),
-                                                    fontSize: 17,
-                                                    fontFamily: 'Poppins-SemiBold',
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.07,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Padding(
-                                                  padding: (sharedpref?.getString('lang') == 'ar')
-                                                      ? EdgeInsets.only(right: 3.0)
-                                                      : EdgeInsets.all(0.0),
-                                                  child:
-                                Text(
-                                // state == 'waiting'
-                                // ? 'Waiting'
-                                //     :
-                                'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
-                                style: TextStyle(
-                                color: Color(0xFF0E8113),
-                                fontSize: 13,
-                                fontFamily: 'Poppins-Regular',
-                                fontWeight: FontWeight.w400,
-                                height: 1.23,
-                                ),),
-                                                  // Text(
-                                                  //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
-                                                  //  // '${data[index]['joinDate']}',
-                                                  //
-                                                  //   style: TextStyle(
-                                                  //     color: Color(0xFF0E8113),
-                                                  //     fontSize: 13,
-                                                  //     fontFamily: 'Poppins-Regular',
-                                                  //     fontWeight: FontWeight.w400,
-                                                  //     height: 1.23,),),
-                                                ),],),
-                                            // SizedBox(width: 103,),
-                                          ],),
-                                        PopupMenuButton<String>(
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(6)),
-                                          ),
-                                          constraints: BoxConstraints.tightFor(
-                                              width: 111, height: 100),
-                                          color: Colors.white,
-                                          surfaceTintColor: Colors.transparent,
-                                          offset: Offset(0, 30),
-                                          itemBuilder: (BuildContext context) =>
-                                          <PopupMenuEntry<String>>[
-                                            PopupMenuItem<String>(
-                                              value: 'item1',
-                                              child: Row(
-                                                children: [Image.asset((sharedpref?.getString('lang') == 'ar')
-                                                    ? 'assets/images/edittt_white_translate.png'
-                                                    : 'assets/images/edittt_white.png', width: 12.81,
-                                                  height: 12.76,),
-                                                  SizedBox(width: 7,),
-                                                  Text('Edit'.tr, style: TextStyle(fontFamily: 'Poppins-Light', fontWeight: FontWeight.w400,
-                                                    fontSize: 17, color: Color(0xFF432B72),),),],),),
-                                            PopupMenuItem<String>(
-                                                value: 'item2', child: Row(
-                                              children: [Image.asset('assets/images/delete.png',
-                                                width: 12.77, height: 13.81,),
-                                                SizedBox(width: 7,),
-                                                Text('Delete'.tr, style: TextStyle(fontFamily: 'Poppins-Light',
-                                                  fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF432B72),)),],)),],
-                                          onSelected: (String value) {
-                                            if (value == 'item1') {Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                                EditAddParents(
-                                                  docid: data[index].id,
-                                                  oldNumber: data[index].get('phoneNumber'),
-                                                  oldName: data[index].get('name'),
-                                                  oldNumberOfChildren: data[index].get('numberOfChildren').toString(),
-                                                  oldType: data[index].get('typeOfParent'),
-                                                  oldNameOfChild: 'test',
-                                                  oldGradeOfChild: 'test',
-                                                  // oldNameOfChild: data[index].childrenData[index]['grade'],
-                                                  // oldGradeOfChild: ['l;']
-                                                  // oldGradeOfChild: data[index]['childern'].get('grade'),
-                                                )),);
-                                            } else if (value == 'item2') {
-                                              void DeleteParentSnackBar(context, String message, {Duration? duration}) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    dismissDirection: DismissDirection.up,
-                                                    duration: duration ?? const Duration(milliseconds: 1000),
-                                                    backgroundColor: Colors.white,
-                                                    margin: EdgeInsets.only(
-                                                      bottom: MediaQuery.of(context).size.height - 150,
-                                                    ),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(10),),
-                                                    behavior: SnackBarBehavior.floating,
-                                                    content: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                      children: [
-                                                        Image.asset('assets/images/saved.png',
-                                                          width: 30,
-                                                          height: 30,),
-                                                        SizedBox(width: 15,),
-                                                        Text(
-                                                          'Parent deleted successfully'.tr,
-                                                          style: const TextStyle(
-                                                            color: Color(0xFF4CAF50),
-                                                            fontSize: 16,
-                                                            fontFamily: 'Poppins-Bold',
-                                                            fontWeight: FontWeight.w700,
-                                                            height: 1.23,
+                                                          backgroundColor: Color(
+                                                              0xff442B72),
+                                                          child: CircleAvatar(
+                                                            backgroundImage: AssetImage(
+                                                                'assets/images/Group 237679 (2).png'),
+                                                            // Replace with your default image path
+                                                            radius: 25,
                                                           ),
-                                                        ),
-                                                      ],
+                                                        );
+                                                      }
+
+                                                      Map<String,
+                                                          dynamic>? data = snapshot
+                                                          .data?.data();
+                                                      if (data != null &&
+                                                          data['busphoto'] !=
+                                                              null) {
+                                                        return CircleAvatar(
+                                                          radius: 25,
+                                                          backgroundColor: Color(
+                                                              0xff442B72),
+                                                          child: CircleAvatar(
+                                                            backgroundImage: NetworkImage(
+                                                                '${data['busphoto']}'),
+                                                            radius: 25,
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
+
+                                                    return Container();
+                                                  },
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Column(
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .start,
+                                                crossAxisAlignment: CrossAxisAlignment
+                                                    .start,
+
+                                                children: [
+                                                  Text('${data[index]['name'] ??
+                                                      '' }',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF442B72),
+                                                      fontSize: 17,
+                                                      fontFamily: 'Poppins-SemiBold',
+                                                      fontWeight: FontWeight
+                                                          .w600,
+                                                      height: 1.07,
                                                     ),
                                                   ),
-                                                );
-                                              }
-                                              showDialog(
-                                                context: context,
-                                                barrierDismissible: false,
-                                                builder: (ctx) => Dialog(
-                                                    backgroundColor: Colors.white,
-                                                    surfaceTintColor: Colors.transparent,
-                                                    // contentPadding: const EdgeInsets.all(20),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(
-                                                        30,
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Padding(
+                                                    padding: (sharedpref
+                                                        ?.getString('lang') ==
+                                                        'ar')
+                                                        ? EdgeInsets.only(
+                                                        right: 3.0)
+                                                        : EdgeInsets.all(0.0),
+                                                    child:
+                                                    Text(
+                                                      // state == 'waiting'
+                                                      // ? 'Waiting'
+                                                      //     :
+                                                      'Joined ${getJoinText(
+                                                          data[index]['joinDate'] ??
+                                                              DateTime.now())}',
+                                                      style: TextStyle(
+                                                        color: Color(0xFF0E8113).withOpacity(0.7),
+                                                        fontSize: 13,
+                                                        fontFamily: 'Poppins-Regular',
+                                                        fontWeight: FontWeight
+                                                            .w400,
+                                                        height: 1.23,
+                                                      ),),
+                                                    // Text(
+                                                    //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                                                    //  // '${data[index]['joinDate']}',
+                                                    //
+                                                    //   style: TextStyle(
+                                                    //     color: Color(0xFF0E8113),
+                                                    //     fontSize: 13,
+                                                    //     fontFamily: 'Poppins-Regular',
+                                                    //     fontWeight: FontWeight.w400,
+                                                    //     height: 1.23,),),
+                                                  ),
+                                                ],),
+                                              // SizedBox(width: 103,),
+                                            ],),
+                                          PopupMenuButton<String>(
+                                            padding: EdgeInsets.zero,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(6)),
+                                            ),
+                                            constraints: BoxConstraints
+                                                .tightFor(
+                                                width: 111, height: 100),
+                                            color: Colors.white,
+                                            surfaceTintColor: Colors
+                                                .transparent,
+                                            offset: Offset(0, 30),
+                                            itemBuilder: (
+                                                BuildContext context) =>
+                                            <PopupMenuEntry<String>>[
+                                              PopupMenuItem<String>(
+                                                value: 'item1',
+                                                child: Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      (sharedpref?.getString(
+                                                          'lang') == 'ar')
+                                                          ? 'assets/images/edittt_white_translate.png'
+                                                          : 'assets/images/edittt_white.png',
+                                                      width: 12.81,
+                                                      height: 12.76,),
+                                                    SizedBox(width: 7,),
+                                                    Text('Edit'.tr,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins-Light',
+                                                        fontWeight: FontWeight
+                                                            .w400,
+                                                        fontSize: 17,
+                                                        color: Color(
+                                                            0xFF432B72),),),
+                                                  ],),),
+                                              PopupMenuItem<String>(
+                                                  value: 'item2', child: Row(
+                                                children: [
+                                                  Image.asset(
+                                                    'assets/images/delete.png',
+                                                    width: 12.77,
+                                                    height: 13.81,),
+                                                  SizedBox(width: 7,),
+                                                  Text('Delete'.tr,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins-Light',
+                                                        fontWeight: FontWeight
+                                                            .w400,
+                                                        fontSize: 15,
+                                                        color: Color(
+                                                            0xFF432B72),)),
+                                                ],)),
+                                            ],
+                                            onSelected: (String value) {
+                                              if (value == 'item1') {
+                                                Navigator.push(context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          EditAddParents(
+                                                            docid: data[index]
+                                                                .id,
+                                                            oldNumber: data[index]
+                                                                .get(
+                                                                'phoneNumber'),
+                                                            oldName: data[index]
+                                                                .get('name'),
+                                                            oldNumberOfChildren: data[index]
+                                                                .get(
+                                                                'numberOfChildren')
+                                                                .toString(),
+                                                            oldType: data[index]
+                                                                .get(
+                                                                'typeOfParent'),
+                                                            oldNameOfChild: 'test',
+                                                            oldGradeOfChild: 'test',
+                                                            // oldNameOfChild: data[index].childrenData[index]['grade'],
+                                                            // oldGradeOfChild: ['l;']
+                                                            // oldGradeOfChild: data[index]['childern'].get('grade'),
+                                                          )),);
+                                              } else if (value == 'item2') {
+                                                void DeleteParentSnackBar(
+                                                    context, String message,
+                                                    {Duration? duration}) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      dismissDirection: DismissDirection
+                                                          .up,
+                                                      duration: duration ??
+                                                          const Duration(
+                                                              milliseconds: 1000),
+                                                      backgroundColor: Colors
+                                                          .white,
+                                                      margin: EdgeInsets.only(
+                                                        bottom: MediaQuery
+                                                            .of(context)
+                                                            .size
+                                                            .height - 150,
+                                                      ),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius
+                                                            .circular(10),),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                      content: Row(
+                                                        mainAxisAlignment: MainAxisAlignment
+                                                            .center,
+                                                        crossAxisAlignment: CrossAxisAlignment
+                                                            .center,
+                                                        children: [
+                                                          Image.asset(
+                                                            'assets/images/saved.png',
+                                                            width: 30,
+                                                            height: 30,),
+                                                          SizedBox(width: 15,),
+                                                          Text(
+                                                            'Parent deleted successfully'
+                                                                .tr,
+                                                            style: const TextStyle(
+                                                              color: Color(
+                                                                  0xFF4CAF50),
+                                                              fontSize: 16,
+                                                              fontFamily: 'Poppins-Bold',
+                                                              fontWeight: FontWeight
+                                                                  .w700,
+                                                              height: 1.23,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                    child: SizedBox(
-                                                      width: 304,
-                                                      height: 182,
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                              children: [
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Flexible(
-                                                                  child: Column(
+                                                  );
+                                                }
+                                                showDialog(
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  builder: (ctx) =>
+                                                      Dialog(
+                                                          backgroundColor: Colors
+                                                              .white,
+                                                          surfaceTintColor: Colors
+                                                              .transparent,
+                                                          // contentPadding: const EdgeInsets.all(20),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius
+                                                                .circular(
+                                                              30,
+                                                            ),
+                                                          ),
+                                                          child: SizedBox(
+                                                            width: 304,
+                                                            height: 182,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 10,
+                                                                  horizontal: 15),
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment
+                                                                    .center,
+                                                                mainAxisAlignment: MainAxisAlignment
+                                                                    .center,
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment: MainAxisAlignment
+                                                                        .start,
                                                                     children: [
-                                                                      GestureDetector(
-                                                                        onTap: () => Navigator.pop(context),
-                                                                        child: Image.asset(
-                                                                          'assets/images/Vertical container.png',
-                                                                          width: 27,
-                                                                          height: 27,
+                                                                      const SizedBox(
+                                                                        width: 8,
+                                                                      ),
+                                                                      Flexible(
+                                                                        child: Column(
+                                                                          children: [
+                                                                            GestureDetector(
+                                                                              onTap: () =>
+                                                                                  Navigator
+                                                                                      .pop(
+                                                                                      context),
+                                                                              child: Image
+                                                                                  .asset(
+                                                                                'assets/images/Vertical container.png',
+                                                                                width: 27,
+                                                                                height: 27,
+                                                                              ),
+                                                                            ),
+                                                                            const SizedBox(
+                                                                              height: 25,
+                                                                            )
+                                                                          ],
                                                                         ),
                                                                       ),
-                                                                      const SizedBox(
-                                                                        height: 25,
-                                                                      )
+                                                                      Expanded(
+                                                                        flex: 3,
+                                                                        child: Text(
+                                                                          'Delete'
+                                                                              .tr,
+                                                                          textAlign: TextAlign
+                                                                              .center,
+                                                                          style: TextStyle(
+                                                                            color: Color(
+                                                                                0xFF442B72),
+                                                                            fontSize: 18,
+                                                                            fontFamily: 'Poppins-SemiBold',
+                                                                            fontWeight: FontWeight
+                                                                                .w600,
+                                                                            height: 1.23,
+                                                                          ),
+                                                                        ),
+                                                                      ),
                                                                     ],
                                                                   ),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 3,
-                                                                  child: Text(
-                                                                    'Delete'.tr,
-                                                                    textAlign: TextAlign.center,
-                                                                    style: TextStyle(
-                                                                      color: Color(0xFF442B72),
-                                                                      fontSize: 18,
-                                                                      fontFamily: 'Poppins-SemiBold',
-                                                                      fontWeight: FontWeight.w600,
-                                                                      height: 1.23,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Center(
-                                                              child: Text(
-                                                                'Are You Sure you want to \n'
-                                                                    'delete this parent ?'.tr,
-                                                                textAlign: TextAlign.center,
-                                                                style: TextStyle(
-                                                                  color: Color(0xFF442B72),
-                                                                  fontSize: 16,
-                                                                  fontFamily: 'Poppins-Light',
-                                                                  fontWeight: FontWeight.w400,
-                                                                  height: 1.23,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                              children: [
-                                                                SizedBox(
-                                                                  child: ElevatedSimpleButton(
-                                                                    txt: 'Delete'.tr,
-                                                                    width:  107,
-                                                                    hight: 38,
-                                                                    onPress: () async{
-                                                                      setState(() {
-                                                                        _deleteSupervisorDocument(data[index].id);
-                                                                      });
-                                                                      DeleteParentSnackBar(context, 'message');
-                                                                      Navigator.pop(context);
-                                                                    },
-                                                                    color: const Color(0xFF442B72),
-                                                                    fontSize: 16,
-                                                                    fontFamily: 'Poppins-Regular',
-                                                                  ),
-                                                                ),
-                                                                // const Spacer(),
-                                                                SizedBox(width: 15,),
-                                                                SizedBox(
-                                                                  width: 107,
-                                                                  height: 38,
-                                                                  child:ElevatedButton(
-                                                                    style: ElevatedButton.styleFrom(
-                                                                      backgroundColor: Colors.white,
-                                                                      surfaceTintColor: Colors.transparent,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          side: BorderSide(
-                                                                            color: Color(0xFF442B72),
-                                                                          ),
-                                                                          borderRadius: BorderRadius.circular(10)
+                                                                  Center(
+                                                                    child: Text(
+                                                                      'Are You Sure you want to \n'
+                                                                          'delete this parent ?'
+                                                                          .tr,
+                                                                      textAlign: TextAlign
+                                                                          .center,
+                                                                      style: TextStyle(
+                                                                        color: Color(
+                                                                            0xFF442B72),
+                                                                        fontSize: 16,
+                                                                        fontFamily: 'Poppins-Light',
+                                                                        fontWeight: FontWeight
+                                                                            .w400,
+                                                                        height: 1.23,
                                                                       ),
                                                                     ),
-                                                                    child: Text(
-                                                                        'Cancel'.tr,
-                                                                        textAlign: TextAlign.center,
-                                                                        style: TextStyle(
-                                                                            color: Color(0xFF442B72),
-                                                                            fontFamily: 'Poppins-Regular',
-                                                                            fontWeight: FontWeight.w500 ,
-                                                                            fontSize: 16)
-                                                                    ), onPressed: () {
-                                                                    Navigator.pop(context);
-                                                                  },
                                                                   ),
-                                                                ),
+                                                                  const SizedBox(
+                                                                    height: 15,
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment: MainAxisAlignment
+                                                                        .center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                        child: ElevatedSimpleButton(
+                                                                          txt: 'Delete'
+                                                                              .tr,
+                                                                          width: 107,
+                                                                          hight: 38,
+                                                                          onPress: () async {
+                                                                            setState(() {
+                                                                              _deleteSupervisorDocument(
+                                                                                  data[index]
+                                                                                      .id);
+                                                                            });
+                                                                            DeleteParentSnackBar(
+                                                                                context,
+                                                                                'message');
+                                                                            Navigator
+                                                                                .pop(
+                                                                                context);
+                                                                          },
+                                                                          color: const Color(
+                                                                              0xFF442B72),
+                                                                          fontSize: 16,
+                                                                          fontFamily: 'Poppins-Regular',
+                                                                        ),
+                                                                      ),
+                                                                      // const Spacer(),
+                                                                      SizedBox(
+                                                                        width: 15,),
+                                                                      SizedBox(
+                                                                        width: 107,
+                                                                        height: 38,
+                                                                        child: ElevatedButton(
+                                                                          style: ElevatedButton
+                                                                              .styleFrom(
+                                                                            backgroundColor: Colors
+                                                                                .white,
+                                                                            surfaceTintColor: Colors
+                                                                                .transparent,
+                                                                            shape: RoundedRectangleBorder(
+                                                                                side: BorderSide(
+                                                                                  color: Color(
+                                                                                      0xFF442B72),
+                                                                                ),
+                                                                                borderRadius: BorderRadius
+                                                                                    .circular(
+                                                                                    10)
+                                                                            ),
+                                                                          ),
+                                                                          child: Text(
+                                                                              'Cancel'
+                                                                                  .tr,
+                                                                              textAlign: TextAlign
+                                                                                  .center,
+                                                                              style: TextStyle(
+                                                                                  color: Color(
+                                                                                      0xFF442B72),
+                                                                                  fontFamily: 'Poppins-Regular',
+                                                                                  fontWeight: FontWeight
+                                                                                      .w500,
+                                                                                  fontSize: 16)
+                                                                          ),
+                                                                          onPressed: () {
+                                                                            Navigator
+                                                                                .pop(
+                                                                                context);
+                                                                          },
+                                                                        ),
+                                                                      ),
 
-                                                              ],
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    )),
-                                              );
-                                            }
-                                          },
-                                          child: Image.asset('assets/images/more.png', width: 20.8, height: 20.8,),),                                    ],
-                                    ),
-                                    SizedBox(height: 25,)],);},),
+                                                          )),
+                                                );
+                                              }
+                                            },
+                                            child: Image.asset(
+                                              'assets/images/more.png',
+                                              width: 20.8, height: 20.8,),),
+                                        ],
+                                      ),
+                                      SizedBox(height: 25,)],);
+                                }
+
+                                },),
                           ),
                           SizedBox(height: 44,)
                         ],
