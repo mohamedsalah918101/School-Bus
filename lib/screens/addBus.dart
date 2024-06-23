@@ -118,7 +118,7 @@ class _AddBusState extends State<AddBus> {
   }
 
   List<QueryDocumentSnapshot> data = [];
-  List<DropdownCheckboxItem> items = [];
+  List<DropdownCheckboxItem>  items = [];
 
   // getData()async{
   //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
@@ -138,7 +138,8 @@ class _AddBusState extends State<AddBus> {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('supervisor')
         .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
-        .where('state', isEqualTo: 1) // Example condition
+        .where('state', isEqualTo: 1)
+        .where('bus_id', isNull: true)// ضفت شرط جديد ان ميظهرش اى مشرف عنده bus id
         .get();
 
     for (int i = 0; i < querySnapshot.docs.length; i++) {

@@ -21,6 +21,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 
@@ -200,11 +201,33 @@ class _EditeBusState extends State<EditeBus> {
       //Some error occurred
     }
   }
+//fun to get current schoolid
+  String? _schoolId;
 
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLIDshh$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor')
+        .where('schoolid', isEqualTo: _schoolId)
+        .where('state', isEqualTo: 1)
         .get();
 
     // data.addAll(querySnapshot.docs);
@@ -260,7 +283,9 @@ class _EditeBusState extends State<EditeBus> {
     _busnumbercontroller.text=widget.olddnumberbus!;
     imageUrldbus=widget.oldphotobus!;
     imageUrldriver=widget.oldphotodriver!;
+    getSchoolId();
     getData();
+
     //imageUrldriver=widget.oldphotodriver!;
     //imageUrldbus=widget.oldphotobus!;
     // responsible
