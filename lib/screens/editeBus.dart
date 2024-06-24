@@ -303,6 +303,7 @@ class _EditeBusState extends State<EditeBus> {
   //     ),
   //   );
   // }
+  //old delete one image
   void _deletebusphoto() {
     FirebaseFirestore.instance.collection('busdata').doc(widget.docid).update({
       'busphoto': FieldValue.delete(),
@@ -314,6 +315,25 @@ class _EditeBusState extends State<EditeBus> {
       print("Failed to delete busphoto: $error");
     });
   }
+  //new delete
+  // void _deletebusphoto(String photoUrlToDelete) {
+  //   if (widget.oldphotobus != null) {
+  //     List<dynamic> updatedPhotos = List<dynamic>.from(widget.oldphotobus!);
+  //
+  //     // Remove the photoUrlToDelete from the list
+  //     updatedPhotos.remove(photoUrlToDelete);
+  //
+  //     // Update Firestore document with the updated photos list
+  //     FirebaseFirestore.instance.collection('busdata').doc(widget.docid).update({
+  //       'busphoto': updatedPhotos,
+  //     }).then((_) {
+  //       print('Photo deleted successfully.');
+  //     }).catchError((error) {
+  //       print('Failed to delete photo: $error');
+  //     });
+  //   }
+  // }
+
 
 // to lock in landscape view
   @override
@@ -903,7 +923,8 @@ class _EditeBusState extends State<EditeBus> {
                                           ? Image.file(_selectedImageBusEdite!,
                                           width: 75, height: 74, fit: BoxFit.cover)
                                           : (widget.oldphotobus == null || widget.oldphotobus == '')
-                                          ? FDottedLine(
+                                          ?
+                                      FDottedLine(
                                         color: Color(0xFF442B72),
                                         strokeWidth: 1.4,
                                         dottedLength: 10,
@@ -940,18 +961,29 @@ class _EditeBusState extends State<EditeBus> {
                                           ),
                                         ),
                                       )
-                                          : Wrap(
+                                          :
+                                      Wrap(
                                         children: imageUrldbus.map((imageUrl) {
-                                          return Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Image.network(
-                                              imageUrl,
-                                              height: 100,
-                                              width: 100,
-                                            ),
-                                          );
+                                            return Padding(
+                                              padding: const EdgeInsets.all(4.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: Color(0xFF442B72), // border color
+                                                    width: 2, // border width
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(5),),
+                                                child: Image.network(
+                                                  imageUrl,
+                                                  height: 100,
+                                                  width: 80,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            );
                                         }).toList(),
                                       ),
+
                                           // old bus photo
                                       // Image.network(widget.oldphotobus!,
                                       //     width: 75, height: 74, fit: BoxFit.cover),

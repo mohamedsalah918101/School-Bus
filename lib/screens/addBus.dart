@@ -296,7 +296,12 @@ class _AddBusState extends State<AddBus> {
     //   _selectedImagebus = null;
     // });
   }
-
+  // Function to delete an image from selectedImages list
+  void _deleteImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index); // Remove image at specified index
+    });
+  }
 // to lock in landscape view
   @override
   void initState() {
@@ -461,9 +466,9 @@ class _AddBusState extends State<AddBus> {
                                                               ? Image.file(
                                                                   _selectedImagedriver!,
                                                                   // Display the uploaded image
-                                                                  width: 83,
+                                                                  width: 65,
                                                                   // Set width as per your preference
-                                                                  height: 78.5,
+                                                                  height: 65,
                                                                   // Set height as per your preference
                                                                   fit: BoxFit
                                                                       .cover, // Adjusts how the image fits in the container
@@ -878,131 +883,279 @@ class _AddBusState extends State<AddBus> {
                                     SizedBox(
                                       height: 15,
                                     ),
+                                    //old container
+                                    // Align(
+                                    //   alignment: AlignmentDirectional.center,
+                                    //   child: GestureDetector(
+                                    //     onTap: () async {
+                                    //       await _pickBusImagesFromGallery();
+                                    //     }, // Call function when tapped
+                                    //     child:
+                                    //     // _selectedImagebus != null
+                                    //     //     ? Image.file(
+                                    //     //         _selectedImagebus!,
+                                    //     //         // Display the uploaded image
+                                    //     //         width: 275,
+                                    //     //         // Set width as per your preference
+                                    //     //         height: 75,
+                                    //     //         // Set height as per your preference
+                                    //     //         fit: BoxFit
+                                    //     //             .cover, // Adjusts how the image fits in the container
+                                    //     //       )
+                                    //     //     :
+                                    //     _selectedImages.isNotEmpty
+                                    //         ?
+                                    //     Container(
+                                    //       height: 100,
+                                    //       child: ListView.builder(
+                                    //         scrollDirection: Axis.horizontal,
+                                    //         itemCount: _selectedImages.length,
+                                    //         itemBuilder: (context, index) {
+                                    //           return Stack(
+                                    //             children:[
+                                    //             Padding(
+                                    //               padding: const EdgeInsets.all(8.0),
+                                    //               child: Container(
+                                    //                 decoration: BoxDecoration(
+                                    //                   border: Border.all(
+                                    //                     color: Color(0xFF442B72), // border color
+                                    //                     width: 2, // border width
+                                    //                   ),
+                                    //                   borderRadius: BorderRadius.circular(5),
+                                    //                 ),
+                                    //                 child: Image.file(
+                                    //                   _selectedImages[index],
+                                    //                   width: 100,
+                                    //                   height: 100,
+                                    //                   fit: BoxFit.cover,
+                                    //                 ),
+                                    //               ),
+                                    //             ),
+                                    //               Positioned(
+                                    //                 top: 0,
+                                    //                 right: 0,
+                                    //                 child: GestureDetector(
+                                    //                   onTap: () {
+                                    //                     _deleteImage(index); // Call delete function
+                                    //                   },
+                                    //                   child: Container(
+                                    //                     width: 20,
+                                    //                     height: 20,
+                                    //                     decoration: BoxDecoration(
+                                    //                       color: Color(0xFF442B72),
+                                    //                       borderRadius: BorderRadius.circular(20),
+                                    //                     ),
+                                    //                     child: Image.asset(
+                                    //                       "assets/imgs/school/Vector (8).png",
+                                    //                       width: 15,
+                                    //                       height: 15,
+                                    //                     ),
+                                    //                   ),
+                                    //                 ),
+                                    //               ),
+                                    //             ]
+                                    //           );
+                                    //         },
+                                    //       ),
+                                    //     ):
+                                    //
+                                    //     FDottedLine(
+                                    //             color: Color(0xFF442B72),
+                                    //             strokeWidth: 0.8,
+                                    //             dottedLength: 10,
+                                    //             space: 5.0,
+                                    //             corner:
+                                    //                 FDottedLineCorner.all(6.0),
+                                    //
+                                    //             // Child widget
+                                    //             child: Container(
+                                    //               width: 275,
+                                    //               height: 75,
+                                    //               alignment: Alignment.center,
+                                    //               child: Row(
+                                    //                 children: [
+                                    //                   Padding(
+                                    //                     padding:
+                                    //                         const EdgeInsets
+                                    //                             .only(left: 80),
+                                    //                     child: Image.asset(
+                                    //                       "assets/imgs/school/icons8_image_document_1 1.png",
+                                    //                       width: 24,
+                                    //                       height: 24,
+                                    //                     ),
+                                    //                   ),
+                                    //                   SizedBox(
+                                    //                     width: 10,
+                                    //                   ),
+                                    //                   Text(
+                                    //                     "upload image",
+                                    //                     style: TextStyle(
+                                    //                       color:
+                                    //                           Color(0xFF442B72),
+                                    //                       fontSize: 14,
+                                    //                       fontFamily:
+                                    //                           'Poppins-Regular',
+                                    //                     ),
+                                    //                   ),
+                                    //                 ],
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //
+                                    //   ),
+                                    //   // Container(
+                                    //   //   width: 290, // Adjust width as needed
+                                    //   //   height: 75, // Adjust height as needed
+                                    //   //   decoration: BoxDecoration(
+                                    //   //     // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
+                                    //   //     image: DecorationImage(
+                                    //   //       image: AssetImage('assets/imgs/school/Frame 136.png'), // Provide the path to your image
+                                    //   //       fit: BoxFit.fill, // Adjust the fit as needed
+                                    //   //     ),
+                                    //   //   ),
+                                    //   // ),
+                                    // ),
                                     Align(
                                       alignment: AlignmentDirectional.center,
                                       child: GestureDetector(
                                         onTap: () async {
                                           await _pickBusImagesFromGallery();
                                         }, // Call function when tapped
-                                        child:
-                                        // _selectedImagebus != null
-                                        //     ? Image.file(
-                                        //         _selectedImagebus!,
-                                        //         // Display the uploaded image
-                                        //         width: 275,
-                                        //         // Set width as per your preference
-                                        //         height: 75,
-                                        //         // Set height as per your preference
-                                        //         fit: BoxFit
-                                        //             .cover, // Adjusts how the image fits in the container
-                                        //       )
-                                        //     :
-                                        _selectedImages.isNotEmpty
-                                            ? Container(
+                                        child: _selectedImages.isNotEmpty
+                                            ?
+                                        Container(
                                           height: 100,
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: _selectedImages.length,
-                                            itemBuilder: (context, index) {
-                                              return Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Image.file(
-                                                  _selectedImages[index],
-                                                  width: 100,
-                                                  height: 100,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ):
-                                        FDottedLine(
-                                                color: Color(0xFF442B72),
-                                                strokeWidth: 0.8,
-                                                dottedLength: 10,
-                                                space: 5.0,
-                                                corner:
-                                                    FDottedLineCorner.all(6.0),
-
-                                                // Child widget
-                                                child: Container(
-                                                  width: 275,
-                                                  height: 75,
-                                                  alignment: Alignment.center,
-                                                  child: Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 80),
-                                                        child: Image.asset(
-                                                          "assets/imgs/school/icons8_image_document_1 1.png",
-                                                          width: 24,
-                                                          height: 24,
+                                          child:
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ListView.builder(
+                                                  scrollDirection: Axis.horizontal,
+                                                  itemCount: _selectedImages.length,
+                                                  itemBuilder: (context, index) {
+                                                    return Stack(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                              border: Border.all(
+                                                                color: Color(0xFF442B72), // border color
+                                                                width: 2, // border width
+                                                              ),
+                                                              borderRadius: BorderRadius.circular(5),
+                                                            ),
+                                                            child: Image.file(
+                                                              _selectedImages[index],
+                                                              width: 100,
+                                                              height: 100,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Text(
-                                                        "upload image",
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF442B72),
-                                                          fontSize: 14,
-                                                          fontFamily:
-                                                              'Poppins-Regular',
+                                                        Positioned(
+                                                          top: 0,
+                                                          right: 0,
+                                                          child: GestureDetector(
+                                                            onTap: () {
+                                                              _deleteImage(index); // Call delete function
+                                                            },
+                                                            child: Container(
+                                                              width: 20,
+                                                              height: 20,
+                                                              decoration: BoxDecoration(
+                                                                color: Color(0xFF442B72),
+                                                                borderRadius: BorderRadius.circular(20),
+                                                              ),
+                                                              child: Image.asset(
+                                                                "assets/imgs/school/Vector (8).png",
+                                                                width: 15,
+                                                                height: 15,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                      ],
+                                                    );
+                                                  },
                                                 ),
                                               ),
+                                              if (_selectedImages.length < 5) // Show FDottedLine if less than 5 images chosen
+                                                FDottedLine(
+                                                  color: Color(0xFF442B72),
+                                                  strokeWidth: 0.8,
+                                                  dottedLength: 10,
+                                                  space: 5.0,
+                                                  corner: FDottedLineCorner.all(6.0),
+                                                  // Child widget
+                                                  child: Container(
+                                                    width: 150,
+                                                    height: 75,
+                                                    alignment: Alignment.center,
+                                                    child: Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 10),
+                                                          child: Image.asset(
+                                                            "assets/imgs/school/icons8_image_document_1 1.png",
+                                                            width: 24,
+                                                            height: 24,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Text(
+                                                          "Upload image",
+                                                          style: TextStyle(
+                                                            color: Color(0xFF442B72),
+                                                            fontSize: 14,
+                                                            fontFamily: 'Poppins-Regular',
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        )
+                                            : FDottedLine(
+                                          color: Color(0xFF442B72),
+                                          strokeWidth: 0.8,
+                                          dottedLength: 10,
+                                          space: 5.0,
+                                          corner: FDottedLineCorner.all(6.0),
+                                          // Child widget
+                                          child: Container(
+                                            width: 275,
+                                            height: 75,
+                                            alignment: Alignment.center,
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 80),
+                                                  child: Image.asset(
+                                                    "assets/imgs/school/icons8_image_document_1 1.png",
+                                                    width: 24,
+                                                    height: 24,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10),
+                                                Text(
+                                                  "Upload image",
+                                                  style: TextStyle(
+                                                    color: Color(0xFF442B72),
+                                                    fontSize: 14,
+                                                    fontFamily: 'Poppins-Regular',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                      // Container(
-                                      //   width: 290, // Adjust width as needed
-                                      //   height: 75, // Adjust height as needed
-                                      //   decoration: BoxDecoration(
-                                      //     // borderRadius: BorderRadius.circular(10.0), // Adjust border radius as needed
-                                      //     image: DecorationImage(
-                                      //       image: AssetImage('assets/imgs/school/Frame 136.png'), // Provide the path to your image
-                                      //       fit: BoxFit.fill, // Adjust the fit as needed
-                                      //     ),
-                                      //   ),
-                                      // ),
                                     ),
-                                    // Container(
-                                    //   width: constrains.maxWidth / 1.2,
-                                    //   height: 45,
-                                    //   child: TextFormField(
-                                    //     cursorColor: const Color(0xFF442B72),
-                                    //     style: TextStyle(color: Color(0xFF442B72)),
-                                    //     //textDirection: TextDirection.ltr,
-                                    //     scrollPadding: const EdgeInsets.symmetric(
-                                    //         vertical: 40),
-                                    //     decoration:  InputDecoration(
-                                    //       //suffixIcon: Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
-                                    //       alignLabelWithHint: true,
-                                    //       counterText: "",
-                                    //       fillColor: const Color(0xFFF1F1F1),
-                                    //       filled: true,
-                                    //       contentPadding: const EdgeInsets.fromLTRB(
-                                    //           8, 30, 10, 5),
-                                    //       //  hintText:"".tr,
-                                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                    //       hintStyle: const TextStyle(
-                                    //         color: Color(0xFFC2C2C2),
-                                    //         fontSize: 12,
-                                    //         fontFamily: 'Inter-Bold',
-                                    //         fontWeight: FontWeight.w700,
-                                    //         height: 1.33,
-                                    //       ),
-                                    //       enabledBorder: myInputBorder(),
-                                    //       focusedBorder: myFocusBorder(),
-                                    //
-                                    //     ),
-                                    //   ),
-                                    // ),
+
+
 
                                     const SizedBox(
                                       height: 25,

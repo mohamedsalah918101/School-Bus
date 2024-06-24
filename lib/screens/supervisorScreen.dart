@@ -71,11 +71,14 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
         .get();
 
     if (busDocument.exists) {
+      print("exists");
       setState(() {
+
         busNumber = busDocument['busnumber'];
         print('BUSSS $busNumber');
       });
     } else {
+
       print('Bus document does not exist for bus_id: $busId');
     }
   }
@@ -650,8 +653,11 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
                                               //data.length,
                                               //itemCount: filteredData.length,
                                               itemBuilder: (context, index) {
-                                                //print(data[index]['bus_id']);
-                                                //  getBusNumber(data[index]['bus_id']);
+                                                print("testtttt");
+                                                print(data[index]['bus_id']);
+                                                  getBusNumber(data[index]['bus_id']
+                                                  );
+
 
                                                 // String supervisorId = data[index]['bus_id']; // Access the ID
                                                 //
