@@ -82,10 +82,7 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
     });
 
     print('Fetching data...');
-    Query query = _firestore.collection('your_collection')
-        .orderBy('your_field')
-        .limit(_limit);
-
+    Query query = _firestore.collection('parent').limit(_limit);
     if (_lastDocument != null) {
       query = query.startAfterDocument(_lastDocument!);
       print('Starting after document: ${_lastDocument!.id}');
@@ -96,8 +93,15 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
       print('Fetched ${querySnapshot.docs.length} documents');
       if (querySnapshot.docs.isNotEmpty) {
         _lastDocument = querySnapshot.docs.last;
+        List<Map<String, dynamic>> allChildren = [];
+        for (var parentDoc in querySnapshot.docs) {
+          List<dynamic> children = parentDoc['children'];
+          allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
+        }
         setState(() {
           _documents.addAll(querySnapshot.docs);
+          childrenData.addAll(allChildren);
+          checkin = List.filled(_documents.length, false);
           print('Total documents: ${_documents.length}');
           if (querySnapshot.docs.length < _limit) {
             _hasMoreData = false;
@@ -117,16 +121,14 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
         _isLoading = false;
       });
     }
-  }
-
-  
-  @override
+  }  @override
   void initState() {
     super.initState();
 
     _scrollController.addListener(() {
         if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
           _fetchMoreData();
+          print('jessydone');
         }
       });
 
@@ -134,7 +136,6 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
     // _scrollController.addListener(_scrollListener);
     _fetchData();
   }
-
   Future<void> _fetchData({String query = ""}) async {
     if (_isLoading || !_hasMoreData) return;
 
@@ -437,11 +438,10 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
                         ),),
                     ),
                     SizedBox(height: 15,),
-
                     sharedpref!.getInt('invit') == 1 ?
 
                     Container(
-                      height: 700,
+                      height: _documents.length*135,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: ListView.builder(
@@ -452,12 +452,20 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
                           itemBuilder: (context, index) {
 
                             if (index == _documents.length) {
-                              return _isLoading
-                                  ? Center(child: CircularProgressIndicator())
-                                  : Center(child: Container()
-                                // Text('No more data')
-                              );
-                            }
+
+    return _isLoading
+    ? Center(child: CircularProgressIndicator())
+        : _hasMoreData
+    ? SizedBox.shrink()
+        : Center(child: Text('No more data'));
+    }
+
+                            //   return _isLoading
+                            //       ? Center(child: CircularProgressIndicator())
+                            //       : Center(child: Container(child:Text('nooooooooooooooooooooooooooooooooo'))
+                            //     // Text('No more data')
+                            //   );
+                            // }
                             final DocumentSnapshot doc = _documents[index];
                             final data = doc.data() as Map<String, dynamic>;
                             var child = childrenData[index];

@@ -74,9 +74,9 @@ class MyApp extends StatelessWidget{
       // PaginatedList()
 
       // home:SplashScreen(),
-      AttendanceSupervisorScreen(),
+      // AttendanceSupervisorScreen(),
       // AddParents(),
-      // SplashScreen(),
+      SplashScreen(),
     );
   }
 }

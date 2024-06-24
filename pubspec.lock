@@ -1092,7 +1092,19 @@ packages:
       sha256: "2e123074287cc9fd6c09de8336dae606d1ddb88d9ac47358826db698c176a1f2"
       url: "https://pub.dev"
     source: hosted
+<<<<<<< HEAD
     version: "1.0.5"
+=======
+    version: "1.0.4"
+  multiple_images_picker:
+    dependency: "direct main"
+    description:
+      name: multiple_images_picker
+      sha256: "95f68febbe7ca6b50dbd7edce7345fc70ca0a33f2e82d766b0f79c02b04ff7e4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
+>>>>>>> 66775cb57e7873efa263644648a8049c751106dc
   nested:
     dependency: transitive
     description:

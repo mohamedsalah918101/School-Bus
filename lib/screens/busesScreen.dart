@@ -131,7 +131,8 @@ class BusScreenSate extends State<BusScreen> {
           filteredData.cast<QueryDocumentSnapshot<Object?>>();
     });
   }
-  void _editBusDocument(String documentId, String imagedriver, String namedriver, String driverphone,String photobus,String numberbus ,List<dynamic>supervisors) {
+  void _editBusDocument(String documentId, String imagedriver, String namedriver,
+      String driverphone,List<dynamic> photobus,String numberbus ,List<dynamic>supervisors) {
     List<DropdownCheckboxItem>allSupervisors=[];
     for(int i=0;i<supervisors.length;i++){
       allSupervisors.add(DropdownCheckboxItem(label: supervisors[i]['name'],phone: supervisors[i]['phone'],docID: supervisors[i]['id']));
@@ -188,19 +189,19 @@ class BusScreenSate extends State<BusScreen> {
         }
 
 // انا ضفتها جديد علشان يمسح البارنت بس مجربتهاش لسه
-        if (busDoc.exists) {
-          List<dynamic> parents = busDoc['parent'];
-          if (parents != null && parents.isNotEmpty) {
-            // Step 2: Delete supervisor documents from 'supervisor' collection
-            for (var parent in parents) {
-              String parentId = parent['id'];
-              await FirebaseFirestore.instance.collection('parent').doc(parentId).delete().then((_) {
-                print('parent document deleted: $parentId');
-              }).catchError((error) {
-                print('Error deleting parent document: $parentId, $error');
-              });
-            }
-          }}
+//         if (busDoc.exists) {
+//           List<dynamic> parents = busDoc['parent'];
+//           if (parents != null && parents.isNotEmpty) {
+//             // Step 2: Delete supervisor documents from 'supervisor' collection
+//             for (var parent in parents) {
+//               String parentId = parent['id'];
+//               await FirebaseFirestore.instance.collection('parent').doc(parentId).delete().then((_) {
+//                 print('parent document deleted: $parentId');
+//               }).catchError((error) {
+//                 print('Error deleting parent document: $parentId, $error');
+//               });
+//             }
+//           }}
 
         // Step 3: Delete the bus document
         await FirebaseFirestore.instance.collection('busdata').doc(documentId).delete().then((_) {
@@ -1074,40 +1075,79 @@ class BusScreenSate extends State<BusScreen> {
                                                                             Row(
                                                                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                               children: [
-                                                                                SizedBox(
-                                                                                  width: 70,
-                                                                                  height: 70,
-                                                                                  child: ClipOval(
-                                                                                    child: data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
-                                                                                        ? Image.network(
-                                                                                      data[index]['busphoto'],
-                                                                                      fit: BoxFit.cover,
-                                                                                    )
-                                                                                        :
-                                                                                    Stack(
-                                                                                    children:[
-                                                                                      Container(
-                                                                                        decoration: BoxDecoration(
-                                                                                          shape: BoxShape.circle,
-                                                                                          color: Color(0xffe6bdf0),
-                                                                                        ),
-                                                                                        child: Center(
-                                                                                          child: Image.asset(
-                                                                                            'assets/imgs/school/image-gallery 1.png',
-                                                                                            width: 40,
-                                                                                            height: 40,
-                                                                                          ),
-                                                                                        ) ,
-                                                                                      ),
-
-
-
-
-                                                                                    ]
-                                                                                      ),
-                                                                                  ),
-                                                                                ),
                                                                                 // SizedBox(
+                                                                                //   width: 70,
+                                                                                //   height: 70,
+                                                                                //   child: ClipOval(
+                                                                                //     child:
+                                                                                //     data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
+                                                                                //         ? Image.network(
+                                                                                //       data[index]['busphoto'],
+                                                                                //       fit: BoxFit.cover,
+                                                                                //     )
+                                                                                //         :
+                                                                                //     Stack(
+                                                                                //     children:[
+                                                                                //       Container(
+                                                                                //         decoration: BoxDecoration(
+                                                                                //           shape: BoxShape.circle,
+                                                                                //           color: Color(0xffe6bdf0),
+                                                                                //         ),
+                                                                                //         child: Center(
+                                                                                //           child: Image.asset(
+                                                                                //             'assets/imgs/school/image-gallery 1.png',
+                                                                                //             width: 40,
+                                                                                //             height: 40,
+                                                                                //           ),
+                                                                                //         ) ,
+                                                                                //       ),
+                                                                                //
+                                                                                //
+                                                                                //
+                                                                                //
+                                                                                //     ]
+                                                                                //       ),
+                                                                                //   ),
+                                                                                // ),
+                                                                              SizedBox(
+                                                                              width: 70,
+                                                                              height: 70,
+                                                                              child: ClipOval(
+                                                                                child: data[index]['busphoto'] != null && data[index]['busphoto'] is List && data[index]['busphoto'].isNotEmpty
+                                                                                    ? GridView.builder(
+                                                                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                                                    crossAxisCount: 1,
+                                                                                    childAspectRatio: 1, // Make sure each image has a 1:1 aspect ratio
+                                                                                  ),
+                                                                                  itemCount: (data[index]['busphoto'] as List).length,
+                                                                                  itemBuilder: (context, imageIndex) {
+                                                                                    return Image.network(
+                                                                                      (data[index]['busphoto'] as List)[imageIndex],
+                                                                                      fit: BoxFit.cover,
+                                                                                    );
+                                                                                  },
+                                                                                )
+                                                                                    : Stack(
+                                                                                  children: [
+                                                                                    Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        shape: BoxShape.circle,
+                                                                                        color: Color(0xffe6bdf0),
+                                                                                      ),
+                                                                                      child: Center(
+                                                                                        child: Image.asset(
+                                                                                          'assets/imgs/school/image-gallery 1.png',
+                                                                                          width: 40,
+                                                                                          height: 40,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            )
+
+                                                                      // SizedBox(
                                                                                 //     width: 80,
                                                                                 //     height: 80,
                                                                                 //     child: Image.network('${data[index]['busphoto']}',
@@ -1576,7 +1616,7 @@ class BusScreenSate extends State<BusScreen> {
             ),
           ),
           child: SizedBox(
-            height: 180,
+            height: 200,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
               child: Column(
@@ -1594,7 +1634,7 @@ class BusScreenSate extends State<BusScreen> {
                               'There are supervisors and parents',
                               style: TextStyle(
                                 color: Color(0xFF442B72),
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontFamily: 'Poppins-Regular',
                                 //fontWeight: FontWeight.w400,
                                 height: 1.23,
@@ -1605,7 +1645,7 @@ class BusScreenSate extends State<BusScreen> {
                                 'on this bus all will be deleted',
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontFamily: 'Poppins-Regular',
                                   // fontWeight: FontWeight.w400,
                                   height: 1.23,
@@ -1617,7 +1657,7 @@ class BusScreenSate extends State<BusScreen> {
                                 'once you delete the bus',
                                 style: TextStyle(
                                   color: Color(0xFF442B72),
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontFamily: 'Poppins-Regular',
                                   // fontWeight: FontWeight.w400,
                                   height: 1.23,
@@ -1629,14 +1669,14 @@ class BusScreenSate extends State<BusScreen> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 18,
                   ),
                   Row(
                     children: [
                       ElevatedSimpleButton(
                         txt: 'Delete',
                         width: 120,
-                        hight: 38,
+                        hight: 36,
                         onPress: () => {
                         Navigator.pop(context),
                           _deleteBusDocument(supervisorId)
@@ -1655,7 +1695,7 @@ class BusScreenSate extends State<BusScreen> {
                       ElevatedSimpleButton(
                         txt: 'Cancel',
                         width: 120,
-                        hight: 38,
+                        hight: 36,
                         onPress: () {
                           Navigator.pop(context);
                         },

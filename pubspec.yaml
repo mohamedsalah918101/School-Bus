@@ -62,6 +62,7 @@ dependencies:
   share_plus: ^7.0.2
   firebase_messaging: ^14.6.5
   flutter_local_notifications: ^15.1.0+1
+<<<<<<< HEAD
   intl: ^0.18.0
   flutter_sound: ^9.2.13
   permission_handler: ^10.2.1
@@ -73,6 +74,9 @@ dependencies:
   connectivity_plus: ^6.0.3
 #  camera: ^0.11.0
   internet_connection_checker: ^1.0.0+1
+=======
+  multiple_images_picker: ^1.0.1
+>>>>>>> 66775cb57e7873efa263644648a8049c751106dc
   #  firebase_messaging_web: ^3.7.0
   url_launcher: ^6.1.14
   flutter_phone_direct_caller: ^2.1.1

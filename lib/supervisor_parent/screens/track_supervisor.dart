@@ -1012,31 +1012,16 @@ class _TrackSupervisorState extends State<TrackSupervisor> {
                                                 width: double.infinity,
                                                 height: 70, //92
                                                 child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    (sharedpref?.getString(
-                                                                'lang') ==
-                                                            'ar')
-                                                        ? Text(
-                                                            '- - -',
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xffFFC53E),
-                                                            ),
-                                                          )
-                                                        : Padding(
-                                                            padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                    top: 15.0),
-                                                            child: Text(
-                                                              ' - - -',
-                                                              style: TextStyle(
-                                                                color: Color(
-                                                                    0xffFFC53E),
+                                                    (sharedpref?.getString('lang') == 'ar')
+                                                        ? Text('- - -', style: TextStyle(
+                                                              color: Color(0xffFFC53E),),)
+                                                        : Padding(padding:
+                                                            const EdgeInsets.only(top: 15.0),
+                                                            child: Text(' - - -',
+                                                              style: TextStyle(color: Color(0xffFFC53E),
                                                               ),
                                                             ),
                                                           ),

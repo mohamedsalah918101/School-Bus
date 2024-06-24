@@ -21,6 +21,7 @@ import '../components/elevated_simple_button.dart';
 import '../components/main_bottom_bar.dart';
 import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
+import '../main.dart';
 import 'busesScreen.dart';
 import 'homeScreen.dart';
 
@@ -31,7 +32,7 @@ class EditeBus extends StatefulWidget{
   final String? oldphotodriver;
   final String? olddrivername;
   final String? olddriverphone;
-  final String? oldphotobus;
+  final List? oldphotobus;
   final String? olddnumberbus;
   List<DropdownCheckboxItem>allSupervisors;
    EditeBus({super.key,
@@ -162,49 +163,116 @@ class _EditeBusState extends State<EditeBus> {
     }
   }
 
+// image of bus only one image
+  // File ? _selectedImageBusEdite;
+  // String? imageUrldbus;
+  // Future _pickImagebusFromGallery() async{
+  //   final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if(returnedImage ==null) return;
+  //   setState(() {
+  //     _selectedImageBusEdite=File(returnedImage.path);
+  //   });
+  //
+  //   //Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = FirebaseStorage.instance.ref().child('busphoto');
+  //   // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+  //   Reference referenceImageToUpload =referenceDirImages.child('busphotoedite');
+  //   // Reference referenceDirImages =
+  //   // referenceRoot.child('images');
+  //   //
+  //   // //Create a reference for the image to be stored
+  //
+  //
+  //   //Handle errors/success
+  //   try {
+  //     //Store the file
+  //     await referenceImageToUpload.putFile(File(returnedImage.path));
+  //     //Success: get the download URL
+  //     imageUrldbus = await referenceImageToUpload.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $imageUrldbus');
+  //     await Bus.doc(widget.docid).update({
+  //       'busphoto': imageUrldbus,
+  //     });
+  //     return imageUrldbus;
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //     return '';
+  //     //Some error occurred
+  //   }
+  // }
 
-  File ? _selectedImageBusEdite;
-  String? imageUrldbus;
-  Future _pickImagebusFromGallery() async{
-    final returnedImage= await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage ==null) return;
+  File? _selectedImageBusEdite;
+  List<String> imageUrldbus = [];
+  Future<void> _pickImagebusFromGallery() async {
+    final List<XFile>? returnedImages = await ImagePicker().pickMultiImage(
+      imageQuality: 50,
+      maxWidth: 800,
+      maxHeight: 600,
+    );
+    if (returnedImages == null || returnedImages.isEmpty) return;
+
     setState(() {
-      _selectedImageBusEdite=File(returnedImage.path);
+      for (var image in returnedImages) {
+        _selectedImageBusEdite = File(image.path);
+        _uploadImage(_selectedImageBusEdite!);
+      }
     });
+  }
 
-    //Get a reference to storage root
+  Future<void> _uploadImage(File image) async {
+    // Get a reference to storage root
     Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('busphoto');
-    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
-    Reference referenceImageToUpload =referenceDirImages.child('busphotoedite');
-    // Reference referenceDirImages =
-    // referenceRoot.child('images');
-    //
-    // //Create a reference for the image to be stored
+    Reference referenceDirImages = referenceRoot.child('busphoto');
+    Reference referenceImageToUpload = referenceDirImages.child('${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-
-    //Handle errors/success
+    // Handle errors/success
     try {
-      //Store the file
-      await referenceImageToUpload.putFile(File(returnedImage.path));
-      //Success: get the download URL
-      imageUrldbus = await referenceImageToUpload.getDownloadURL();
-      print('Image uploaded successfully. URL: $imageUrldbus');
+      // Store the file
+      await referenceImageToUpload.putFile(image);
+      // Success: get the download URL
+      String imageUrl = await referenceImageToUpload.getDownloadURL();
+      setState(() {
+        imageUrldbus.add(imageUrl);
+      });
       await Bus.doc(widget.docid).update({
         'busphoto': imageUrldbus,
       });
-      return imageUrldbus;
+      print('Image uploaded successfully. URL: $imageUrl');
     } catch (error) {
       print('Error uploading image: $error');
-      return '';
-      //Some error occurred
     }
   }
 
+
+
+//fun to get current schoolid
+  String? _schoolId;
+
+  Future<void> getSchoolId() async {
+    try {
+      // Get the SharedPreferences instance
+      // final prefs = await SharedPreferences.getInstance();
+
+      // Retrieve the school ID from SharedPreferences
+      _schoolId = sharedpref!.getString('id');
+      print("SCHOOLIDshh$_schoolId");
+      // If the school ID is not found in SharedPreferences, you can handle this case
+      if (_schoolId == null) {
+        // You can either throw an exception or set a default value
+        throw Exception('School ID not found in SharedPreferences');
+      }
+    } catch (e) {
+      // Handle any errors that occur
+      print('Error retrieving school ID: $e');
+    }
+  }
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
   getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor').where('state', isEqualTo: 1) // Example condition
+    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor')
+        .where('schoolid', isEqualTo: _schoolId)
+        .where('state', isEqualTo: 1)
         .get();
 
     // data.addAll(querySnapshot.docs);
@@ -258,9 +326,16 @@ class _EditeBusState extends State<EditeBus> {
     _namedrivercontroller.text=widget.olddrivername!;
     _phonedrivercontroller.text=widget.olddriverphone!;
     _busnumbercontroller.text=widget.olddnumberbus!;
-    imageUrldbus=widget.oldphotobus!;
+   // imageUrldbus=widget.oldphotobus!;
+    // Initialize imageUrldbus with all the images from oldphotobus, ensuring it's not null
+    if (widget.oldphotobus != null) {
+      imageUrldbus = List<String>.from(widget.oldphotobus!.map((item) => item.toString()));
+    }
+
     imageUrldriver=widget.oldphotodriver!;
+    getSchoolId();
     getData();
+
     //imageUrldriver=widget.oldphotodriver!;
     //imageUrldbus=widget.oldphotobus!;
     // responsible
@@ -823,7 +898,8 @@ class _EditeBusState extends State<EditeBus> {
                                       _pickImagebusFromGallery();
                                     },
                                     child: InteractiveViewer(
-                                      child: _selectedImageBusEdite != null
+                                      child:
+                                      _selectedImageBusEdite != null
                                           ? Image.file(_selectedImageBusEdite!,
                                           width: 75, height: 74, fit: BoxFit.cover)
                                           : (widget.oldphotobus == null || widget.oldphotobus == '')
@@ -864,8 +940,22 @@ class _EditeBusState extends State<EditeBus> {
                                           ),
                                         ),
                                       )
-                                          : Image.network(widget.oldphotobus!,
-                                          width: 75, height: 74, fit: BoxFit.cover),
+                                          : Wrap(
+                                        children: imageUrldbus.map((imageUrl) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Image.network(
+                                              imageUrl,
+                                              height: 100,
+                                              width: 100,
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                          // old bus photo
+                                      // Image.network(widget.oldphotobus!,
+                                      //     width: 75, height: 74, fit: BoxFit.cover),
+
                                     ),
                                   ),
                                   if (_selectedImageBusEdite != null || (widget.oldphotobus != null && widget.oldphotobus != ''))
