@@ -62,7 +62,6 @@ dependencies:
   share_plus: ^7.0.2
   firebase_messaging: ^14.6.5
   flutter_local_notifications: ^15.1.0+1
-<<<<<<< HEAD
   intl: ^0.18.0
   flutter_sound: ^9.2.13
   permission_handler: ^10.2.1
@@ -72,16 +71,13 @@ dependencies:
   audioplayers: ^5.2.1
   uuid: ^3.0.7
   connectivity_plus: ^6.0.3
-#  camera: ^0.11.0
+  #  camera: ^0.11.0
   internet_connection_checker: ^1.0.0+1
-=======
-  multiple_images_picker: ^1.0.1
->>>>>>> 66775cb57e7873efa263644648a8049c751106dc
   #  firebase_messaging_web: ^3.7.0
   url_launcher: ^6.1.14
   flutter_phone_direct_caller: ^2.1.1
   fluttercontactpicker: ^4.7.0
-#  firebase_messaging: ^14.7.20
+  #  firebase_messaging: ^14.7.20
   local_auth: ^2.1.8
   date_format: ^2.0.6
   loadmore: ^2.0.1
@@ -107,9 +103,12 @@ dev_dependencies:
   google_maps_place_picker_mb: ^3.0.2
   geolocator: ^9.0.1
   permission_handler: ^10.2.0
-  timeago: ^3.6.0
   #image_picker: ^1.0.8
 #  firebase_messaging: ^14.7.20
+  timeago: ^3.6.0
+#  multiple_images_picker: ^1.0.1
+
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
