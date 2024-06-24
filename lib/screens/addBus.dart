@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multiple_images_picker/multiple_images_picker.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -69,9 +70,9 @@ class _AddBusState extends State<AddBus> {
 // add to firestore
   final _firestore = FirebaseFirestore.instance;
   File? _selectedImagedriver;
-  File? _selectedImagebus;
+ // File? _selectedImagebus;
   String? imageUrl;
-  String? busimage;
+ // String? busimage;
   bool _validateDriverName = false;
   bool _validateDriverNumber = false;
   bool _validateBusNumber = false;
@@ -139,7 +140,7 @@ class _AddBusState extends State<AddBus> {
         .collection('supervisor')
         .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
         .where('state', isEqualTo: 1)
-        .where('bus_id', isNull: true)// ضفت شرط جديد ان ميظهرش اى مشرف عنده bus id
+        .where('bus_id', isEqualTo: '') // ضفت شرط جديد ان ميظهرش اى مشرف عنده bus id
         .get();
 
     for (int i = 0; i < querySnapshot.docs.length; i++) {
@@ -156,38 +157,94 @@ class _AddBusState extends State<AddBus> {
   }
 
   //fun image bus from gallery
-  Future _pickBusImageFromGallery() async {
-    final returnedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (returnedImage == null) return;
-    setState(() {
-      _selectedImagebus = File(returnedImage.path);
-    });
+  // Future _pickBusImageFromGallery() async {
+  //   final returnedImage =
+  //       await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if (returnedImage == null) return;
+  //   setState(() {
+  //     _selectedImagebus = File(returnedImage.path);
+  //   });
+  //
+  //   //Get a reference to storage root
+  //   Reference referenceRoot = FirebaseStorage.instance.ref();
+  //   Reference referenceDirImages = FirebaseStorage.instance.ref().child('img');
+  //   // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+  //   Reference referenceImageToUpload = referenceDirImages.child('bus');
+  //   // Reference referenceDirImages =
+  //   // referenceRoot.child('images');
+  //   //
+  //   // //Create a reference for the image to be stored
+  //
+  //   //Handle errors/success
+  //   try {
+  //     //Store the file
+  //     await referenceImageToUpload.putFile(File(returnedImage.path));
+  //     //Success: get the download URL
+  //     busimage = await referenceImageToUpload.getDownloadURL();
+  //     print('Image uploaded successfully. URL: $busimage');
+  //     return busimage;
+  //   } catch (error) {
+  //     print('Error uploading image: $error');
+  //     return '';
+  //     //Some error occurred
+  //   }
+  // }
+  List<XFile>? _imageFiles;
+  List<String> busImageUrls = [];
+  //File? _selectedImagebus;
+  String? busimage;
+  final ImagePicker _picker = ImagePicker();
+  List<File> _selectedImages = [];
 
-    //Get a reference to storage root
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = FirebaseStorage.instance.ref().child('img');
-    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
-    Reference referenceImageToUpload = referenceDirImages.child('bus');
-    // Reference referenceDirImages =
-    // referenceRoot.child('images');
-    //
-    // //Create a reference for the image to be stored
 
-    //Handle errors/success
-    try {
-      //Store the file
-      await referenceImageToUpload.putFile(File(returnedImage.path));
-      //Success: get the download URL
-      busimage = await referenceImageToUpload.getDownloadURL();
-      print('Image uploaded successfully. URL: $busimage');
-      return busimage;
-    } catch (error) {
-      print('Error uploading image: $error');
-      return '';
-      //Some error occurred
+  Future<void> _pickBusImagesFromGallery() async {
+    int remainingSlots = 5 - _selectedImages.length;
+
+    if (remainingSlots > 0) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage(
+        imageQuality: 50,
+        maxWidth: 800, // Adjust as needed
+        maxHeight: 600, // Adjust as needed
+      );
+
+      if (pickedFiles != null) {
+        setState(() {
+          _selectedImages.addAll(
+            pickedFiles.map((xfile) => File(xfile.path)).take(remainingSlots),
+          );
+          if (_selectedImages.length > 5) {
+            _selectedImages = _selectedImages.sublist(0, 5);
+          }
+          _uploadImages();
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You can select up to 5 images.'),
+        ),
+      );
     }
   }
+
+  Future<void> _uploadImages() async {
+    busImageUrls.clear();
+
+    for (File imageFile in _selectedImages) {
+      Reference referenceRoot = FirebaseStorage.instance.ref();
+      Reference referenceDirImages = referenceRoot.child('img');
+      Reference referenceImageToUpload = referenceDirImages.child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      try {
+        await referenceImageToUpload.putFile(imageFile);
+        String downloadUrl = await referenceImageToUpload.getDownloadURL();
+        busImageUrls.add(downloadUrl);
+      } catch (error) {
+        print('Error uploading image: $error');
+      }
+    }
+  }
+
 
   void _addDataToFirestore() async {
     // if (_driverName.text.isEmpty || _driverNumber.text.isEmpty || _busNumber.text.isEmpty || _selectedImage == null || _selectedImagebus == null) {
@@ -211,7 +268,7 @@ class _AddBusState extends State<AddBus> {
       'busnumber': _busNumber.text,
       'supervisors': supervisorsList,
       'imagedriver': imageUrl ?? '',
-      'busphoto': busimage ?? '',
+      'busphoto':busImageUrls,
       'schoolid': _schoolId
     };
     // Add the data to the Firestore collection
@@ -825,20 +882,40 @@ class _AddBusState extends State<AddBus> {
                                       alignment: AlignmentDirectional.center,
                                       child: GestureDetector(
                                         onTap: () async {
-                                          await _pickBusImageFromGallery();
+                                          await _pickBusImagesFromGallery();
                                         }, // Call function when tapped
-                                        child: _selectedImagebus != null
-                                            ? Image.file(
-                                                _selectedImagebus!,
-                                                // Display the uploaded image
-                                                width: 275,
-                                                // Set width as per your preference
-                                                height: 75,
-                                                // Set height as per your preference
-                                                fit: BoxFit
-                                                    .cover, // Adjusts how the image fits in the container
-                                              )
-                                            :
+                                        child:
+                                        // _selectedImagebus != null
+                                        //     ? Image.file(
+                                        //         _selectedImagebus!,
+                                        //         // Display the uploaded image
+                                        //         width: 275,
+                                        //         // Set width as per your preference
+                                        //         height: 75,
+                                        //         // Set height as per your preference
+                                        //         fit: BoxFit
+                                        //             .cover, // Adjusts how the image fits in the container
+                                        //       )
+                                        //     :
+                                        _selectedImages.isNotEmpty
+                                            ? Container(
+                                          height: 100,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: _selectedImages.length,
+                                            itemBuilder: (context, index) {
+                                              return Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Image.file(
+                                                  _selectedImages[index],
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ):
                                         FDottedLine(
                                                 color: Color(0xFF442B72),
                                                 strokeWidth: 0.8,
