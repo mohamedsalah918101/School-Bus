@@ -71,12 +71,12 @@ class MyApp extends StatelessWidget{
 
       home: // AcceptInvitationSupervisor()
       // HomeForSupervisor(),
-      PaginatedList()
-
+      // PaginatedList()
+      // ParentsView()
       // home:SplashScreen(),
       // AttendanceSupervisorScreen(),
       // AddParents(),
-      // SplashScreen(),
+      SplashScreen(),
     );
   }
 }

@@ -15,6 +15,7 @@ import 'package:school_account/supervisor_parent/screens/notification_supervisor
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/show_all_students.dart';
 import 'package:school_account/supervisor_parent/screens/student_screen.dart';
+import 'package:school_account/supervisor_parent/screens/test.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 
 class HomeForSupervisor extends StatefulWidget {
@@ -733,7 +734,8 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  TrackSupervisor()),
+                                                  TrackSupervisor()
+                                          ),
                                         );
                                       });
                                     },

@@ -122,7 +122,9 @@ class _EditAddParentsState extends State<EditAddParents> {
               'bus_id': busID,
               'name': nameChildControllers[index].text,
               'grade': gradeControllers[index].text,
-            },
+              'joinDate': FieldValue.serverTimestamp(),
+
+                },
           );
 
           await Parent.doc(widget.docid).update({

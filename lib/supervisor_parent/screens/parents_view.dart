@@ -156,7 +156,19 @@ class _ParentsViewState extends State<ParentsView> {
     });
 
     print('Fetching data...');
-    Query query = _firestore.collection('parent').limit(_limit);
+    String? supervisorId = sharedpref!.getString('id');
+    if (supervisorId == null) {
+      print('Supervisor ID is null');
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    Query query = _firestore.collection('parent')
+        .where('supervisor', isEqualTo: supervisorId)
+        .limit(_limit);
+
     if (_lastDocument != null) {
       query = query.startAfterDocument(_lastDocument!);
       print('Starting after document: ${_lastDocument!.id}');
@@ -198,46 +210,46 @@ class _ParentsViewState extends State<ParentsView> {
   }
 
   Future<void> getData({String query = ""}) async {
-      try {
-        String? supervisorId = sharedpref!.getString('id');
-        if (supervisorId == null) {
-          print('jessysupervisorId is null');
-          return;
-        }
-
-        print('jessysupervisorId: $supervisorId');
-        QuerySnapshot querySnapshot;
-
-        if (query.isEmpty) {
-          print('jessyQuery is empty, searching by supervisorId only');
-          querySnapshot = await FirebaseFirestore.instance.collection('parent')
-              .where('supervisor', isEqualTo: supervisorId)
-              .get();
-        } else {
-          print('jessySearching by supervisorId and name');
-          querySnapshot = await FirebaseFirestore.instance
-              .collection('parent')
-              .where('supervisor', isEqualTo: supervisorId)
-              .where('name', isGreaterThanOrEqualTo: query)
-              .where('name', isLessThanOrEqualTo: query + '\uf8ff')
-              .get();
-        }
-
-        setState(() {
-          _documents = querySnapshot.docs;
-        });
-
-        print('jessyFetched ${querySnapshot.docs.length} documents');
-        for (var doc in querySnapshot.docs) {
-          print(doc.data());
-        }
-      } catch (e) {
-        print('jessyErrorl: $e');
-        setState(() {
-          // errorMessage = e.toString();
-        });
+    try {
+      String? supervisorId = sharedpref!.getString('id');
+      if (supervisorId == null) {
+        print('Supervisor ID is null');
+        return;
       }
+
+      print('Supervisor ID: $supervisorId');
+      QuerySnapshot querySnapshot;
+
+      if (query.isEmpty) {
+        print('Query is empty, searching by supervisorId only');
+        querySnapshot = await FirebaseFirestore.instance.collection('parent')
+            .where('supervisor', isEqualTo: supervisorId)
+            .get();
+      } else {
+        print('Searching by supervisorId and name');
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('parent')
+            .where('supervisor', isEqualTo: supervisorId)
+            .where('name', isGreaterThanOrEqualTo: query)
+            .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+            .get();
+      }
+
+      setState(() {
+        _documents = querySnapshot.docs;
+      });
+
+      print('Fetched ${querySnapshot.docs.length} documents');
+      for (var doc in querySnapshot.docs) {
+        print(doc.data());
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        // errorMessage = e.toString();
+      });
     }
+  }
 
   Future<void> _fetchData({String query = ""}) async {
     if (_isLoading || !_hasMoreData) return;
@@ -246,7 +258,19 @@ class _ParentsViewState extends State<ParentsView> {
       _isLoading = true;
     });
 
-    Query baseQuery = _firestore.collection('parent').limit(_limit);
+    String? supervisorId = sharedpref!.getString('id');
+    if (supervisorId == null) {
+      print('Supervisor ID is null');
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    Query baseQuery = _firestore.collection('parent')
+        .where('supervisor', isEqualTo: supervisorId)
+        .limit(_limit);
+
     if (_lastDocument != null) {
       baseQuery = baseQuery.startAfterDocument(_lastDocument!);
     }
@@ -291,7 +315,6 @@ class _ParentsViewState extends State<ParentsView> {
       _isLoading = false;
     });
   }
-
 
 
   void _onSearchChanged() {
