@@ -1081,37 +1081,40 @@ class _AddBusState extends State<AddBus> {
                                                 ),
                                               ),
                                               if (_selectedImages.length < 5) // Show FDottedLine if less than 5 images chosen
-                                                FDottedLine(
-                                                  color: Color(0xFF442B72),
-                                                  strokeWidth: 0.8,
-                                                  dottedLength: 10,
-                                                  space: 5.0,
-                                                  corner: FDottedLineCorner.all(6.0),
-                                                  // Child widget
-                                                  child: Container(
-                                                    width: 150,
-                                                    height: 75,
-                                                    alignment: Alignment.center,
-                                                    child: Row(
-                                                      children: [
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(left: 10),
-                                                          child: Image.asset(
-                                                            "assets/imgs/school/icons8_image_document_1 1.png",
-                                                            width: 24,
-                                                            height: 24,
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                  child: FDottedLine(
+                                                    color: Color(0xFF442B72),
+                                                    strokeWidth: 0.8,
+                                                    dottedLength: 10,
+                                                    space: 5.0,
+                                                    corner: FDottedLineCorner.all(6.0),
+                                                    // Child widget
+                                                    child: Container(
+                                                      width: 150,
+                                                      height: 75,
+                                                      alignment: Alignment.center,
+                                                      child: Row(
+                                                        children: [
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(left: 10),
+                                                            child: Image.asset(
+                                                              "assets/imgs/school/icons8_image_document_1 1.png",
+                                                              width: 24,
+                                                              height: 24,
+                                                            ),
                                                           ),
-                                                        ),
-                                                        SizedBox(width: 10),
-                                                        Text(
-                                                          "Upload image",
-                                                          style: TextStyle(
-                                                            color: Color(0xFF442B72),
-                                                            fontSize: 14,
-                                                            fontFamily: 'Poppins-Regular',
+                                                          SizedBox(width: 10),
+                                                          Text(
+                                                            "Upload image",
+                                                            style: TextStyle(
+                                                              color: Color(0xFF442B72),
+                                                              fontSize: 14,
+                                                              fontFamily: 'Poppins-Regular',
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 ),

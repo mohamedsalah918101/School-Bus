@@ -752,7 +752,7 @@ class BusScreenSate extends State<BusScreen> {
                                                       String supervisorPhoneNumber = filteredData[index]['phonedriver'];
                                                       // to change image depended on filter if filter with bus number show image of bus & if filter with driver name image of driver appear
                                                       String imageUrl = selectedFilter == 'Bus Number'
-                                                          ? filteredData[index]['busphoto'] // Use busphoto for Bus Number filter
+                                                          ? filteredData[index]['busphoto'][0] // Use busphoto for Bus Number filter
                                                           : filteredData[index]['imagedriver'];
                                                       // Determine the fallback image asset based on the selected filter
                                                       String defaultImageAsset = selectedFilter == 'Bus Number'
@@ -986,7 +986,6 @@ class BusScreenSate extends State<BusScreen> {
                                                               ),
                                                               tileColor: Colors.white,
                                                               onTap: (){
-
                                                                 // List<DropdownCheckboxItem>allSupervisors=[];
                                                                 // for(int i=0;i<data[index]['supervisors'].length;i++){
                                                                 //   allSupervisors.add(DropdownCheckboxItem(label:data[index]['supervisors'][i]['name'],phone: data[index]['supervisors'][i]['phone'],docID: data[index]['supervisors'][i]['id']));
@@ -1072,92 +1071,64 @@ class BusScreenSate extends State<BusScreen> {
                                                                               ),
                                                                             ),
                                                                             SizedBox(height:25,),
-                                                                            Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                              children: [
-                                                                                // SizedBox(
-                                                                                //   width: 70,
-                                                                                //   height: 70,
-                                                                                //   child: ClipOval(
-                                                                                //     child:
-                                                                                //     data[index]['busphoto'] != null && data[index]['busphoto'].isNotEmpty
-                                                                                //         ? Image.network(
-                                                                                //       data[index]['busphoto'],
-                                                                                //       fit: BoxFit.cover,
-                                                                                //     )
-                                                                                //         :
-                                                                                //     Stack(
-                                                                                //     children:[
-                                                                                //       Container(
-                                                                                //         decoration: BoxDecoration(
-                                                                                //           shape: BoxShape.circle,
-                                                                                //           color: Color(0xffe6bdf0),
-                                                                                //         ),
-                                                                                //         child: Center(
-                                                                                //           child: Image.asset(
-                                                                                //             'assets/imgs/school/image-gallery 1.png',
-                                                                                //             width: 40,
-                                                                                //             height: 40,
-                                                                                //           ),
-                                                                                //         ) ,
-                                                                                //       ),
-                                                                                //
-                                                                                //
-                                                                                //
-                                                                                //
-                                                                                //     ]
-                                                                                //       ),
-                                                                                //   ),
-                                                                                // ),
-                                                                              SizedBox(
-                                                                              width: 70,
-                                                                              height: 70,
-                                                                              child: ClipOval(
-                                                                                child: data[index]['busphoto'] != null && data[index]['busphoto'] is List && data[index]['busphoto'].isNotEmpty
-                                                                                    ? GridView.builder(
-                                                                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                                                    crossAxisCount: 1,
-                                                                                    childAspectRatio: 1, // Make sure each image has a 1:1 aspect ratio
-                                                                                  ),
-                                                                                  itemCount: (data[index]['busphoto'] as List).length,
-                                                                                  itemBuilder: (context, imageIndex) {
-                                                                                    return Image.network(
-                                                                                      (data[index]['busphoto'] as List)[imageIndex],
-                                                                                      fit: BoxFit.cover,
-                                                                                    );
-                                                                                  },
-                                                                                )
-                                                                                    : Stack(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      decoration: BoxDecoration(
-                                                                                        shape: BoxShape.circle,
-                                                                                        color: Color(0xffe6bdf0),
-                                                                                      ),
-                                                                                      child: Center(
-                                                                                        child: Image.asset(
-                                                                                          'assets/imgs/school/image-gallery 1.png',
-                                                                                          width: 40,
-                                                                                          height: 40,
+                                                                            //
+                                                                            // ListView.builder(
+                                                                            //   shrinkWrap: true,
+                                                                            //   itemCount: data.length,
+                                                                            //   itemBuilder: (context, index) {
+                                                                            //     return
+                                                                                  Padding(
+                                                                                  padding: const EdgeInsets.all(8.0),
+                                                                                  child: SizedBox(
+                                                                                    width: 300,
+                                                                                    height: 70,
+                                                                                    child: data[index]['busphoto'] != null && data[index]['busphoto'] is List && data[index]['busphoto'].isNotEmpty
+                                                                                        ?
+                                                                                    ListView.builder(
+                                                                                      scrollDirection: Axis.horizontal,
+
+                                                                                      itemCount: (data[index]['busphoto'] as List).length,
+                                                                                      itemBuilder: (context, imageIndex) {
+                                                                                        return Padding(
+                                                                                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                                                          child: Container(
+                                                                                            width: 70,
+                                                                                            decoration: BoxDecoration(
+                                                                                              border: Border.all(
+                                                                                                color: Color(0xFF442B72), // border color
+                                                                                                width: 2, // border width
+                                                                                              ),
+                                                                                              borderRadius: BorderRadius.circular(5),
+                                                                                            ),
+                                                                                            child: Image.network(
+                                                                                              (data[index]['busphoto'] as List)[imageIndex],
+                                                                                              fit: BoxFit.cover,
+                                                                                            ),
+                                                                                          ),
+                                                                                        );
+                                                                                      },
+                                                                                    )
+                                                                                        : Stack(
+                                                                                      children: [
+                                                                                        Container(
+                                                                                          decoration: BoxDecoration(
+                                                                                            shape: BoxShape.circle,
+                                                                                            color: Color(0xffe6bdf0),
+                                                                                          ),
+                                                                                          child: Center(
+                                                                                            child: Image.asset(
+                                                                                              'assets/imgs/school/image-gallery 1.png',
+                                                                                              width: 40,
+                                                                                              height: 40,
+                                                                                            ),
+                                                                                          ),
                                                                                         ),
-                                                                                      ),
+                                                                                      ],
                                                                                     ),
-                                                                                  ],
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                            )
-
-                                                                      // SizedBox(
-                                                                                //     width: 80,
-                                                                                //     height: 80,
-                                                                                //     child: Image.network('${data[index]['busphoto']}',
-                                                                                //       fit: BoxFit.scaleDown,
-                                                                                //     )
-                                                                                // )
-
-                                                                                // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,),
-                                                                                // Image.asset("assets/imgs/school/Frame 137.png",width: 69,height: 68,)
-                                                                              ],),
+                                                                            //   },
+                                                                            // ),
                                                                             SizedBox(height: 25,),
                                                                             Text("Driver", style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
                                                                             SizedBox(height: 10,),

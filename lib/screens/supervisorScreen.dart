@@ -145,10 +145,12 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
         .where('schoolid', isEqualTo: _schoolId) // Filter by school ID
         .get();
     data.addAll(querySnapshot.docs);
-    setState(() {
-      data = querySnapshot.docs;
-      filteredData = List.from(data);
-    });
+    if (_isMounted) {
+      setState(() {
+        data = querySnapshot.docs;
+        filteredData = List.from(data);
+      });
+    }
   }
 
   //fun get bus number
@@ -266,10 +268,10 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
       isFiltered = true;
     });
   }
-
+bool _isMounted= true;
   @override
-  dispose() {
-
+ void dispose() {
+    _isMounted = false;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
