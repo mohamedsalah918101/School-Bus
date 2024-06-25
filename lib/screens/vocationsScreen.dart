@@ -291,20 +291,25 @@ String newDocId='';
       String docNameFirst=''; String docNameSecond='';
       var weekend=[];
       for (var doc in querySnapshot.docs) {
+print("123456");
         weekend=doc['days'];
-        if( weekend.length > 0){
-
-       //   _selectedDays.add( Day(name: doc['days'][0],weekdayIndex:0, isChecked: true));
-        docNameFirst= doc['days'][0];
-        if( weekend.length > 1){
+        if( weekend.length == 1) {
+          //   _selectedDays.add( Day(name: doc['days'][0],weekdayIndex:0, isChecked: true));
+          docNameFirst = doc['days'][0];
+        }
+        else if( weekend.length == 2){
+          docNameFirst = doc['days'][0];
           docNameSecond= doc['days'][1];
          // _selectedDays.add( Day(name: doc['days'][1],weekdayIndex:1, isChecked: true));
-
-        }}
+//_selectedDays
+        }
         // String docName = doc['days'][0];
+_selectedDays.clear();
         for (var day in days) {
           if (day.name == docNameFirst || day.name == docNameSecond) {
             day.isChecked = true;
+            _selectedDays.add(day);
+            print(day.name);
           }
         }
       }
@@ -460,6 +465,7 @@ String newDocId='';
               // Create a new Holiday object and add it to the list
               Holiday holiday = Holiday(name: name, fromDate: fromDateString, toDate: toDateString, selectedDates: selectedDatesStrings,schoolid:sharedpref!.getString('id').toString(),);
               _holidays.add(holiday);
+
               retrievedHolidays.add(holiday);
               // Print extracted data
               print('Name: $name');
@@ -493,10 +499,12 @@ String newDocId='';
 
   List<Day> _selectedDays = [];
 
+  SfDateRangePicker _datePickerController = SfDateRangePicker();
 
   @override
   void initState() {
     super.initState();
+    //DateTime.now().add(Duration(days: 2));
     //_getSelectedDaysFromFirestore();
     retrieveAllData();
     _loadSelectedDays();
@@ -735,15 +743,24 @@ String newDocId='';
                                           days.map((day) {
                                             return GestureDetector(
                                               onTap: ()
-                                              {
-                                                if (_selectedDays.length < 2) {
+                                              {print("list_length");
+                                              print(_selectedDays.length);
+                                                if (_selectedDays.length <= 2) {
+
                                                   setState(() {
-                                                    day.toggleCheck();
-                                                    if (day.isChecked) {
-                                                      _selectedDays.add(day);
+
+                                                    if (!day.isChecked) {
+                                                      if(_selectedDays.length<2) {
+                                                        day.toggleCheck();
+                                                        _selectedDays.add(day);
+                                                        day.isChecked = true;
+                                                      }
                                                     } else {
                                                       _selectedDays.remove(day);
+                                                      day.isChecked = false;
                                                     }
+                                                    print("list_length2");
+                                                    print(_selectedDays.length);
                                                   });
                                                 }
                                               },
@@ -1189,6 +1206,9 @@ String newDocId='';
                           child: SfDateRangePicker(
                             onSelectionChanged: _onSelectionChanged, // Prevent selection
                             allowViewNavigation: true,
+
+
+
                             //new
                            // onSelectionChanged: _onDateRangeSelected,
 
