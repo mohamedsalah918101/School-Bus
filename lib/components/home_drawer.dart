@@ -61,8 +61,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 13.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
                         child: SizedBox(

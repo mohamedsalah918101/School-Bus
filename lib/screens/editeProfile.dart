@@ -349,916 +349,921 @@ class _EditeProfileState extends State<EditeProfile> {
           preferredSize: Size.fromHeight(70),
         ),
         //Custom().customAppBar(context, 'Edite Profile'),
-        body: SingleChildScrollView(
-          //reverse: true,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Form(
-              key: formState,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                 //old stack
-                 //  Stack(
-                 //    children: [
-                 //      Center(
-                 //        child: Padding(
-                 //          padding: const EdgeInsets.only(top: 20),
-                 //          child: FutureBuilder<String>(
-                 //            future: _getImageUrl(),
-                 //            builder: (BuildContext context,
-                 //                AsyncSnapshot<String> snapshot) {
-                 //              if (snapshot.connectionState ==
-                 //                  ConnectionState.waiting) {
-                 //                return CircularProgressIndicator();
-                 //              }
-                 //
-                 //              if (snapshot.hasError) {
-                 //                return Text('Error: ${snapshot.error}');
-                 //              }
-                 //
-                 //              if (!snapshot.hasData || snapshot.data == null) {
-                 //                return GestureDetector(
-                 //                  onTap: () async {
-                 //                    await _pickEditeImageProfileFromGallery();
-                 //                  },
-                 //                  child: CircleAvatar(
-                 //                    backgroundColor: Colors.white,
-                 //                    radius: 50,
-                 //                    child: Image.asset(
-                 //                      'assets/imgs/school/Ellipse 2 (2).png',
-                 //                      fit: BoxFit.cover,
-                 //                      width: 100,
-                 //                      height: 100,
-                 //                    ),
-                 //                  ),
-                 //                );
-                 //              }
-                 //
-                 //              return Image.network(
-                 //                snapshot.data!,
-                 //                width: 83,
-                 //                height: 78.5,
-                 //                fit: BoxFit.cover,
-                 //              );
-                 //            },
-                 //          ),
-                 //        ),
-                 //      ),
-                 //      Center(
-                 //        child: Padding(
-                 //          padding: const EdgeInsets.only(top: 95, left: 55),
-                 //          child: Container(
-                 //            decoration: BoxDecoration(
-                 //              shape: BoxShape.circle,
-                 //              border: Border.all(
-                 //                  width: 3, color: Color(0xff432B72)),
-                 //            ),
-                 //            child: CircleAvatar(
-                 //              backgroundColor: Colors.white,
-                 //              radius: 10,
-                 //              child: GestureDetector(
-                 //                onTap: () {
-                 //                  changePhotoDialog(context);
-                 //                },
-                 //                child: Image.asset(
-                 //                  'assets/imgs/school/edite.png',
-                 //                  fit: BoxFit.cover,
-                 //                  width: 15,
-                 //                  height: 15,
-                 //                ),
-                 //              ),
-                 //            ),
-                 //          ),
-                 //        ),
-                 //      ),
-                 //    ],
-                 //  ),
-                  Stack(
-                    children: [
-                      Center(
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child:
-                                _selectedImageEditeProfile != null
-                                    ? Image.file(
-                                  _selectedImageEditeProfile!,  // Display the uploaded image
-                                  width: 83,  // Set width as per your preference
-                                  height: 78.5,  // Set height as per your preference
-                                  fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                                ) :
-                                CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: 50,
-                                  child: FutureBuilder<DocumentSnapshot>(
-                                    future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                      if (snapshot.hasError) {
-                                        return Icon(
-                                          Icons.error,
-                                          color: Colors.red,
-                                          size: 50,
-                                        ); // Display error icon if fetch fails
-                                      }
-
-                                      if (snapshot.connectionState == ConnectionState.done) {
-                                        Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
-
-                                        // Check if data contains photo URL
-                                        if (data != null && data.containsKey('photo')) {
-                                          return ClipOval(
-                                            child: Image.network(
-                                              data['photo'],
-                                              //fit: BoxFit.fill,
-                                              width: 90,
-                                              height: 90,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          );
-                                        } else {
-                                          return Image.asset(
-                                            'assets/imgs/school/Ellipse 2 (2).png', // Default image if photo URL is missing
-                                            fit: BoxFit.cover,
-                                            width: 100,
-                                            height: 100,
-                                          );
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            //reverse: true,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Form(
+                key: formState,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                   //old stack
+                   //  Stack(
+                   //    children: [
+                   //      Center(
+                   //        child: Padding(
+                   //          padding: const EdgeInsets.only(top: 20),
+                   //          child: FutureBuilder<String>(
+                   //            future: _getImageUrl(),
+                   //            builder: (BuildContext context,
+                   //                AsyncSnapshot<String> snapshot) {
+                   //              if (snapshot.connectionState ==
+                   //                  ConnectionState.waiting) {
+                   //                return CircularProgressIndicator();
+                   //              }
+                   //
+                   //              if (snapshot.hasError) {
+                   //                return Text('Error: ${snapshot.error}');
+                   //              }
+                   //
+                   //              if (!snapshot.hasData || snapshot.data == null) {
+                   //                return GestureDetector(
+                   //                  onTap: () async {
+                   //                    await _pickEditeImageProfileFromGallery();
+                   //                  },
+                   //                  child: CircleAvatar(
+                   //                    backgroundColor: Colors.white,
+                   //                    radius: 50,
+                   //                    child: Image.asset(
+                   //                      'assets/imgs/school/Ellipse 2 (2).png',
+                   //                      fit: BoxFit.cover,
+                   //                      width: 100,
+                   //                      height: 100,
+                   //                    ),
+                   //                  ),
+                   //                );
+                   //              }
+                   //
+                   //              return Image.network(
+                   //                snapshot.data!,
+                   //                width: 83,
+                   //                height: 78.5,
+                   //                fit: BoxFit.cover,
+                   //              );
+                   //            },
+                   //          ),
+                   //        ),
+                   //      ),
+                   //      Center(
+                   //        child: Padding(
+                   //          padding: const EdgeInsets.only(top: 95, left: 55),
+                   //          child: Container(
+                   //            decoration: BoxDecoration(
+                   //              shape: BoxShape.circle,
+                   //              border: Border.all(
+                   //                  width: 3, color: Color(0xff432B72)),
+                   //            ),
+                   //            child: CircleAvatar(
+                   //              backgroundColor: Colors.white,
+                   //              radius: 10,
+                   //              child: GestureDetector(
+                   //                onTap: () {
+                   //                  changePhotoDialog(context);
+                   //                },
+                   //                child: Image.asset(
+                   //                  'assets/imgs/school/edite.png',
+                   //                  fit: BoxFit.cover,
+                   //                  width: 15,
+                   //                  height: 15,
+                   //                ),
+                   //              ),
+                   //            ),
+                   //          ),
+                   //        ),
+                   //      ),
+                   //    ],
+                   //  ),
+                    Stack(
+                      children: [
+                        Center(
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child:
+                                  _selectedImageEditeProfile != null
+                                      ? Image.file(
+                                    _selectedImageEditeProfile!,  // Display the uploaded image
+                                    width: 83,  // Set width as per your preference
+                                    height: 78.5,  // Set height as per your preference
+                                    fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                  ) :
+                                  CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 50,
+                                    child: FutureBuilder<DocumentSnapshot>(
+                                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                        if (snapshot.hasError) {
+                                          return Icon(
+                                            Icons.error,
+                                            color: Colors.red,
+                                            size: 50,
+                                          ); // Display error icon if fetch fails
                                         }
-                                      }
 
-                                      return CircularProgressIndicator(); // Display loading indicator while fetching data
-                                    },
+                                        if (snapshot.connectionState == ConnectionState.done) {
+                                          Map<String, dynamic>? data = snapshot.data!.data() as Map<String, dynamic>?;
+
+                                          // Check if data contains photo URL
+                                          if (data != null && data.containsKey('photo')) {
+                                            return ClipOval(
+                                              child: Image.network(
+                                                data['photo'],
+                                                //fit: BoxFit.fill,
+                                                width: 90,
+                                                height: 90,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            );
+                                          } else {
+                                            return Image.asset(
+                                              'assets/imgs/school/Ellipse 2 (2).png', // Default image if photo URL is missing
+                                              fit: BoxFit.cover,
+                                              width: 100,
+                                              height: 100,
+                                            );
+                                          }
+                                        }
+
+                                        return CircularProgressIndicator(); // Display loading indicator while fetching data
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 95, left: 55),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(width: 3, color: Color(0xff432B72)),
-                                  ),
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    radius: 10,
-                                    child:
-                                    GestureDetector(
-                                      onTap: (){
-                                        changePhotoDialogProfile(context);
-                                        // _pickProfileImageFromGallery();
-                                      },
-                                      child: Image.asset(
-                                        'assets/imgs/school/edite.png',
-                                        fit: BoxFit.cover,
-                                        width: 15,
-                                        height: 15,
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 95, left: 55),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(width: 3, color: Color(0xff432B72)),
+                                    ),
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.white,
+                                      radius: 10,
+                                      child:
+                                      GestureDetector(
+                                        onTap: (){
+                                          changePhotoDialogProfile(context);
+                                          // _pickProfileImageFromGallery();
+                                        },
+                                        child: Image.asset(
+                                          'assets/imgs/school/edite.png',
+                                          fit: BoxFit.cover,
+                                          width: 15,
+                                          height: 15,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
 
-                      // Center(
-                      //   child: Stack(
-                      //     children: [
-                      //       Center(
-                      //         child: Padding(
-                      //           padding: const EdgeInsets.only(top: 20),
-                      //           child: CircleAvatar(
-                      //             backgroundColor: Colors.white,
-                      //             radius: 50,
-                      //             child: Image.asset(
-                      //               'assets/imgs/school/Ellipse 2 (2).png',
-                      //               fit: BoxFit.cover,
-                      //               width: 100,
-                      //               height: 100,
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //       Center(
-                      //         child: Padding(
-                      //           padding: const EdgeInsets.only(top: 95, left: 55),
-                      //           child: GestureDetector(
-                      //             onTap: (){
-                      //               Dialoge.changePhotoDialog(context);
-                      //             },
-                      //             child: Container(
-                      //
-                      //               decoration: BoxDecoration(
-                      //                 shape: BoxShape.circle,
-                      //                 border: Border.all(width: 3, color: Color(0xff432B72)),
-                      //               ),
-                      //               child: CircleAvatar(
-                      //                 backgroundColor: Colors.white,
-                      //                 radius: 10,
-                      //
-                      //                 child: Image.asset(
-                      //                   'assets/imgs/school/edite.png',
-                      //                   fit: BoxFit.cover,
-                      //                   width: 15,
-                      //                   height: 15,
-                      //
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
+                        // Center(
+                        //   child: Stack(
+                        //     children: [
+                        //       Center(
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.only(top: 20),
+                        //           child: CircleAvatar(
+                        //             backgroundColor: Colors.white,
+                        //             radius: 50,
+                        //             child: Image.asset(
+                        //               'assets/imgs/school/Ellipse 2 (2).png',
+                        //               fit: BoxFit.cover,
+                        //               width: 100,
+                        //               height: 100,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Center(
+                        //         child: Padding(
+                        //           padding: const EdgeInsets.only(top: 95, left: 55),
+                        //           child: GestureDetector(
+                        //             onTap: (){
+                        //               Dialoge.changePhotoDialog(context);
+                        //             },
+                        //             child: Container(
+                        //
+                        //               decoration: BoxDecoration(
+                        //                 shape: BoxShape.circle,
+                        //                 border: Border.all(width: 3, color: Color(0xff432B72)),
+                        //               ),
+                        //               child: CircleAvatar(
+                        //                 backgroundColor: Colors.white,
+                        //                 radius: 10,
+                        //
+                        //                 child: Image.asset(
+                        //                   'assets/imgs/school/edite.png',
+                        //                   fit: BoxFit.cover,
+                        //                   width: 15,
+                        //                   height: 15,
+                        //
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
 
-                    ],
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "School information",
-                    style: TextStyle(
-                        fontSize: 19,
-                        fontFamily: "Poppins-Bold",
-                        color: Color(0xff771F98)),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Text('School name in English'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins-Bold',
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 320,
-                    height: 45,
-                    child:
-                        FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      future: _future,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong');
-                        }
-
-                        if (!snapshot.hasData ||
-                            snapshot.data == null ||
-                            snapshot.data!.data() == null) {
-                          return Text('No data available');
-                        }
-
-                        Map<String, dynamic>? data = snapshot.data!.data();
-                        String nameEnglish = data?['nameEnglish'] ?? '';
-
-                        // Update the text field with the retrieved data
-                        _nameEnglish.text = nameEnglish;
-                        // Set the cursor to the end of the text
-                        _nameEnglish.selection = TextSelection.fromPosition(
-                            TextPosition(offset: _nameEnglish.text.length));
-
-                        return TextFormField(
-                          controller: _nameEnglish,
-
-                          style: TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 14,
-                            //fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins-Regular',
-                          ),
-
-                          textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                          onFieldSubmitted: (value) {
-                            // move to the next field when the user presses the "Done" button
-                            FocusScope.of(context).requestFocus(_NameArabicFocus);
-                          },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]+')), // Allow only English characters and spaces
-                          ],
-                          cursorColor: const Color(0xFF442B72),
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(color: Color(0xFF442B72)),
-                            alignLabelWithHint: true,
-                            counterText: "",
-                            fillColor: const Color(0xFFF1F1F1),
-                            filled: true,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            enabledBorder: myInputBorder(),
-                            focusedBorder: myFocusBorder(),
-                          ),
-                        );
-                      },
+                      ],
                     ),
-                  ),
 
-                  // Container(
-                  //   width: 320,
-                  //   height: 45,
-                  //   child: TextFormField(
-                  //     controller: _nameEnglish,
-                  //     onFieldSubmitted: (value) {
-                  //       // move to the next field when the user presses the "Done" button
-                  //       FocusScope.of(context).requestFocus(_NameArabicFocus);
-                  //     },
-                  //     style: TextStyle(color: Color(0xFF442B72)),
-                  //     //controller: _namesupervisor,
-                  //     cursorColor: const Color(0xFF442B72),
-                  //     //textDirection: TextDirection.ltr,
-                  //     scrollPadding: const EdgeInsets.symmetric(
-                  //         vertical: 40),
-                  //
-                  //     decoration:  InputDecoration(
-                  //       //labelText: 'Shady Ayman'.tr,
-                  //       //hintText:'ElSalam School '.tr ,
-                  //       hintStyle: TextStyle(color: Color(0xFF442B72)),
-                  //       alignLabelWithHint: true,
-                  //       counterText: "",
-                  //       fillColor: const Color(0xFFF1F1F1),
-                  //       filled: true,
-                  //       contentPadding: const EdgeInsets.fromLTRB(
-                  //           8, 5, 10, 5),
-                  //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                  //       enabledBorder: myInputBorder(),
-                  //       focusedBorder: myFocusBorder(),
-                  //     ),
-                  //
-                  //   ),
-                  // ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  Text('School name in Arabic'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins-Bold',
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 320,
-                    height: 45,
-                    child:
-                        FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      future: _future,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong');
-                        }
-
-                        if (!snapshot.hasData ||
-                            snapshot.data == null ||
-                            snapshot.data!.data() == null) {
-                          return Text('No data available');
-                        }
-
-                        Map<String, dynamic>? data = snapshot.data!.data();
-                        String nameEnglish = data?['nameArabic'] ?? '';
-
-                        // Update the text field with the retrieved data
-                        _nameArabic.text = nameEnglish;
-
-                        return TextFormField(
-                          controller: _nameArabic,
-                          focusNode: _NameArabicFocus,
-                          style: TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 14,
-                            //fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins-Regular',
-                          ),
-
-                          textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                          onFieldSubmitted: (value) {
-                            // move to the next field when the user presses the "Done" button
-                            FocusScope.of(context).requestFocus(_AddressFocus);
-                          },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
-                          ],
-                          cursorColor: const Color(0xFF442B72),
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(color: Color(0xFF442B72)),
-                            alignLabelWithHint: true,
-                            counterText: "",
-                            fillColor: const Color(0xFFF1F1F1),
-                            filled: true,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            enabledBorder: myInputBorder(),
-                            focusedBorder: myFocusBorder(),
-                          ),
-                        );
-                      },
+                    SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  // Container(
-                  //   width: 320,
-                  //   height: 45,
-                  //   child: TextFormField(
-                  //     controller: _nameArabic,
-                  //     focusNode: _NameArabicFocus,
-                  //     onFieldSubmitted: (value) {
-                  //       // move to the next field when the user presses the "Done" button
-                  //       FocusScope.of(context).requestFocus(_AddressFocus);
-                  //     },
-                  //     style: TextStyle(color: Color(0xFF442B72)),
-                  //     //controller: _namesupervisor,
-                  //     cursorColor: const Color(0xFF442B72),
-                  //     //textDirection: TextDirection.ltr,
-                  //     scrollPadding: const EdgeInsets.symmetric(
-                  //         vertical: 40),
-                  //
-                  //     decoration:  InputDecoration(
-                  //       //labelText: 'Shady Ayman'.tr,
-                  //      // hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
-                  //       hintStyle: TextStyle(color: Color(0xFF442B72)),
-                  //       alignLabelWithHint: true,
-                  //       counterText: "",
-                  //       fillColor: const Color(0xFFF1F1F1),
-                  //       filled: true,
-                  //       contentPadding: const EdgeInsets.fromLTRB(
-                  //           8, 5, 10, 5),
-                  //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                  //       enabledBorder: myInputBorder(),
-                  //       focusedBorder: myFocusBorder(),
-                  //     ),
-                  //
-                  //   ),
-                  // ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text('Address'.tr,
+                    Text(
+                      "School information",
                       style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins-Bold',
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
+                          fontSize: 19,
+                          fontFamily: "Poppins-Bold",
+                          color: Color(0xff771F98)),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text('School name in English'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Bold',
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 320,
+                      height: 45,
+                      child:
+                          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
 
-                  Container(
-                    width: 320,
-                    height: 45,
-                    child:
-                        FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      future: _future,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
 
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong');
-                        }
+                          if (!snapshot.hasData ||
+                              snapshot.data == null ||
+                              snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
 
-                        if (!snapshot.hasData ||
-                            snapshot.data == null ||
-                            snapshot.data!.data() == null) {
-                          return Text('No data available');
-                        }
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String nameEnglish = data?['nameEnglish'] ?? '';
 
-                        Map<String, dynamic>? data = snapshot.data!.data();
-                        String nameEnglish = data?['address'] ?? '';
+                          // Update the text field with the retrieved data
+                          _nameEnglish.text = nameEnglish;
+                          // Set the cursor to the end of the text
+                          _nameEnglish.selection = TextSelection.fromPosition(
+                              TextPosition(offset: _nameEnglish.text.length));
 
-                        // Update the text field with the retrieved data
-                        _Address.text = nameEnglish;
+                          return TextFormField(
+                            controller: _nameEnglish,
 
-                        return Form(
-                          key: _formKey,
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 14,
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
+                            ),
 
-                          autovalidateMode: _autovalidateMode,
-                          child: GooglePlacesAutoCompleteTextFormField(
-                            focusNode: _AddressFocus,
-                            cursorColor: Color(0xFF442B72),
-                            textEditingController: _Address,
-                            googleAPIKey: _yourGoogleAPIKey,
+                            textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                            onFieldSubmitted: (value) {
+                              // move to the next field when the user presses the "Done" button
+                              FocusScope.of(context).requestFocus(_NameArabicFocus);
+                            },
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]+')), // Allow only English characters and spaces
+                            ],
+                            cursorColor: const Color(0xFF442B72),
                             decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.purple),
-                              suffixIcon: Image.asset(
-                                "assets/imgs/school/icons8_Location.png",
-                                width: 20,
-                                height: 20,
-                              ),
+                              hintStyle: TextStyle(color: Color(0xFF442B72)),
                               alignLabelWithHint: true,
                               counterText: "",
-                              fillColor: Color(0xFFF1F1F1),
+                              fillColor: const Color(0xFFF1F1F1),
                               filled: true,
-                              contentPadding: EdgeInsets.fromLTRB(8, 10, 10, 5),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              hintStyle: TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 10,
-                                fontFamily: 'Inter-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.5,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                    color:
-                                        Colors.black), // Customize border color
-                              ),
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
                               enabledBorder: myInputBorder(),
                               focusedBorder: myFocusBorder(),
                             ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Container(
+                    //   width: 320,
+                    //   height: 45,
+                    //   child: TextFormField(
+                    //     controller: _nameEnglish,
+                    //     onFieldSubmitted: (value) {
+                    //       // move to the next field when the user presses the "Done" button
+                    //       FocusScope.of(context).requestFocus(_NameArabicFocus);
+                    //     },
+                    //     style: TextStyle(color: Color(0xFF442B72)),
+                    //     //controller: _namesupervisor,
+                    //     cursorColor: const Color(0xFF442B72),
+                    //     //textDirection: TextDirection.ltr,
+                    //     scrollPadding: const EdgeInsets.symmetric(
+                    //         vertical: 40),
+                    //
+                    //     decoration:  InputDecoration(
+                    //       //labelText: 'Shady Ayman'.tr,
+                    //       //hintText:'ElSalam School '.tr ,
+                    //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                    //       alignLabelWithHint: true,
+                    //       counterText: "",
+                    //       fillColor: const Color(0xFFF1F1F1),
+                    //       filled: true,
+                    //       contentPadding: const EdgeInsets.fromLTRB(
+                    //           8, 5, 10, 5),
+                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                    //       enabledBorder: myInputBorder(),
+                    //       focusedBorder: myFocusBorder(),
+                    //     ),
+                    //
+                    //   ),
+                    // ),
+
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    Text('School name in Arabic'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Bold',
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 320,
+                      height: 45,
+                      child:
+                          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data == null ||
+                              snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String nameEnglish = data?['nameArabic'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _nameArabic.text = nameEnglish;
+
+                          return TextFormField(
+                            controller: _nameArabic,
+                            focusNode: _NameArabicFocus,
                             style: TextStyle(
                               color: Color(0xFF442B72),
-                              // Set text color to purple
                               fontSize: 14,
-                              fontFamily:
-                                  'Poppins-Regular', // Customize font family
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
                             ),
-                            maxLines: 1,
-                            overlayContainer: (child) => Material(
-                              elevation: 1.0,
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              child: child,
-                            ),
-                            getPlaceDetailWithLatLng: (prediction) {
-                              print('placeDetails${prediction.lng}');
+
+                            textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                            onFieldSubmitted: (value) {
+                              // move to the next field when the user presses the "Done" button
+                              FocusScope.of(context).requestFocus(_AddressFocus);
                             },
-                            itmClick: (Prediction prediction) =>
-                                _Address.text = prediction.description!,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  // Container(
-                  //     width: 320,
-                  //     height: 45,
-                  //
-                  //   child: Form(
-                  //
-                  //     key: _formKey,
-                  //     autovalidateMode: _autovalidateMode,
-                  //     child: GooglePlacesAutoCompleteTextFormField(
-                  //
-                  //       cursorColor: Color(0xFF442B72),
-                  //       textEditingController: _Address,
-                  //       googleAPIKey: _yourGoogleAPIKey,
-                  //       decoration: InputDecoration(
-                  //       //  errorText: _validateAddress ? "Please Enter Your Address" : null,
-                  //         labelStyle: TextStyle(color: Colors.purple),
-                  //         suffixIcon: Image.asset(
-                  //           "assets/imgs/school/icons8_Location.png",
-                  //           width: 20,
-                  //           height: 20,
-                  //         ),
-                  //         alignLabelWithHint: true,
-                  //         counterText: "",
-                  //         fillColor: const Color(0xFFF1F1F1),
-                  //         filled: true,
-                  //         contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
-                  //         floatingLabelBehavior: FloatingLabelBehavior.never,
-                  //         hintStyle: const TextStyle(
-                  //           color: Color(0xFF442B72),
-                  //           fontSize: 10,
-                  //           fontFamily: 'Inter-Bold',
-                  //           fontWeight: FontWeight.w700,
-                  //           height: 1.5,
-                  //         ),
-                  //         border: OutlineInputBorder(
-                  //           borderRadius: BorderRadius.circular(12),
-                  //           borderSide: BorderSide(color: Colors.black), // Customize border color
-                  //         ),
-                  //         enabledBorder: myInputBorder(),
-                  //         focusedBorder: myFocusBorder(),
-                  //
-                  //
-                  //       ),
-                  //       style: TextStyle(
-                  //         color: Color(0xFF442B72), // Set text color to purple
-                  //         fontSize: 14,
-                  //         fontFamily: 'Poppins-Regular', // Customize font family
-                  //         //fontWeight: FontWeight.normal, // Customize font weight
-                  //         // Add more text style properties as needed
-                  //       ),
-                  //       // validator: (value) {
-                  //       //   if (value!.isEmpty) {
-                  //       //     return 'Please enter some text';
-                  //       //   }
-                  //       //   return null;
-                  //       // },
-                  //       maxLines: 1,
-                  //
-                  //       overlayContainer: (child) => Material(
-                  //         elevation: 1.0,
-                  //         color: Colors.white,
-                  //         borderRadius: BorderRadius.circular(12),
-                  //         child: child,
-                  //       ),
-                  //       getPlaceDetailWithLatLng: (prediction) {
-                  //         print('placeDetails${prediction.lng}');
-                  //       },
-                  //       itmClick: (Prediction prediction) => _Address.text = prediction.description!,
-                  //     ),
-                  //   ),
-                  // ),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  Text(
-                    "Personal information",
-                    style: TextStyle(
-                        fontSize: 19,
-                        fontFamily: "Poppins-Bold",
-                        color: Color(0xff771F98)),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Text('Coordinator Name'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins-Bold',
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 320,
-                    height: 45,
-                    child:
-                        FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      future: _future,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
+                            ],
+                            cursorColor: const Color(0xFF442B72),
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(color: Color(0xFF442B72)),
+                              alignLabelWithHint: true,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              enabledBorder: myInputBorder(),
+                              focusedBorder: myFocusBorder(),
+                            ),
                           );
-                        }
-
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong');
-                        }
-
-                        if (!snapshot.hasData ||
-                            snapshot.data == null ||
-                            snapshot.data!.data() == null) {
-                          return Text('No data available');
-                        }
-
-                        Map<String, dynamic>? data = snapshot.data!.data();
-                        String nameEnglish = data?['coordinatorName'] ?? '';
-
-                        // Update the text field with the retrieved data
-                        _coordinatorName.text = nameEnglish;
-
-                        return TextFormField(
-                          controller: _coordinatorName,
-                          focusNode: _CoordinatorFocus,
-                          style: TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 14,
-                            //fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins-Regular',
-                          ),
-
-                          textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                          onFieldSubmitted: (value) {
-                            // move to the next field when the user presses the "Done" button
-                            FocusScope.of(context).requestFocus(_SupporterFocus);
-                          },
-                          cursorColor: const Color(0xFF442B72),
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(color: Color(0xFF442B72)),
-                            alignLabelWithHint: true,
-                            counterText: "",
-                            fillColor: const Color(0xFFF1F1F1),
-                            filled: true,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            enabledBorder: myInputBorder(),
-                            focusedBorder: myFocusBorder(),
-                          ),
-                        );
-                      },
+                        },
+                      ),
                     ),
-                  ),
-                  // Container(
-                  //   width: 320,
-                  //   height: 45,
-                  //   child: TextFormField(
-                  //     controller: _coordinatorName,
-                  //     focusNode: _CoordinatorFocus,
-                  //     onFieldSubmitted: (value) {
-                  //       // move to the next field when the user presses the "Done" button
-                  //       FocusScope.of(context).requestFocus(_SupporterFocus);
-                  //     },
-                  //     style: TextStyle(color: Color(0xFF442B72)),
-                  //     //controller: _namesupervisor,
-                  //     cursorColor: const Color(0xFF442B72),
-                  //     //textDirection: TextDirection.ltr,
-                  //     scrollPadding: const EdgeInsets.symmetric(
-                  //         vertical: 40),
-                  //
-                  //     decoration:  InputDecoration(
-                  //       //labelText: 'Shady Ayman'.tr,
-                  //       //hintText:'Shady Ayman'.tr ,
-                  //       hintStyle: TextStyle(color: Color(0xFF442B72)),
-                  //       alignLabelWithHint: true,
-                  //       counterText: "",
-                  //       fillColor: const Color(0xFFF1F1F1),
-                  //       filled: true,
-                  //       contentPadding: const EdgeInsets.fromLTRB(
-                  //           8, 5, 10, 5),
-                  //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                  //       enabledBorder: myInputBorder(),
-                  //       focusedBorder: myFocusBorder(),
-                  //     ),
-                  //
-                  //   ),
-                  // ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text('Support Number'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF442B72),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins-Bold',
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 320,
-                    height: 45,
-                    child:
-                        FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      future: _future,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
+                    // Container(
+                    //   width: 320,
+                    //   height: 45,
+                    //   child: TextFormField(
+                    //     controller: _nameArabic,
+                    //     focusNode: _NameArabicFocus,
+                    //     onFieldSubmitted: (value) {
+                    //       // move to the next field when the user presses the "Done" button
+                    //       FocusScope.of(context).requestFocus(_AddressFocus);
+                    //     },
+                    //     style: TextStyle(color: Color(0xFF442B72)),
+                    //     //controller: _namesupervisor,
+                    //     cursorColor: const Color(0xFF442B72),
+                    //     //textDirection: TextDirection.ltr,
+                    //     scrollPadding: const EdgeInsets.symmetric(
+                    //         vertical: 40),
+                    //
+                    //     decoration:  InputDecoration(
+                    //       //labelText: 'Shady Ayman'.tr,
+                    //      // hintText:'مدرسة السلام الاعدادية الثانويه المشتركة'.tr ,
+                    //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                    //       alignLabelWithHint: true,
+                    //       counterText: "",
+                    //       fillColor: const Color(0xFFF1F1F1),
+                    //       filled: true,
+                    //       contentPadding: const EdgeInsets.fromLTRB(
+                    //           8, 5, 10, 5),
+                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                    //       enabledBorder: myInputBorder(),
+                    //       focusedBorder: myFocusBorder(),
+                    //     ),
+                    //
+                    //   ),
+                    // ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text('Address'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Bold',
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+
+                    Container(
+                      width: 320,
+                      height: 45,
+                      child:
+                          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data == null ||
+                              snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String nameEnglish = data?['address'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _Address.text = nameEnglish;
+
+                          return Form(
+                            key: _formKey,
+
+                            autovalidateMode: _autovalidateMode,
+                            child: GooglePlacesAutoCompleteTextFormField(
+                              focusNode: _AddressFocus,
+                              cursorColor: Color(0xFF442B72),
+                              textEditingController: _Address,
+                              googleAPIKey: _yourGoogleAPIKey,
+                              decoration: InputDecoration(
+                                labelStyle: TextStyle(color: Colors.purple),
+                                suffixIcon: Image.asset(
+                                  "assets/imgs/school/icons8_Location.png",
+                                  width: 20,
+                                  height: 20,
+                                ),
+                                alignLabelWithHint: true,
+                                counterText: "",
+                                fillColor: Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding: EdgeInsets.fromLTRB(8, 10, 10, 5),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.never,
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF442B72),
+                                  fontSize: 10,
+                                  fontFamily: 'Inter-Bold',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.5,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                      color:
+                                          Colors.black), // Customize border color
+                                ),
+                                enabledBorder: myInputBorder(),
+                                focusedBorder: myFocusBorder(),
+                              ),
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                // Set text color to purple
+                                fontSize: 14,
+                                fontFamily:
+                                    'Poppins-Regular', // Customize font family
+                              ),
+                              maxLines: 1,
+                              overlayContainer: (child) => Material(
+                                elevation: 1.0,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                child: child,
+                              ),
+                              getPlaceDetailWithLatLng: (prediction) {
+                                print('placeDetails${prediction.lng}');
+                              },
+                              itmClick: (Prediction prediction) =>
+                                  _Address.text = prediction.description!,
+                            ),
                           );
-                        }
-
-                        if (snapshot.hasError) {
-                          return Text('Something went wrong');
-                        }
-
-                        if (!snapshot.hasData ||
-                            snapshot.data == null ||
-                            snapshot.data!.data() == null) {
-                          return Text('No data available');
-                        }
-
-                        Map<String, dynamic>? data = snapshot.data!.data();
-                        String nameEnglish = data?['supportNumber'] ?? '';
-
-                        // Update the text field with the retrieved data
-                        _supportNumber.text = nameEnglish;
-
-                        return TextFormField(
-                          controller: _supportNumber,
-                          focusNode: _SupporterFocus,
-                          maxLength: 11,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
-                            LengthLimitingTextInputFormatter(11), // Limit the length programmatically
-                          ],
-                          style: TextStyle(
-                            color: Color(0xFF442B72),
-                            fontSize: 14,
-                            //fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins-Regular',
-                          ),
-                          cursorColor: const Color(0xFF442B72),
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(color: Color(0xFF442B72)),
-                            alignLabelWithHint: true,
-                            counterText: "",
-                            fillColor: const Color(0xFFF1F1F1),
-                            filled: true,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            enabledBorder: myInputBorder(),
-                            focusedBorder: myFocusBorder(),
-                          ),
-                        );
-                      },
+                        },
+                      ),
                     ),
-                  ),
-                  // Container(
-                  //   width: 320,
-                  //   height: 45,
-                  //   child: TextFormField(
-                  //     keyboardType: TextInputType.number,
-                  //     controller: _supportNumber,
-                  //     focusNode: _SupporterFocus,
-                  //     style: TextStyle(color: Color(0xFF442B72)),
-                  //     //controller: _namesupervisor,
-                  //     cursorColor: const Color(0xFF442B72),
-                  //     //textDirection: TextDirection.ltr,
-                  //     scrollPadding: const EdgeInsets.symmetric(
-                  //         vertical: 40),
-                  //
-                  //     decoration:  InputDecoration(
-                  //       //labelText: 'Shady Ayman'.tr,
-                  //      // hintText:'01028765006'.tr ,
-                  //       hintStyle: TextStyle(color: Color(0xFF442B72)),
-                  //       alignLabelWithHint: true,
-                  //       counterText: "",
-                  //       fillColor: const Color(0xFFF1F1F1),
-                  //       filled: true,
-                  //       contentPadding: const EdgeInsets.fromLTRB(
-                  //           8, 5, 10, 5),
-                  //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                  //       enabledBorder: myInputBorder(),
-                  //       focusedBorder: myFocusBorder(),
-                  //     ),
-                  //
-                  //   ),
-                  // ),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  Center(
-                      child: ElevatedSimpleButton(
-                    txt: 'Save'.tr,
-                    width: 320,
-                    hight: 48,
-                    onPress: () {
-                      editProfile();
-                      showSnackBarFun(context);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ProfileScreen()));
-                    },
-                    color: Color(0xff432B72),
-                    fontSize: 16,
-                  )),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom))
-                ],
+                    // Container(
+                    //     width: 320,
+                    //     height: 45,
+                    //
+                    //   child: Form(
+                    //
+                    //     key: _formKey,
+                    //     autovalidateMode: _autovalidateMode,
+                    //     child: GooglePlacesAutoCompleteTextFormField(
+                    //
+                    //       cursorColor: Color(0xFF442B72),
+                    //       textEditingController: _Address,
+                    //       googleAPIKey: _yourGoogleAPIKey,
+                    //       decoration: InputDecoration(
+                    //       //  errorText: _validateAddress ? "Please Enter Your Address" : null,
+                    //         labelStyle: TextStyle(color: Colors.purple),
+                    //         suffixIcon: Image.asset(
+                    //           "assets/imgs/school/icons8_Location.png",
+                    //           width: 20,
+                    //           height: 20,
+                    //         ),
+                    //         alignLabelWithHint: true,
+                    //         counterText: "",
+                    //         fillColor: const Color(0xFFF1F1F1),
+                    //         filled: true,
+                    //         contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
+                    //         floatingLabelBehavior: FloatingLabelBehavior.never,
+                    //         hintStyle: const TextStyle(
+                    //           color: Color(0xFF442B72),
+                    //           fontSize: 10,
+                    //           fontFamily: 'Inter-Bold',
+                    //           fontWeight: FontWeight.w700,
+                    //           height: 1.5,
+                    //         ),
+                    //         border: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(12),
+                    //           borderSide: BorderSide(color: Colors.black), // Customize border color
+                    //         ),
+                    //         enabledBorder: myInputBorder(),
+                    //         focusedBorder: myFocusBorder(),
+                    //
+                    //
+                    //       ),
+                    //       style: TextStyle(
+                    //         color: Color(0xFF442B72), // Set text color to purple
+                    //         fontSize: 14,
+                    //         fontFamily: 'Poppins-Regular', // Customize font family
+                    //         //fontWeight: FontWeight.normal, // Customize font weight
+                    //         // Add more text style properties as needed
+                    //       ),
+                    //       // validator: (value) {
+                    //       //   if (value!.isEmpty) {
+                    //       //     return 'Please enter some text';
+                    //       //   }
+                    //       //   return null;
+                    //       // },
+                    //       maxLines: 1,
+                    //
+                    //       overlayContainer: (child) => Material(
+                    //         elevation: 1.0,
+                    //         color: Colors.white,
+                    //         borderRadius: BorderRadius.circular(12),
+                    //         child: child,
+                    //       ),
+                    //       getPlaceDetailWithLatLng: (prediction) {
+                    //         print('placeDetails${prediction.lng}');
+                    //       },
+                    //       itmClick: (Prediction prediction) => _Address.text = prediction.description!,
+                    //     ),
+                    //   ),
+                    // ),
+                    SizedBox(
+                      height: 35,
+                    ),
+                    Text(
+                      "Personal information",
+                      style: TextStyle(
+                          fontSize: 19,
+                          fontFamily: "Poppins-Bold",
+                          color: Color(0xff771F98)),
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text('Coordinator Name'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Bold',
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 320,
+                      height: 45,
+                      child:
+                          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data == null ||
+                              snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String nameEnglish = data?['coordinatorName'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _coordinatorName.text = nameEnglish;
+
+                          return TextFormField(
+                            controller: _coordinatorName,
+                            focusNode: _CoordinatorFocus,
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 14,
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
+                            ),
+
+                            textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                            onFieldSubmitted: (value) {
+                              // move to the next field when the user presses the "Done" button
+                              FocusScope.of(context).requestFocus(_SupporterFocus);
+                            },
+                            cursorColor: const Color(0xFF442B72),
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(color: Color(0xFF442B72)),
+                              alignLabelWithHint: true,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              enabledBorder: myInputBorder(),
+                              focusedBorder: myFocusBorder(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // Container(
+                    //   width: 320,
+                    //   height: 45,
+                    //   child: TextFormField(
+                    //     controller: _coordinatorName,
+                    //     focusNode: _CoordinatorFocus,
+                    //     onFieldSubmitted: (value) {
+                    //       // move to the next field when the user presses the "Done" button
+                    //       FocusScope.of(context).requestFocus(_SupporterFocus);
+                    //     },
+                    //     style: TextStyle(color: Color(0xFF442B72)),
+                    //     //controller: _namesupervisor,
+                    //     cursorColor: const Color(0xFF442B72),
+                    //     //textDirection: TextDirection.ltr,
+                    //     scrollPadding: const EdgeInsets.symmetric(
+                    //         vertical: 40),
+                    //
+                    //     decoration:  InputDecoration(
+                    //       //labelText: 'Shady Ayman'.tr,
+                    //       //hintText:'Shady Ayman'.tr ,
+                    //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                    //       alignLabelWithHint: true,
+                    //       counterText: "",
+                    //       fillColor: const Color(0xFFF1F1F1),
+                    //       filled: true,
+                    //       contentPadding: const EdgeInsets.fromLTRB(
+                    //           8, 5, 10, 5),
+                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                    //       enabledBorder: myInputBorder(),
+                    //       focusedBorder: myFocusBorder(),
+                    //     ),
+                    //
+                    //   ),
+                    // ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text('Support Number'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF442B72),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins-Bold',
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 320,
+                      height: 45,
+                      child:
+                          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: _future,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                                snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text('Something went wrong');
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data == null ||
+                              snapshot.data!.data() == null) {
+                            return Text('No data available');
+                          }
+
+                          Map<String, dynamic>? data = snapshot.data!.data();
+                          String nameEnglish = data?['supportNumber'] ?? '';
+
+                          // Update the text field with the retrieved data
+                          _supportNumber.text = nameEnglish;
+
+                          return TextFormField(
+                            controller: _supportNumber,
+                            focusNode: _SupporterFocus,
+                            maxLength: 11,
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                              LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                            ],
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                              fontSize: 14,
+                              //fontWeight: FontWeight.bold,
+                              fontFamily: 'Poppins-Regular',
+                            ),
+                            cursorColor: const Color(0xFF442B72),
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(color: Color(0xFF442B72)),
+                              alignLabelWithHint: true,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              enabledBorder: myInputBorder(),
+                              focusedBorder: myFocusBorder(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // Container(
+                    //   width: 320,
+                    //   height: 45,
+                    //   child: TextFormField(
+                    //     keyboardType: TextInputType.number,
+                    //     controller: _supportNumber,
+                    //     focusNode: _SupporterFocus,
+                    //     style: TextStyle(color: Color(0xFF442B72)),
+                    //     //controller: _namesupervisor,
+                    //     cursorColor: const Color(0xFF442B72),
+                    //     //textDirection: TextDirection.ltr,
+                    //     scrollPadding: const EdgeInsets.symmetric(
+                    //         vertical: 40),
+                    //
+                    //     decoration:  InputDecoration(
+                    //       //labelText: 'Shady Ayman'.tr,
+                    //      // hintText:'01028765006'.tr ,
+                    //       hintStyle: TextStyle(color: Color(0xFF442B72)),
+                    //       alignLabelWithHint: true,
+                    //       counterText: "",
+                    //       fillColor: const Color(0xFFF1F1F1),
+                    //       filled: true,
+                    //       contentPadding: const EdgeInsets.fromLTRB(
+                    //           8, 5, 10, 5),
+                    //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                    //       enabledBorder: myInputBorder(),
+                    //       focusedBorder: myFocusBorder(),
+                    //     ),
+                    //
+                    //   ),
+                    // ),
+                    SizedBox(
+                      height: 35,
+                    ),
+                    Center(
+                        child: ElevatedSimpleButton(
+                      txt: 'Save'.tr,
+                      width: 320,
+                      hight: 48,
+                      onPress: () {
+                        editProfile();
+                        showSnackBarFun(context);
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfileScreen()));
+                      },
+                      color: Color(0xff432B72),
+                      fontSize: 16,
+                    )),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Padding(
+                        padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom))
+                  ],
+                ),
               ),
             ),
           ),

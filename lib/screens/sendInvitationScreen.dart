@@ -213,615 +213,620 @@ bool _nameEntered =true;
         resizeToAvoidBottomInset: false,
         endDrawer: HomeDrawer(),
         backgroundColor: const Color(0xFFFFFFFF),
-        body: LayoutBuilder(builder: (context, constrains) {
-          return SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Align(
-                        alignment: AlignmentDirectional.topStart,
-                        child: InkWell(
-                          onTap: () {
-                            // Navigate back to the previous page
-                            Navigator.pop(context);
-                          },
-                          // onTap: ()=>exit(0),
-                          child: const Icon(
-                            Icons.arrow_back_ios_new_rounded,
-                            size: 23,
-                            color: Color(0xff442B72),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          "Supervisors".tr,
-                          style: TextStyle(
-                            color: Color(0xFF993D9A),
-                            fontSize: 25,
-                            fontFamily: 'Poppins-Bold',
-                            fontWeight: FontWeight.w700,
-                         //   height: 0.64,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional.topEnd,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Row(
-                          children: [
-                           GestureDetector(
-                             onTap: () async{
-                               bool permission = await FlutterContactPicker.requestPermission();
-                               if(permission){
-                                 if(await FlutterContactPicker.hasPermission()){
-                                   _phoneContact=await FlutterContactPicker.pickPhoneContact();
-                                   if(_phoneContact!=null){
-                                     if(_phoneContact!.fullName!.isNotEmpty){
-                                       setState(() {
-                                         kPickerName=_phoneContact!.fullName.toString();
-                                        _nameController.text=kPickerName;
-                                       });
-                                     }
-                                     if (_phoneContact!.phoneNumber != null &&
-                                         _phoneContact!.phoneNumber!.number != null &&
-                                         _phoneContact!.phoneNumber!.number!.isNotEmpty) {
-                                       setState(() {
-                                         kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
-                                         if (kPickerNumber.startsWith('0')) {
-                                           kPickerNumber = kPickerNumber.substring(1);
-
-                                         }
-                                         kPickerNumber = kPickerNumber.replaceAll(' ', '');
-                                         _phoneNumberController.text = kPickerNumber;
-                                         enteredPhoneNumber='+20'+kPickerNumber;
-                                       });
-                                     }
-                                     // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
-                                     //   setState(() {
-                                     //     kPickerNumber=_phoneContact!.phoneNumber.toString();
-                                     //     _phoneNumberController.text=kPickerNumber;
-                                     //   });
-                                     // }
-                                   }
-
-                                 }
-                               }
-                             },
-                             child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
-                               color: Color(0xff442B72),),
-                           ),
-                            SizedBox(width: 10,),
-                             InkWell(onTap: (){
-                               Scaffold.of(context).openEndDrawer();
-                              },
-                      child: Icon(
-                        Icons.menu_rounded,
-                      size: 40,
-                        color: Color(0xff442B72),
-                          ),)
-
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-
-                const SizedBox(
-                  height: 40,
-                ),
-                
-                SizedBox(
-                  height: 40,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Stack(
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: LayoutBuilder(builder: (context, constrains) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       Padding(
-                        padding: const EdgeInsets.only(top:5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Name".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Align(
+                          alignment: AlignmentDirectional.topStart,
+                          child: InkWell(
+                            onTap: () {
+                              // Navigate back to the previous page
+                              Navigator.pop(context);
+                            },
+                            // onTap: ()=>exit(0),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 23,
+                              color: Color(0xff442B72),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0),
-                              // Adjust horizontal padding
-                              child: SizedBox(
-                                width: constrains.maxWidth / 1.4,
-
-                              ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Supervisors".tr,
+                            style: TextStyle(
+                              color: Color(0xFF993D9A),
+                              fontSize: 25,
+                              fontFamily: 'Poppins-Bold',
+                              fontWeight: FontWeight.w700,
+                           //   height: 0.64,
                             ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
-                              height: 44,
-                              child:
-                              TextFormField(
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: AlignmentDirectional.topEnd,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Row(
+                            children: [
+                             GestureDetector(
+                               onTap: () async{
+                                 bool permission = await FlutterContactPicker.requestPermission();
+                                 if(permission){
+                                   if(await FlutterContactPicker.hasPermission()){
+                                     _phoneContact=await FlutterContactPicker.pickPhoneContact();
+                                     if(_phoneContact!=null){
+                                       if(_phoneContact!.fullName!.isNotEmpty){
+                                         setState(() {
+                                           kPickerName=_phoneContact!.fullName.toString();
+                                          _nameController.text=kPickerName;
+                                         });
+                                       }
+                                       if (_phoneContact!.phoneNumber != null &&
+                                           _phoneContact!.phoneNumber!.number != null &&
+                                           _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+                                         setState(() {
+                                           kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                           if (kPickerNumber.startsWith('0')) {
+                                             kPickerNumber = kPickerNumber.substring(1);
 
-                                controller: _nameController,
-                                focusNode: _nameSupervisorFocus,
-                                cursorColor: const Color(0xFF442B72),
-                                style: TextStyle(color: Color(0xFF442B72)),
-                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                   FocusScope.of(context).requestFocus(_numberSupervisorFocus);
+                                           }
+                                           kPickerNumber = kPickerNumber.replaceAll(' ', '');
+                                           _phoneNumberController.text = kPickerNumber;
+                                           enteredPhoneNumber='+20'+kPickerNumber;
+                                         });
+                                       }
+                                       // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+                                       //   setState(() {
+                                       //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+                                       //     _phoneNumberController.text=kPickerNumber;
+                                       //   });
+                                       // }
+                                     }
+
+                                   }
+                                 }
+                               },
+                               child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+                                 color: Color(0xff442B72),),
+                             ),
+                              SizedBox(width: 10,),
+                               InkWell(onTap: (){
+                                 Scaffold.of(context).openEndDrawer();
                                 },
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                decoration:  InputDecoration(
-                                  //errorText: _validateName ? "Please Enter Your Name" : null,
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  hintText:"Your Name".tr,
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    borderSide:  BorderSide(
-                                      color: !_nameEntered
-                                          ? Colors.red // Red border if phone number not entered
-                                          : Color(0xFFFFC53E),
+                        child: Icon(
+                          Icons.menu_rounded,
+                        size: 40,
+                          color: Color(0xff442B72),
+                            ),)
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+
+                  const SizedBox(
+                    height: 40,
+                  ),
+
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Stack(
+                      children: [
+
+                        Padding(
+                          padding: const EdgeInsets.only(top:5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Name".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
-                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                  focusedBorder: myFocusBorder(),
                                 ),
                               ),
-                            ),
-                            nameerror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 30),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter name".tr,
-                                  style: TextStyle(color: Colors.red),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 0),
+                                // Adjust horizontal padding
+                                child: SizedBox(
+                                  width: constrains.maxWidth / 1.4,
+
                                 ),
                               ),
-                            ),
-
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Name'.tr,
-                            // ),
-
-
-
-                            // Container(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   height: 38,
-                            //   child:
-
-                              // TextFormField(
-                              //
-                              //   // controller: _namesupervisor,
-                              //   cursorColor: const Color(0xFF442B72),
-                              //   //textDirection: TextDirection.ltr,
-                              //   scrollPadding: const EdgeInsets.symmetric(
-                              //       vertical: 40),
-                              //   decoration:  InputDecoration(
-                              //     // labelText: 'Shady Ayman'.tr,
-                              //     hintText:'Name'.tr ,
-                              //     hintStyle: const TextStyle(
-                              //       color: Color(0xFFC2C2C2),
-                              //       fontSize: 12,
-                              //       fontFamily: 'Inter-Bold',
-                              //       fontWeight: FontWeight.w700,
-                              //       height: 1.33,
-                              //     ),
-                              //     alignLabelWithHint: true,
-                              //     counterText: "",
-                              //     fillColor: const Color(0xFFF1F1F1),
-                              //     filled: true,
-                              //     contentPadding: const EdgeInsets.fromLTRB(
-                              //         8, 30, 10, 5),
-                              //     floatingLabelBehavior:  FloatingLabelBehavior.never,
-                              //     enabledBorder: myInputBorder(),
-                              //     focusedBorder: myFocusBorder(),
-                              //   ),
-                              //
-                              // ),
-                            //),
-
-                            const SizedBox(
-                              height:15,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+                                height: 44,
                                 child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
+                                TextFormField(
+
+                                  controller: _nameController,
+                                  focusNode: _nameSupervisorFocus,
+                                  cursorColor: const Color(0xFF442B72),
+                                  style: TextStyle(color: Color(0xFF442B72)),
+                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                  onFieldSubmitted: (value) {
+                                    // move to the next field when the user presses the "Done" button
+                                     FocusScope.of(context).requestFocus(_numberSupervisorFocus);
+                                  },
+                                  //textDirection: TextDirection.ltr,
+                                  scrollPadding: const EdgeInsets.symmetric(
+                                      vertical: 40),
+                                  decoration:  InputDecoration(
+                                    //errorText: _validateName ? "Please Enter Your Name" : null,
+                                    alignLabelWithHint: true,
+                                    counterText: "",
+                                    fillColor: const Color(0xFFF1F1F1),
+                                    filled: true,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        8, 30, 10, 5),
+                                    hintText:"Your Name".tr,
+                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFFC2C2C2),
+                                      fontSize: 12,
                                       fontFamily: 'Poppins-Bold',
                                       fontWeight: FontWeight.w700,
+                                      height: 1.33,
                                     ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Phone Number".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      borderSide:  BorderSide(
+                                        color: !_nameEntered
+                                            ? Colors.red // Red border if phone number not entered
+                                            : Color(0xFFFFC53E),
                                       ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
+                                    ),
+                                    enabledBorder: myInputBorder(),
+                                    // focusedBorder: myFocusBorder(),
+                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                    focusedBorder: myFocusBorder(),
                                   ),
                                 ),
-                                // Text(
-                                //   'Phone Number *'.tr,
-                                //   style: TextStyle(
-                                //     color: Color(0xFF442B72),
-                                //     fontSize: 15,
-                                //     fontFamily: 'Poppins-Bold',
-                                //     fontWeight: FontWeight.w700,
-                                //     height: 1.07,
-                                //   ),
-                                // ),
                               ),
-                            ),
-                            // const SizedBox(
-                            //   height: 10,
-                            // ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Phone Number'.tr,
-                            // ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
-                              height: 65,
-                              child:
-                              IntlPhoneField(
+                              nameerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 30),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter name".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
 
-                                cursorColor:Color(0xFF442B72) ,
-                                controller: _phoneNumberController,
-                                dropdownIconPosition:IconPosition.trailing,
-                                invalidNumberMessage:" ",
-                                style: TextStyle(color: Color(0xFF442B72),height: 1.5),
-                                dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
-                                decoration: InputDecoration(
-                                 // errorText: _validatePhone ? "Please Enter Your Phone" : null,
-                                  fillColor: Color(0xffF1F1F1),
-                                  filled: true,
-                                  hintText: 'Phone Number'.tr,
-                                  hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Name'.tr,
+                              // ),
 
-                                  border:
-                                  OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    borderSide:  BorderSide(
-                                      color: !_phoneNumberEntered
-                                          ? Colors.red // Red border if phone number not entered
-                                          : Color(0xFFFFC53E),
+
+
+                              // Container(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   height: 38,
+                              //   child:
+
+                                // TextFormField(
+                                //
+                                //   // controller: _namesupervisor,
+                                //   cursorColor: const Color(0xFF442B72),
+                                //   //textDirection: TextDirection.ltr,
+                                //   scrollPadding: const EdgeInsets.symmetric(
+                                //       vertical: 40),
+                                //   decoration:  InputDecoration(
+                                //     // labelText: 'Shady Ayman'.tr,
+                                //     hintText:'Name'.tr ,
+                                //     hintStyle: const TextStyle(
+                                //       color: Color(0xFFC2C2C2),
+                                //       fontSize: 12,
+                                //       fontFamily: 'Inter-Bold',
+                                //       fontWeight: FontWeight.w700,
+                                //       height: 1.33,
+                                //     ),
+                                //     alignLabelWithHint: true,
+                                //     counterText: "",
+                                //     fillColor: const Color(0xFFF1F1F1),
+                                //     filled: true,
+                                //     contentPadding: const EdgeInsets.fromLTRB(
+                                //         8, 30, 10, 5),
+                                //     floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                //     enabledBorder: myInputBorder(),
+                                //     focusedBorder: myFocusBorder(),
+                                //   ),
+                                //
+                                // ),
+                              //),
+
+                              const SizedBox(
+                                height:15,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Phone Number".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
                                     ),
                                   ),
+                                  // Text(
+                                  //   'Phone Number *'.tr,
+                                  //   style: TextStyle(
+                                  //     color: Color(0xFF442B72),
+                                  //     fontSize: 15,
+                                  //     fontFamily: 'Poppins-Bold',
+                                  //     fontWeight: FontWeight.w700,
+                                  //     height: 1.07,
+                                  //   ),
+                                  // ),
+                                ),
+                              ),
+                              // const SizedBox(
+                              //   height: 10,
+                              // ),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Phone Number'.tr,
+                              // ),
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+                                height: 65,
+                                child:
+                                IntlPhoneField(
 
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Colors.red,
-                                        width: 2
+                                  cursorColor:Color(0xFF442B72) ,
+                                  controller: _phoneNumberController,
+                                  dropdownIconPosition:IconPosition.trailing,
+                                  invalidNumberMessage:" ",
+                                  style: TextStyle(color: Color(0xFF442B72),height: 1.5),
+                                  dropdownIcon:Icon(Icons.keyboard_arrow_down,color: Color(0xff442B72),),
+                                  decoration: InputDecoration(
+                                   // errorText: _validatePhone ? "Please Enter Your Phone" : null,
+                                    fillColor: Color(0xffF1F1F1),
+                                    filled: true,
+                                    hintText: 'Phone Number'.tr,
+                                    hintStyle: TextStyle(color: Color(0xFFC2C2C2),fontSize: 12,fontFamily: "Poppins-Bold"),
+
+                                    border:
+                                    OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      borderSide:  BorderSide(
+                                        color: !_phoneNumberEntered
+                                            ? Colors.red // Red border if phone number not entered
+                                            : Color(0xFFFFC53E),
+                                      ),
                                     ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFFC53E),
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
+
+                                    focusedErrorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(7)),
                                       borderSide: BorderSide(
                                           color: Colors.red,
                                           width: 2
-                                      )
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(7)),
+                                      borderSide: BorderSide(
+                                        color: Color(0xFFFFC53E),
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(7)),
+                                        borderSide: BorderSide(
+                                            color: Colors.red,
+                                            width: 2
+                                        )
+                                    ),
+                                    focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderSide: BorderSide(
+                                        color: Color(0xFFFFC53E),
+                                      ),
+                                    ),
+
+
+                                    contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+
+
                                   ),
-                                  focusedBorder: OutlineInputBorder(  // Set border color when the text field is focused
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFFC53E),
+
+                                  initialCountryCode: 'EG', // Set initial country code if needed
+                                  onChanged: (phone) {
+                                    enteredPhoneNumber = phone.completeNumber;
+
+                                    // _phoneNumberController.text = phone.completeNumber;
+                                    // Update the enteredPhoneNumber variable with the entered phone number
+
+                                  },
+
+                                ),
+                              ),
+                              phoneerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 30),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter phone number".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
+                              // Container(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   height: 38,
+                              //   child: TextField(
+                              //
+                              //     //controller: _namesupervisor,
+                              //     cursorColor: const Color(0xFF442B72),
+                              //     //textDirection: TextDirection.ltr,
+                              //     scrollPadding: const EdgeInsets.symmetric(
+                              //         vertical: 40),
+                              //     decoration:  InputDecoration(
+                              //       // labelText: 'Shady Ayman'.tr,
+                              //       hintText:'01028765006'.tr ,
+                              //       alignLabelWithHint: true,
+                              //       counterText: "",
+                              //       fillColor: const Color(0xFFF1F1F1),
+                              //       filled: true,
+                              //       contentPadding: const EdgeInsets.fromLTRB(
+                              //           8, 30, 10, 5),
+                              //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                              //       enabledBorder: myInputBorder(),
+                              //       focusedBorder: myFocusBorder(),
+                              //     ),
+                              //     keyboardType: TextInputType.number,
+                              //   ),
+                              // ),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Your Name'.tr,
+                              // ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    'Email'.tr,
+                                    style: TextStyle(
+                                      color: Color(0xFF442B72),
+                                      fontSize: 15,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.07,
                                     ),
                                   ),
-
-
-                                  contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-
-
-                                ),
-
-                                initialCountryCode: 'EG', // Set initial country code if needed
-                                onChanged: (phone) {
-                                  enteredPhoneNumber = phone.completeNumber;
-
-                                  // _phoneNumberController.text = phone.completeNumber;
-                                  // Update the enteredPhoneNumber variable with the entered phone number
-
-                                },
-
-                              ),
-                            ),
-                            phoneerror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 30),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter phone number".tr,
-                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
-                            ),
-                            // Container(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   height: 38,
-                            //   child: TextField(
-                            //
-                            //     //controller: _namesupervisor,
-                            //     cursorColor: const Color(0xFF442B72),
-                            //     //textDirection: TextDirection.ltr,
-                            //     scrollPadding: const EdgeInsets.symmetric(
-                            //         vertical: 40),
-                            //     decoration:  InputDecoration(
-                            //       // labelText: 'Shady Ayman'.tr,
-                            //       hintText:'01028765006'.tr ,
-                            //       alignLabelWithHint: true,
-                            //       counterText: "",
-                            //       fillColor: const Color(0xFFF1F1F1),
-                            //       filled: true,
-                            //       contentPadding: const EdgeInsets.fromLTRB(
-                            //           8, 30, 10, 5),
-                            //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                            //       enabledBorder: myInputBorder(),
-                            //       focusedBorder: myFocusBorder(),
-                            //     ),
-                            //     keyboardType: TextInputType.number,
-                            //   ),
-                            // ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Your Name'.tr,
-                            // ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  'Email'.tr,
-                                  style: TextStyle(
-                                    color: Color(0xFF442B72),
-                                    fontSize: 15,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.07,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // const SizedBox(
-                            //   height: 5,
-                            // ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Your Name'.tr,
-                            // ),
-                            // Container(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   height: 38,
-                            //   child: TextField(
-                            //
-                            //     //controller: _namesupervisor,
-                            //     cursorColor: const Color(0xFF442B72),
-                            //     //textDirection: TextDirection.ltr,
-                            //     scrollPadding: const EdgeInsets.symmetric(
-                            //         vertical: 40),
-                            //     decoration:  InputDecoration(
-                            //       //labelText: 'Shady Ayman'.tr,
-                            //       hintText:'Shahd@gmail.com'.tr ,
-                            //       alignLabelWithHint: true,
-                            //       counterText: "",
-                            //       fillColor: const Color(0xFFF1F1F1),
-                            //       filled: true,
-                            //       contentPadding: const EdgeInsets.fromLTRB(
-                            //           8, 30, 10, 5),
-                            //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                            //       enabledBorder: myInputBorder(),
-                            //       focusedBorder: myFocusBorder(),
-                            //     ),
-                            //
-                            //   ),
-                            // ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
-                              height: 44,
-                              child: TextFormField(
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return null; // allow empty email field
-                                  }
-                                  if (!isValidEmail(value)) {
-                                    return 'Invalid email address';
-                                  }
-                                  return null;
-                                },
-                                controller: _emailController,
-                                focusNode: _emailSupervisorFocus,
-                                cursorColor: const Color(0xFF442B72),
-                                style: TextStyle(color: Color(0xFF442B72)),
-                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                  //FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                },
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                decoration:  InputDecoration(
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  hintText:"Your Email".tr,
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
-                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                  focusedBorder: myFocusBorder(),
-                                ),
-                                // onFieldSubmitted: (value) {
-                                //   // move to the next field when the user presses the "Done" button
-                                //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                // },
-                              ),
-                            ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Email'.tr,
-                            // ),
-                            SizedBox(
-                              height: 50,
-                            ),
-
-
-
-                            SizedBox(
-                              width: constrains.maxWidth / 1.2,
-                              child: Center(
-                                child: ElevatedSimpleButton(
-                                  txt: "Send invitation".tr,
-                                 onPress: ()
-                                 //async
-                                 async {
-
-                                   setState(() {
-                                     if (_nameController.text.trim().isEmpty) {
-                                       nameerror = false;
-                                     } else {
-                                       nameerror = true;
-                                     }
-                                     if (_phoneNumberController.text.isEmpty) {
-                                       phoneerror = false;
-                                     } else {
-                                       phoneerror = true;
-                                     }
-                                     // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                                     // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
-                                   });
-                                   if(nameerror &&
-                                  // ! _nameController.text.isEmpty
-
-                                       //! _phoneNumberController.text.isEmpty
-                                   _phoneNumberController.text.length == 10 && phoneerror){
-                                     _addDataToFirestore();
-
-                                   }
-                                   else{
-                                     SnackBar(content: Text('Please,enter valid name and phone number'));
-                                   }
-                                //   _addDataToFirestore();
+                              // const SizedBox(
+                              //   height: 5,
+                              // ),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Your Name'.tr,
+                              // ),
+                              // Container(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   height: 38,
+                              //   child: TextField(
+                              //
+                              //     //controller: _namesupervisor,
+                              //     cursorColor: const Color(0xFF442B72),
+                              //     //textDirection: TextDirection.ltr,
+                              //     scrollPadding: const EdgeInsets.symmetric(
+                              //         vertical: 40),
+                              //     decoration:  InputDecoration(
+                              //       //labelText: 'Shady Ayman'.tr,
+                              //       hintText:'Shahd@gmail.com'.tr ,
+                              //       alignLabelWithHint: true,
+                              //       counterText: "",
+                              //       fillColor: const Color(0xFFF1F1F1),
+                              //       filled: true,
+                              //       contentPadding: const EdgeInsets.fromLTRB(
+                              //           8, 30, 10, 5),
+                              //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                              //       enabledBorder: myInputBorder(),
+                              //       focusedBorder: myFocusBorder(),
+                              //     ),
+                              //
+                              //   ),
+                              // ),
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+                                height: 44,
+                                child: TextFormField(
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null; // allow empty email field
+                                    }
+                                    if (!isValidEmail(value)) {
+                                      return 'Invalid email address';
+                                    }
+                                    return null;
                                   },
-                                  width: constrains.maxWidth /1.2,
-                                  hight: 48,
-                                  color: const Color(0xFF442B72),
-                                  fontSize: 16,
+                                  controller: _emailController,
+                                  focusNode: _emailSupervisorFocus,
+                                  cursorColor: const Color(0xFF442B72),
+                                  style: TextStyle(color: Color(0xFF442B72)),
+                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                  onFieldSubmitted: (value) {
+                                    // move to the next field when the user presses the "Done" button
+                                    //FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                  },
+                                  //textDirection: TextDirection.ltr,
+                                  scrollPadding: const EdgeInsets.symmetric(
+                                      vertical: 40),
+                                  decoration:  InputDecoration(
+                                    alignLabelWithHint: true,
+                                    counterText: "",
+                                    fillColor: const Color(0xFFF1F1F1),
+                                    filled: true,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        8, 30, 10, 5),
+                                    hintText:"Your Email".tr,
+                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFFC2C2C2),
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.33,
+                                    ),
+                                    enabledBorder: myInputBorder(),
+                                    // focusedBorder: myFocusBorder(),
+                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                    focusedBorder: myFocusBorder(),
+                                  ),
+                                  // onFieldSubmitted: (value) {
+                                  //   // move to the next field when the user presses the "Done" button
+                                  //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                  // },
                                 ),
-                                // end of comment
                               ),
-                            ) ,
-                            SizedBox(height: 30),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Email'.tr,
+                              // ),
+                              SizedBox(
+                                height: 50,
+                              ),
 
 
-                            const SizedBox(
-                              height: 60,
-                            ),
+
+                              SizedBox(
+                                width: constrains.maxWidth / 1.2,
+                                child: Center(
+                                  child: ElevatedSimpleButton(
+                                    txt: "Send invitation".tr,
+                                   onPress: ()
+                                   //async
+                                   async {
+
+                                     setState(() {
+                                       if (_nameController.text.trim().isEmpty) {
+                                         nameerror = false;
+                                       } else {
+                                         nameerror = true;
+                                       }
+                                       if (_phoneNumberController.text.isEmpty) {
+                                         phoneerror = false;
+                                       } else {
+                                         phoneerror = true;
+                                       }
+                                       // _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                                       // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                     });
+                                     if(nameerror &&
+                                    // ! _nameController.text.isEmpty
+
+                                         //! _phoneNumberController.text.isEmpty
+                                     _phoneNumberController.text.length == 10 && phoneerror){
+                                       _addDataToFirestore();
+
+                                     }
+                                     else{
+                                       SnackBar(content: Text('Please,enter valid name and phone number'));
+                                     }
+                                  //   _addDataToFirestore();
+                                    },
+                                    width: constrains.maxWidth /1.2,
+                                    hight: 48,
+                                    color: const Color(0xFF442B72),
+                                    fontSize: 16,
+                                  ),
+                                  // end of comment
+                                ),
+                              ) ,
+                              SizedBox(height: 30),
 
 
-                          ],
-                        ),
-                      )
-                    ],
+                              const SizedBox(
+                                height: 60,
+                              ),
+
+
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
 
-              ],
-            ),
+                ],
+              ),
 
-          );
-        }
+            );
+          }
+          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
