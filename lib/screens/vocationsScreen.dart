@@ -212,14 +212,14 @@ String newDocId='';
   }
 
 
-  Future<List<SchoolHoliday>> _fetchHolidays() async {
+  Future<List<Holiday>> _fetchHolidays() async {
     final firestore = FirebaseFirestore.instance;
     final holidaysRef = firestore.collection('schoolholiday');
-    final holidaysSnapshot = await holidaysRef.get();
+    final holidaysSnapshot = await holidaysRef.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
 
-    List<SchoolHoliday> holidays = [];
+   // List<Holiday> holidays = [];
     for (var doc in holidaysSnapshot.docs) {
-      SchoolHoliday holiday = SchoolHoliday.fromJson(doc.data());
+      Holiday holiday = Holiday.fromJson(doc.data());
       holidays.add(holiday);
     }
 
@@ -508,6 +508,7 @@ _selectedDays.clear();
     //_getSelectedDaysFromFirestore();
     retrieveAllData();
     _loadSelectedDays();
+
    // retrieveDateTime();
    // getData();
 
@@ -1151,6 +1152,10 @@ _selectedDays.clear();
                               // },
 
                               selectionMode: DateRangePickerSelectionMode.multiple,
+
+
+
+
                               selectionColor: const Color(0xFF7A12FF),
                               rangeSelectionColor: const Color(0xFF7A12FF),
                               rangeTextStyle: const TextStyle(
@@ -1386,7 +1391,16 @@ _selectedDays.clear();
                               //     : null,
                             ),
 
-                            selectionMode: DateRangePickerSelectionMode.single,
+                            selectionMode: DateRangePickerSelectionMode.multiple,
+                            initialSelectedDates: [DateTime.now().subtract(Duration(days: 4))]
+                            ,
+
+                            /*initialSelectedRanges: <PickerDateRange>[
+                              PickerDateRange(DateTime.now().subtract(Duration(days: 4)),
+                                  DateTime.now().add(Duration(days: 4))),
+                              PickerDateRange(DateTime.now().add(Duration(days: 7)),
+                                  DateTime.now().add(Duration(days: 14)))
+                            ],*/
                             selectionColor: const Color(0xFF7A12FF),
                             rangeSelectionColor: const Color(0xFF7A12FF),
                             rangeTextStyle: const TextStyle(
@@ -2021,7 +2035,7 @@ _selectedDays.clear();
         children: [
           // Add your image here
           Padding(
-            padding: const EdgeInsets.only(left: 40),
+            padding: const EdgeInsets.only(left: 20),
             child: Image.asset(
               photo,
               // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path

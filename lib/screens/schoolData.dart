@@ -213,915 +213,920 @@ class _SchoolDataState extends State<SchoolData> {
         //غيرت resizeToAvoidBottomInset من false ل true علشان لما اكتب ال تيكست فيلد يظهر
         resizeToAvoidBottomInset: true,
         backgroundColor: const Color(0xFFFFFFFF),
-        body: LayoutBuilder(builder: (context, constrains) {
-          return SingleChildScrollView(
-            //reverse: true,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // const SizedBox(
-                //   height: 5,
-                // ),
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                //   child: InkWell(onTap: (){},
-                //     child: const Icon(
-                //       Icons.menu_rounded,
-                //       size: 40,
-                //       color: Color(0xff442B72),
-                //     ),
-                //   ),
-                // ),
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: LayoutBuilder(builder: (context, constrains) {
+            return SingleChildScrollView(
+              //reverse: true,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // const SizedBox(
+                  //   height: 5,
+                  // ),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  //   child: InkWell(onTap: (){},
+                  //     child: const Icon(
+                  //       Icons.menu_rounded,
+                  //       size: 40,
+                  //       color: Color(0xff442B72),
+                  //     ),
+                  //   ),
+                  // ),
 
-                const SizedBox(
-                  height: 45,
-                ),
-                Center(
-                  child: Text(
-                    "Welcome".tr,
-                    style: TextStyle(
-                      color: Color(0xFF993D9A),
-                      fontSize: 25,
-                      fontFamily: 'Poppins-Bold',
-                      fontWeight: FontWeight.bold,
-                      height: 0.64,
+                  const SizedBox(
+                    height: 45,
+                  ),
+                  Center(
+                    child: Text(
+                      "Welcome".tr,
+                      style: TextStyle(
+                        color: Color(0xFF993D9A),
+                        fontSize: 25,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.bold,
+                        height: 0.64,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Stack(
-                    children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Stack(
+                      children: [
 
-                      Padding(
-                        padding: const EdgeInsets.only(top:5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Padding(
-                            //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            //   child: InkWell(
-                            //     onTap: ()
-                            //     {
-                            //       Navigator.push(
-                            //           context,
-                            //           MaterialPageRoute(
-                            //               builder: (context) =>
-                            //                   MainBottomNavigationBar(pageNum: 5),
-                            //               maintainState: false));
-                            //     },
-                            //     // child: Image.asset(
-                            //     //   'assets/imgs/school/Vector (11).png',
-                            //     //   width: 22,
-                            //     //   height: 22,
-                            //     // ),
-                            //   ),
-                            // ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
+                        Padding(
+                          padding: const EdgeInsets.only(top:5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Padding(
+                              //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              //   child: InkWell(
+                              //     onTap: ()
+                              //     {
+                              //       Navigator.push(
+                              //           context,
+                              //           MaterialPageRoute(
+                              //               builder: (context) =>
+                              //                   MainBottomNavigationBar(pageNum: 5),
+                              //               maintainState: false));
+                              //     },
+                              //     // child: Image.asset(
+                              //     //   'assets/imgs/school/Vector (11).png',
+                              //     //   width: 22,
+                              //     //   height: 22,
+                              //     // ),
+                              //   ),
+                              // ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
 
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w400,
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "School logo".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
                                     ),
-                                    children: [
-                                      TextSpan(
-                                        text: "School logo".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0),
-                              // Adjust horizontal padding
-                              child: SizedBox(
-                                width: constrains.maxWidth / 1.4,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 0),
+                                // Adjust horizontal padding
+                                child: SizedBox(
+                                  width: constrains.maxWidth / 1.4,
+
+
+                                ),
+
 
 
                               ),
 
 
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.4,
+                              //   hintTxt: 'Your Phone'.tr,
+                              // ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              GestureDetector(
+                                onTap:()async {
+                                  await _pickImageFromGallery();}  , // Call function when tapped
+                                child: _selectedImage != null
+                                    ? Image.file(
+                                  _selectedImage!,  // Display the uploaded image
+                                  width: 83,  // Set width as per your preference
+                                  height: 78.5,  // Set height as per your preference
+                                  fit: BoxFit.cover,  // Adjusts how the image fits in the container
+                                )
+                                //     : FDottedLine(
+                                //   color: Color(0xFF442B72),
+                                //   strokeWidth: 2.0,
+                                //   dottedLength: 8.0,
+                                //   space: 3.0,
+                                //   corner: FDottedLineCorner.all(6.0),
+                                //
+                                //   // Child widget
+                                //   child: Container(
+                                //     width: 83,
+                                //     height: 78.5,
+                                //     alignment: Alignment.center,
+                                //     child: Column(
+                                //       children: [
+                                //         Padding(
+                                //           padding: const EdgeInsets.only(top:10),
+                                //           child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
+                                //         ),
+                                //         SizedBox(height: 10,),
+                                //         Text(
+                                //           "School logo",
+                                //           style: TextStyle(
+                                //             color: Color(0xFF442B72),
+                                //             fontSize: 11,
+                                //             fontFamily: 'Poppins-Regular',
+                                //           ),
+                                //         ),
+                                //
+                                //
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
+                                    : Column(
+                                  children: [
+                                    FDottedLine(
+                                      color: Color(0xFF442B72),
+                                      strokeWidth: 2.0,
+                                      dottedLength: 8.0,
+                                      space: 3.0,
+                                      corner: FDottedLineCorner.all(6.0),
 
-                            ),
+                                      // Child widget
+                                      child: Container(
+                                        width: 83,
+                                        height: 78.5,
+                                        alignment: Alignment.center,
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top:10),
+                                              child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Text(
+                                              "School logo",
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 11,
+                                                fontFamily: 'Poppins-Regular',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
 
+                                    ),
+                                    SizedBox(height: 5,),
+                                    logoerror?Container(): Padding(
+                                      padding: const EdgeInsets.only(left: 32),
+                                      child: Align( alignment: AlignmentDirectional.centerStart,
+                                        child: Text(
+                                          "Please enter school logo".tr,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ),
+                                    // Text(
+                                    //   _selectedImage == null ? "Please Enter School logo" : "",
+                                    //   style: TextStyle(
+                                    //     color: Color(0xFFAD1519),
+                                    //     fontSize: 11,
+                                    //     fontFamily: 'Poppins-Regular',
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
 
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.4,
-                            //   hintTxt: 'Your Phone'.tr,
-                            // ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            GestureDetector(
-                              onTap:()async {
-                                await _pickImageFromGallery();}  , // Call function when tapped
-                              child: _selectedImage != null
-                                  ? Image.file(
-                                _selectedImage!,  // Display the uploaded image
-                                width: 83,  // Set width as per your preference
-                                height: 78.5,  // Set height as per your preference
-                                fit: BoxFit.cover,  // Adjusts how the image fits in the container
-                              )
-                              //     : FDottedLine(
-                              //   color: Color(0xFF442B72),
-                              //   strokeWidth: 2.0,
-                              //   dottedLength: 8.0,
-                              //   space: 3.0,
-                              //   corner: FDottedLineCorner.all(6.0),
+                              ),
+                              // GestureDetector(
+                              //   onTap: (){
+                              //     _pickImageFromGallery();
+                              //     // ImagePicker imagePicker=ImagePicker();
+                              //     // imagePicker.pickImage(source: ImageSource.gallery);
+                              //   },
+                              //   child: FDottedLine(
+                              //     color:Color(0xFF442B72),
+                              //     strokeWidth: 2.0,
+                              //     dottedLength: 8.0,
+                              //     space: 3.0,
+                              //     corner: FDottedLineCorner.all(6.0),
                               //
-                              //   // Child widget
-                              //   child: Container(
-                              //     width: 83,
-                              //     height: 78.5,
-                              //     alignment: Alignment.center,
-                              //     child: Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(top:10),
-                              //           child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
-                              //         ),
-                              //         SizedBox(height: 10,),
-                              //         Text(
-                              //           "School logo",
-                              //           style: TextStyle(
-                              //             color: Color(0xFF442B72),
-                              //             fontSize: 11,
-                              //             fontFamily: 'Poppins-Regular',
-                              //           ),
-                              //         ),
-                              //
-                              //
-                              //       ],
+                              //     /// add widget
+                              //     child: Container(
+                              //       width: 100,
+                              //       height: 100,
+                              //       alignment: Alignment.center,
+                              //       child: Text("School logo",style: TextStyle(color:Color(0xFF442B72),fontSize:11,fontFamily:'Poppins-Regular'   ),),
                               //     ),
                               //   ),
                               // ),
-                                  : Column(
-                                children: [
-                                  FDottedLine(
-                                    color: Color(0xFF442B72),
-                                    strokeWidth: 2.0,
-                                    dottedLength: 8.0,
-                                    space: 3.0,
-                                    corner: FDottedLineCorner.all(6.0),
-
-                                    // Child widget
-                                    child: Container(
-                                      width: 83,
-                                      height: 78.5,
-                                      alignment: Alignment.center,
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(top:10),
-                                            child: Image.asset("assets/imgs/school/Vector (13).png",width: 29,height: 29,),
-                                          ),
-                                          SizedBox(height: 10,),
-                                          Text(
-                                            "School logo",
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 11,
-                                              fontFamily: 'Poppins-Regular',
-                                            ),
-                                          ),
-                                        ],
+                              // _selectedImage !=null?Image.file(_selectedImage!) : Text(""),
+                              const SizedBox(
+                                height: 30,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w400,
                                       ),
-                                    ),
-
-                                  ),
-                                  SizedBox(height: 5,),
-                                  logoerror?Container(): Padding(
-                                    padding: const EdgeInsets.only(left: 32),
-                                    child: Align( alignment: AlignmentDirectional.centerStart,
-                                      child: Text(
-                                        "Please enter school logo".tr,
-                                        style: TextStyle(color: Colors.red),
-                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "School name in English".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   // Text(
-                                  //   _selectedImage == null ? "Please Enter School logo" : "",
+                                  //   'School name in English'.tr,
                                   //   style: TextStyle(
-                                  //     color: Color(0xFFAD1519),
-                                  //     fontSize: 11,
-                                  //     fontFamily: 'Poppins-Regular',
+                                  //     color: Color(0xFF442B72),
+                                  //     fontSize: 15,
+                                  //     fontFamily: 'Poppins-Bold',
+                                  //     fontWeight: FontWeight.w700,
+                                  //     height: 1.07,
                                   //   ),
                                   // ),
-                                ],
+                                ),
                               ),
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+                                height: 44,
+                                child: TextFormField(
+                                  controller: _nameEnglish,
+                                  cursorColor: const Color(0xFF442B72),
 
-                            ),
-                            // GestureDetector(
-                            //   onTap: (){
-                            //     _pickImageFromGallery();
-                            //     // ImagePicker imagePicker=ImagePicker();
-                            //     // imagePicker.pickImage(source: ImageSource.gallery);
-                            //   },
-                            //   child: FDottedLine(
-                            //     color:Color(0xFF442B72),
-                            //     strokeWidth: 2.0,
-                            //     dottedLength: 8.0,
-                            //     space: 3.0,
-                            //     corner: FDottedLineCorner.all(6.0),
-                            //
-                            //     /// add widget
-                            //     child: Container(
-                            //       width: 100,
-                            //       height: 100,
-                            //       alignment: Alignment.center,
-                            //       child: Text("School logo",style: TextStyle(color:Color(0xFF442B72),fontSize:11,fontFamily:'Poppins-Regular'   ),),
-                            //     ),
-                            //   ),
-                            // ),
-                            // _selectedImage !=null?Image.file(_selectedImage!) : Text(""),
-                            const SizedBox(
-                              height: 30,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "School name in English".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
+                                  style: TextStyle(color: Color(0xFF442B72)
                                   ),
-                                ),
-                                // Text(
-                                //   'School name in English'.tr,
-                                //   style: TextStyle(
-                                //     color: Color(0xFF442B72),
-                                //     fontSize: 15,
-                                //     fontFamily: 'Poppins-Bold',
-                                //     fontWeight: FontWeight.w700,
-                                //     height: 1.07,
-                                //   ),
-                                // ),
-                              ),
-                            ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
-                              height: 44,
-                              child: TextFormField(
-                                controller: _nameEnglish,
-                                cursorColor: const Color(0xFF442B72),
 
-                                style: TextStyle(color: Color(0xFF442B72)
-                                ),
-
-                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                  FocusScope.of(context).requestFocus(_NameArabicFocus);
-                                },
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]+')), // Allow only English characters and spaces
-                                ],
+                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                  onFieldSubmitted: (value) {
+                                    // move to the next field when the user presses the "Done" button
+                                    FocusScope.of(context).requestFocus(_NameArabicFocus);
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]+')), // Allow only English characters and spaces
+                                  ],
 
 
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                decoration:  InputDecoration(
-                                  //errorText: _validateNameEnglish ? "Please Enter Your Name" : null,
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  hintText:"Your Name".tr,
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
-                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                  focusedBorder: myFocusBorder(),
-                                ),
-                              ),
-                            ),
-                            nameenglisherror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 32),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter your Name".tr,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Your Name'.tr,
-                            //
-                            // ),
-                            const SizedBox(
-                              height: 25,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "School name in Arabic".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
-                              height: 44,
-                              child: TextFormField(
-                                controller: _nameArabic,
-                                focusNode: _NameArabicFocus,
-                                cursorColor: const Color(0xFF442B72),
-                                style: TextStyle(color: Color(0xFF442B72)),
-                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                  FocusScope.of(context).requestFocus(_AddressFocus);
-                                },
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
-                                ],
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                decoration:  InputDecoration(
-                                  //errorText: _validateNameArabic ? "Please Enter Your Name" : null,
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  hintText:"Your Name".tr,
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
-                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                  focusedBorder: myFocusBorder(),
-                                ),
-                              ),
-                            ),
-                            namearabicerror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 32),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter your Name".tr,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: 'Your Name'.tr,
-                            // ),
-                            const SizedBox(
-                              height: 25,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Address".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // textform field without icon location
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: ''.tr,
-                            //
-                            //
-                            // ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Container(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   height: 45,
-                            //   child: TextFormField(
-                            //     controller: _Address,
-                            //     focusNode: _AddressFocus,
-                            //     cursorColor: const Color(0xFF442B72),
-                            //     onFieldSubmitted: (value) {
-                            //       // move to the next field when the user presses the "Done" button
-                            //       FocusScope.of(context).requestFocus(_CoordinatorFocus);
-                            //     },
-                            //     style: TextStyle(color: Color(0xFF442B72)),
-                            //     //textDirection: TextDirection.ltr,
-                            //     scrollPadding: const EdgeInsets.symmetric(
-                            //         vertical: 40),
-                            //     decoration:  InputDecoration(
-                            //         suffixIcon: Image.asset("assets/imgs/school/icons8_Location.png",width: 23,height: 23,),
-                            //         //Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
-                            //       alignLabelWithHint: true,
-                            //       counterText: "",
-                            //       fillColor: const Color(0xFFF1F1F1),
-                            //       filled: true,
-                            //       contentPadding: const EdgeInsets.fromLTRB(
-                            //           8, 30, 10, 5),
-                            //     //  hintText:"".tr,
-                            //       floatingLabelBehavior:  FloatingLabelBehavior.never,
-                            //       hintStyle: const TextStyle(
-                            //         color: Color(0xFFC2C2C2),
-                            //         fontSize: 12,
-                            //         fontFamily: 'Inter-Bold',
-                            //         fontWeight: FontWeight.w700,
-                            //         height: 1.33,
-                            //       ),
-                            //       enabledBorder: myInputBorder(),
-                            //        focusedBorder: myFocusBorder(),
-                            //
-                            //     ),
-                            //   ),
-                            // ),
-                            // Form(
-                            //   key: _formKey,
-                            //   autovalidateMode: _autovalidateMode,
-                            //   child: GooglePlacesAutoCompleteTextFormField(
-                            //     textEditingController: _textController,
-                            //     googleAPIKey: _yourGoogleAPIKey,
-                            //     decoration: const InputDecoration(
-                            //
-                            //       labelText: 'Address',
-                            //       labelStyle: TextStyle(color: Colors.purple),
-                            //       border: OutlineInputBorder(),
-                            //     ),
-                            //     validator: (value) {
-                            //       if (value!.isEmpty) {
-                            //         return 'Please enter some text';
-                            //       }
-                            //       return null;
-                            //     },
-                            //     // proxyURL: _yourProxyURL,
-                            //     maxLines: 1,
-                            //     overlayContainer: (child) => Material(
-                            //       elevation: 1.0,
-                            //       color: Colors.white,
-                            //       borderRadius: BorderRadius.circular(12),
-                            //       child: child,
-                            //     ),
-                            //     getPlaceDetailWithLatLng: (prediction) {
-                            //       print('placeDetails${prediction.lng}');
-                            //     },
-                            //     itmClick: (Prediction prediction) =>
-                            //     _textController.text = prediction.description!,
-                            //   ),
-                            // ),
-
-                            Container(
-                              height: 45,
-                              width: constrains.maxWidth / 1.2,
-
-                              child: Form(
-                                key: _formKey,
-
-                                autovalidateMode: _autovalidateMode,
-                                child: GooglePlacesAutoCompleteTextFormField(
-
-                                  cursorColor: Color(0xFF442B72),
-                                  textEditingController: _textController,
-                                  googleAPIKey: _yourGoogleAPIKey,
-                                  decoration: InputDecoration(
-                                    //errorText: _validateAddress ? "Please Enter Your Address" : null,
-                                    labelStyle: TextStyle(color: Colors.purple),
-                                    suffixIcon: Image.asset(
-                                      "assets/imgs/school/icons8_Location.png",
-                                      width: 20,
-                                      height: 20,
-                                    ),
+                                  //textDirection: TextDirection.ltr,
+                                  scrollPadding: const EdgeInsets.symmetric(
+                                      vertical: 40),
+                                  decoration:  InputDecoration(
+                                    //errorText: _validateNameEnglish ? "Please Enter Your Name" : null,
                                     alignLabelWithHint: true,
                                     counterText: "",
                                     fillColor: const Color(0xFFF1F1F1),
                                     filled: true,
-                                    contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
-                                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        8, 30, 10, 5),
+                                    hintText:"Your Name".tr,
+                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
                                     hintStyle: const TextStyle(
                                       color: Color(0xFFC2C2C2),
-                                      fontSize: 10,
-                                      fontFamily: 'Inter-Bold',
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Bold',
                                       fontWeight: FontWeight.w700,
-                                      height: 1.5,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.black), // Customize border color
+                                      height: 1.33,
                                     ),
                                     enabledBorder: myInputBorder(),
+                                    // focusedBorder: myFocusBorder(),
+                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
                                     focusedBorder: myFocusBorder(),
+                                  ),
+                                ),
+                              ),
+                              nameenglisherror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your Name".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Your Name'.tr,
+                              //
+                              // ),
+                              const SizedBox(
+                                height: 25,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "School name in Arabic".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+                                height: 44,
+                                child: TextFormField(
+                                  controller: _nameArabic,
+                                  focusNode: _NameArabicFocus,
+                                  cursorColor: const Color(0xFF442B72),
+                                  style: TextStyle(color: Color(0xFF442B72)),
+                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                  onFieldSubmitted: (value) {
+                                    // move to the next field when the user presses the "Done" button
+                                    FocusScope.of(context).requestFocus(_AddressFocus);
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
+                                  ],
+                                  //textDirection: TextDirection.ltr,
+                                  scrollPadding: const EdgeInsets.symmetric(
+                                      vertical: 40),
+                                  decoration:  InputDecoration(
+                                    //errorText: _validateNameArabic ? "Please Enter Your Name" : null,
+                                    alignLabelWithHint: true,
+                                    counterText: "",
+                                    fillColor: const Color(0xFFF1F1F1),
+                                    filled: true,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        8, 30, 10, 5),
+                                    hintText:"Your Name".tr,
+                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFFC2C2C2),
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.33,
+                                    ),
+                                    enabledBorder: myInputBorder(),
+                                    // focusedBorder: myFocusBorder(),
+                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                    focusedBorder: myFocusBorder(),
+                                  ),
+                                ),
+                              ),
+                              namearabicerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your Name".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: 'Your Name'.tr,
+                              // ),
+                              const SizedBox(
+                                height: 25,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Address".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // textform field without icon location
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: ''.tr,
+                              //
+                              //
+                              // ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              // Container(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   height: 45,
+                              //   child: TextFormField(
+                              //     controller: _Address,
+                              //     focusNode: _AddressFocus,
+                              //     cursorColor: const Color(0xFF442B72),
+                              //     onFieldSubmitted: (value) {
+                              //       // move to the next field when the user presses the "Done" button
+                              //       FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                              //     },
+                              //     style: TextStyle(color: Color(0xFF442B72)),
+                              //     //textDirection: TextDirection.ltr,
+                              //     scrollPadding: const EdgeInsets.symmetric(
+                              //         vertical: 40),
+                              //     decoration:  InputDecoration(
+                              //         suffixIcon: Image.asset("assets/imgs/school/icons8_Location.png",width: 23,height: 23,),
+                              //         //Icon(Icons.location_on,color: Color(0xFF442B72),size: 23,),
+                              //       alignLabelWithHint: true,
+                              //       counterText: "",
+                              //       fillColor: const Color(0xFFF1F1F1),
+                              //       filled: true,
+                              //       contentPadding: const EdgeInsets.fromLTRB(
+                              //           8, 30, 10, 5),
+                              //     //  hintText:"".tr,
+                              //       floatingLabelBehavior:  FloatingLabelBehavior.never,
+                              //       hintStyle: const TextStyle(
+                              //         color: Color(0xFFC2C2C2),
+                              //         fontSize: 12,
+                              //         fontFamily: 'Inter-Bold',
+                              //         fontWeight: FontWeight.w700,
+                              //         height: 1.33,
+                              //       ),
+                              //       enabledBorder: myInputBorder(),
+                              //        focusedBorder: myFocusBorder(),
+                              //
+                              //     ),
+                              //   ),
+                              // ),
+                              // Form(
+                              //   key: _formKey,
+                              //   autovalidateMode: _autovalidateMode,
+                              //   child: GooglePlacesAutoCompleteTextFormField(
+                              //     textEditingController: _textController,
+                              //     googleAPIKey: _yourGoogleAPIKey,
+                              //     decoration: const InputDecoration(
+                              //
+                              //       labelText: 'Address',
+                              //       labelStyle: TextStyle(color: Colors.purple),
+                              //       border: OutlineInputBorder(),
+                              //     ),
+                              //     validator: (value) {
+                              //       if (value!.isEmpty) {
+                              //         return 'Please enter some text';
+                              //       }
+                              //       return null;
+                              //     },
+                              //     // proxyURL: _yourProxyURL,
+                              //     maxLines: 1,
+                              //     overlayContainer: (child) => Material(
+                              //       elevation: 1.0,
+                              //       color: Colors.white,
+                              //       borderRadius: BorderRadius.circular(12),
+                              //       child: child,
+                              //     ),
+                              //     getPlaceDetailWithLatLng: (prediction) {
+                              //       print('placeDetails${prediction.lng}');
+                              //     },
+                              //     itmClick: (Prediction prediction) =>
+                              //     _textController.text = prediction.description!,
+                              //   ),
+                              // ),
 
+                              Container(
+                                height: 45,
+                                width: constrains.maxWidth / 1.2,
+
+                                child: Form(
+                                  key: _formKey,
+
+                                  autovalidateMode: _autovalidateMode,
+                                  child: GooglePlacesAutoCompleteTextFormField(
+
+                                    cursorColor: Color(0xFF442B72),
+                                    textEditingController: _textController,
+                                    googleAPIKey: _yourGoogleAPIKey,
+                                    decoration: InputDecoration(
+                                      //errorText: _validateAddress ? "Please Enter Your Address" : null,
+                                      labelStyle: TextStyle(color: Colors.purple),
+                                      suffixIcon: Image.asset(
+                                        "assets/imgs/school/icons8_Location.png",
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      alignLabelWithHint: true,
+                                      counterText: "",
+                                      fillColor: const Color(0xFFF1F1F1),
+                                      filled: true,
+                                      contentPadding: const EdgeInsets.fromLTRB(8, 10, 10, 5),
+                                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                                      hintStyle: const TextStyle(
+                                        color: Color(0xFFC2C2C2),
+                                        fontSize: 10,
+                                        fontFamily: 'Inter-Bold',
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.5,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(color: Colors.black), // Customize border color
+                                      ),
+                                      enabledBorder: myInputBorder(),
+                                      focusedBorder: myFocusBorder(),
+
+                                    ),
+
+                                    // validator: (value) {
+                                    //   if (value!.isEmpty) {
+                                    //     return 'Please enter some text';
+                                    //   }
+                                    //   return null;
+                                    // },
+                                    maxLines: 1,
+                                    overlayContainer: (child) => Material(
+                                      elevation: 1.0,
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: child,
+                                    ),
+                                    getPlaceDetailWithLatLng: (prediction) {
+                                      print('placeDetails${prediction.lng}');
+                                    },
+                                    itmClick: (Prediction prediction) => _textController.text = prediction.description!,
+                                  ),
+                                ),
+                              ),
+                              addresserror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter address".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(
+                                height: 25,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Coordinator Name".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
+                                    ),
                                   ),
 
-                                  // validator: (value) {
-                                  //   if (value!.isEmpty) {
-                                  //     return 'Please enter some text';
-                                  //   }
-                                  //   return null;
+                                ),
+                              ),
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+
+                                height: 44,
+                                child: TextFormField(
+                                  controller: _coordinatorName,
+                                  focusNode: _CoordinatorFocus,
+                                  cursorColor: const Color(0xFF442B72),
+                                  style: TextStyle(color: Color(0xFF442B72)),
+                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                  onFieldSubmitted: (value) {
+                                    // move to the next field when the user presses the "Done" button
+                                    FocusScope.of(context).requestFocus(_SupporterFocus);
+                                  },
+                                  //textDirection: TextDirection.ltr,
+                                  scrollPadding: const EdgeInsets.symmetric(
+                                      vertical: 40),
+                                  decoration:  InputDecoration(
+                                    //errorText: _validateCoordinatorName ? "Please Enter Name" : null,
+                                    alignLabelWithHint: true,
+                                    counterText: "",
+                                    fillColor: const Color(0xFFF1F1F1),
+                                    filled: true,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        8, 30, 10, 5),
+                                    hintText:"Name".tr,
+                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFFC2C2C2),
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.33,
+                                    ),
+                                    enabledBorder: myInputBorder(),
+                                    // focusedBorder: myFocusBorder(),
+                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                    focusedBorder: myFocusBorder(),
+                                  ),
+
+                                ),
+                              ),
+                              coordinateerror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your name".tr,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: "Name".tr,
+                              // ),
+                              const SizedBox(
+                                height: 25,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child:
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        //color: Colors.black, // Setting default text color to black
+                                        fontSize: 15,
+                                        fontFamily: 'Poppins-Bold',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Support Number".tr,
+                                          style: TextStyle(color: Color(0xFF442B72)),
+                                        ),
+                                        TextSpan(
+                                          text: " *".tr,
+                                          style: TextStyle(color: Color(0xFFAD1519)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Text(
+                                  //   "Support Number".tr,
+                                  //   style: TextStyle(
+                                  //     color: Color(0xFF442B72),
+                                  //     fontSize: 15,
+                                  //     fontFamily: 'Poppins-Bold',
+                                  //     fontWeight: FontWeight.w700,
+                                  //     height: 1.07,
+                                  //   ),
+                                  // ),
+                                ),
+                              ),
+                              SizedBox(height: 10,),
+                              Container(
+                                width: constrains.maxWidth / 1.2,
+                                height: 44,
+                                child: TextFormField(
+                                  controller: _supportNumber,
+                                  focusNode: _SupporterFocus,
+                                  keyboardType: TextInputType.number,
+                                  cursorColor: const Color(0xFF442B72),
+                                  style: TextStyle(color: Color(0xFF442B72)),
+                                  textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                                  maxLength: 11,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
+                                    LengthLimitingTextInputFormatter(11), // Limit the length programmatically
+                                  ],
+                                  onFieldSubmitted: (value) {
+                                    // move to the next field when the user presses the "Done" button
+                                    // FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
+                                  },
+                                  //textDirection: TextDirection.ltr,
+                                  scrollPadding: const EdgeInsets.symmetric(
+                                      vertical: 40),
+                                  decoration:  InputDecoration(
+                                   // errorText: _validateSupportNumber ? "Please Enter Number" : null,
+                                    alignLabelWithHint: true,
+                                    counterText: "",
+                                    fillColor: const Color(0xFFF1F1F1),
+                                    filled: true,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        8, 30, 10, 5),
+                                    hintText:"Number".tr,
+                                    floatingLabelBehavior:  FloatingLabelBehavior.never,
+                                    hintStyle: const TextStyle(
+                                      color: Color(0xFFC2C2C2),
+                                      fontSize: 12,
+                                      fontFamily: 'Poppins-Bold',
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.33,
+                                    ),
+                                    enabledBorder: myInputBorder(),
+                                    // focusedBorder: myFocusBorder(),
+                                    // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
+                                    focusedBorder: myFocusBorder(),
+                                  ),
+                                  // onFieldSubmitted: (value) {
+                                  //   // move to the next field when the user presses the "Done" button
+                                  //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
                                   // },
-                                  maxLines: 1,
-                                  overlayContainer: (child) => Material(
-                                    elevation: 1.0,
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: child,
-                                  ),
-                                  getPlaceDetailWithLatLng: (prediction) {
-                                    print('placeDetails${prediction.lng}');
-                                  },
-                                  itmClick: (Prediction prediction) => _textController.text = prediction.description!,
                                 ),
                               ),
-                            ),
-                            addresserror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 32),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter address".tr,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(
-                              height: 25,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Coordinator Name".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
+                              supporterror?Container(): Padding(
+                                padding: const EdgeInsets.only(left: 32),
+                                child: Align( alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "Please enter your number".tr,
+                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ),
-
                               ),
-                            ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
+                              // TextFormFieldCustom(
+                              //   width: constrains.maxWidth / 1.2,
+                              //   hintTxt: "Number".tr,
+                              // ),
 
-                              height: 44,
-                              child: TextFormField(
-                                controller: _coordinatorName,
-                                focusNode: _CoordinatorFocus,
-                                cursorColor: const Color(0xFF442B72),
-                                style: TextStyle(color: Color(0xFF442B72)),
-                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                  FocusScope.of(context).requestFocus(_SupporterFocus);
-                                },
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                decoration:  InputDecoration(
-                                  //errorText: _validateCoordinatorName ? "Please Enter Name" : null,
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  hintText:"Name".tr,
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
+                              SizedBox(
+                                //height: constrains.maxWidth /13,
+                                height: 40,
+                              ),
+
+                              SizedBox(
+                                width: constrains.maxWidth / 1.2,
+                                child: Center(
+                                  child: ElevatedSimpleButton(
+                                    txt: "Submit".tr,
+                                    onPress: () async {
+                                      setState(() {
+                                        if (_nameEnglish.text.isEmpty) {
+                                          nameenglisherror = false;
+                                        } else {
+                                          nameenglisherror = true;
+                                        }
+                                        if (_nameArabic.text.isEmpty) {
+                                          namearabicerror = false;
+                                        } else {
+                                          namearabicerror = true;
+                                        }
+                                        if (_textController.text.isEmpty) {
+                                          addresserror = false;
+                                        } else {
+                                          addresserror = true;
+                                        }
+                                        if (_coordinatorName.text.isEmpty) {
+                                          coordinateerror = false;
+                                        } else {
+                                          coordinateerror = true;
+                                        }
+                                        if (_supportNumber.text.isEmpty) {
+                                          supporterror = false;
+                                        } else {
+                                          supporterror = true;
+                                        }
+                                        if (_selectedImage == null) {
+                                          logoerror = false;
+                                        } else {
+                                          logoerror = true;
+                                        }
+
+                                        // _nameEnglish.text.isEmpty ? _validateNameEnglish = true :  _validateNameEnglish = false;
+                                        // _nameArabic.text.isEmpty ? _validateNameArabic = true :  _validateNameArabic = false;
+                                        // _textController.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
+                                        // _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
+                                        // _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
+
+                                        // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                      });
+                                 if(_supportNumber.text.length == 11 && nameenglisherror &&
+                                     namearabicerror
+                                     && addresserror
+                                     &&coordinateerror &&supporterror&& logoerror
+                                     //_selectedImage!= null
+                                 ) {
+                                   _addDataToFirestore();
+                                   Navigator.pushReplacement(
+
+                                       context ,
+                                       MaterialPageRoute(
+                                           builder: (context) =>  HomeScreen(),
+                                           maintainState: false));
+                                             }else{
+                                   // ScaffoldMessenger.of(context).showSnackBar(
+                                   //     SnackBar(content: Text('Please,enter valid number')));
+                                 }
+
+                                    },
+                                    width: constrains.maxWidth /1.2,
+                                    hight: 48,
+                                    color: const Color(0xFF442B72),
+                                    fontSize: 16,
+
+
                                   ),
-                                  enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
-                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                  focusedBorder: myFocusBorder(),
+                                  // end of comment
                                 ),
+                              ) ,
 
-                              ),
-                            ),
-                            coordinateerror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 32),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter your name".tr,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: "Name".tr,
-                            // ),
-                            const SizedBox(
-                              height: 25,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:25,vertical: 0 ),
-                              child: Align(
-                                alignment: AlignmentDirectional.topStart,
-                                child:
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      //color: Colors.black, // Setting default text color to black
-                                      fontSize: 15,
-                                      fontFamily: 'Poppins-Bold',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Support Number".tr,
-                                        style: TextStyle(color: Color(0xFF442B72)),
-                                      ),
-                                      TextSpan(
-                                        text: " *".tr,
-                                        style: TextStyle(color: Color(0xFFAD1519)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Text(
-                                //   "Support Number".tr,
-                                //   style: TextStyle(
-                                //     color: Color(0xFF442B72),
-                                //     fontSize: 15,
-                                //     fontFamily: 'Poppins-Bold',
-                                //     fontWeight: FontWeight.w700,
-                                //     height: 1.07,
-                                //   ),
-                                // ),
-                              ),
-                            ),
-                            SizedBox(height: 10,),
-                            Container(
-                              width: constrains.maxWidth / 1.2,
-                              height: 44,
-                              child: TextFormField(
-                                controller: _supportNumber,
-                                focusNode: _SupporterFocus,
-                                keyboardType: TextInputType.number,
-                                cursorColor: const Color(0xFF442B72),
-                                style: TextStyle(color: Color(0xFF442B72)),
-                                textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                                maxLength: 11,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
-                                  LengthLimitingTextInputFormatter(11), // Limit the length programmatically
-                                ],
-                                onFieldSubmitted: (value) {
-                                  // move to the next field when the user presses the "Done" button
-                                  // FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                },
-                                //textDirection: TextDirection.ltr,
-                                scrollPadding: const EdgeInsets.symmetric(
-                                    vertical: 40),
-                                decoration:  InputDecoration(
-                                 // errorText: _validateSupportNumber ? "Please Enter Number" : null,
-                                  alignLabelWithHint: true,
-                                  counterText: "",
-                                  fillColor: const Color(0xFFF1F1F1),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.fromLTRB(
-                                      8, 30, 10, 5),
-                                  hintText:"Number".tr,
-                                  floatingLabelBehavior:  FloatingLabelBehavior.never,
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFFC2C2C2),
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins-Bold',
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.33,
-                                  ),
-                                  enabledBorder: myInputBorder(),
-                                  // focusedBorder: myFocusBorder(),
-                                  // enabledBorder: _nameuser ? myInputBorder() : myErrorBorder(),
-                                  focusedBorder: myFocusBorder(),
-                                ),
-                                // onFieldSubmitted: (value) {
-                                //   // move to the next field when the user presses the "Done" button
-                                //   FocusScope.of(context).requestFocus(_phoneNumberFocusNode);
-                                // },
-                              ),
-                            ),
-                            supporterror?Container(): Padding(
-                              padding: const EdgeInsets.only(left: 32),
-                              child: Align( alignment: AlignmentDirectional.topStart,
-                                child: Text(
-                                  "Please enter your number".tr,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ),
-                            // TextFormFieldCustom(
-                            //   width: constrains.maxWidth / 1.2,
-                            //   hintTxt: "Number".tr,
-                            // ),
-
-                            SizedBox(
-                              //height: constrains.maxWidth /13,
-                              height: 40,
-                            ),
-
-                            SizedBox(
-                              width: constrains.maxWidth / 1.2,
-                              child: Center(
-                                child: ElevatedSimpleButton(
-                                  txt: "Submit".tr,
-                                  onPress: () async {
-                                    setState(() {
-                                      if (_nameEnglish.text.isEmpty) {
-                                        nameenglisherror = false;
-                                      } else {
-                                        nameenglisherror = true;
-                                      }
-                                      if (_nameArabic.text.isEmpty) {
-                                        namearabicerror = false;
-                                      } else {
-                                        namearabicerror = true;
-                                      }
-                                      if (_textController.text.isEmpty) {
-                                        addresserror = false;
-                                      } else {
-                                        addresserror = true;
-                                      }
-                                      if (_coordinatorName.text.isEmpty) {
-                                        coordinateerror = false;
-                                      } else {
-                                        coordinateerror = true;
-                                      }
-                                      if (_supportNumber.text.isEmpty) {
-                                        supporterror = false;
-                                      } else {
-                                        supporterror = true;
-                                      }
-                                      if (_selectedImage == null) {
-                                        logoerror = false;
-                                      } else {
-                                        logoerror = true;
-                                      }
-
-                                      // _nameEnglish.text.isEmpty ? _validateNameEnglish = true :  _validateNameEnglish = false;
-                                      // _nameArabic.text.isEmpty ? _validateNameArabic = true :  _validateNameArabic = false;
-                                      // _textController.text.isEmpty ? _validateAddress = true :  _validateAddress = false;
-                                      // _coordinatorName.text.isEmpty ? _validateCoordinatorName = true :  _validateCoordinatorName = false;
-                                      // _supportNumber.text.isEmpty ? _validateSupportNumber = true :  _validateSupportNumber = false;
-
-                                      // _phoneNumberController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
-                                    });
-                               if(_supportNumber.text.length == 11 && nameenglisherror &&
-                                   namearabicerror
-                                   && addresserror
-                                   &&coordinateerror &&supporterror&& logoerror
-                                   //_selectedImage!= null
-                               ) {
-                                 _addDataToFirestore();
-                                 Navigator.push(
-
-                                     context ,
-                                     MaterialPageRoute(
-                                         builder: (context) =>  HomeScreen(),
-                                         maintainState: false));
-                                           }else{
-                                 // ScaffoldMessenger.of(context).showSnackBar(
-                                 //     SnackBar(content: Text('Please,enter valid number')));
-                               }
-
-                                  },
-                                  width: constrains.maxWidth /1.2,
-                                  hight: 48,
-                                  color: const Color(0xFF442B72),
-                                  fontSize: 16,
+                              // const SizedBox(
+                              //   height: 60,
+                              // ),
 
 
-                                ),
-                                // end of comment
-                              ),
-                            ) ,
-
-                            // const SizedBox(
-                            //   height: 60,
-                            // ),
-
-
-                          ],
-                        ),
-                      )
-                    ],
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
 
-              ],
-            ),
-          );
-        }
+                ],
+              ),
+            );
+          }
+          ),
         ),
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         //

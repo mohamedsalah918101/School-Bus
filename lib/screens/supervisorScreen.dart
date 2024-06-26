@@ -69,7 +69,14 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
         .collection('busdata')
         .doc(busId)
         .get();
-
+    if (busId.isEmpty) {
+      // Handle the case where busId is empty
+      setState(() {
+        busNumber = 'No bus ID provided';
+      });
+      print('No bus ID provided');
+      return;
+    }
     if (busDocument.exists) {
       print("exists");
       setState(() {
