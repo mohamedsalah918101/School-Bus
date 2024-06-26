@@ -1,14 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -102,13 +92,23 @@ class _YourBusState extends State<YourBus> {
       dataLoading = true;
     });
 
+    String? supervisorId = sharedpref?.getString('id');
+    if (supervisorId == null) {
+      print('Supervisor ID is null');
+      setState(() {
+        dataLoading = false;
+      });
+      return;
+    }
+
     DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
         .collection('supervisor')
-        .doc(sharedpref?.getString('id'))
+        .doc(supervisorId)
         .get();
 
     if (supervisorDoc.exists) {
       String busId = supervisorDoc['bus_id'];
+      print('Bus ID: $busId');
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('busdata')
@@ -131,14 +131,22 @@ class _YourBusState extends State<YourBus> {
           _busnumber = busnumber;
         });
 
+        print('Namedriver: $namedriver');
+        print('Photodriver: $photodriver');
+        print('Photobus: $photobus');
+        print('Phonedriver: $phonedriver');
+        print('Busnumber: $busnumber');
+
         List supervisors = busData['supervisors'];
 
         if (supervisors.length > 1) {
           setState(() {
             firstChildName = supervisors[1]['name'];
           });
+          print('First Child Name: $firstChildName');
         } else {
           setState(() {
+
             firstChildName = 'No second supervisor found';
           });
           print('No second supervisor found');
@@ -153,16 +161,11 @@ class _YourBusState extends State<YourBus> {
     setState(() {
       dataLoading = false;
     });
-  }
-  @override
+  }  @override
   void initState() {
     getDataForBus();
     super.initState();
-    setState(() {
-
-    });
   }
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   // List<ChildDataItem> children = [];
 

@@ -66,13 +66,14 @@ class _MainDrawerState extends State<SupervisorDrawer> {
             child: Drawer(
               backgroundColor: Colors.transparent,
               child: Container(
-                padding: const EdgeInsets.only(top: 61),
+                // padding: const EdgeInsets.only(top: 61),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 13.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: 70,),
                       Center(
                         child: SizedBox(
                           width: 133.82,
@@ -83,7 +84,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                         ),
                       ),
                       // const Spacer(),
-                      SizedBox(height: 60,),
+                      SizedBox(height: 75,),
                       ListTile(
                         visualDensity: const VisualDensity(
                           horizontal: -4,
@@ -278,7 +279,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                             // userData.write('language', null);
                             // Get.offAll(() => const LoginScreen());
                           }),
-                      SizedBox( height:  60 ),
+                      SizedBox( height:  70 ),
                       Container(
                         width: 172.65,
                         decoration: const ShapeDecoration(
@@ -378,7 +379,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                                       '${data['name']}',
                                       style: TextStyle(
                                         color: Colors.white,
-                                            fontSize: 18,
+                                            fontSize: 18.74,
                                             fontFamily: 'Poppins-SemiBold',
                                             fontWeight: FontWeight.w600,
                                       ),

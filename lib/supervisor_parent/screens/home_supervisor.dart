@@ -362,22 +362,30 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: data.length-1,
-                                  // data?[0]['childern'].length,
-                                  // data.length,
+                                  itemCount: data.length,
                                   itemBuilder: (BuildContext context, int index) {
-                                    List<dynamic>? children = data[index]['children'];                                    String address = data[index]['address'];
+                                    if (data.isEmpty) {
+                                      return Container();
+                                    }
+
+                                    List<dynamic>? children = data[index]['children'];
+                                    String address = data[index]['address'];
                                     List<String> words = address.split(' ');
                                     String firstLine = words.take(3).join(' ');
                                     String secondLine = words.skip(3).join(' ');
-                                    if (data.isEmpty) {
+
+                                    // Filter the children list based on supervisor ID and state
+                                    List<dynamic> filteredChildren = children?.where((child) {
+                                      return child['supervisor'] == sharedpref!.getString('id').toString() && data[index]['state'] == 1;
+                                    }).toList() ?? [];
+
+                                    if (filteredChildren.isEmpty) {
                                       return Container();
                                     } else {
                                       return Column(
                                         children: [
-                                          for (var child in children ?? [])
-                                            if (child['supervisor'] == sharedpref!.getString('id').toString())
-                                              SizedBox(
+                                          for (var child in filteredChildren)
+                                            SizedBox(
                                               width: double.infinity,
                                               height: 98, //92
                                               child: Card(
@@ -410,42 +418,12 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                       mainAxisAlignment: MainAxisAlignment.start,
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 8.0),
-                                                          child:FutureBuilder(
-                                                            future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                              if (snapshot.hasError) {
-                                                                return Text('Something went wrong');
-                                                              }
-
-                                                              if (snapshot.connectionState == ConnectionState.done) {
-                                                                if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                                  return CircleAvatar(
-                                                                    radius: 18,
-                                                                    backgroundColor: Color(0xff442B72),
-                                                                    child: CircleAvatar(
-                                                                      backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                      radius: 18,
-                                                                    ),
-                                                                  );
-                                                                }
-
-                                                                Map<String, dynamic>? data = snapshot.data?.data();
-                                                                if (data != null && data['busphoto'] != null) {
-                                                                  return CircleAvatar(
-                                                                    radius: 18,
-                                                                    backgroundColor: Color(0xff442B72),
-                                                                    child: CircleAvatar(
-                                                                      backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                      radius:18,
-                                                                    ),
-                                                                  );
-                                                                }
-                                                              }
-
-                                                              return Container();
-                                                            },
+                                                        CircleAvatar(
+                                                          radius: 18,
+                                                          backgroundColor: Color(0xff442B72),
+                                                          child: CircleAvatar(
+                                                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                            radius: 18,
                                                           ),
                                                         ),
                                                         SizedBox(width: 12),
@@ -529,7 +507,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                       );
                                     }
                                   },
-                                ),
+                                )
                               ),
                             ],
                           ),
