@@ -731,68 +731,75 @@ class _EditeProfileState extends State<EditeProfile> {
                       width: 320,
                       height: 45,
                       child:
-                          FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                          Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                         future: _future,
                         builder: (BuildContext context,
-                            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                                snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
+                              AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                                  snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
+
+                            if (!snapshot.hasData ||
+                                snapshot.data == null ||
+                                snapshot.data!.data() == null) {
+                              return Text('No data available');
+                            }
+
+                            Map<String, dynamic>? data = snapshot.data!.data();
+                            String nameArabic = data?['nameArabic'] ?? '';
+
+
+                            // Update the text field with the retrieved data
+                            _nameArabic.text = nameArabic;
+                            // Set the cursor to the end of the text
+                            _nameArabic.selection = TextSelection.fromPosition(
+                                TextPosition(offset: _nameArabic.text.length));
+
+                            return TextFormField(
+                              controller: _nameArabic,
+                              focusNode: _NameArabicFocus,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 14,
+                                //fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins-Regular',
+                              ),
+
+                              textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
+                              onFieldSubmitted: (value) {
+                                // move to the next field when the user presses the "Done" button
+                                FocusScope.of(context).requestFocus(_AddressFocus);
+                              },
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
+                              ],
+                              cursorColor: const Color(0xFF442B72),
+                              decoration: InputDecoration(
+                                hintStyle: TextStyle(color: Color(0xFF442B72)),
+                                alignLabelWithHint: true,
+                                counterText: "",
+                                fillColor: const Color(0xFFF1F1F1),
+                                filled: true,
+                                contentPadding:
+                                    const EdgeInsets.fromLTRB(8, 5, 10, 5),
+                                floatingLabelBehavior: FloatingLabelBehavior.never,
+                                enabledBorder: myInputBorder(),
+                                focusedBorder: myFocusBorder(),
+                              ),
                             );
-                          }
-
-                          if (snapshot.hasError) {
-                            return Text('Something went wrong');
-                          }
-
-                          if (!snapshot.hasData ||
-                              snapshot.data == null ||
-                              snapshot.data!.data() == null) {
-                            return Text('No data available');
-                          }
-
-                          Map<String, dynamic>? data = snapshot.data!.data();
-                          String nameEnglish = data?['nameArabic'] ?? '';
-
-                          // Update the text field with the retrieved data
-                          _nameArabic.text = nameEnglish;
-
-                          return TextFormField(
-                            controller: _nameArabic,
-                            focusNode: _NameArabicFocus,
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                              fontSize: 14,
-                              //fontWeight: FontWeight.bold,
-                              fontFamily: 'Poppins-Regular',
-                            ),
-
-                            textInputAction: TextInputAction.next, // Move to the next field when "Done" is pressed
-                            onFieldSubmitted: (value) {
-                              // move to the next field when the user presses the "Done" button
-                              FocusScope.of(context).requestFocus(_AddressFocus);
-                            },
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'^[؀-ۿ ً ٌ ٍ َ ُ ِ ّ ْ]+$')), // Allow Arabic characters only
-                            ],
-                            cursorColor: const Color(0xFF442B72),
-                            decoration: InputDecoration(
-                              hintStyle: TextStyle(color: Color(0xFF442B72)),
-                              alignLabelWithHint: true,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                                  const EdgeInsets.fromLTRB(8, 5, 10, 5),
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
-                              enabledBorder: myInputBorder(),
-                              focusedBorder: myFocusBorder(),
-                            ),
-                          );
                         },
                       ),
+                          ),
                     ),
                     // Container(
                     //   width: 320,
@@ -873,6 +880,8 @@ class _EditeProfileState extends State<EditeProfile> {
 
                           // Update the text field with the retrieved data
                           _Address.text = nameEnglish;
+                          _Address.selection = TextSelection.fromPosition(
+                              TextPosition(offset: _Address.text.length));
 
                           return Form(
                             key: _formKey,
@@ -930,9 +939,15 @@ class _EditeProfileState extends State<EditeProfile> {
                               getPlaceDetailWithLatLng: (prediction) {
                                 print('placeDetails${prediction.lng}');
                               },
-                              itmClick: (Prediction prediction) =>
-                                  _Address.text = prediction.description!,
+                              itmClick: (Prediction prediction) {
+                                _Address.text = prediction.description!;
+
+                              },
+                              onFieldSubmitted: (value) {
+                                FocusScope.of(context).requestFocus(_CoordinatorFocus);
+                              },
                             ),
+
                           );
                         },
                       ),
@@ -1062,7 +1077,8 @@ class _EditeProfileState extends State<EditeProfile> {
 
                           // Update the text field with the retrieved data
                           _coordinatorName.text = nameEnglish;
-
+                          _coordinatorName.selection = TextSelection.fromPosition(
+                              TextPosition(offset: _coordinatorName.text.length));
                           return TextFormField(
                             controller: _coordinatorName,
                             focusNode: _CoordinatorFocus,
@@ -1173,6 +1189,8 @@ class _EditeProfileState extends State<EditeProfile> {
 
                           // Update the text field with the retrieved data
                           _supportNumber.text = nameEnglish;
+                          _supportNumber.selection = TextSelection.fromPosition(
+                              TextPosition(offset: _supportNumber.text.length));
 
                           return TextFormField(
                             controller: _supportNumber,

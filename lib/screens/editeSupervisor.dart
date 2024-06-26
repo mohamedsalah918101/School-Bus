@@ -611,7 +611,11 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
                                     }
                                   //  createDynamicLink(true,docid,_phonenumber.text,'supervisor');
                                   },
-                                    child: Text("Resend invitation".tr,style:TextStyle(color: Color(0xff442B72),fontSize: 14,fontFamily:"Poppins-Regular"),)),
+                                    child: Text("Resend invitation".tr,style:TextStyle(
+                                        color: Color(0xff442B72),fontSize: 14,fontFamily:"Poppins-Regular",
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Color(0xff442B72), // Optional: Set color of underline
+                                      decorationStyle: TextDecorationStyle.solid,),)),
                                 const SizedBox(
                                   height: 60,
                                 ),

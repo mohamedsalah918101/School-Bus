@@ -225,11 +225,12 @@ class _AddBusState extends State<AddBus> {
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('You can select up to 5 images.'),
-        ),
-      );
+      print ("You can select up to 5 images.");
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('You can select up to 5 images.'),
+      //   ),
+      // );
     }
   }
 
