@@ -66,13 +66,14 @@ class _MainDrawerState extends State<SupervisorDrawer> {
             child: Drawer(
               backgroundColor: Colors.transparent,
               child: Container(
-                padding: const EdgeInsets.only(top: 61),
+                // padding: const EdgeInsets.only(top: 61),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 13.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: 70,),
                       Center(
                         child: SizedBox(
                           width: 133.82,
@@ -83,7 +84,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                         ),
                       ),
                       // const Spacer(),
-                      SizedBox(height: 60,),
+                      SizedBox(height: 75,),
                       ListTile(
                         visualDensity: const VisualDensity(
                           horizontal: -4,
@@ -171,7 +172,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                           color: Colors.white,
                         ),
                         title: Text(
-                          "Your Bus".tr,
+                          "My Bus".tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: (sharedpref?.getString('lang') == 'ar')?
@@ -278,7 +279,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                             // userData.write('language', null);
                             // Get.offAll(() => const LoginScreen());
                           }),
-                      SizedBox( height:  60 ),
+                      SizedBox( height:  70 ),
                       Container(
                         width: 172.65,
                         decoration: const ShapeDecoration(
@@ -301,44 +302,41 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                          FutureBuilder(
-                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                          if (snapshot.hasError) {
-                            return Text('Something went wrong');
-                          }
+                              FutureBuilder(
+                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Something went wrong');
+                                  }
 
-                          if (snapshot.connectionState == ConnectionState.done) {
-                            if (snapshot.data?.data() == null) {
-                              return Text(
-                                'No data available',
-                                style: TextStyle(
-                                  color: Color(0xff442B72),
-                                  fontSize: 12,
-                                  fontFamily: 'Poppins-Regular',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              );
-                            }
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                      return CircleAvatar(
+                                        radius: 31,
+                                        backgroundColor: Color(0xff442B72),
+                                        child: CircleAvatar(
+                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                          radius: 31,
+                                        ),
+                                      );
+                                    }
 
-                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                    Map<String, dynamic>? data = snapshot.data?.data();
+                                    if (data != null && data['busphoto'] != null) {
+                                      return CircleAvatar(
+                                        radius: 31,
+                                        backgroundColor: Color(0xff442B72),
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage('${data['busphoto']}'),
+                                          radius:31,
+                                        ),
+                                      );
+                                    }
+                                  }
 
-                            sharedpref?.getString('lang') == 'en';
-                            return
-                              CircleAvatar(
-                                radius: 31,
-                                backgroundColor: Color(0xff442B72),
-                                child: CircleAvatar(
-                                  backgroundImage:
-                                  NetworkImage('${data['busphoto'] }'),
-                                  radius: 31,
-                                ),
-                              );
-                          }
-
-                          return Container();
-                        },
-                      ),
+                                  return Container();
+                                },
+                              ),
                               // children.isNotEmpty?
                               // Image.asset(
                               //   'assets/images/Ellipse 1.png',
@@ -381,7 +379,7 @@ class _MainDrawerState extends State<SupervisorDrawer> {
                                       '${data['name']}',
                                       style: TextStyle(
                                         color: Colors.white,
-                                            fontSize: 18,
+                                            fontSize: 18.74,
                                             fontFamily: 'Poppins-SemiBold',
                                             fontWeight: FontWeight.w600,
                                       ),

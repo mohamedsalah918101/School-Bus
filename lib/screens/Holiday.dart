@@ -20,6 +20,7 @@
 //   DateTime get toDateAsDateTime => toDate.toDate();
 // }
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class Holiday {
   final String name;
@@ -58,5 +59,8 @@ class Holiday {
       'selectedDates': selectedDates,
       'schoolid': schoolid,
     };
+  }
+  List<DateTime> toSelectedDates() {
+    return selectedDates.map((dateStr) => DateTime.parse(dateStr)).toList();
   }
 }

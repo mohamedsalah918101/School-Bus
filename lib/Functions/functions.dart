@@ -1,14 +1,27 @@
+import 'dart:async';
+import 'dart:collection';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart' as FDB;
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
+import 'package:http/http.dart' as http;
 import '../classes/dropdowncheckboxitem.dart';
 import '../main.dart';
+import '../model/ParentModel.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
+
 dynamic platform;
 
 FirebaseDynamicLinks dynamicLinks = FirebaseDynamicLinks.instance;
+Set<Polyline> polyline = {};
+List<ParentModel> childrenData = [];
 
 List<DropdownCheckboxItem> selectedItems = [];
 class ValueNotifying {
@@ -195,6 +208,94 @@ Future<bool> addSupervisorCheck(String phoneNumber) async {
   }
 }
 
+
+
+List<PointLatLng> decodeEncodedPolyline(String encoded) {
+  List<PointLatLng> poly = [];
+  int index = 0, len = encoded.length;
+  int lat = 0, lng = 0;
+  polyline.clear();
+
+  while (index < len) {
+    int b, shift = 0, result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+    LatLng p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+    polyList.add(p);
+  }
+  polyline.add(Polyline(
+    polylineId: const PolylineId('1'),
+    visible: true,patterns: [
+    PatternItem.dash(10),
+    PatternItem.gap(10),
+  ],
+    color: const Color(0xff39BF4E),
+    width: 4,
+    points: polyList,
+  )
+    // polyline.add(
+    //   Polyline(
+    //       polylineId: const PolylineId('1'),
+    //       color: Colors.blueAccent,
+    //       visible: true,
+    //       width: 4,
+    //       points: polyList),
+  );
+  valueNotifierHome.incrementNotifier();
+  return poly;
+}
+
+List<LatLng> polyList = [];
+
+getPolylines() async {
+  print('callhistory1');
+
+  polyList.clear();
+  String pickLat = '';
+  String pickLng = '';
+  String dropLat = '';
+  String dropLng = '';
+  List<String> wayPointsList = [];
+  List<String> wayPointsAddressList = [];
+  String wayPoints = '';
+
+  print('callhistory1$dropLat--$dropLng');
+  try {
+    var response = await http.get(Uri.parse(wayPoints != ''
+        ? 'httpon?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&waypoints=$wayPoints&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=AIzaSyCkokUjMmOTA9NeIxSs-HEhrp5DtOeBM04'
+        : 'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=AIzaSyCkokUjMmOTA9NeIxSs-HEhrp5DtOeBM04'));
+
+    // 'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapKey'));
+    if (response.statusCode == 200) {
+      var steps =
+      jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
+
+      decodeEncodedPolyline(steps);
+    } else {
+      debugPrint(';;;;;' + response.body);
+    }
+  } catch (e) {
+    if (e is SocketException) {
+     // internet = false;
+    }
+  }
+  return polyList;
+}
 Future<bool> addParentCheck(String phoneNumber) async {
   CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('schooldata');
 
@@ -293,3 +394,77 @@ void makePhoneCall(String phoneNumber) async {
   }
 
 }
+class PointLatLng {
+  /// Creates a geographical location specified in degrees [latitude] and
+  /// [longitude].
+  ///
+  const PointLatLng(double latitude, double longitude)
+  // ignore: unnecessary_null_comparison
+      : assert(latitude != null),
+  // ignore: unnecessary_null_comparison
+        assert(longitude != null),
+  // ignore: unnecessary_this, prefer_initializing_formals
+        this.latitude = latitude,
+  // ignore: unnecessary_this, prefer_initializing_formals
+        this.longitude = longitude;
+
+  /// The latitude in degrees.
+  final double latitude;
+
+  /// The longitude in degrees
+  final double longitude;
+
+  @override
+  String toString() {
+    return "lat: $latitude / longitude: $longitude";
+  }
+}
+
+
+
+dynamic center;
+dynamic last;
+
+//supervisir track
+addPoints(){
+  Timer.periodic(const Duration(seconds: 5), (timer) async {
+    geolocator.LocationPermission permission;
+
+   var serviceEnabled =
+    await geolocator.GeolocatorPlatform.instance.isLocationServiceEnabled();
+    permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
+    if (
+        permission != geolocator.LocationPermission.denied &&
+        permission != geolocator.LocationPermission.deniedForever) {
+    var locs = await geolocator.Geolocator.getLastKnownPosition();
+    if (locs != null) {
+      center = LatLng(locs.latitude, locs.longitude);
+    } else {
+      var loc = await geolocator.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocator.LocationAccuracy.low);
+      center = LatLng(double.parse(loc.latitude.toString()),
+          double.parse(loc.longitude.toString()));
+    }
+
+    if (last == null || last.latitude != center.latitude || last.longitude != center.longitude) {
+      last = center;
+      FDB.FirebaseDatabase.instance
+          .ref()
+          .child('supervisors').child(sharedpref!.getString("id").toString()).push().set({
+        'lat': center.latitude, 'lang': center.longitude
+      });
+      FirebaseFirestore.instance.collection('supervisor').doc(sharedpref!.getString("id").toString()).update({
+        'lat': center.latitude, 'lang': center.longitude
+      });
+
+    }}else{
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.denied) {
+        addPoints();
+      }
+    }
+  });
+}
+
+
+

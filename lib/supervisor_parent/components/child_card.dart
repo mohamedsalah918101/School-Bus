@@ -236,7 +236,9 @@ class _ChildCardState extends State<ChildCard> {
                            onTap: () {
                              Navigator.of(context).push(
                                  MaterialPageRoute(builder: (context) =>
-                                     ChatScreen()));},
+                                     ChatScreen(receiverPhone: widget.childrenData!.supervisors![0].phone!, receiverName: widget.childrenData!.supervisors![0].name!,
+                                       receiverId: widget.childrenData!.supervisors![0].id!,)));
+                             },
                            child: Image.asset('assets/images/icons8_chat 1.png' ,
                              width: 26,
                              height: 26,),
@@ -306,7 +308,9 @@ class _ChildCardState extends State<ChildCard> {
                                   onTap: () {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) =>
-                                            ChatScreen()));},
+                                            ChatScreen(receiverPhone: widget.childrenData!.supervisors![0].phone!, receiverName: widget.childrenData!.supervisors![0].name!,
+                                              receiverId: widget.childrenData!.supervisors![0].id!,)));
+                                    },
                                   child: Image.asset('assets/images/icons8_chat 1.png' ,
                                     width: 26,
                                     height: 26,),
@@ -376,7 +380,9 @@ class _ChildCardState extends State<ChildCard> {
                                   onTap: () {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) =>
-                                            ChatScreen()));},
+                                            ChatScreen(receiverPhone: widget.childrenData!.supervisors![1].phone!, receiverName: widget.childrenData!.supervisors![1].name!,
+                                              receiverId: widget.childrenData!.supervisors![1].id!,)));
+                                    },
                                   child: Image.asset('assets/images/icons8_chat 1.png' ,
                                     width: 26,
                                     height: 26,),

@@ -1478,8 +1478,8 @@ class _EditeBusState extends State<EditeBus> {
             //height: 100,
             child: FloatingActionButton(
               backgroundColor:Color(0xff442B72),
-              // shape: RoundedRectangleBorder(
-              //     borderRadius: BorderRadius.circular(100)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               onPressed: () async {
                Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
               },
@@ -1504,7 +1504,8 @@ class _EditeBusState extends State<EditeBus> {
             ),
 
             child: BottomAppBar(
-
+              padding: EdgeInsets.symmetric(vertical: 3),
+              height: 60,
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
               shape: const AutomaticNotchedShape( RoundedRectangleBorder(
@@ -1517,13 +1518,13 @@ class _EditeBusState extends State<EditeBus> {
               //shape of notch
               notchMargin: 7,
               child: SizedBox(
-                height: 55,
+                height: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.0),
                   child: SingleChildScrollView(
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.symmetric(

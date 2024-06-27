@@ -212,6 +212,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
@@ -232,6 +234,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             topRight: Radius.circular(25),
           ),
           child: BottomAppBar(
+            padding: EdgeInsets.symmetric(vertical: 3),
+            height: 60,
             color: const Color(0xFF442B72),
             clipBehavior: Clip.antiAlias,
             shape: const AutomaticNotchedShape(
@@ -251,7 +255,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 child: SingleChildScrollView(
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.symmetric(

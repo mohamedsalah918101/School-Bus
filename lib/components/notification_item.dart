@@ -19,7 +19,7 @@ class NotificationItem extends StatelessWidget {
           minWidth: double.infinity,
         ),
         decoration: ShapeDecoration(
-          color: Colors.white,
+          color: Color(0xffFFFFFF),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

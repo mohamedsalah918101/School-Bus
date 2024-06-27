@@ -5,7 +5,7 @@ class ReciverMessageItem extends StatelessWidget {
   String messageContent, time;
 
   ReciverMessageItem(
-      {super.key, required this.messageContent, required this.time});
+      {super.key, required this.messageContent, required this.time,});
 
   @override
   Widget build(BuildContext context) {

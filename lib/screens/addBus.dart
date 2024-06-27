@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multiple_images_picker/multiple_images_picker.dart';
+// import 'package:multiple_images_picker/multiple_images_picker.dart';
 import 'package:school_account/components/home_drawer.dart';
 import 'package:school_account/screens/notificationsScreen.dart';
 import 'package:school_account/screens/profileScreen.dart';
@@ -1554,6 +1554,8 @@ class _AddBusState extends State<AddBus> {
             child: SizedBox(
               //height: 100,
               child: FloatingActionButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
                 backgroundColor: Color(0xff442B72),
                 onPressed: () async {
                   Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
@@ -1575,6 +1577,8 @@ class _AddBusState extends State<AddBus> {
                 topRight: Radius.circular(25),
               ),
               child: BottomAppBar(
+                padding: EdgeInsets.symmetric(vertical: 3),
+                height: 60,
                 color: const Color(0xFF442B72),
                 clipBehavior: Clip.antiAlias,
                 shape: const AutomaticNotchedShape(
@@ -1588,13 +1592,13 @@ class _AddBusState extends State<AddBus> {
                 //shape of notch
                 notchMargin: 7,
                 child: SizedBox(
-                  height: 55,
+                  height: 10,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
                     child: SingleChildScrollView(
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           // Padding(
                           //   padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 5),

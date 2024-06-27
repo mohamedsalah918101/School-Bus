@@ -49,47 +49,78 @@ class _ProfileCardInSupervisorState extends State<ProfileCardInSupervisor> {
                 },
                 child: FutureBuilder(
                   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
                     if (snapshot.hasError) {
                       return Text('Something went wrong');
                     }
 
                     if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.data?.data() == null) {
-                        return Text(
-                          'No data available',
-                          style: TextStyle(
-                            color: Color(0xff442B72),
-                            fontSize: 12,
-                            fontFamily: 'Poppins-Regular',
-                            fontWeight: FontWeight.w400,
+                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                        return CircleAvatar(
+                          radius: 30.5,
+                          backgroundColor: Color(0xff442B72),
+                          child: CircleAvatar(
+                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                            radius: 30.5,
                           ),
                         );
                       }
 
-                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                      sharedpref?.getString('lang') == 'en';
-                      return
-                        CircleAvatar(
+                      Map<String, dynamic>? data = snapshot.data?.data();
+                      if (data != null && data['busphoto'] != null) {
+                        return CircleAvatar(
                           radius: 30.5,
                           backgroundColor: Color(0xff442B72),
                           child: CircleAvatar(
-                            backgroundImage:
-                            NetworkImage('${data['busphoto'] }'),
+                            backgroundImage: NetworkImage('${data['busphoto']}'),
                             radius: 30.5,
                           ),
                         );
+                      }
                     }
 
                     return Container();
                   },
                 ),
-                // Image.asset(
-                //   'assets/images/Ellipse 16.png',
-                //   width: 62,
-                //   height: 62,
+                // FutureBuilder(
+                //   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                //     if (snapshot.hasError) {
+                //       return Text('Something went wrong');
+                //     }
+                //
+                //     if (snapshot.connectionState == ConnectionState.done) {
+                //       if (snapshot.data?.data() == null) {
+                //         return Text(
+                //           'No data available',
+                //           style: TextStyle(
+                //             color: Color(0xff442B72),
+                //             fontSize: 12,
+                //             fontFamily: 'Poppins-Regular',
+                //             fontWeight: FontWeight.w400,
+                //           ),
+                //         );
+                //       }
+                //
+                //       Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                //
+                //       sharedpref?.getString('lang') == 'en';
+                //       return
+                //         CircleAvatar(
+                //           radius: 30.5,
+                //           backgroundColor: Color(0xff442B72),
+                //           child: CircleAvatar(
+                //             backgroundImage:
+                //             NetworkImage('${data['busphoto'] }'),
+                //             radius: 30.5,
+                //           ),
+                //         );
+                //     }
+                //
+                //     return Container();
+                //   },
                 // ),
+
               ),
               SizedBox(width: 18),
               Expanded(

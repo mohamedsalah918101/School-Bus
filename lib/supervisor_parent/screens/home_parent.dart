@@ -12,6 +12,7 @@ import 'package:school_account/supervisor_parent/screens/attendence_parent.dart'
 import 'package:school_account/supervisor_parent/screens/home_parent_takebus.dart';
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
+import '../../Functions/functions.dart';
 import '../components/bus_component.dart';
 import '../components/child_card.dart';
 import '../components/main_bottom_bar.dart';
@@ -36,7 +37,6 @@ class HomeParentState extends State<HomeParent> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   // List<ChildDataItem> children = [];
   // late Function() onTapMenu;
-  List<ParentModel> childrenData = [];
   getData()async{
     try {
       DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
@@ -51,7 +51,7 @@ class HomeParentState extends State<HomeParent> {
           busNumber =  busSnapshot.get('busnumber');
 
           for(int x =0; x<supervisors.length ;x++){
-          supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id']));
+          supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id'],lat: supervisors[x]['lat'],lang:supervisors[x]['lang']));
           }
           childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: busNumber,supervisors: supervisorsData));
 

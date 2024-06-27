@@ -1,3 +1,4 @@
+import 'package:cloud_firestore_platform_interface/src/timestamp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/main.dart';
@@ -6,7 +7,7 @@ import 'dialogs.dart';
 import 'elevated_simple_button.dart';
 
 class AddedChildCard extends StatelessWidget {
-  const AddedChildCard({super.key});
+  const AddedChildCard({super.key, });
 
   @override
   Widget build(BuildContext context) {

@@ -166,7 +166,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
 
 
                               await _firestore.collection('notification').add({
-                                'item': 'Invitation Accepted',
+                                'item': 'accept Invitation',
                                 'timestamp': FieldValue.serverTimestamp(),
                                 'SchoolId': _schoolIdText ,
                                 'SupervisorId': sharedpref!.getString('id') ,
@@ -217,7 +217,7 @@ class _AcceptInvitationSupervisorState extends State<AcceptInvitationSupervisor>
                                     )));
                                 setState(() {});
                                 await _firestore.collection('notification').add({
-                                  'item': 'Invitation Declined',
+                                  'item': 'Decline Invitation',
                                   'timestamp': FieldValue.serverTimestamp(),
                                   'SchoolId': _schoolIdText ,
                                   'SupervisorId': sharedpref!.getString('id') ,

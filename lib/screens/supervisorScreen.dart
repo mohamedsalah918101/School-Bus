@@ -1282,6 +1282,8 @@ bool _isMounted= true;
               Navigator.push(context, MaterialPageRoute(builder: (context)=>SendInvitation()));
               },
               backgroundColor: Color(0xFF442B72),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
               child: Icon(Icons.add,color: Colors.white,size: 35,),),
             )
             ],),
@@ -1295,6 +1297,8 @@ bool _isMounted= true;
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
                 Navigator.push(context,
@@ -1315,6 +1319,8 @@ bool _isMounted= true;
             topRight: Radius.circular(25),
           ),
           child: BottomAppBar(
+            padding: EdgeInsets.symmetric(vertical: 3),
+            height: 60,
             // padding: EdgeInsets.symmetric(vertical: 3),
             // height: 60,
             color: const Color(0xFF442B72),
@@ -1330,13 +1336,13 @@ bool _isMounted= true;
             //shape of notch
             notchMargin: 7,
             child: SizedBox(
-              height: 55,
+              height: 10,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: SingleChildScrollView(
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       // Padding(
                       //   padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 5),
