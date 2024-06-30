@@ -36,11 +36,22 @@ class HomeParentState extends State<HomeParent> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   // List<ChildDataItem> children = [];
+  String parentName = '';
   // late Function() onTapMenu;
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
   getData()async{
     try {
       DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
       if (documentSnapshot.exists) {
+        setState(() {
+          parentName = documentSnapshot.get('name');
+        });
       List<dynamic> children =  documentSnapshot.get('children');
       for(int i =0; i<children.length ;i++){
         DocumentSnapshot busSnapshot = await _firestore.collection('busdata').doc(children[i]['bus_id']).get();
@@ -61,9 +72,7 @@ class HomeParentState extends State<HomeParent> {
         }
 
       }
-      setState(() {
 
-      });
        } else {
         print("Document does not exist");
         return null;
@@ -73,12 +82,7 @@ class HomeParentState extends State<HomeParent> {
       return null;
     }
   }
-  @override
-  void initState() {
-    getData();
-    super.initState();
 
-  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -126,7 +130,7 @@ class HomeParentState extends State<HomeParent> {
                             ),
                           ),
                           TextSpan(
-                            text: sharedpref!.getString('name').toString(),
+                            text: parentName,
                             style: TextStyle(
                               color: Color(0xFF993D9A),
                               fontSize: 16,
