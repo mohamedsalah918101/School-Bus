@@ -24,7 +24,7 @@ import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
 import 'package:google_places_autocomplete_text_field/model/prediction.dart';
 
-class   EditProfileParent extends StatefulWidget {
+class EditProfileParent extends StatefulWidget {
   const EditProfileParent({super.key});
 
   @override
