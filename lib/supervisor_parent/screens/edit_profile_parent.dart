@@ -108,9 +108,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
     }
   }
 
-  Future<void> _pickImageSecond() async {
+  Future<void> _pickImageSecond(ImageSource src, StateSetter _setState) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: src);
     if (pickedFile != null) {
       setState(() {
         _imageSecond = File(pickedFile.path);
@@ -407,7 +407,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 25.0),
+                  padding: const EdgeInsets.only(left: 25.0, right: 20),
                   child: Text(
                     'Name'.tr,
                     style: const TextStyle(
@@ -424,7 +424,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                 ),
                 Padding(
                   padding: (sharedpref?.getString('lang') == 'ar')
-                      ? const EdgeInsets.symmetric(horizontal: 0.0)
+                      ? const EdgeInsets.symmetric(horizontal: 26.0)
                       : const EdgeInsets.symmetric(horizontal: 26.0),
                   child: SizedBox(
                     width: 322,
@@ -445,7 +445,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                         fillColor: const Color(0xFFF1F1F1),
                         filled: true,
                         contentPadding: (sharedpref?.getString('lang') == 'ar')
-                            ? const EdgeInsets.fromLTRB(166, 0, 17, 40)
+                            ? const EdgeInsets.fromLTRB(150, 20, 15, 40)
                             : const EdgeInsets.fromLTRB(15, 20, 150, 40),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
@@ -479,7 +479,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                   height: 18,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 25.0),
+                  padding: const EdgeInsets.only(left: 25.0, right: 20),
                   child: Text(
                     'Number'.tr,
                     style: const TextStyle(
@@ -496,7 +496,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                 ),
                 Padding(
                   padding: (sharedpref?.getString('lang') == 'ar')
-                      ? const EdgeInsets.symmetric(horizontal: 0.0)
+                      ? const EdgeInsets.symmetric(horizontal: 26.0)
                       : const EdgeInsets.symmetric(horizontal: 26.0),
                   child: SizedBox(
                     width: 322,
@@ -520,7 +520,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                         fillColor: const Color(0xFFF1F1F1),
                         filled: true,
                         contentPadding: (sharedpref?.getString('lang') == 'ar')
-                            ? const EdgeInsets.fromLTRB(166, 0, 17, 40)
+                            ? const EdgeInsets.fromLTRB(40, 40, 15, 40)
                             : const EdgeInsets.fromLTRB(15, 40, 40, 40),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
@@ -554,7 +554,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                   height: 25,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 25.0),
+                  padding: const EdgeInsets.only(left: 25.0,right: 20),
                   child: Text(
                     'Location *'.tr,
                     style: const TextStyle(
@@ -571,7 +571,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                 ),
                 Padding(
                   padding: (sharedpref?.getString('lang') == 'ar')
-                      ? const EdgeInsets.symmetric(horizontal: 0.0)
+                      ? const EdgeInsets.symmetric(horizontal: 26.0)
                       : const EdgeInsets.symmetric(horizontal: 26.0),
                   child: SizedBox(
                     width: 322,
@@ -600,7 +600,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                         fillColor: const Color(0xFFF1F1F1),
                         filled: true,
                         contentPadding: (sharedpref?.getString('lang') == 'ar')
-                            ? const EdgeInsets.fromLTRB(166, 0, 17, 40)
+                            ? const EdgeInsets.fromLTRB(15, 5, 15, 5)
                             : const EdgeInsets.fromLTRB(15, 5, 15, 5),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
@@ -643,7 +643,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                   height: 35,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 28.0),
+                  padding: const EdgeInsets.only(left: 28.0, right: 25),
                   child: Row(
                     children: [
                       Text(
@@ -719,7 +719,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                 child: Stack(
                                                   children: [
                                                     GestureDetector(
-                                                      onTap: _pickImageSecond,
+                                                      onTap:(){ _pickImageSecond(ImageSource.gallery, setState);},
                                                       child: CircleAvatar(
                                                         backgroundColor:
                                                             const Color(
@@ -738,7 +738,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                       bottom: 0,
                                                       right: 0,
                                                       child: GestureDetector(
-                                                        onTap: _pickImageSecond,
+                                                        onTap: (){ _pickImageSecond(ImageSource.gallery, setState);},
                                                         child: Container(
                                                           padding:
                                                               const EdgeInsets
@@ -803,12 +803,8 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                 padding: (sharedpref?.getString(
                                                             'lang') ==
                                                         'ar')
-                                                    ? const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 0.0)
-                                                    : const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 12.0),
+                                                    ? const EdgeInsets.symmetric(horizontal: 0.0)
+                                                    : const EdgeInsets.symmetric(horizontal: 12.0),
                                                 child: SizedBox(
                                                   width: 277,
                                                   height: 33,
@@ -836,16 +832,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                       fillColor: const Color(
                                                           0xFFF1F1F1),
                                                       filled: true,
-                                                      contentPadding: (sharedpref
-                                                                  ?.getString(
-                                                                      'lang') ==
-                                                              'ar')
-                                                          ? const EdgeInsets
-                                                              .fromLTRB(
-                                                              166, 0, 17, 40)
-                                                          : const EdgeInsets
-                                                              .fromLTRB(
-                                                              17, 5, 0, 5),
+                                                      contentPadding: (sharedpref?.getString('lang') == 'ar')
+                                                          ? const EdgeInsets.fromLTRB(0, 5, 17, 40)
+                                                          : const EdgeInsets.fromLTRB(17, 5, 0, 40),
                                                       floatingLabelBehavior:
                                                           FloatingLabelBehavior
                                                               .never,
@@ -974,16 +963,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                       fillColor: const Color(
                                                           0xFFF1F1F1),
                                                       filled: true,
-                                                      contentPadding: (sharedpref
-                                                                  ?.getString(
-                                                                      'lang') ==
-                                                              'ar')
-                                                          ? const EdgeInsets
-                                                              .fromLTRB(
-                                                              166, 0, 17, 40)
-                                                          : const EdgeInsets
-                                                              .fromLTRB(
-                                                              17, 5, 0, 5),
+                                                      contentPadding: (sharedpref?.getString('lang') == 'ar')
+                                                          ? const EdgeInsets.fromLTRB(0, 5, 17, 5)
+                                                          : const EdgeInsets.fromLTRB(17, 5, 0, 5),
                                                       floatingLabelBehavior:
                                                           FloatingLabelBehavior
                                                               .never,
