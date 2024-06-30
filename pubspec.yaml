@@ -81,6 +81,7 @@ dependencies:
   local_auth: ^2.1.8
   date_format: ^2.0.6
   loadmore: ^2.0.1
+  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:
@@ -104,7 +105,7 @@ dev_dependencies:
   geolocator: ^9.0.1
   permission_handler: ^10.2.0
   #image_picker: ^1.0.8
-#  firebase_messaging: ^14.7.20
+  #  firebase_messaging: ^14.7.20
   timeago: ^3.6.0
 #  multiple_images_picker: ^1.0.1
 
