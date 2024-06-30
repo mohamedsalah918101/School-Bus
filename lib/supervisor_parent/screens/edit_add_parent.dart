@@ -903,8 +903,8 @@ class _EditAddParentsState extends State<EditAddParents> {
                                     },
                                     child: Image.asset(
                                       _showNumbers
-                                          ? 'assets/images/iconamoon_arrow-up-2-thin.png'
-                                          : 'assets/images/iconamoon_arrow-up-2-thin (1).png',
+                                          ? 'assets/images/iconamoon_arrow-up-2-thin (1).png'
+                                          : 'assets/images/iconamoon_arrow-up-2-thin.png',
                                       width: 34,
                                       height: 34,
                                     ),

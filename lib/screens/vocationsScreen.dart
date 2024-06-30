@@ -212,19 +212,7 @@ String newDocId='';
   }
 
 
-  Future<List<SchoolHoliday>> _fetchHolidays() async {
-    final firestore = FirebaseFirestore.instance;
-    final holidaysRef = firestore.collection('schoolholiday');
-    final holidaysSnapshot = await holidaysRef.get();
 
-    List<SchoolHoliday> holidays = [];
-    for (var doc in holidaysSnapshot.docs) {
-      SchoolHoliday holiday = SchoolHoliday.fromJson(doc.data());
-      holidays.add(holiday);
-    }
-
-    return holidays;
-  }
 
 
   List<QueryDocumentSnapshot> data = [];
@@ -434,6 +422,7 @@ _selectedDays.clear();
 
   void retrieveAllData() async {
     try {
+      List<DateTime> dates=[];
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('schoolholiday').where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
       if (querySnapshot.size > 0) {
 
@@ -453,7 +442,7 @@ _selectedDays.clear();
 
               // Extract and parse selectedDates from string to DateTime
               List<dynamic> dateStrings = data['selectedDates'];
-              List<DateTime> dates = dateStrings.map((dateString) => DateTime.parse(dateString)).toList();
+               dates = dateStrings.map((dateString) => DateTime.parse(dateString)).toList();
 
               // Convert the DateTime objects to strings
               String fromDateString = fromDate.toString();
@@ -473,6 +462,7 @@ _selectedDays.clear();
               print('To Date: ${toDate.toLocal()}');
               print('Selected Dates:');
               for (DateTime date in dates) {
+
                 print(' - ${date.toLocal()}');
               }
               print('-----------------------------------');
@@ -485,9 +475,19 @@ _selectedDays.clear();
         }
         // Sort the holidays by fromDate in descending order
         retrievedHolidays.sort((a, b) => DateTime.parse(b.fromDate).compareTo(DateTime.parse(a.fromDate)));
+
+        // Collect all selected dates from each holiday
+        List<DateTime> selectedDates = [];
+        for (Holiday holiday in retrievedHolidays) {
+          selectedDates.addAll(holiday.toSelectedDates());
+        }
+
         // Update the state with the sorted holidays
         setState(() {
           _holidays = retrievedHolidays;
+          _initialSelectedDates = selectedDates;
+          print("ssssssssssssssssssssssss");
+          print(selectedDates);
         });
       } else {
         print("No documents exist");
@@ -495,6 +495,20 @@ _selectedDays.clear();
     } catch (e) {
       print("Error retrieving data: $e");
     }
+  }
+  List<DateTime> _initialSelectedDates    = [];
+  Future<List<Holiday>> _fetchHolidays() async {
+    final firestore = FirebaseFirestore.instance;
+    final holidaysRef = firestore.collection('schoolholiday');
+    final holidaysSnapshot = await holidaysRef.where('schoolid', isEqualTo: sharedpref!.getString('id')).get();
+
+    // List<Holiday> holidays = [];
+    for (var doc in holidaysSnapshot.docs) {
+      Holiday holiday = Holiday.fromJson(doc.data());
+      holidays.add(holiday);
+    }
+
+    return holidays;
   }
 
   List<Day> _selectedDays = [];
@@ -508,6 +522,7 @@ _selectedDays.clear();
     //_getSelectedDaysFromFirestore();
     retrieveAllData();
     _loadSelectedDays();
+
    // retrieveDateTime();
    // getData();
 
@@ -1151,6 +1166,10 @@ _selectedDays.clear();
                               // },
 
                               selectionMode: DateRangePickerSelectionMode.multiple,
+
+
+
+
                               selectionColor: const Color(0xFF7A12FF),
                               rangeSelectionColor: const Color(0xFF7A12FF),
                               rangeTextStyle: const TextStyle(
@@ -1386,7 +1405,15 @@ _selectedDays.clear();
                               //     : null,
                             ),
 
-                            selectionMode: DateRangePickerSelectionMode.single,
+                            selectionMode: DateRangePickerSelectionMode.multiple,
+                            // initialSelectedDates: [DateTime.now().subtract(Duration(days: 4))],
+                            initialSelectedDates:_initialSelectedDates,
+                            /*initialSelectedRanges: <PickerDateRange>[
+                              PickerDateRange(DateTime.now().subtract(Duration(days: 4)),
+                                  DateTime.now().add(Duration(days: 4))),
+                              PickerDateRange(DateTime.now().add(Duration(days: 7)),
+                                  DateTime.now().add(Duration(days: 14)))
+                            ],*/
                             selectionColor: const Color(0xFF7A12FF),
                             rangeSelectionColor: const Color(0xFF7A12FF),
                             rangeTextStyle: const TextStyle(
@@ -1568,34 +1595,6 @@ _selectedDays.clear();
                       children: [
 
 
-                        //old column to display holidays
-                        // Column(
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   mainAxisAlignment: MainAxisAlignment.start,
-                        //   children: [
-                        //     Text(
-                        //       '16 Aug. 2023'.tr,
-                        //       style: TextStyle(
-                        //         color: Color(0xFF4F4F4F),
-                        //         fontSize: 25,
-                        //         fontFamily: 'Poppins-Regular',
-                        //         fontWeight: FontWeight.w500,
-                        //         height: 1.53,
-                        //       ),
-                        //     ),
-                        //     Text(
-                        //       'Ramadan Kareem'.tr,
-                        //       style: TextStyle(
-                        //         color: Color(0xFF442B72),
-                        //         fontSize: 14,
-                        //         fontFamily: 'Poppins-Light',
-                        //         fontWeight: FontWeight.w400,
-                        //         height: 2.38,
-                        //       ),
-                        //     ),
-                        //   ],
-                        // )
-
                         Column(
                           children: _holidays.map((holiday) {
                             return Row(
@@ -1643,44 +1642,7 @@ _selectedDays.clear();
                         const SizedBox(
                           height: 35,
                         ),
-                        // Row(
-                        //   children: [
-                        //     Container(
-                        //       width: 3,
-                        //       height: 55,
-                        //       color: const Color(0xFFFEDF96),
-                        //     ),
-                        //     const SizedBox(
-                        //       width: 18,
-                        //     ),
-                        //     Column(
-                        //       crossAxisAlignment: CrossAxisAlignment.start,
-                        //       mainAxisAlignment: MainAxisAlignment.start,
-                        //       children: [
-                        //         Text(
-                        //           '4 Aug. 2023'.tr,
-                        //           style: TextStyle(
-                        //             color: Color(0xFF4F4F4F),
-                        //             fontSize: 25,
-                        //             fontFamily: 'Poppins-Regular',
-                        //             fontWeight: FontWeight.w500,
-                        //             height: 1.53,
-                        //           ),
-                        //         ),
-                        //         Text(
-                        //           'Holiday'.tr,
-                        //           style: TextStyle(
-                        //             color: Color(0xFFFFC53D),
-                        //             fontSize: 14,
-                        //             fontFamily: 'Poppins-Light',
-                        //             fontWeight: FontWeight.w400,
-                        //             height: 2.38,
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     )
-                        //   ],
-                        // ),
+
                       ],
                     ),
                   ),
@@ -1861,6 +1823,8 @@ _selectedDays.clear();
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
                 Navigator.push(context,
@@ -1882,6 +1846,8 @@ _selectedDays.clear();
             topRight: Radius.circular(25),
           ),
           child: BottomAppBar(
+            padding: EdgeInsets.symmetric(vertical: 3),
+            height: 60,
             color: const Color(0xFF442B72),
             clipBehavior: Clip.antiAlias,
             shape: const AutomaticNotchedShape( RoundedRectangleBorder(
@@ -1895,13 +1861,13 @@ _selectedDays.clear();
             //shape of notch
             notchMargin: 7,
             child: SizedBox(
-              height: 50,
+              height: 10,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: SingleChildScrollView(
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -2021,7 +1987,7 @@ _selectedDays.clear();
         children: [
           // Add your image here
           Padding(
-            padding: const EdgeInsets.only(left: 40),
+            padding: const EdgeInsets.only(left: 20),
             child: Image.asset(
               photo,
               // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path

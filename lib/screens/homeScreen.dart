@@ -292,65 +292,64 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProfileScreen(),
+                                          maintainState: false,
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
 
-                                    decoration: BoxDecoration(
-                                        color: Colors.white, // Your desired background color
-                                        borderRadius: BorderRadius.circular(5),
-                                        boxShadow: [
-                                          BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
-                                        ]
-                                    ),
-                                    child:
+                                      decoration: BoxDecoration(
+                                          color: Colors.white, // Your desired background color
+                                          borderRadius: BorderRadius.circular(5),
+                                          boxShadow: [
+                                            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
+                                          ]
+                                      ),
+                                      child:
 
-                                    // ListTile(
-                                    //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    //   leading: GestureDetector(
-                                    //       onTap: (){
-                                    //         Navigator.push(
-                                    //             context ,
-                                    //             MaterialPageRoute(
-                                    //                 builder: (context) =>  ProfileScreen(),
-                                    //                 maintainState: false));
-                                    //       },
-                                    //       child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
-                                    //   //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
-                                    //   title: Text(
-                                    //     'Salam Language School'.tr,
-                                    //     style: TextStyle(
-                                    //       color: Color(0xFF442B72),
-                                    //       fontSize: 15,
-                                    //       fontWeight: FontWeight.bold,
-                                    //       fontFamily: 'Poppins-Bold',
-                                    //     ),
-                                    //   ),
-                                    //   subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
-                                    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                                    //     tileColor: Colors.white,
-                                    // ),
-                                    FutureBuilder(
-                                      future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
-                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                        if (snapshot.hasError) {
-                                          return Text('Something went wrong');
-                                        }
+                                      // ListTile(
+                                      //   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      //   leading: GestureDetector(
+                                      //       onTap: (){
+                                      //         Navigator.push(
+                                      //             context ,
+                                      //             MaterialPageRoute(
+                                      //                 builder: (context) =>  ProfileScreen(),
+                                      //                 maintainState: false));
+                                      //       },
+                                      //       child: Image.asset('assets/imgs/school/Ellipse 2 (2).png',width: 61,height: 61,)),
+                                      //   //title: Text('Supervisors'.tr,style: TextStyle(color: Color(0xFF442B72),fontSize: 12,fontWeight: FontWeight.bold,fontFamily: 'Poppins-Bold',),),
+                                      //   title: Text(
+                                      //     'Salam Language School'.tr,
+                                      //     style: TextStyle(
+                                      //       color: Color(0xFF442B72),
+                                      //       fontSize: 15,
+                                      //       fontWeight: FontWeight.bold,
+                                      //       fontFamily: 'Poppins-Bold',
+                                      //     ),
+                                      //   ),
+                                      //   subtitle: Text("16 Khaled st , Asyut , Egypt",style: TextStyle(fontSize: 12,fontFamily: "Poppins-Regular",color: Color(0xff442B72)),),
+                                      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                      //     tileColor: Colors.white,
+                                      // ),
+                                      FutureBuilder(
+                                        future: _firestore.collection('schooldata').doc(sharedpref!.getString('id')).get(),
+                                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                          if (snapshot.hasError) {
+                                            return Text('Something went wrong');
+                                          }
 
-                                        if (snapshot.connectionState == ConnectionState.done) {
-                                          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                          return ListTile(
-                                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                            leading: GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => ProfileScreen(),
-                                                    maintainState: false,
-                                                  ),
-                                                );
-                                              },
-                                              child:
-                                              data['photo'] != null ? ClipOval(
+                                          if (snapshot.connectionState == ConnectionState.done) {
+                                            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                            return ListTile(
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                              leading: data['photo'] != null ? ClipOval(
                                                 child: Image.network(data['photo'], width: 61, height: 61,
                                                   fit: BoxFit.cover,
                                                   errorBuilder: (context, error, stackTrace) {
@@ -358,28 +357,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   },
                                                 ),
                                               ):Image.asset('assets/images/school (2) 1.png', width: 61, height: 61),
-                                            ),
-                                            title: Text(
-                                              data['nameEnglish'],
-                                              style: TextStyle(
-                                                color: Color(0xFF442B72),
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'Poppins-Bold',
+                                              title: Text(
+                                                data['nameEnglish'],
+                                                style: TextStyle(
+                                                  color: Color(0xFF442B72),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Poppins-Bold',
+                                                ),
                                               ),
-                                            ),
-                                            subtitle: Text(
-                                              data['address'],
-                                              style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
-                                            ),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
-                                            tileColor: Colors.white,
-                                          );
-                                        }
+                                              subtitle: Text(
+                                                data['address'],
+                                                style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff442B72)),
+                                              ),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),),
+                                              tileColor: Colors.white,
+                                            );
+                                          }
 
-                                        return CircularProgressIndicator();
-                                      },
-                                    )
+                                          return CircularProgressIndicator();
+                                        },
+                                      )
+                                    ),
                                   ),
                                   SizedBox(height: 30,),
 
@@ -458,25 +457,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   onTap: (){
                                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>BusScreen()));
                                                   },
-                                                  child: Container(
-                                                    width: 57,
-                                                    height: 27,
-                                                    decoration: BoxDecoration(
-                                                        color: Color(0xff442B72),
-                                                      borderRadius: BorderRadius.only(
-                                                          topLeft: Radius.circular(15),
-                                                      bottomRight: Radius.circular(7)),
+                                                  child: Align(alignment: AlignmentDirectional.bottomEnd,
+                                                    child: Container(
+                                                      width: 57,
+                                                      height: 29,
+                                                      decoration: BoxDecoration(
+                                                          color: Color(0xff442B72),
+                                                        borderRadius: BorderRadius.only(
+                                                            topLeft: Radius.circular(15),
+                                                        bottomRight: Radius.circular(7)),
 
-                                                    ),
-                                                    child: Align(
-                                                        alignment: AlignmentDirectional.bottomCenter,
-                                                      child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
-                                                  //     FaIcon(
-                                                  //     FontAwesomeIcons.arrowRight,
-                                                  //     color: Colors.white,
-                                                  //     size: 20,
-                                                  // ),
-                                                    ),),
+                                                      ),
+                                                      child: Align(
+                                                          alignment: AlignmentDirectional.bottomCenter,
+                                                        child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
+                                                    //     FaIcon(
+                                                    //     FontAwesomeIcons.arrowRight,
+                                                    //     color: Colors.white,
+                                                    //     size: 20,
+                                                    // ),
+                                                      ),),
+                                                  ),
                                                 ),
                                               ),
 
@@ -546,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   },
                                                   child: Container(
                                                     width: 57,
-                                                    height: 27,
+                                                    height: 29,
                                                     decoration: BoxDecoration(
                                                       color: Color(0xff442B72),
                                                       borderRadius: BorderRadius.only(
@@ -647,6 +648,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   //
                                   //   }),
                                   // ),
+                                  if (data.isEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 30),
+                                      child: Text('No Parents',
+                                          style: TextStyle(color: Colors.grey)),
+                                    ),
+                                  if (data.isNotEmpty)
                                   SizedBox(
                                     height: 400,
                                     // height: Parent.length*325,
@@ -915,6 +924,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
@@ -941,7 +952,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             child: BottomAppBar(
-
+              padding: EdgeInsets.symmetric(vertical: 3),
+              height: 60,
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
               shape: const AutomaticNotchedShape( RoundedRectangleBorder(
@@ -950,18 +962,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       topRight: Radius.circular(38.5))),
                   RoundedRectangleBorder(
                       borderRadius:
-                      BorderRadius.all(Radius.circular(50)))),
+                      BorderRadius.all(Radius.circular(100)))),
               //CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(
-                height: 55,
+                height: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.0),
                   child: SingleChildScrollView(
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.symmetric(

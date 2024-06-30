@@ -22,7 +22,7 @@ import '../controller/local_controller.dart';
 import '../main.dart';
 import 'homeScreen.dart';
 import 'dart:math' as math;
-
+import 'package:timeago/timeago.dart' as timeago;
 class ParentsScreen extends StatefulWidget {
   const ParentsScreen({super.key});
 
@@ -598,14 +598,81 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                                     fontFamily: 'Poppins-Bold',
                                                   ),
                                                 ),
-                                                subtitle: Text(
-                                                  //  '${filteredData[index]['state']}',
-                                                  statusText,
-                                                  style: TextStyle(
-                                                    color: statusColor,
-                                                    fontSize: 13,
-                                                    fontFamily: 'Poppins',
-                                                  ),
+                                                subtitle: Row(
+                                                  children: [
+                                                    Text(
+                                                      //  '${filteredData[index]['state']}',
+                                                      statusText,
+                                                      style: TextStyle(
+                                                        color: statusColor,
+                                                        fontSize: 13,
+                                                        fontFamily: 'Poppins',
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 10),
+                                                    FutureBuilder<QuerySnapshot>(
+                                                      future: FirebaseFirestore.instance.collection('parent').where('SupervisorId', isEqualTo: filteredData[index].id).get(),
+                                                      builder: (context, snapshot) {
+                                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                                          return Text(
+                                                            'Loading...',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 13,
+                                                              fontFamily: 'Poppins',
+                                                            ),
+                                                          );
+                                                        } else if (snapshot.hasError) {
+                                                          return Text(
+                                                            'Error: ${snapshot.error}',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 13,
+                                                              fontFamily: 'Poppins',
+                                                            ),
+                                                          );
+                                                        } else if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                                                          Timestamp notificationTimestamp = snapshot.data!.docs.first['timestamp'];
+                                                          DateTime now = DateTime.now();
+                                                          DateTime notificationDate = notificationTimestamp.toDate();
+
+                                                          if (notificationDate.year == now.year &&
+                                                              notificationDate.month == now.month &&
+                                                              notificationDate.day == now.day) {
+                                                            // If the notification date is today
+                                                            return Text(
+                                                              'Today',
+                                                              style: TextStyle(
+                                                                color: statusColor,
+                                                                fontSize: 13,
+                                                                fontFamily: 'Poppins',
+                                                              ),
+                                                            );
+                                                          } else {
+                                                            // If the notification date is not today, use timeago package to format the time difference
+                                                            String formattedTime = timeago.format(notificationDate, locale: 'en_short');
+                                                            return Text(
+                                                              formattedTime,
+                                                              style: TextStyle(
+                                                                color: statusColor,
+                                                                fontSize: 13,
+                                                                fontFamily: 'Poppins',
+                                                              ),
+                                                            );
+                                                          }
+                                                        } else {
+                                                          return Text(
+                                                            'No notification',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 13,
+                                                              fontFamily: 'Poppins',
+                                                            ),
+                                                          );
+                                                        }
+                                                      },
+                                                    )
+                                                  ],
                                                 ),
                                                 //trailing: Icon(Icons.more_vert,size: 30,color: Color(0xFF442B72),),
                                               );
@@ -713,6 +780,8 @@ class ParentsScreenSate extends State<ParentsScreen> {
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
@@ -734,19 +803,21 @@ class ParentsScreenSate extends State<ParentsScreen> {
               topRight: Radius.circular(25),
             ),
             child: BottomAppBar(
+              padding: EdgeInsets.symmetric(vertical: 3),
+              height: 60,
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
               shape: const CircularNotchedRectangle(),
               //shape of notch
               notchMargin: 7,
               child: SizedBox(
-                height: 50,
+                height: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.0),
                   child: SingleChildScrollView(
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         // Padding(
                         //   padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 5),

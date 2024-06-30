@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_sound/public/flutter_sound_player.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
+//import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:path_provider/path_provider.dart';
 // import 'package:record/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -57,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   UserStatusService _userStatusService = UserStatusService();
   bool sending = true;
   final ScrollController _scrollController = ScrollController();
-  late StreamSubscription<InternetConnectionStatus> _internetConnectionSubscription;
+ // late StreamSubscription<InternetConnectionStatus> _internetConnectionSubscription;
   String _connectionStatus = ' ';
 
   FlutterSoundRecorder? _recorder;
@@ -257,17 +257,17 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     // initRecorder();
     WidgetsBinding.instance!.addObserver(this);
     _userStatusService.setOnline();
-    _internetConnectionSubscription = InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
-      if (status == InternetConnectionStatus.connected) {
-        setState(() {
-          _connectionStatus = 'Online';
-        });
-      } else {
-        setState(() {
-          _connectionStatus = 'Offline';
-        });
-      }
-    });
+    // _internetConnectionSubscription = InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
+    //   if (status == InternetConnectionStatus.connected) {
+    //     setState(() {
+    //       _connectionStatus = 'Online';
+    //     });
+    //   } else {
+    //     setState(() {
+    //       _connectionStatus = 'Offline';
+    //     });
+    //   }
+    // });
   }
 
   @override
@@ -279,7 +279,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       });
     }
     WidgetsBinding.instance!.removeObserver(this);
-    _internetConnectionSubscription.cancel();
+    // _internetConnectionSubscription.cancel();
     super.dispose();
   }
 

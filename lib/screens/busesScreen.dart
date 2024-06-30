@@ -339,7 +339,7 @@ class BusScreenSate extends State<BusScreen> {
     }
   }
   String _supervisorName = '';
-
+  final PageController _pageController = PageController(viewportFraction: 0.8);
 // to lock in landscape view
   @override
   void initState() {
@@ -364,6 +364,7 @@ class BusScreenSate extends State<BusScreen> {
       DeviceOrientation.portraitDown,
     ]);
     // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -546,6 +547,7 @@ class BusScreenSate extends State<BusScreen> {
                                               // width: 27.62,
                                               // height: 21.6,),
                                               PopupMenuButton<String>(
+
                                                 child: Padding(
                                                   padding: const EdgeInsets.only(right: 15),
                                                   child: Image(
@@ -568,6 +570,7 @@ class BusScreenSate extends State<BusScreen> {
                                                       Column(
                                                         children: [
                                                           Container(
+
                                                             child:  DropdownRadiobutton(
                                                               items: [
                                                                 DropdownCheckboxItem(label: 'Bus Number'.tr),
@@ -637,7 +640,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                           print('1');
                                                                         }
                                                                       },
-                                                                      child: Text('Apply'.tr,style: TextStyle(fontSize:18),)
+                                                                      child: Text('Apply'.tr,style: TextStyle(fontSize:18,color: Color(0xffFFFFFF)),)
 
                                                                   ),
                                                                 ),
@@ -846,6 +849,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                     : 'Bus number: ${data[index]['busnumber']}',
                                                                 style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
                                                               ),
+
                                                               trailing:
                                                               PopupMenuButton<String>(
                                                                 enabled: !isEditingBus,
@@ -1077,56 +1081,109 @@ class BusScreenSate extends State<BusScreen> {
                                                                             //   itemCount: data.length,
                                                                             //   itemBuilder: (context, index) {
                                                                             //     return
-                                                                                  Padding(
-                                                                                  padding: const EdgeInsets.all(8.0),
-                                                                                  child: SizedBox(
-                                                                                    width: 300,
-                                                                                    height: 70,
-                                                                                    child: data[index]['busphoto'] != null && data[index]['busphoto'] is List && data[index]['busphoto'].isNotEmpty
-                                                                                        ?
-                                                                                    ListView.builder(
-                                                                                      scrollDirection: Axis.horizontal,
+                                                                                  Center(
+                                                                                    child: Padding(
+                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                    child: SizedBox(
+                                                                                      width: 250,
+                                                                                      height: 100,
+                                                                                      child: data[index]['busphoto'] != null && data[index]['busphoto'] is List && data[index]['busphoto'].isNotEmpty
+                                                                                          ?
+                                                                                      // ListView.builder(
+                                                                                      //   scrollDirection: Axis.horizontal,
+                                                                                      //
+                                                                                      //   itemCount: (data[index]['busphoto'] as List).length,
+                                                                                      //   itemBuilder: (context, imageIndex) {
+                                                                                      //     return Padding(
+                                                                                      //       padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                                                      //       child: Container(
+                                                                                      //         width: 80,
+                                                                                      //         decoration: BoxDecoration(
+                                                                                      //           border: Border.all(
+                                                                                      //             color: Color(0xFF442B72), // border color
+                                                                                      //             width: 2, // border width
+                                                                                      //           ),
+                                                                                      //           borderRadius: BorderRadius.circular(5),
+                                                                                      //         ),
+                                                                                      //         child: Image.network(
+                                                                                      //           (data[index]['busphoto'] as List)[imageIndex],
+                                                                                      //           fit: BoxFit.cover,
+                                                                                      //         ),
+                                                                                      //       ),
+                                                                                      //     );
+                                                                                      //   },
+                                                                                      // )
+                                                                                      Center(
+                                                                                        child: SizedBox(
+                                                                                          height: 200,
+                                                                                          // Set the height according to your requirements
+                                                                                          child: PageView.builder(
+                                                                                            controller: _pageController,
+                                                                                            itemCount: (data[index]['busphoto'] as List).length,
+                                                                                            itemBuilder: (context, imageIndex) {
+                                                                                              return AnimatedBuilder(
+                                                                                                animation: _pageController,
+                                                                                                builder: (context, child) {
+                                                                                                  double scale = 0.8;
+                                                                                                  if (_pageController.position.haveDimensions) {
+                                                                                                    double currentPage = _pageController.page ?? _pageController.initialPage.toDouble();
+                                                                                                    double distance = (currentPage - imageIndex).abs();
+                                                                                                    if (distance < 0.5) { // Check if the current image is the middle one
+                                                                                                      scale = 1.0; // Make the middle image bigger
+                                                                                                    } else {
+                                                                                                      scale = 0.8 - (distance * 0.2).clamp(0.0, 0.2); // Scale down other images
+                                                                                                    }
+                                                                                                  }
+                                                                                                  return Transform.scale(
+                                                                                                    scale: scale,
+                                                                                                    child: child,
+                                                                                                  );
+                                                                                                },
+                                                                                                child: Padding(
+                                                                                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                                                                  child: AspectRatio(
+                                                                                                    aspectRatio: 1,
+                                                                                                    child: Container(
+                                                                                                      decoration: BoxDecoration(
+                                                                                                        border: Border.all(
+                                                                                                          color: Color(0xFF442B72),
+                                                                                                          width: 2,
+                                                                                                        ),
+                                                                                                        borderRadius: BorderRadius.circular(5),
+                                                                                                      ),
+                                                                                                      child: Image.network(
+                                                                                                        (data[index]['busphoto'] as List)[imageIndex],
 
-                                                                                      itemCount: (data[index]['busphoto'] as List).length,
-                                                                                      itemBuilder: (context, imageIndex) {
-                                                                                        return Padding(
-                                                                                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                                                                                          child: Container(
-                                                                                            width: 70,
-                                                                                            decoration: BoxDecoration(
-                                                                                              border: Border.all(
-                                                                                                color: Color(0xFF442B72), // border color
-                                                                                                width: 2, // border width
-                                                                                              ),
-                                                                                              borderRadius: BorderRadius.circular(5),
-                                                                                            ),
-                                                                                            child: Image.network(
-                                                                                              (data[index]['busphoto'] as List)[imageIndex],
-                                                                                              fit: BoxFit.cover,
-                                                                                            ),
-                                                                                          ),
-                                                                                        );
-                                                                                      },
-                                                                                    )
-                                                                                        : Stack(
-                                                                                      children: [
-                                                                                        Container(
-                                                                                          decoration: BoxDecoration(
-                                                                                            shape: BoxShape.circle,
-                                                                                            color: Color(0xffe6bdf0),
-                                                                                          ),
-                                                                                          child: Center(
-                                                                                            child: Image.asset(
-                                                                                              'assets/imgs/school/image-gallery 1.png',
-                                                                                              width: 40,
-                                                                                              height: 40,
-                                                                                            ),
+                                                                                                        fit: BoxFit.cover,
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              );
+                                                                                            },
                                                                                           ),
                                                                                         ),
-                                                                                      ],
+                                                                                      )
+                                                                                          : Stack(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            decoration: BoxDecoration(
+                                                                                              shape: BoxShape.circle,
+                                                                                              color: Color(0xffe6bdf0),
+                                                                                            ),
+                                                                                            child: Center(
+                                                                                              child: Image.asset(
+                                                                                                'assets/imgs/school/image-gallery 1.png',
+                                                                                                width: 40,
+                                                                                                height: 40,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
                                                                                     ),
-                                                                                  ),
                                                                                 ),
+                                                                                  ),
                                                                             //   },
                                                                             // ),
                                                                             SizedBox(height: 25,),
@@ -1367,6 +1424,8 @@ class BusScreenSate extends State<BusScreen> {
                         Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
                       },
                         backgroundColor: Color(0xFF442B72),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100)),
                         child: Icon(Icons.add,color: Colors.white,size: 35,),)
                     ],),
                   ),
@@ -1383,6 +1442,8 @@ class BusScreenSate extends State<BusScreen> {
           child: SizedBox(
             //height: 100,
             child: FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               backgroundColor: Color(0xff442B72),
               onPressed: () async {
                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
@@ -1408,7 +1469,8 @@ class BusScreenSate extends State<BusScreen> {
             ),
 
             child: BottomAppBar(
-
+              padding: EdgeInsets.symmetric(vertical: 3),
+              height: 60,
               color: const Color(0xFF442B72),
               clipBehavior: Clip.antiAlias,
               shape: const AutomaticNotchedShape( RoundedRectangleBorder(
@@ -1422,13 +1484,15 @@ class BusScreenSate extends State<BusScreen> {
               //shape of notch
               notchMargin: 7,
               child: SizedBox(
-                height: 55,
+                height: 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.0),
                   child: SingleChildScrollView(
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         // Padding(
                         //   padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 5),

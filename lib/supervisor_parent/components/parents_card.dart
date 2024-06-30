@@ -9,6 +9,8 @@ import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 import 'package:school_account/supervisor_parent/screens/parents_view.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import 'elevated_simple_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ParentsCard extends StatefulWidget {
   int? numberOfNames;
@@ -22,14 +24,26 @@ class _ParentsCardState extends State<ParentsCard> {
   final int numberOfNames;
 
   _ParentsCardState({required this.numberOfNames});
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  int _limit = 10;
+  DocumentSnapshot? _lastDocument;
+  List<DocumentSnapshot> _documents = [];
+  List<Map<String, dynamic>> childrenData = [];
+  List<bool> checkin = [];
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  SharedPreferences? sharedpref;
+  int _nameCount = 0;
+  String? supervisorId;
 
 
-  final _firestore = FirebaseFirestore.instance;
+
 
   @override
   void initState() {
     super.initState();
     _fetchDataLength();
+    _initializeSharedPreferences();
   }
 
   void _fetchDataLength() async {
@@ -41,6 +55,75 @@ class _ParentsCardState extends State<ParentsCard> {
         .get();
     setState(() {
       updatedDataLength = snapshot.docs.length;
+    });
+  }
+
+
+  Future<void> _initializeSharedPreferences() async {
+    sharedpref = await SharedPreferences.getInstance();
+    setState(() {
+      supervisorId = sharedpref!.getString('id');
+    });
+  }
+
+  Future<void> _fetchData({String query = ""}) async {
+    if (_isLoading || !_hasMoreData) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    String? supervisorId = sharedpref!.getString('id');
+    if (supervisorId == null) {
+      print('Supervisor ID is null');
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    Query baseQuery = _firestore.collection('parent')
+        .where('supervisor', isEqualTo: supervisorId)
+        .limit(_limit);
+
+    if (_lastDocument != null) {
+      baseQuery = baseQuery.startAfterDocument(_lastDocument!);
+    }
+
+    QuerySnapshot snapshot;
+    if (query.isNotEmpty) {
+      // Filter the data based on the search query
+      snapshot = await baseQuery.where('name', isGreaterThanOrEqualTo: query)
+          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
+          .get();
+    } else {
+      // Fetch all the data
+      snapshot = await baseQuery.get();
+    }
+
+    if (snapshot.docs.isEmpty) {
+      setState(() {
+        _hasMoreData = false;
+      });
+    } else {
+      List<Map<String, dynamic>> allChildren = [];
+      for (var parentDoc in snapshot.docs) {
+        List<dynamic> children = parentDoc['children'];
+        allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
+      }
+
+      // Filter the childrenData list based on the search query
+      List<Map<String, dynamic>> filteredChildrenData = allChildren.where((child) {
+        return child['name'].toLowerCase().contains(query.toLowerCase());
+      }).toList();
+
+      setState(() {
+        _nameCount = filteredChildrenData.length; // Update the name count
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -86,15 +169,57 @@ class _ParentsCardState extends State<ParentsCard> {
                           // height: 1,
                         ),
                       ),
-                      Text(
-                        '#${numberOfNames ?? 0}', // Displaying the length of the list
-                        style: TextStyle(
-                          color: Color(0xff442B72),
-                          fontSize: 12,
-                          fontFamily: 'Poppins-Regular',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      StreamBuilder<QuerySnapshot>(
+                        stream: _firestore.collection('parent')
+                            .where('supervisor', isEqualTo: supervisorId)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+
+                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                            return Center(
+                              child: Text('No data available'),
+                            );
+                          }
+
+                          // Extract the names directly from the parent collection
+                          List<String> parentNames = snapshot.data!.docs
+                              .map((doc) => doc['name'] as String)
+                              .toList();
+
+                          int nameCount = parentNames.length;
+
+                          return Center(
+                            child: Text(
+                              '# $nameCount', // Displaying the length of the list
+                              style: TextStyle(
+                                color: Color(0xff442B72),
+                                fontSize: 12,
+                                fontFamily: 'Poppins-Regular',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          );
+                        },
+                      )                      // Text(
+                      //   '# $_nameCount', // Displaying the length of the list
+                      //   style: TextStyle(
+                      //     color: Color(0xff442B72),
+                      //     fontSize: 12,
+                      //     fontFamily: 'Poppins-Regular',
+                      //     fontWeight: FontWeight.w400,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],

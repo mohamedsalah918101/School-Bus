@@ -59,10 +59,10 @@ class _MainDrawerState extends State<HomeDrawer> {
                 padding: const EdgeInsets.only(top: 50),
                 alignment: Alignment.centerRight,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 13.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
                         child: SizedBox(
@@ -124,13 +124,16 @@ class _MainDrawerState extends State<HomeDrawer> {
                             height: 21.90,
                           ),
                           minLeadingWidth: 27,
-                          title:  Text(
-                            "School Profile".tr,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15.52,
-                              fontFamily: 'Poppins-Regular',
-                              fontWeight: FontWeight.w500,
+                          title:  FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              "School Profile".tr,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15.52,
+                                fontFamily: 'Poppins-Regular',
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           onTap: () {

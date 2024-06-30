@@ -74,68 +74,15 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
     }
   }
 
-  Future<void> _fetchMoreData() async {
-    if (_isLoading || !_hasMoreData) return;
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    print('Fetching data...');
-    Query query = _firestore.collection('parent').limit(_limit);
-    if (_lastDocument != null) {
-      query = query.startAfterDocument(_lastDocument!);
-      print('Starting after document: ${_lastDocument!.id}');
-    }
-
-    try {
-      QuerySnapshot querySnapshot = await query.get();
-      print('Fetched ${querySnapshot.docs.length} documents');
-      if (querySnapshot.docs.isNotEmpty) {
-        _lastDocument = querySnapshot.docs.last;
-        List<Map<String, dynamic>> allChildren = [];
-        for (var parentDoc in querySnapshot.docs) {
-          List<dynamic> children = parentDoc['children'];
-          allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
-        }
-        setState(() {
-          _documents.addAll(querySnapshot.docs);
-          childrenData.addAll(allChildren);
-          checkin = List.filled(_documents.length, false);
-          print('Total documents: ${_documents.length}');
-          if (querySnapshot.docs.length < _limit) {
-            _hasMoreData = false;
-            print('No more data to fetch');
-          }
-        });
-      } else {
-        setState(() {
-          _hasMoreData = false;
-          print('No more data to fetch');
-        });
-      }
-    } catch (e) {
-      print('Error fetching data: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }  @override
+  @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(() {
-        if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-          _fetchMoreData();
-          print('jessydone');
-        }
-      });
-
     _searchController.addListener(_onSearchChanged);
-    // _scrollController.addListener(_scrollListener);
+    _scrollController.addListener(_scrollListener);
     _fetchData();
   }
+
   Future<void> _fetchData({String query = ""}) async {
     if (_isLoading || !_hasMoreData) return;
 
@@ -286,428 +233,427 @@ class _AttendanceSupervisorScreenState extends State<AttendanceSupervisorScreen>
                   ],
                 ),
               ),
-              Expanded(
-                  child:
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 20,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                child:
 
+              Expanded(
+                flex: 0,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20,),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                  child:
+
+                                  FutureBuilder(
+                                    future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                      if (snapshot.hasError) {
+                                        return Text('Something went wrong');
+                                      }
+                                      if (snapshot.connectionState == ConnectionState.done) {
+                                        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
+                                          return CircleAvatar(
+                                            radius: 30,
+                                            backgroundColor: Color(0xff442B72),
+                                            child: CircleAvatar(
+                                              backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                              radius: 30,
+                                            ),
+                                          );
+                                        }
+
+                                        Map<String, dynamic>? data = snapshot.data?.data();
+                                        if (data != null && data['photo'] != null) {
+                                          return CircleAvatar(
+                                            radius: 30,
+                                            backgroundColor: Color(0xff442B72),
+                                            child: CircleAvatar(
+                                              backgroundImage: NetworkImage('${data['photo']}'),
+                                              radius:30,
+                                            ),
+                                          );
+                                        }
+                                      }
+
+                                      return Container();
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 10,),
                                 FutureBuilder(
                                   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                                     if (snapshot.hasError) {
                                       return Text('Something went wrong');
                                     }
+
                                     if (snapshot.connectionState == ConnectionState.done) {
-                                      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['photo'] == null || snapshot.data!.data()!['photo'].toString().trim().isEmpty) {
-                                        return CircleAvatar(
-                                          radius: 30,
-                                          backgroundColor: Color(0xff442B72),
-                                          child: CircleAvatar(
-                                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                            radius: 30,
+                                      if (snapshot.data?.data() == null) {
+                                        return Text(
+                                          'No data available',
+                                          style: TextStyle(
+                                            color: Color(0xff442B72),
+                                            fontSize: 12,
+                                            fontFamily: 'Poppins-Regular',
+                                            fontWeight: FontWeight.w400,
                                           ),
                                         );
                                       }
 
-                                      Map<String, dynamic>? data = snapshot.data?.data();
-                                      if (data != null && data['photo'] != null) {
-                                        return CircleAvatar(
-                                          radius: 30,
-                                          backgroundColor: Color(0xff442B72),
-                                          child: CircleAvatar(
-                                            backgroundImage: NetworkImage('${data['photo']}'),
-                                            radius:30,
-                                          ),
-                                        );
-                                      }
-                                    }
+                                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
 
-                                    return Container();
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: 10,),
-                              FutureBuilder(
-                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text('Something went wrong');
-                                  }
+                                      String schoolName = data['schoolname']?.toString() ?? 'no school';
+                                      List<String> words = schoolName.split(' ');
 
-                                  if (snapshot.connectionState == ConnectionState.done) {
-                                    if (snapshot.data?.data() == null) {
-                                      return Text(
-                                        'No data available',
-                                        style: TextStyle(
-                                          color: Color(0xff442B72),
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w400,
+                                      return Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            for (String word in words) ...[
+                                              TextSpan(
+                                                text: '$word\n',
+                                                style: TextStyle(
+                                                  color: Color(0xFF993D9A),
+                                                  fontSize: 20,
+                                                  fontFamily: 'Poppins-Bold',
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                         ),
                                       );
                                     }
 
-                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                                    String schoolName = data['schoolname']?.toString() ?? 'no school';
-                                    List<String> words = schoolName.split(' ');
-
-                                    return Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          for (String word in words) ...[
-                                            TextSpan(
-                                              text: '$word\n',
-                                              style: TextStyle(
-                                                color: Color(0xFF993D9A),
-                                                fontSize: 20,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    );
-                                  }
-
-                                  return CircularProgressIndicator();
-                                },
-                              )
+                                    return CircularProgressIndicator();
+                                  },
+                                )
 
 
-                              // SizedBox(width: 25,),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 25.0),
-                            child: SizedBox(
-                              width: 119,
-                              height: 40,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    padding:  EdgeInsets.all(0),
-                                    backgroundColor: Color(0xFF442B72),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(5)
-                                    )
-                                ),
-                                onPressed: () async {
-                                  isStarting =! isStarting;
-                                  setState(() {
-                                  });
-                                },
-                                child: Text(
-                                  // 'test2',
-                                  isStarting? 'End Your trip'.tr:'Start your trip'.tr,
-                                  style: TextStyle(
-                                      fontFamily: 'Poppins-SemiBold',
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                      fontSize: 13
-                                  ),),
-                              ),
+                                // SizedBox(width: 25,),
+                              ],
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 15,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                      child: Text('Attendances'.tr,
-                        style: TextStyle(
-                          color: Color(0xFF771F98),
-                          fontSize: 19,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                        ),),
-                    ),
-                    SizedBox(height: 15,),
-                    sharedpref!.getInt('invit') == 1 ?
-
-                    Container(
-                      height: _documents.length*135,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics:  NeverScrollableScrollPhysics(),
-                          controller: _scrollController,
-                          itemCount: _documents.length + 1,
-                          itemBuilder: (context, index) {
-
-                            if (index == _documents.length) {
-
-    return _isLoading
-    ? Center(child: CircularProgressIndicator())
-        : _hasMoreData
-    ? SizedBox.shrink()
-        : Center(child: Text('No more data'));
-    }
-
-                            //   return _isLoading
-                            //       ? Center(child: CircularProgressIndicator())
-                            //       : Center(child: Container(child:Text('nooooooooooooooooooooooooooooooooo'))
-                            //     // Text('No more data')
-                            //   );
-                            // }
-                            final DocumentSnapshot doc = _documents[index];
-                            final data = doc.data() as Map<String, dynamic>;
-                            var child = childrenData[index];
-                            String supervisorPhoneNumber = _documents[index]['phoneNumber']?? 0;
-
-                            return Column(
-                              children: [
-                                // for (var child in children)
-                                if (child['supervisor'] == sharedpref!.getString('id').toString())
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height:122,
-                                    child: Card(
-                                      elevation: 10,
-                                      color: Colors.white,
-                                      surfaceTintColor: Colors.transparent,
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 25.0),
+                              child: SizedBox(
+                                width: 119,
+                                height: 40,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      padding:  EdgeInsets.all(0),
+                                      backgroundColor: Color(0xFF442B72),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(14.0),
-                                      ),
-                                      child: Padding(
-                                          padding: (sharedpref?.getString('lang') == 'ar')?
-                                          EdgeInsets.only(right: 10.0 , left: 10) :
-                                          EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                          borderRadius: BorderRadius.circular(5)
+                                      )
+                                  ),
+                                  onPressed: () async {
+                                    isStarting =! isStarting;
+                                    setState(() {
+                                    });
+                                  },
+                                  child: Text(
+                                    // 'test2',
+                                    isStarting? 'End Your trip'.tr:'Start your trip'.tr,
+                                    style: TextStyle(
+                                        fontFamily: 'Poppins-SemiBold',
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        fontSize: 13
+                                    ),),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 15,),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                        child: Text('Attendances'.tr,
+                          style: TextStyle(
+                            color: Color(0xFF771F98),
+                            fontSize: 19,
+                            fontFamily: 'Poppins-Bold',
+                            fontWeight: FontWeight.w700,
+                          ),),
+                      ),
+                      SizedBox(height: 15,)
+                    ],
+                  ),
+                ),
+              ),
+
+              Expanded(
+
+                child:
+                sharedpref!.getInt('invit') == 1 ?
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    // physics:  NeverScrollableScrollPhysics(),
+                    controller: _scrollController,
+                    itemCount: _documents.length + 1,
+                    itemBuilder: (context, index) {
+
+                      if (index == _documents.length) {
+                        return _isLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : Center(child: Container()
+                          // Text('No more data')
+                        );
+                      }
+                      final DocumentSnapshot doc = _documents[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      var child = childrenData[index];
+                      String supervisorPhoneNumber = _documents[index]['phoneNumber']?? 0;
+
+                      return Column(
+                        children: [
+                          // for (var child in children)
+                            if (child['supervisor'] == sharedpref!.getString('id').toString())
+                              SizedBox(
+                                width: double.infinity,
+                                height:122,
+                                child: Card(
+                                  elevation: 10,
+                                  color: Colors.white,
+                                  surfaceTintColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.0),
+                                  ),
+                                  child: Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')?
+                                      EdgeInsets.only(right: 10.0 , left: 10) :
+                                      EdgeInsets.only(left: 14.0 , right: 14 , bottom: 0),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(bottom: 20.0),
-                                                    child: Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        FutureBuilder(
-                                                          future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                                            if (snapshot.hasError) {
-                                                              return Text('Something went wrong');
-                                                            }
+                                              Padding(
+                                                padding: const EdgeInsets.only(bottom: 20.0),
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    FutureBuilder(
+                                                      future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                        if (snapshot.hasError) {
+                                                          return Text('Something went wrong');
+                                                        }
 
-                                                            if (snapshot.connectionState == ConnectionState.done) {
-                                                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                                return CircleAvatar(
-                                                                  radius: 25,
-                                                                  backgroundColor: Color(0xff442B72),
-                                                                  child: CircleAvatar(
-                                                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                                    radius: 25,
-                                                                  ),
-                                                                );
-                                                              }
-
-                                                              Map<String, dynamic>? data = snapshot.data?.data();
-                                                              if (data != null && data['busphoto'] != null) {
-                                                                return CircleAvatar(
-                                                                  radius: 25,
-                                                                  backgroundColor: Color(0xff442B72),
-                                                                  child: CircleAvatar(
-                                                                    backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                                    radius:25,
-                                                                  ),
-                                                                );
-                                                              }
-                                                            }
-
-                                                            return Container();
-                                                          },
-                                                        ),
-
-                                                        const SizedBox(
-                                                          width: 7,
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 10.0),
-                                                          child: Column(
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              Text(
-                                                                '${child['name']}',
-                                                                style: TextStyle(
-                                                                  color: Color(0xff442B72),
-                                                                  fontSize: 17,
-                                                                  fontFamily: 'Poppins-SemiBold',
-                                                                  fontWeight: FontWeight.w600,
-                                                                  height: 0.94,
-                                                                ),
+                                                        if (snapshot.connectionState == ConnectionState.done) {
+                                                          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                            return CircleAvatar(
+                                                              radius: 25,
+                                                              backgroundColor: Color(0xff442B72),
+                                                              child: CircleAvatar(
+                                                                backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                                radius: 25,
                                                               ),
-                                                              SizedBox(
-                                                                height: 4,
+                                                            );
+                                                          }
+
+                                                          Map<String, dynamic>? data = snapshot.data?.data();
+                                                          if (data != null && data['busphoto'] != null) {
+                                                            return CircleAvatar(
+                                                              radius: 25,
+                                                              backgroundColor: Color(0xff442B72),
+                                                              child: CircleAvatar(
+                                                                backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                                radius:25,
                                                               ),
-                                                              Text.rich(
-                                                                TextSpan(
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text: 'Grade: '.tr,
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF919191),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: '${child['grade']}',
-                                                                      // '${data[index]['children']?[0]['grade'] }',
-                                                                      style: TextStyle(
-                                                                        color: Color(0xFF442B72),
-                                                                        fontSize: 12,
-                                                                        fontFamily: 'Poppins-Light',
-                                                                        fontWeight: FontWeight.w400,
-                                                                        // height: 1.33,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
+                                                            );
+                                                          }
+                                                        }
+
+                                                        return Container();
+                                                      },
                                                     ),
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      SizedBox(height: 20),
-                                                      Column(
+
+                                                    const SizedBox(
+                                                      width: 7,
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(top: 10.0),
+                                                      child: Column(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          SizedBox(
-                                                            height: 40,
-                                                            width: 80,
-                                                            child: ElevatedButton(
-                                                              style: ElevatedButton.styleFrom(
-                                                                  padding:  EdgeInsets.all(0),
-                                                                  backgroundColor: Color(0xFF442B72),
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(5)
-                                                                  )
-                                                              ),
-                                                              onPressed: (){
-                                                                // checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
-
-
-                                                                setState(() {
-                                                                  checkin[index] = !checkin[index];
-                                                                });
-                                                              },
-                                                              child: Text(
-                                                                // 'test1',
-                                                                checkin[index] ? 'Check out'.tr : 'Check in'.tr,
-                                                                style: TextStyle(
-                                                                    fontFamily: 'Poppins-SemiBold',
-                                                                    fontWeight: FontWeight.w600,
-                                                                    color: Colors.white,
-                                                                    fontSize: 13
-                                                                ),),
+                                                          Text(
+                                                            '${child['name']}',
+                                                            style: TextStyle(
+                                                              color: Color(0xff442B72),
+                                                              fontSize: 17,
+                                                              fontFamily: 'Poppins-SemiBold',
+                                                              fontWeight: FontWeight.w600,
+                                                              height: 0.94,
                                                             ),
                                                           ),
-                                                          SizedBox(height: 15,),
-                                                          Row(
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              GestureDetector(
-                                                                onTap:(){
-                                                                  makePhoneCall(supervisorPhoneNumber);
+                                                          SizedBox(
+                                                            height: 4,
+                                                          ),
+                                                          Text.rich(
+                                                            TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: 'Grade: '.tr,
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF919191),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: '${child['grade']}',
+                                                                  // '${data[index]['children']?[0]['grade'] }',
+                                                                  style: TextStyle(
+                                                                    color: Color(0xFF442B72),
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Poppins-Light',
+                                                                    fontWeight: FontWeight.w400,
+                                                                    // height: 1.33,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  SizedBox(height: 20),
+                                                  Column(
+                                                    children: [
+                                                      SizedBox(
+                                                        height: 40,
+                                                        width: 80,
+                                                        child: ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                              padding:  EdgeInsets.all(0),
+                                                              backgroundColor: Color(0xFF442B72),
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(5)
+                                                              )
+                                                          ),
+                                                          onPressed: (){
+                                                            // checkinStates[children.indexOf(child)] =!checkinStates[children.indexOf(child)];
 
-                                                                },
-                                                                child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                                  color: Color(0xff442B72),
-                                                                  width: 28,
-                                                                  height: 28,),
-                                                              ),
-                                                              SizedBox(width: 9),
-                                                              GestureDetector(
-                                                                child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                                  color: Color(0xff442B72),
-                                                                  width: 26,
-                                                                  height: 26,),
-                                                                onTap: () {
-                                                                  print('object');
-                                                                  Navigator.of(context).push(
-                                                                      MaterialPageRoute(builder: (context) =>
-                                                                          ChatScreen(
-                                                                            receiverName: data[index]['name'],
-                                                                            receiverPhone: data[index]['phoneNumber'],
-                                                                            receiverId : data[index].id,
-                                                                          )));
-                                                                },
-                                                              ),
-                                                            ],
+
+                                                            setState(() {
+                                                              checkin[index] = !checkin[index];
+                                                            });
+                                                          },
+                                                          child: Text(
+                                                            // 'test1',
+                                                            checkin[index] ? 'Check out'.tr : 'Check in'.tr,
+                                                            style: TextStyle(
+                                                                fontFamily: 'Poppins-SemiBold',
+                                                                fontWeight: FontWeight.w600,
+                                                                color: Colors.white,
+                                                                fontSize: 13
+                                                            ),),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 15,),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap:(){
+                                                              makePhoneCall(supervisorPhoneNumber);
+
+                                                            },
+                                                            child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
+                                                              color: Color(0xff442B72),
+                                                              width: 28,
+                                                              height: 28,),
+                                                          ),
+                                                          SizedBox(width: 9),
+                                                          GestureDetector(
+                                                            child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
+                                                              color: Color(0xff442B72),
+                                                              width: 26,
+                                                              height: 26,),
+                                                            onTap: () {
+                                                              print('object');
+                                                              Navigator.of(context).push(
+                                                                  MaterialPageRoute(builder: (context) =>
+                                                                      ChatScreen(
+                                                                        receiverName: data[index]['name'],
+                                                                        receiverPhone: data[index]['phoneNumber'],
+                                                                        receiverId : data[index].id,
+                                                                      )));
+                                                            },
                                                           ),
                                                         ],
                                                       ),
                                                     ],
-                                                  )
+                                                  ),
                                                 ],
-                                              ),
+                                              )
                                             ],
-                                          )),
-                                    ),
-                                  ),
-                                SizedBox(height: 5,)
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ) :
-                    Column(
-                      children: [
-                        SizedBox(height: 50,),
-                        Image.asset('assets/images/Group 237684.png',
-                        ),
-                        Text('No Data Found'.tr,
-                          style: TextStyle(
-                            color: Color(0xff442B72),
-                            fontFamily: 'Poppins-Regular',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 19,
-                          ),
-                        ),
-                        Text('You haven’t added any \n '
-                            'dates yet'.tr,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xffBE7FBF),
-                            fontFamily: 'Poppins-Light',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                          ),)
-                      ],
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              ),
+                          SizedBox(height: 5,)
+                        ],
+                      );
+                    },
+                  ),
+                ) :
+                Column(
+                  children: [
+                    SizedBox(height: 50,),
+                    Image.asset('assets/images/Group 237684.png',
                     ),
+                    Text('No Data Found'.tr,
+                      style: TextStyle(
+                        color: Color(0xff442B72),
+                        fontFamily: 'Poppins-Regular',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 19,
+                      ),
+                    ),
+                    Text('You haven’t added any \n '
+                        'dates yet'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xffBE7FBF),
+                        fontFamily: 'Poppins-Light',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                      ),)
                   ],
                 ),
-              ))
+
+              ),
             ],
-          )
+          ),
         ),
 
         resizeToAvoidBottomInset: false,
