@@ -40,6 +40,17 @@ class _EditProfileParentState extends State<EditProfileParent> {
   String _address = '';
   String _imageUrl = '';
   String _imageUrlSecond = '';
+
+  int? _invite;
+  DateTime? _joinDate;
+  int? _numberOfChildren;
+  String _schoolId = '';
+  int? _state;
+  String _supervisorId = '';
+  String _supervisorName = '';
+  String _typeofParent = '';
+  List<Map<String, dynamic>> _children = [];
+
   final _firestore = FirebaseFirestore.instance;
   TextEditingController nameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
@@ -50,18 +61,6 @@ class _EditProfileParentState extends State<EditProfileParent> {
   String _phoneNumber2 = '';
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   final _yourGoogleAPIKey = 'AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA';
-
-  String bus_id = '';
-  String gender = '';
-  String grade = '';
-  Timestamp currentTimestamp = Timestamp.now();
-  String childName = '';
-  String schoolId = '';
-  String supervisor = '';
-  String supervisor_name = '';
-
-
-
 
 
   // List<Widget> cards = [];
@@ -190,6 +189,29 @@ class _EditProfileParentState extends State<EditProfileParent> {
           nameController.text = _name;
           numberController.text = _phoneNumber;
           locationController.text = _address;
+
+          _invite = userDoc['invite'];
+          _joinDate = userDoc['joinDate']?.toDate();
+          _numberOfChildren = userDoc['numberOfChildren'];
+          _schoolId = userDoc['schoolid'];
+          _state = userDoc['state'];
+          _supervisorId = userDoc['supervisor'];
+          _supervisorName = userDoc['supervisor_name'];
+          _typeofParent = userDoc['typeofParent'];
+
+          // Process children list
+          _children = userDoc['children']?.map<Map<String, dynamic>>((child) {
+            return {
+              'bus_id': child['bus_id'],
+              'gender': child['gender'],
+              'grade': child['grade'],
+              'joinDateChild': child['joinDateChild']?.toDate(),
+              'name': child['name'],
+              'schoolid': child['schoolid'],
+              'supervisor': child['supervisor'],
+              'supervisor_name': child['supervisor_name'],
+            };
+          }).toList() ?? [];
         });
       }
     } catch (e) {
@@ -227,6 +249,27 @@ class _EditProfileParentState extends State<EditProfileParent> {
         'name': nameController.text,
         'phoneNumber': numberController.text,
         'address': locationController.text,
+
+        'invite': _invite,
+        'joinDate': _joinDate,
+        'numberOfChildren': _numberOfChildren,
+        'schoolid': _schoolId,
+        'state': _state,
+        'supervisorid': _supervisorId,
+        'supervisor_name': _supervisorName,
+        'typeofParent': _typeofParent,
+        'children': _children.map((child) {
+          return {
+            'bus_id': child['bus_id'],
+            'gender': child['gender'],
+            'grade': child['grade'],
+            'joinDateChild': child['joinDateChild'],
+            'name': child['name'],
+            'schoolid': child['schoolid'],
+            'supervisor': child['supervisor'],
+            'supervisor_name': child['supervisor_name'],
+          };
+        }).toList(),
         // Add other fields you want to update
       });
     } catch (e) {
