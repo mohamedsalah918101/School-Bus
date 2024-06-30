@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
@@ -49,6 +50,19 @@ class _EditProfileParentState extends State<EditProfileParent> {
   String _phoneNumber2 = '';
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   final _yourGoogleAPIKey = 'AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA';
+
+  String bus_id = '';
+  String gender = '';
+  String grade = '';
+  Timestamp currentTimestamp = Timestamp.now();
+  String childName = '';
+  String schoolId = '';
+  String supervisor = '';
+  String supervisor_name = '';
+
+
+
+
 
   // List<Widget> cards = [];
   // int cardCount = 0;
