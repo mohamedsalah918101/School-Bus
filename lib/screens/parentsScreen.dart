@@ -402,7 +402,9 @@ class ParentsScreenSate extends State<ParentsScreen> {
                                                           child: Text(
                                                             'Apply',
                                                             style: TextStyle(
-                                                                fontSize: 18),
+                                                                fontSize: 18,
+                                                              color: Color(0xffffffff),),
+
                                                           ),
                                                           onTap: () {
                                                             if (selectedValueAccept !=
