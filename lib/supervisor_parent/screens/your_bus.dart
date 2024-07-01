@@ -1263,9 +1263,6 @@ class _YourBusState extends State<YourBus> {
   String busId = '';
   String _secondSupervisorName = '';
   SharedPreferences? sharedpref;
-  String _photobus1 = ''; // تخزين صورة الحافلة الأولى
-  String _photobus2 = ''; // تخزين صورة الحافلة الثانية
-  String _photobus3 = ''; // تخزين صورة الحافلة الثالثة
 
   Future<void> initializeSharedPreferences() async {
     sharedpref = await SharedPreferences.getInstance();
@@ -1327,34 +1324,46 @@ class _YourBusState extends State<YourBus> {
           .doc(busId)
           .get();
 
+      print('Document fetched for busId: $busId');
 
-      String busPhotoUrl = document['busphoto'].isNotEmpty ? document['busphoto'][0] : '';
-      String busPhotoUrl1 = document['busphoto'].length > 1 ? document['busphoto'][1] : '';
-      String busPhotoUrl2 = document['busphoto'].length > 2 ? document['busphoto'][2] : '';
+      if (document.exists) {
+        print('Document data: ${document.data()}');
 
-      // استرجاع القيمة من الحقل المطلوب
-      // _secondSupervisorName = document['supervisors'][0]['id'] as String;
-      if (document['supervisors'].length > 1) {
-        _secondSupervisorName = document['supervisors'][1]['name'] as String;
+        String busPhotoUrl = document['busphoto'].isNotEmpty ? document['busphoto'][0] : '';
+        String busPhotoUrl1 = document['busphoto'].length > 1 ? document['busphoto'][1] : '';
+        String busPhotoUrl2 = document['busphoto'].length > 2 ? document['busphoto'][2] : '';
+        print('Bus Photos: $busPhotoUrl, $busPhotoUrl1, $busPhotoUrl2');
+
+        _secondSupervisorName = document['supervisors'].isEmpty
+            ? 'no second supervisor'
+            : document['supervisors'].length > 1
+            ? document['supervisors'][1]['name'] as String
+            : 'no second supervisor';
+        print('Second supervisor name: $_secondSupervisorName');
+
+        if (_secondSupervisorName == 'no second supervisor') {
+          // Handle case where there is no second supervisor
+        }
+
+        setState(() {
+          _busPhotoUrl = busPhotoUrl;
+          _busPhotoUrl1 = busPhotoUrl1;
+          _busPhotoUrl2 = busPhotoUrl2;
+          _namedriverText = document['namedriver'];
+          _photodriver = document['imagedriver'];
+          _phonedriver = document['phonedriver'];
+          _busnumber = document['busnumber'];
+          dataLoading = false;
+        });
+
+        print('Data successfully loaded and state updated');
+
       } else {
-        _secondSupervisorName = 'no second supervisor';
+        print('Document does not exist');
+        setState(() {
+          dataLoading = false;
+        });
       }
-
-// تحقق من تطابق الـ ID مع المستخدم الحالي
-      if (document['supervisors'][1]['id'] == sharedpref!.getString('id')) {
-        _secondSupervisorName = document['supervisors'][0]['name'] as String;
-      }
-      setState(() {
-         _busPhotoUrl = busPhotoUrl;
-         _busPhotoUrl1 = busPhotoUrl1;
-         _busPhotoUrl2 = busPhotoUrl2;
-        _namedriverText = document['namedriver'];
-        _photodriver = document['imagedriver'];
-        _phonedriver = document['phonedriver'];
-        _busnumber = document['busnumber'];
-        dataLoading = false;
-      });
-
     } catch (e) {
       print('Error fetching data: $e');
       setState(() {
@@ -1362,9 +1371,6 @@ class _YourBusState extends State<YourBus> {
       });
     }
   }
-
-
-
 
   @override
   void initState() {
@@ -1632,26 +1638,28 @@ class _YourBusState extends State<YourBus> {
                               padding: const EdgeInsets.only(left: 3.0),
                               child:Row(
                                 children: [
-                                  _busPhotoUrl.isNotEmpty // التحقق من وجود URL قبل عرض الصورة
-                                      ? Image.network(
-                                    _busPhotoUrl,
-                                    width: 82,
-                                    height: 80,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null
-                                              ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
-                                              : null,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        Icon(Icons.error),
-                                  )
-                                      : CircularProgressIndicator(),
+                              _busPhotoUrl.isNotEmpty // التحقق من وجود URL قبل عرض الصورة
+                              ? Image.network(
+                              _busPhotoUrl,
+                                width: 82,
+                                height: 80,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  print('Error loading image: $error');
+                                  return Icon(Icons.error);
+                                },
+                              )
+                                    : CircularProgressIndicator(),
                                   _busPhotoUrl1.isNotEmpty // التحقق من وجود URL قبل عرض الصورة
                                       ? Image.network(
                                     _busPhotoUrl1,

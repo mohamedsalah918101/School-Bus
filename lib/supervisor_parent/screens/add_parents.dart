@@ -951,8 +951,6 @@ class _AddParentsState extends State<AddParents> {
                                 style: TextStyle(color: Colors.red),
                               ),
                             ),
-
-
                             phoneError
                                 ? Container()
                                 : Padding(
@@ -1009,22 +1007,19 @@ class _AddParentsState extends State<AddParents> {
                                 height: 40,
                                 child: TextFormField(
                                   onChanged: (val) {
-                                    setState(() {
-                                      String input = _numberOfChildrenController.text;
-                                      count = int.tryParse(input) ?? 0;
-                                      // count = count - nameChildControllers.length;
-                                      for (int i = 0; i < count; i++) {
-                                        genderSelection.add('male');
-                                        TextEditingController nameController =
-                                        TextEditingController();
-                                        TextEditingController gradeController =
-                                        TextEditingController();
+                                    String input = _numberOfChildrenController.text;
+                                    count = int.tryParse(input) ?? 0;
+                                    // count = count - nameChildControllers.length;
+                                    for (int i = 0; i < count; i++) {
+                                      genderSelection.add('male');
+                                      TextEditingController nameController =
+                                      TextEditingController();
+                                      TextEditingController gradeController =
+                                      TextEditingController();
 
-                                        nameChildControllers.add(nameController);
-                                        gradeControllers.add(gradeController); }
-                                    });
-
-
+                                      nameChildControllers.add(nameController);
+                                      gradeControllers.add(gradeController);
+                                    }
                                   },
                                   controller: _numberOfChildrenController,
                                   style: TextStyle(

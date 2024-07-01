@@ -2400,9 +2400,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
+import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
+import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
 import 'package:school_account/supervisor_parent/screens/add_parents.dart';
 
 import '../../main.dart';
@@ -2416,8 +2420,6 @@ class _CardPageState extends State<CardPage> {
   int numberOfCards = 0;
   bool showCards = true;
   bool isFirstImage = true;
-  bool nameChildeError = true;
-  bool gradeError = true;
   bool typeOfParentError = true;
   List<TextEditingController> nameChildControllers = [];
   List<TextEditingController> gradeControllers = [];
@@ -2427,6 +2429,22 @@ class _CardPageState extends State<CardPage> {
   bool _isLoading = false;
   bool phoneAdded = true;
   final _phoneNumberController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String kPickerNumber='';
+  String kPickerName='';
+  PhoneContact? _phoneContact;
+  final _nameController = TextEditingController();
+  bool nameError = false;
+  // bool typeOfParentError = true;
+  bool showList = false;
+  String selectedValue = '';
+  bool numberOfChildrenError = false;
+  bool childNameError = false;
+  bool childGradeError = false;
+  List<bool> childNameErrors = [];
+  List<bool> childGradeErrors = [];
+  bool _phoneNumberEntered = true;
+
 
   void _addDataToFirestore() async {
     int numberOfChildren = numberOfCards;
@@ -2444,6 +2462,50 @@ class _CardPageState extends State<CardPage> {
     }
 
     Timestamp currentTimestamp = Timestamp.now();
+    for (int i = 0; i < numberOfCards; i++) {
+      if (nameChildControllers[i].text.isEmpty) {
+        setState(() {
+          childNameErrors[i] = true;
+        });
+      }else {
+        setState(() {
+          childNameErrors[i] = false;
+        });
+      }
+      if (gradeControllers[i].text.isEmpty) {
+        setState(() {
+          childGradeErrors[i] = true;
+        });
+      }else {
+        setState(() {
+          childGradeErrors[i] = false;
+        });
+      }
+    }
+
+    if (_nameController.text.isEmpty) {
+      setState(() {
+        nameError = true;
+      });
+    }else {
+      setState(() {
+        nameError = false;
+      });
+    }
+
+    if (numberOfCards == 0 || numberOfCards == null) {
+      setState(() {
+        numberOfChildrenError = true;
+      });
+    }else {
+      setState(() {
+        numberOfChildrenError = false;
+      });
+    }
+
+    if (childNameError || childGradeError || numberOfChildrenError || nameError) {
+      return;
+    }
 
     List<Map<String, dynamic>> childrenData = List.generate(
       numberOfChildren,
@@ -2460,6 +2522,7 @@ class _CardPageState extends State<CardPage> {
     );
 
     Map<String, dynamic> data = {
+      'name': _nameController.text,
       'schoolid': SchoolID,
       'address': '',
       'children': childrenData,
@@ -2497,6 +2560,8 @@ class _CardPageState extends State<CardPage> {
                 nameChildControllers.clear();
                 gradeControllers.clear();
                 _phoneNumberController.clear();
+                _nameController.clear();
+
               });
             } else {
               InvitationNotSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFFFF3C3C));
@@ -2540,295 +2605,616 @@ class _CardPageState extends State<CardPage> {
       print('Error: $e');
     }
   }
-
   void toggleCardsVisibility() {
     setState(() {
       showCards = !showCards;
     });
   }
-
   void toggleImage() {
     setState(() {
       isFirstImage = !isFirstImage;
     });
   }
-
   void updateControllers(int newCount) {
     if (newCount > nameChildControllers.length) {
       for (int i = nameChildControllers.length; i < newCount; i++) {
         nameChildControllers.add(TextEditingController());
         gradeControllers.add(TextEditingController());
         genderSelection.add('');
+        childNameErrors.add(false); // Add this line
+        childGradeErrors.add(false); // Add this line
       }
     } else {
       nameChildControllers = nameChildControllers.sublist(0, newCount);
       gradeControllers = gradeControllers.sublist(0, newCount);
       genderSelection = genderSelection.sublist(0, newCount);
+      childNameErrors = childNameErrors.sublist(0, newCount); // Add this line
+      childGradeErrors = childGradeErrors.sublist(0, newCount); // Add this line
     }
   }
-
+  // void updateControllers(int newCount) {
+  //   if (newCount > nameChildControllers.length) {
+  //     for (int i = nameChildControllers.length; i < newCount; i++) {
+  //       nameChildControllers.add(TextEditingController());
+  //       gradeControllers.add(TextEditingController());
+  //       genderSelection.add('');
+  //     }
+  //   } else {
+  //     nameChildControllers = nameChildControllers.sublist(0, newCount);
+  //     gradeControllers = gradeControllers.sublist(0, newCount);
+  //     genderSelection = genderSelection.sublist(0, newCount);
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) {
-              setState(() {
-                numberOfCards = int.tryParse(value) ?? 0;
-                updateControllers(numberOfCards);
-              });
-            },
-            decoration: InputDecoration(
-              labelText: 'Enter number of cards',
-              border: OutlineInputBorder(),
+      key: _scaffoldKey,
+      endDrawer: SupervisorDrawer(),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 35,
             ),
-          ),
-          GestureDetector(
-            onTap: () {
-              toggleCardsVisibility();
-              toggleImage();
-            },
-            child: Image.asset(
-              isFirstImage
-                  ? 'assets/images/iconamoon_arrow-up-2-thin (1).png'
-                  : 'assets/images/iconamoon_arrow-up-2-thin.png',
-              width: 34,
-              height: 34,
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 17.0),
+                      child: Image.asset(
+                        (sharedpref?.getString('lang') == 'ar')
+                            ? 'assets/images/Layer 1.png'
+                            : 'assets/images/fi-rr-angle-left.png',
+                        width: 20,
+                        height: 22,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: (sharedpref?.getString('lang') == 'ar')
+                        ? EdgeInsets.only(right: 40)
+                        : EdgeInsets.only(left: 40),
+                    child: Text(
+                      'Parents'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF993D9A),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async{
+                            bool permission = await FlutterContactPicker.requestPermission();
+                            if(permission){
+                              if(await FlutterContactPicker.hasPermission()){
+                                _phoneContact=await FlutterContactPicker.pickPhoneContact();
+                                if(_phoneContact!=null){
+                                  if(_phoneContact!.fullName!.isNotEmpty){
+                                    setState(() {
+                                      kPickerName=_phoneContact!.fullName.toString();
+                                      _nameController.text=kPickerName;
+                                    });
+                                  }
+                                  if (_phoneContact!.phoneNumber != null &&
+                                      _phoneContact!.phoneNumber!.number != null &&
+                                      _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+                                    setState(() {
+                                      kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+                                      if (kPickerNumber.startsWith('0')) {
+                                        kPickerNumber = kPickerNumber.substring(1);
+
+                                      }
+                                      kPickerNumber = kPickerNumber.replaceAll(' ', '');
+                                      _phoneNumberController.text = kPickerNumber;
+                                    });
+                                  }
+                                  // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+                                  //   setState(() {
+                                  //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+                                  //     _phoneNumberController.text=kPickerNumber;
+                                  //   });
+                                  // }
+                                }
+
+                              }
+                            }
+                          },
+                          child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+                            color: Color(0xff442B72),),
+                        ),
+                        // Image.asset(
+                        //   'assets/images/icons8_Add_Male_User_Group 1.png',
+                        //   width: 27,
+                        //   height: 27,
+                        // ),
+                        IconButton(
+                          onPressed: () {
+                            _scaffoldKey.currentState!.openEndDrawer();
+                          },
+                          icon: const Icon(
+                            Icons.menu_rounded,
+                            color: Color(0xff442B72),
+                            size: 35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: showCards
-                ? ListView.builder(
-              itemCount: numberOfCards,
-              itemBuilder: (context, index) {
-                return Center(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: 296,
-                        height: 310,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: (sharedpref?.getString('lang') == 'ar')
+                          ? EdgeInsets.only(right: 25.0)
+                          : EdgeInsets.only(left: 25.0),
+                      child: Text(
+                        'Parent'.tr,
+                        style: TextStyle(
+                          fontSize: 19,
+                          // height:  0.94,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xff771F98),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: (sharedpref?.getString('lang') == 'ar')
+                          ? EdgeInsets.only(right: 42.0)
+                          : EdgeInsets.only(left: 42.0),
+                      child: Text.rich(
+                        TextSpan(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xff771F98).withOpacity(0.03),
-                                borderRadius: BorderRadius.circular(14),
+                            TextSpan(
+                              text: 'Parent'.tr,
+                              style: TextStyle(
+                                color: Color(0xFF442B72),
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.07,
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(height: 10),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 12.0)
-                                        : EdgeInsets.only(left: 12.0),
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Child '.tr,
-                                            style: TextStyle(
-                                              color: Color(0xff771F98),
-                                              fontSize: 16,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: '${index + 1}',
-                                            style: TextStyle(
-                                              color: Color(0xff771F98),
-                                              fontSize: 16,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 18.0)
-                                        : EdgeInsets.only(left: 18.0),
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Name'.tr,
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.07,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: ' *',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.07,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 6),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 12.0)
-                                        : EdgeInsets.only(left: 12.0),
-                                    child: TextField(
-                                      controller: nameChildControllers[index],
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                        hintText: 'Enter child name',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 14),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 18.0)
-                                        : EdgeInsets.only(left: 18.0),
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Grade'.tr,
-                                            style: TextStyle(
-                                              color: Color(0xFF442B72),
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.07,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: ' *',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 15,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.07,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 6),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 12.0)
-                                        : EdgeInsets.only(left: 12.0),
-                                    child: TextField(
-                                      controller: gradeControllers[index],
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                        hintText: 'Enter child grade',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 14),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 18.0)
-                                        : EdgeInsets.only(left: 18.0),
-                                    child: Text(
-                                      'Gender',
-                                      style: TextStyle(
-                                        color: Color(0xFF442B72),
-                                        fontSize: 15,
-                                        fontFamily: 'Poppins-Bold',
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.07,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 6),
-                                  Padding(
-                                    padding: (sharedpref?.getString('lang') == 'ar')
-                                        ? EdgeInsets.only(right: 12.0)
-                                        : EdgeInsets.only(left: 12.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: RadioListTile<String>(
-                                            title: Text('Male'),
-                                            value: 'male',
-                                            groupValue: genderSelection[index],
-                                            onChanged: (value) {
-                                              setState(() {
-                                                genderSelection[index] = value!;
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: RadioListTile<String>(
-                                            title: Text('Female'),
-                                            value: 'female',
-                                            groupValue: genderSelection[index],
-                                            onChanged: (value) {
-                                              setState(() {
-                                                genderSelection[index] = value!;
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                            ),
+                            TextSpan(
+                              text: ' *',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.07,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
-            )
-                : Container(),
-          ),
-          SizedBox(height: 20),
-          TextField(
-            controller: _phoneNumberController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: 'Enter phone number',
-              border: OutlineInputBorder(),
+                    ),
+                    SizedBox(
+                      height: 13,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 42.0),
+                      child: SizedBox(
+                        // width: 277,
+                        height: 40,
+                        child: TextFormField(
+                            controller: _nameController,
+
+                            // cursorRadius: Radius.circular(300),
+                            style: TextStyle(
+                              color: Color(0xFF442B72),
+                            ),
+                            cursorColor: const Color(0xFF442B72),
+                            textDirection: (sharedpref?.getString('lang') == 'ar')
+                                ? TextDirection.rtl
+                                : TextDirection.ltr,
+                            // selectionHeightStyle: 20,
+                            autofocus: true,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.text,
+                            textAlign: (sharedpref?.getString('lang') == 'ar')
+                                ? TextAlign.right
+                                : TextAlign.left,
+                            scrollPadding: EdgeInsets.symmetric(vertical: 30),
+                            decoration: InputDecoration(
+                              alignLabelWithHint: false,
+                              counterText: "",
+                              fillColor: const Color(0xFFF1F1F1),
+                              filled: true,
+                              contentPadding:
+                              (sharedpref?.getString('lang') == 'ar')
+                                  ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+                                  : EdgeInsets.fromLTRB(17, 0, 0, 10),
+                              hintText: 'Please enter your name'.tr,
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF9E9E9E),
+                                fontSize: 12,
+                                fontFamily: 'Poppins-Bold',
+                                fontWeight: FontWeight.w700,
+                                height: 1.33,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(7)),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFFC53E),
+                                    width: 0.5,
+                                  )),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(7)),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFFFC53E),
+                                  width: 0.5,
+                                ),
+                              ),
+
+                              // enabledBorder: myInputBorder(),
+                              // focusedBorder: myFocusBorder(),
+                            )),
+                      ),
+                    ),
+                    nameError
+                        ?Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
+                      child: Text(
+                        "Please enter your name".tr,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ):
+                        Container(),
+              
+                    //testttttt
+                    TextField(
+                      controller: _phoneNumberController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Enter phone number',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        enteredPhoneNumber = value;
+                      },
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+                          numberOfCards = int.tryParse(value) ?? 0;
+                          updateControllers(numberOfCards);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Enter number of cards',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    numberOfChildrenError
+                        ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
+                      child: Text(
+                        "Please enter your number of children".tr,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ):Container(),
+                  ],
+                ),
+              ),
             ),
-            onChanged: (value) {
-              enteredPhoneNumber = value;
-            },
-          ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: _addDataToFirestore,
-            child: Text('Save'),
-          ),
-          SizedBox(height: 20),
-        ],
+
+
+            GestureDetector(
+              onTap: () {
+                toggleCardsVisibility();
+                toggleImage();
+              },
+              child: Image.asset(
+                isFirstImage
+                    ? 'assets/images/iconamoon_arrow-up-2-thin (1).png'
+                    : 'assets/images/iconamoon_arrow-up-2-thin.png',
+                width: 34,
+                height: 34,
+              ),
+            ),
+            Expanded(
+              child: showCards
+                  ? ListView.builder(
+                itemCount: numberOfCards,
+                itemBuilder: (context, index) {
+                  return Center(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 296,
+                          height: 310,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xff771F98).withOpacity(0.03),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 10),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 12.0)
+                                          : EdgeInsets.only(left: 12.0),
+                                      child: Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Child '.tr,
+                                              style: TextStyle(
+                                                color: Color(0xff771F98),
+                                                fontSize: 16,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: '${index + 1}',
+                                              style: TextStyle(
+                                                color: Color(0xff771F98),
+                                                fontSize: 16,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 18.0)
+                                          : EdgeInsets.only(left: 18.0),
+                                      child: Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Name'.tr,
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 15,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                                height: 1.07,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: ' *',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 15,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                                height: 1.07,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 12.0)
+                                          : EdgeInsets.only(left: 12.0),
+                                      child: TextField(
+                                        controller: nameChildControllers[index],
+                                        decoration: InputDecoration(
+                                          errorText: childNameErrors[index] ? 'Please enter child name' : null,
+                                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                          hintText: 'Enter child name',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+
+                                        ),
+
+                                      ),
+                                    ),
+                                    SizedBox(height: 14),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 18.0)
+                                          : EdgeInsets.only(left: 18.0),
+                                      child: Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Grade'.tr,
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 15,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                                height: 1.07,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: ' *',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 15,
+                                                fontFamily: 'Poppins-Bold',
+                                                fontWeight: FontWeight.w700,
+                                                height: 1.07,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 12.0)
+                                          : EdgeInsets.only(left: 12.0),
+                                      child: TextField(
+                                        controller: gradeControllers[index],
+                                        decoration: InputDecoration(
+                                          errorText: childGradeErrors[index] ? 'Please enter grade name' : null,
+                                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                          hintText: 'Enter child grade',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+
+                                      ),
+                                    ),
+                                    SizedBox(height: 14),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 18.0)
+                                          : EdgeInsets.only(left: 18.0),
+                                      child: Text(
+                                        'Gender',
+                                        style: TextStyle(
+                                          color: Color(0xFF442B72),
+                                          fontSize: 15,
+                                          fontFamily: 'Poppins-Bold',
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.07,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(right: 12.0)
+                                          : EdgeInsets.only(left: 12.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: RadioListTile<String>(
+                                              title: Text('Male'),
+                                              value: 'male',
+                                              groupValue: genderSelection[index],
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  genderSelection[index] = value!;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: RadioListTile<String>(
+                                              title: Text('Female'),
+                                              value: 'female',
+                                              groupValue: genderSelection[index],
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  genderSelection[index] = value!;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              )
+                  : Container(),
+            ),
+            SizedBox(height: 20),
+
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  bool isValid = true;
+                  if (numberOfCards == 0 || numberOfCards == null) {
+                    numberOfChildrenError = true;
+                    isValid = false;
+                  } else {
+                    numberOfChildrenError = false;
+                  }
+
+                  if (_nameController.text.isEmpty ) {
+                    nameError = true;
+                    isValid = false;
+                  } else {
+                    nameError = false;
+                  }
+                  // if (_phoneNumberController.text.isEmpty) {
+                  //   phoneError = true;
+                  //   isValid = false;
+                  // } else {
+                  //   phoneError = false;
+                  // }
+
+                  for (int i = 0; i < nameChildControllers.length; i++) {
+                    if (nameChildControllers[i].text.isEmpty) {
+                      childNameErrors[i] = true;
+                      isValid = false;
+                    } else {
+                      childNameErrors[i] = false;
+                    }
+
+                    if (gradeControllers[i].text.isEmpty) {
+                      childGradeErrors[i] = true;
+                      isValid = false;
+                    } else {
+                      childGradeErrors[i] = false;
+                    }
+                  }
+
+                  if (isValid) {
+                    _addDataToFirestore();
+                  }
+                });
+              },
+              // onPressed:  _addDataToFirestore,
+              child: Text('Save'),
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
