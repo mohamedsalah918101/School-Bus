@@ -598,6 +598,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               MaterialPageRoute(
                                   builder: (context) => const SignUpScreen()),
                               (Route<dynamic> route) => false);
+                          showSnackBarFun(
+                              context, 'Account deleted successfully',Color(0xFF4CAF50),
+                              'assets/imgs/school/Vector (4).png');
                         },
                         color: const Color(0xFF442B72),
                         fontSize: 16,
@@ -621,5 +624,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           )),
     );
+  }
+  showSnackBarFun(context,msg,color,photo) {
+    SnackBar snackBar = SnackBar(
+
+      // content: const Text('Invitation sent successfully',
+      //     style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color: Color(0xff442B72))
+      // ),
+      content: Row(
+        children: [
+          // Add your image here
+          Padding(
+            padding: const EdgeInsets.only(left: 50),
+            child: Image.asset(
+              photo,
+              // 'assets/imgs/school/Vector (4).png', // Replace 'assets/image.png' with your image path
+              width: 30, // Adjust width as needed
+              height: 30, // Adjust height as needed
+            ),
+          ),
+          SizedBox(width: 10), // Add some space between the image and the text
+          Text(
+            msg,
+            style: TextStyle(fontSize: 16,fontFamily: "Poppins-Bold",color:color),
+          ),
+        ],
+      ),
+      backgroundColor: Color(0xffFFFFFF),
+      duration: Duration(seconds: 2),
+
+      dismissDirection: DismissDirection.up,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 165,
+          left: 10,
+          right: 10),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

@@ -1453,10 +1453,6 @@ class _AddBusState extends State<AddBus> {
                                             txt: "Add".tr,
                                             onPress: () {
                                               setState(() {
-                                                // _driverName.text.isEmpty ? _validateDriverName = true :  _validateDriverName = false;
-                                                // _driverNumber.text.isEmpty ? _validateDriverNumber = true :  _validateDriverNumber = false;
-                                                // _busNumber.text.isEmpty ? _validateBusNumber = true :  _validateBusNumber = false;
-
                                                 if (_driverName.text.isEmpty) {
                                                   namedrivererror = false;
                                                 } else {
@@ -1472,48 +1468,52 @@ class _AddBusState extends State<AddBus> {
                                                 } else {
                                                   busnumbererror = true;
                                                 }
-                                                if (_supervisorController
-                                                    .text.isEmpty) {
+                                                if (_supervisorController.text.isEmpty) {
                                                   supervisorerror = false;
                                                 } else {
                                                   supervisorerror = true;
                                                 }
-                                                if (_selectedImagedriver ==
-                                                    null) {
+                                                if (_selectedImagedriver == null) {
                                                   driverphotoerror = false;
                                                 } else {
                                                   driverphotoerror = true;
                                                 }
                                               });
-                                              if (_driverNumber.text.length ==
-                                                          11 &&
-                                                      namedrivererror &&
-                                                      drivernumbererror
-                                                      // ! _driverNumber.text.isEmpty
-                                                      &&
-                                                      busnumbererror
-                                                      //&& supervisorerror
-                                                      &&
-                                                      _selectedImagedriver !=
-                                                          null &&
-                                                      driverphotoerror &&
-                                                      items != null && items.isNotEmpty
-                                                  //_selectedImage != null && _selectedImagebus != null
-                                                  ) {
+
+                                              if (_driverNumber.text.length == 11 &&
+                                                  namedrivererror &&
+                                                  drivernumbererror &&
+                                                  busnumbererror &&
+                                                  _selectedImagedriver != null &&
+                                                  driverphotoerror &&
+                                                  items != null && items.isNotEmpty) {
                                                 _addDataToFirestore();
                                                 Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            BusScreen(),
-                                                        maintainState: false));
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => BusScreen(),
+                                                    maintainState: false,
+                                                  ),
+                                                );
                                               } else {
-                                                  showSnackBarFun(context, 'You must add a supervisor first', Colors.red, 'assets/imgs/school/icons8_cancel 2.png');
-                                                // SnackBar(
-                                                //     content: Text(
-                                                //         'Please,enter valid number'));
+                                                if (items == null || items.isEmpty) {
+                                                  showSnackBarFun(
+                                                      context,
+                                                      'You must add a supervisor first',
+                                                      Colors.red,
+                                                      'assets/imgs/school/icons8_cancel 2.png'
+                                                  );
+                                                } else {
+                                                  showSnackBarFun(
+                                                      context,
+                                                      'Please, enter valid number',
+                                                      Colors.red,
+                                                      'assets/imgs/school/icons8_cancel 2.png'
+                                                  );
+                                                }
                                               }
                                             },
+
                                             width: constrains.maxWidth / 1.2,
                                             hight: 48,
                                             color: const Color(0xFF442B72),

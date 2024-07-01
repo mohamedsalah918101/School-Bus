@@ -547,7 +547,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 // ),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Edit',
+                                  'Edit'.tr,
                                   style: TextStyle(color: Color(0xff432B72), fontSize: 16, fontFamily: "Poppins-Regular"),
                                 ),
                               ],

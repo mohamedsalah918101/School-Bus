@@ -134,7 +134,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
   //   }
   // }
 
-
+  int? oldPhoneLength;
 // to lock in landscape view
   @override
   void initState() {
@@ -142,6 +142,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
     _name.text = widget.oldName!;
     _phonenumber.text = widget.oldPhone!;
     _email.text = widget.oldEmail!;
+    oldPhoneLength = widget.oldPhone!.length;
     // responsible
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -409,7 +410,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
 
                                     inputFormatters: <TextInputFormatter>[
                                       //FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Allow only numbers
-                                      LengthLimitingTextInputFormatter(13), // Limit the length programmatically
+                                      LengthLimitingTextInputFormatter(oldPhoneLength), // Limit the length programmatically
                                     ],
                                     onFieldSubmitted: (value) {
                                       // move to the next field when the user presses the "Done" button
@@ -569,7 +570,7 @@ class _EditeSupervisorState extends State<EditeSupervisor> {
             // ! _nameController.text.isEmpty
             &&
             //! _phoneNumberController.text.isEmpty
-            _phonenumber.text.length == 13 && phoneerror){
+            _phonenumber.text.length == oldPhoneLength && phoneerror){
             editAddSupervisor();
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
 

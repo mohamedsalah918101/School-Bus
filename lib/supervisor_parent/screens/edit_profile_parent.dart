@@ -720,18 +720,17 @@ class _EditProfileParentState extends State<EditProfileParent> {
                           showDialog(
                             context: context,
                             barrierDismissible: false,
-                            builder: (ctx) {
-                              return StatefulBuilder(builder:
-                                  (BuildContext context, StateSetter setState) {
-                                return Dialog(
-                                    backgroundColor: Colors.white,
-                                    surfaceTintColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        30,
-                                      ),
-                                    ),
-                                    child: SingleChildScrollView(
+                            builder: (ctx) => Dialog(
+                                backgroundColor: Colors.white,
+                                surfaceTintColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    30,
+                                  ),
+                                ),
+                                child: StatefulBuilder(
+                                  builder: (BuildContext context, StateSetter setState) {
+                                    return SingleChildScrollView(
                                       child: SizedBox(
                                         width: 337,
                                         child: Padding(
@@ -739,9 +738,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                               vertical: 20.0, horizontal: 15),
                                           child: Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                            MainAxisAlignment.start,
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Align(
                                                 alignment: Alignment.topLeft,
@@ -764,7 +763,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                     fontSize: 20,
                                                     color: Color(0xFF432B72),
                                                     fontFamily:
-                                                        'Poppins-SemiBold',
+                                                    'Poppins-SemiBold',
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
@@ -779,15 +778,15 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                       onTap:(){ _pickImageSecond(ImageSource.gallery, setState);},
                                                       child: CircleAvatar(
                                                         backgroundColor:
-                                                            const Color(
-                                                                0xFFF1F1F1),
+                                                        const Color(
+                                                            0xFFF1F1F1),
                                                         backgroundImage: _imageUrlSecond
-                                                                .isEmpty
+                                                            .isEmpty
                                                             ? const AssetImage(
-                                                                "assets/images/add_additional_data.png")
+                                                            "assets/images/add_additional_data.png")
                                                             : NetworkImage(
-                                                                    _imageUrlSecond)
-                                                                as ImageProvider,
+                                                            _imageUrlSecond)
+                                                        as ImageProvider,
                                                         radius: 55,
                                                       ),
                                                     ),
@@ -798,14 +797,14 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                         onTap: (){ _pickImageSecond(ImageSource.gallery, setState);},
                                                         child: Container(
                                                           padding:
-                                                              const EdgeInsets
-                                                                  .all(8),
+                                                          const EdgeInsets
+                                                              .all(8),
                                                           decoration:
-                                                              const BoxDecoration(
+                                                          const BoxDecoration(
                                                             color: Color(
                                                                 0xFFF1F1F1),
                                                             shape:
-                                                                BoxShape.circle,
+                                                            BoxShape.circle,
                                                           ),
                                                           child: const Icon(
                                                             Icons.edit,
@@ -828,12 +827,12 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                         text: 'Name'.tr,
                                                         style: const TextStyle(
                                                           color:
-                                                              Color(0xFF442B72),
+                                                          Color(0xFF442B72),
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Poppins-Bold',
+                                                          'Poppins-Bold',
                                                           fontWeight:
-                                                              FontWeight.w700,
+                                                          FontWeight.w700,
                                                           height: 1.07,
                                                         ),
                                                       ),
@@ -843,9 +842,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                           color: Colors.red,
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Poppins-Bold',
+                                                          'Poppins-Bold',
                                                           fontWeight:
-                                                              FontWeight.w700,
+                                                          FontWeight.w700,
                                                           height: 1.07,
                                                         ),
                                                       ),
@@ -858,8 +857,8 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                               ),
                                               Padding(
                                                 padding: (sharedpref?.getString(
-                                                            'lang') ==
-                                                        'ar')
+                                                    'lang') ==
+                                                    'ar')
                                                     ? const EdgeInsets.symmetric(horizontal: 0.0)
                                                     : const EdgeInsets.symmetric(horizontal: 12.0),
                                                 child: SizedBox(
@@ -867,22 +866,22 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                   height: 33,
                                                   child: TextFormField(
                                                     controller:
-                                                        secondParentNameController,
+                                                    secondParentNameController,
                                                     autofocus: true,
                                                     textInputAction:
-                                                        TextInputAction.next,
+                                                    TextInputAction.next,
                                                     cursorColor:
-                                                        const Color(0xFF442B72),
+                                                    const Color(0xFF442B72),
                                                     textDirection:
-                                                        (sharedpref?.getString(
-                                                                    'lang') ==
-                                                                'ar')
-                                                            ? TextDirection.rtl
-                                                            : TextDirection.ltr,
+                                                    (sharedpref?.getString(
+                                                        'lang') ==
+                                                        'ar')
+                                                        ? TextDirection.rtl
+                                                        : TextDirection.ltr,
                                                     scrollPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                            vertical: 30),
+                                                    const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 30),
                                                     decoration: InputDecoration(
                                                       alignLabelWithHint: true,
                                                       counterText: "",
@@ -893,40 +892,40 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                           ? const EdgeInsets.fromLTRB(0, 5, 17, 40)
                                                           : const EdgeInsets.fromLTRB(17, 5, 0, 40),
                                                       floatingLabelBehavior:
-                                                          FloatingLabelBehavior
-                                                              .never,
+                                                      FloatingLabelBehavior
+                                                          .never,
                                                       hintStyle:
-                                                          const TextStyle(
+                                                      const TextStyle(
                                                         color:
-                                                            Color(0xFFC2C2C2),
+                                                        Color(0xFFC2C2C2),
                                                         fontSize: 12,
                                                         fontFamily:
-                                                            'Poppins-Bold',
+                                                        'Poppins-Bold',
                                                         fontWeight:
-                                                            FontWeight.w700,
+                                                        FontWeight.w700,
                                                         height: 1.33,
                                                       ),
                                                       focusedBorder:
-                                                          const OutlineInputBorder(
+                                                      const OutlineInputBorder(
                                                         borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    7)),
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                7)),
                                                         borderSide: BorderSide(
                                                           color:
-                                                              Color(0xFFFFC53E),
+                                                          Color(0xFFFFC53E),
                                                           width: 0.5,
                                                         ),
                                                       ),
                                                       enabledBorder:
-                                                          const OutlineInputBorder(
+                                                      const OutlineInputBorder(
                                                         borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    7)),
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                7)),
                                                         borderSide: BorderSide(
                                                           color:
-                                                              Color(0xFFFFC53E),
+                                                          Color(0xFFFFC53E),
                                                           width: 0.5,
                                                         ),
                                                       ),
@@ -949,12 +948,12 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                         text: 'Number'.tr,
                                                         style: const TextStyle(
                                                           color:
-                                                              Color(0xFF442B72),
+                                                          Color(0xFF442B72),
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Poppins-Bold',
+                                                          'Poppins-Bold',
                                                           fontWeight:
-                                                              FontWeight.w700,
+                                                          FontWeight.w700,
                                                           height: 1.07,
                                                         ),
                                                       ),
@@ -964,9 +963,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                           color: Colors.red,
                                                           fontSize: 15,
                                                           fontFamily:
-                                                              'Poppins-Bold',
+                                                          'Poppins-Bold',
                                                           fontWeight:
-                                                              FontWeight.w700,
+                                                          FontWeight.w700,
                                                           height: 1.07,
                                                         ),
                                                       ),
@@ -979,41 +978,41 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                               ),
                                               Padding(
                                                 padding: (sharedpref?.getString(
-                                                            'lang') ==
-                                                        'ar')
+                                                    'lang') ==
+                                                    'ar')
                                                     ? const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 0.0)
+                                                    .symmetric(
+                                                    horizontal: 0.0)
                                                     : const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 12.0),
+                                                    .symmetric(
+                                                    horizontal: 12.0),
                                                 child: SizedBox(
                                                   width: 322,
                                                   height: 33,
                                                   child: TextFormField(
                                                     controller:
-                                                        secondParentNumberController,
+                                                    secondParentNumberController,
                                                     autofocus: true,
                                                     textInputAction:
-                                                        TextInputAction.done,
+                                                    TextInputAction.done,
                                                     keyboardType:
-                                                        TextInputType.phone,
+                                                    TextInputType.phone,
                                                     inputFormatters: <TextInputFormatter>[
                                                       LengthLimitingTextInputFormatter(
                                                           13),
                                                     ],
                                                     cursorColor:
-                                                        const Color(0xFF442B72),
+                                                    const Color(0xFF442B72),
                                                     textDirection:
-                                                        (sharedpref?.getString(
-                                                                    'lang') ==
-                                                                'ar')
-                                                            ? TextDirection.rtl
-                                                            : TextDirection.ltr,
+                                                    (sharedpref?.getString(
+                                                        'lang') ==
+                                                        'ar')
+                                                        ? TextDirection.rtl
+                                                        : TextDirection.ltr,
                                                     scrollPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                            vertical: 30),
+                                                    const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 30),
                                                     decoration: InputDecoration(
                                                       alignLabelWithHint: true,
                                                       counterText: "",
@@ -1024,40 +1023,40 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                           ? const EdgeInsets.fromLTRB(0, 5, 17, 5)
                                                           : const EdgeInsets.fromLTRB(17, 5, 0, 5),
                                                       floatingLabelBehavior:
-                                                          FloatingLabelBehavior
-                                                              .never,
+                                                      FloatingLabelBehavior
+                                                          .never,
                                                       hintStyle:
-                                                          const TextStyle(
+                                                      const TextStyle(
                                                         color:
-                                                            Color(0xFFC2C2C2),
+                                                        Color(0xFFC2C2C2),
                                                         fontSize: 12,
                                                         fontFamily:
-                                                            'Poppins-Bold',
+                                                        'Poppins-Bold',
                                                         fontWeight:
-                                                            FontWeight.w700,
+                                                        FontWeight.w700,
                                                         height: 1.33,
                                                       ),
                                                       focusedBorder:
-                                                          const OutlineInputBorder(
+                                                      const OutlineInputBorder(
                                                         borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    7)),
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                7)),
                                                         borderSide: BorderSide(
                                                           color:
-                                                              Color(0xFFFFC53E),
+                                                          Color(0xFFFFC53E),
                                                           width: 0.5,
                                                         ),
                                                       ),
                                                       enabledBorder:
-                                                          const OutlineInputBorder(
+                                                      const OutlineInputBorder(
                                                         borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    7)),
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                7)),
                                                         borderSide: BorderSide(
                                                           color:
-                                                              Color(0xFFFFC53E),
+                                                          Color(0xFFFFC53E),
                                                           width: 0.5,
                                                         ),
                                                       ),
@@ -1077,7 +1076,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                   hight: 40,
                                                   onPress: () {
                                                     if (secondParentNameController
-                                                            .text.isNotEmpty &&
+                                                        .text.isNotEmpty &&
                                                         secondParentNumberController
                                                             .text.isNotEmpty) {
                                                       _setSecondParentData();
@@ -1090,7 +1089,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                     }
                                                   },
                                                   color:
-                                                      const Color(0xFF442B72),
+                                                  const Color(0xFF442B72),
                                                   fontSize: 16,
                                                   fontFamily: 'Poppins-Regular',
                                                 ),
@@ -1099,9 +1098,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                           ),
                                         ),
                                       ),
-                                    ));
-                              });
-                            },
+                                    );
+                                  }
+                                ))
                           );
                           // Dialoge.addAdditionalDataDialog(context);
                         },

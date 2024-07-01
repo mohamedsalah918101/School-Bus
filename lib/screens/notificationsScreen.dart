@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -228,140 +229,143 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
 // انا شيلت من هنا directionality ltr
-        bottomNavigationBar: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
-          child: BottomAppBar(
-            padding: EdgeInsets.symmetric(vertical: 3),
-            height: 60,
-            color: const Color(0xFF442B72),
-            clipBehavior: Clip.antiAlias,
-            shape: const AutomaticNotchedShape(
-                RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(38.5),
-                        topRight: Radius.circular(38.5))),
-                RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(50)))),
-            //CircularNotchedRectangle(),
-            //shape of notch
-            notchMargin: 7,
-            child: SizedBox(
-              height: 50,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: SingleChildScrollView(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 2.0, vertical: 5),
-                        child: GestureDetector(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
-                                  maintainState: false),
-                            );
-                          },
-                          child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              direction: Axis.vertical,
-                              children: [
-                                Image.asset(
-                                    'assets/imgs/school/icons8_home_1 1.png',
-                                    height: 21,
-                                    width: 21),
-                                Text("Home".tr,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 10)),
-                              ]),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: GestureDetector(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            Navigator.pushReplacement(
+        bottomNavigationBar: Directionality(
+          textDirection:ui.TextDirection.ltr,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+            child: BottomAppBar(
+              padding: EdgeInsets.symmetric(vertical: 3),
+              height: 60,
+              color: const Color(0xFF442B72),
+              clipBehavior: Clip.antiAlias,
+              shape: const AutomaticNotchedShape(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(38.5),
+                          topRight: Radius.circular(38.5))),
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(50)))),
+              //CircularNotchedRectangle(),
+              //shape of notch
+              notchMargin: 7,
+              child: SizedBox(
+                height: 50,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: SingleChildScrollView(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 2.0, vertical: 5),
+                          child: GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => NotificationScreen(),
-                                    maintainState: false));
-                          },
-                          child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              direction: Axis.vertical,
-                              children: [
-                                Image.asset(
-                                    'assets/imgs/school/icons8_notification 1.png',
-                                    height: 22,
-                                    width: 22),
-                                Text('Notification'.tr,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 10)),
-                              ]),
+                                    builder: (context) => HomeScreen(),
+                                    maintainState: false),
+                              );
+                            },
+                            child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                direction: Axis.vertical,
+                                children: [
+                                  Image.asset(
+                                      'assets/imgs/school/icons8_home_1 1.png',
+                                      height: 21,
+                                      width: 21),
+                                  Text("Home".tr,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10)),
+                                ]),
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 100),
-                        child: GestureDetector(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SupervisorScreen(),
-                                    maintainState: false));
-                          },
-                          child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              direction: Axis.vertical,
-                              children: [
-                                Image.asset(
-                                    'assets/imgs/school/empty_supervisor.png',
-                                    height: 22,
-                                    width: 22),
-                                Text("Supervisor".tr,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 10)),
-                              ]),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NotificationScreen(),
+                                      maintainState: false));
+                            },
+                            child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                direction: Axis.vertical,
+                                children: [
+                                  Image.asset(
+                                      'assets/imgs/school/icons8_notification 1.png',
+                                      height: 22,
+                                      width: 22),
+                                  Text('Notification'.tr,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10)),
+                                ]),
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => BusScreen(),
-                                    maintainState: false));
-                            // _key.currentState!.openDrawer();
-                          },
-                          child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              direction: Axis.vertical,
-                              children: [
-                                Image.asset(
-                                    'assets/imgs/school/ph_bus-light (1).png',
-                                    height: 22,
-                                    width: 22),
-                                Text("Buses".tr,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 10)),
-                              ]),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 100),
+                          child: GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SupervisorScreen(),
+                                      maintainState: false));
+                            },
+                            child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                direction: Axis.vertical,
+                                children: [
+                                  Image.asset(
+                                      'assets/imgs/school/empty_supervisor.png',
+                                      height: 22,
+                                      width: 22),
+                                  Text("Supervisor".tr,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10)),
+                                ]),
+                          ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 0),
+                          child: GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => BusScreen(),
+                                      maintainState: false));
+                              // _key.currentState!.openDrawer();
+                            },
+                            child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                direction: Axis.vertical,
+                                children: [
+                                  Image.asset(
+                                      'assets/imgs/school/ph_bus-light (1).png',
+                                      height: 22,
+                                      width: 22),
+                                  Text("Buses".tr,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10)),
+                                ]),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

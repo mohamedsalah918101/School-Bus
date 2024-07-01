@@ -6,6 +6,7 @@ import 'package:school_account/model/ParentModel.dart';
 import 'package:school_account/model/SupervisorsModel.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
+import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
@@ -33,6 +34,7 @@ class HomeParent extends StatefulWidget {
 
 class HomeParentState extends State<HomeParent> {
   final _firestore = FirebaseFirestore.instance;
+  int minutes = 15;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   // List<ChildDataItem> children = [];
@@ -83,6 +85,7 @@ class HomeParentState extends State<HomeParent> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -107,7 +110,221 @@ class HomeParentState extends State<HomeParent> {
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: GestureDetector(
                         onTap: () {
-                          Dialoge.setReminderDialog(context);
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (ctx) => Dialog(
+                                backgroundColor: Colors.white,
+                                surfaceTintColor: Colors.transparent,
+                                // contentPadding: const EdgeInsets.all(10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    30,
+                                  ),
+                                ),
+                                child: StatefulBuilder(
+                                  builder: (BuildContext context, StateSetter setState){
+                                    return SizedBox(
+                                      width: 304,
+                                      height: 295,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                const SizedBox(
+                                                  width: 8,
+                                                ),
+                                                Flexible(
+                                                  child: Column(
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () => Navigator.pop(context),
+                                                        child: Image.asset(
+                                                          'assets/images/Vertical container.png',
+                                                          width: 27,
+                                                          height: 27,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 20,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 3,
+                                                  child: Text(
+                                                    'Set Reminder'.tr,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: Color(0xFF442B72),
+                                                      fontSize: 18,
+                                                      fontFamily: 'Poppins-SemiBold',
+                                                      fontWeight: FontWeight.w600,
+                                                      height: 1.23,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 15
+                                              ,
+                                            ),
+                                            Text(
+                                              'You Set Reminder Before Bus Arrive'.tr,
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 13,
+                                                fontFamily: 'Poppins-Light',
+                                                fontWeight: FontWeight.w400,
+                                                height: 1.23,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (minutes > 0) {
+                                                        minutes -= 1;
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    width: 62.56,
+                                                    height: 76.58,
+                                                    decoration:  BoxDecoration(
+                                                      borderRadius:
+                                                      (sharedpref?.getString('lang') == 'ar') ?
+                                                      BorderRadius.only(
+                                                          topRight: Radius.circular(13),
+                                                          bottomRight: Radius.circular(13)) :
+                                                      BorderRadius.only(
+                                                          topLeft: Radius.circular(13),
+                                                          bottomLeft: Radius.circular(13)),
+                                                      color: Color(0xFF9889B4),
+                                                    ),
+                                                    child:  Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.minimize_rounded,
+                                                          size: 45,
+                                                          color: Colors.white,
+                                                        ),
+                                                        SizedBox(
+                                                          height: 28,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 89.52,
+                                                  height: 76.54,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.black,
+                                                      width: .5,
+                                                    ),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Text(
+                                                        '$minutes',
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 40.22,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.23,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      minutes += 1;
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    width: 62.56,
+                                                    height: 76.58,
+                                                    decoration:  BoxDecoration(
+                                                      borderRadius:
+                                                      (sharedpref?.getString('lang') == 'ar') ?
+                                                      BorderRadius.only(
+                                                          topLeft: Radius.circular(13),
+                                                          bottomLeft: Radius.circular(13)):
+                                                      BorderRadius.only(
+                                                          topRight: Radius.circular(13),
+                                                          bottomRight: Radius.circular(13)),
+                                                      color: Color(0xFF442B72),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.add,
+                                                        size: 35,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 11,
+                                            ),
+                                            Text(
+                                              'Minutes'.tr,
+                                              style: TextStyle(
+                                                color: Color(0xFF442B72),
+                                                fontSize: 15,
+                                                fontFamily: 'Poppins-Light',
+                                                fontWeight: FontWeight.w400,
+                                                height: 1.23,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 18,
+                                            ),
+                                            Center(
+                                              child: ElevatedSimpleButton(
+                                                txt: 'Set'.tr,
+                                                width: 200,
+                                                hight: 42,
+                                                onPress: () {
+                                                  Navigator.pop(context);
+                                                  // Dialoge.busArrivedDialog(context);
+                                                },
+                                                color: const Color(0xFF993D9A),
+                                                fontSize: 17,
+                                                fontFamily: 'Poppins-Regular',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )),
+                          );
                         },
                         child: Image.asset(
                           'assets/images/clock.png',

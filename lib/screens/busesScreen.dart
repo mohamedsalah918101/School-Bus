@@ -455,6 +455,7 @@ class BusScreenSate extends State<BusScreen> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 5.0),
                               child: Stack(
+
                                 children: [
 
                                   Padding(
@@ -470,6 +471,7 @@ class BusScreenSate extends State<BusScreen> {
                                             children: [
                                               Expanded(
                                                 child: Container(
+                                                  color: Color(0xffffffff),
                                                   //width: constrains.maxWidth / 1.0,
                                                   height: 50,
                                                   child: Theme(
@@ -547,7 +549,7 @@ class BusScreenSate extends State<BusScreen> {
                                               // width: 27.62,
                                               // height: 21.6,),
                                               PopupMenuButton<String>(
-
+                                                color: Color(0xffffffff),
                                                 child: Padding(
                                                   padding: const EdgeInsets.only(right: 15),
                                                   child: Image(
@@ -568,6 +570,7 @@ class BusScreenSate extends State<BusScreen> {
                                                       value: 'custom',
                                                       child:
                                                       Column(
+
                                                         children: [
                                                           Container(
 
@@ -1074,7 +1077,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                                 ],
                                                                               ),
                                                                             ),
-                                                                            SizedBox(height:25,),
+                                                                            SizedBox(height:20,),
                                                                             //
                                                                             // ListView.builder(
                                                                             //   shrinkWrap: true,
@@ -1186,7 +1189,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                                   ),
                                                                             //   },
                                                                             // ),
-                                                                            SizedBox(height: 25,),
+                                                                            SizedBox(height: 10,),
                                                                             Text("Driver", style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
                                                                             SizedBox(height: 10,),
                                                                             Row(
@@ -1259,43 +1262,39 @@ class BusScreenSate extends State<BusScreen> {
                                                                                   ],
                                                                                 ),
                                                                                 //SizedBox(width: 110,),
-                                                                                Padding(
-                                                                                  padding:
-                                                                                  const EdgeInsets.only(
-                                                                                      left:80),
-                                                                                  child: Material(
-                                                                                    elevation: 3,
-                                                                                    shape: CircleBorder(),
-                                                                                    child: Align(
-                                                                                      alignment: Alignment
-                                                                                          .centerRight,
-                                                                                      child: GestureDetector(
-                                                                                        onTap: ()async{
-                                                                                          _makePhoneCall(supervisorPhoneNumber);
-                                                                                          //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                                          //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                                        },
-                                                                                        // onTap: () async {
-                                                                                        //   try {
-                                                                                        //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
-                                                                                        //   } catch (e) {
-                                                                                        //     print('Error making phone call: $e');
-                                                                                        //     // Handle error gracefully (e.g., show a snackbar or alert)
-                                                                                        //   }
-                                                                                        // },
-                                                                                        child: CircleAvatar(
-                                                                                          backgroundColor:
-                                                                                          Colors.white,
-                                                                                          child:Transform.scale(
-                                                                                              scaleX: -1,
-                                                                                              child:  FaIcon(
-                                                                                                FontAwesomeIcons
-                                                                                                    .phone,
-                                                                                                color: Color(
-                                                                                                    0xFF442B72),
-                                                                                                size: 26,
-                                                                                              )),
-                                                                                        ),
+                                                                                Spacer(),
+                                                                                Material(
+                                                                                  elevation: 3,
+                                                                                  shape: CircleBorder(),
+                                                                                  child: Align(
+                                                                                    alignment: Alignment
+                                                                                        .centerRight,
+                                                                                    child: GestureDetector(
+                                                                                      onTap: ()async{
+                                                                                        _makePhoneCall(supervisorPhoneNumber);
+                                                                                        //   FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                        //FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                      },
+                                                                                      // onTap: () async {
+                                                                                      //   try {
+                                                                                      //     await FlutterPhoneDirectCaller.callNumber(supervisorPhoneNumber);
+                                                                                      //   } catch (e) {
+                                                                                      //     print('Error making phone call: $e');
+                                                                                      //     // Handle error gracefully (e.g., show a snackbar or alert)
+                                                                                      //   }
+                                                                                      // },
+                                                                                      child: CircleAvatar(
+                                                                                        backgroundColor:
+                                                                                        Colors.white,
+                                                                                        child:Transform.scale(
+                                                                                            scaleX: -1,
+                                                                                            child:  FaIcon(
+                                                                                              FontAwesomeIcons
+                                                                                                  .phone,
+                                                                                              color: Color(
+                                                                                                  0xFF442B72),
+                                                                                              size: 26,
+                                                                                            )),
                                                                                       ),
                                                                                     ),
                                                                                   ),

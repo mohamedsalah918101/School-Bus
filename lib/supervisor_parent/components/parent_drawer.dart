@@ -1,4 +1,5 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
@@ -28,7 +29,33 @@ class ParentDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<ParentDrawer> {
   late final int selectedImage;
+  String _name = '';
+  String _imageUrl = '';
+  final _firestore = FirebaseFirestore.instance;
   // List<ChildDataItem> children = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final userDoc = await _firestore
+          .collection('parent')
+          .doc(sharedpref!.getString('id'))
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          _imageUrl = userDoc['parentImage'];
+          _name = userDoc['name'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -343,11 +370,13 @@ class _MainDrawerState extends State<ParentDrawer> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // children.isNotEmpty?
-                            Image.asset(
-                              'assets/images/Ellipse 1.png',
-                              fit: BoxFit.fill,
-                              height: 62,
-                              width: 62,
+                            CircleAvatar(
+                              backgroundImage: _imageUrl.isEmpty
+                                  ? const AssetImage(
+                                  "assets/images/Ellipse 1.png")
+                                  : NetworkImage(_imageUrl)
+                              as ImageProvider,
+                              radius: 35.5,
                             ),
                             //     : Image.asset(
                             //   'assets/images/Group 237679.png',
@@ -359,7 +388,7 @@ class _MainDrawerState extends State<ParentDrawer> {
                               height: 15,
                             ),
                             Text(
-                              'Shady Ayman'.tr,
+                              _name,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

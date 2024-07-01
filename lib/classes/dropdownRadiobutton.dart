@@ -109,89 +109,92 @@ class _DropdownRadiobuttonState extends State<DropdownRadiobutton> {
 //   }
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonHideUnderline(
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Filter'.tr,style: TextStyle(color: Color(0xff993D9A),
-                  fontSize: 18,
-                  fontFamily: 'Poppins-Bold',
-                  ),),
-                   Divider(
-                  color: Color(0xFF442B72),
-                  thickness: 0.5,
-                height: 40,
-                //  width: 20, // Adjust the width as needed
-                ),
-              ],
+    return Container(
+      //color: Color(0xffffffff),
+      child: DropdownButtonHideUnderline(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Filter'.tr,style: TextStyle(color: Color(0xff993D9A),
+                    fontSize: 18,
+                    fontFamily: 'Poppins-Bold',
+                    ),),
+                     Divider(
+                    color: Color(0xFF442B72),
+                    thickness: 0.5,
+                  height: 40,
+                  //  width: 20, // Adjust the width as needed
+                  ),
+                ],
+              ),
             ),
-          ),
-          Container(
-            child: Column(
-              children: widget.items.map<Widget>((item) {
-                return Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          // Unselect all items
-                          for (var selectedItem in widget.selectedItems) {
-                            selectedItem.isChecked = false;
-                          }
-                          // Clear selected items list
-                          widget.selectedItems.clear();
+            Container(
+              child: Column(
+                children: widget.items.map<Widget>((item) {
+                  return Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            // Unselect all items
+                            for (var selectedItem in widget.selectedItems) {
+                              selectedItem.isChecked = false;
+                            }
+                            // Clear selected items list
+                            widget.selectedItems.clear();
 
-                          // Select the tapped item
-                          item.isChecked = true;
-                          widget.selectedItems.add(item);
+                            // Select the tapped item
+                            item.isChecked = true;
+                            widget.selectedItems.add(item);
 
-                          // Notify the parent about the selection change
-                          widget.onSelectionChanged(widget.selectedItems);
-                        });
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Color(0xFF442B72), width: 1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: AnimatedContainer(
-                                duration: Duration(milliseconds: 300),
-                                width: item.isChecked ? 12 : 0,
-                                height: item.isChecked ? 12 : 0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFF442B72),
+                            // Notify the parent about the selection change
+                            widget.onSelectionChanged(widget.selectedItems);
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0xFF442B72), width: 1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  width: item.isChecked ? 12 : 0,
+                                  height: item.isChecked ? 12 : 0,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFF442B72),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            item.label,
-                            style: TextStyle(color: Color(0xff442B72)),
-                          ),
+                            SizedBox(width: 10),
+                            Text(
+                              item.label,
+                              style: TextStyle(color: Color(0xff442B72)),
+                            ),
 
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                );
+                      SizedBox(height: 20),
+                    ],
+                  );
 
-              }).toList(),
+                }).toList(),
+              ),
             ),
-          ),
 
-        ],
+          ],
+        ),
       ),
     );
   }
