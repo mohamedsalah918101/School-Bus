@@ -67,12 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> Parent = [];
   List<QueryDocumentSnapshot> data = [];
 
-  getData()async{
+  Future<void> getData()async{
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').where('state', isEqualTo:1).where('schoolid',isEqualTo:sharedpref!.getString('id') ).get();
     data.addAll(querySnapshot.docs);
-    setState(() {
-
-    });
+    if (mounted) {
+      setState(() {});
+    }
   }
   String? _schoolId;
   Future<void> getSchoolId() async {

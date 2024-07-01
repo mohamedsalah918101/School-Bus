@@ -1504,12 +1504,12 @@ class _AddBusState extends State<AddBus> {
                                                       'assets/imgs/school/icons8_cancel 2.png'
                                                   );
                                                 } else {
-                                                  showSnackBarFun(
-                                                      context,
-                                                      'Please, enter valid number',
-                                                      Colors.red,
-                                                      'assets/imgs/school/icons8_cancel 2.png'
-                                                  );
+                                                  // showSnackBarFun(
+                                                  //     context,
+                                                  //     'Please, enter valid number',
+                                                  //     Colors.red,
+                                                  //     'assets/imgs/school/icons8_cancel 2.png'
+                                                  // );
                                                 }
                                               }
                                             },
