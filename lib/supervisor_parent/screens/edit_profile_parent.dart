@@ -121,16 +121,6 @@ class _EditProfileParentState extends State<EditProfileParent> {
     }
   }
 
-  Future<void> _pickImageSecond(ImageSource src, StateSetter _setState) async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: src);
-    if (pickedFile != null) {
-      setState(() {
-        _imageSecond = File(pickedFile.path);
-      });
-      _uploadImageSecondToFirebase();
-    }
-  }
 
   Future<void> _uploadImageSecondToFirebase() async {
     if (_imageSecond != null) {
@@ -730,6 +720,17 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                 ),
                                 child: StatefulBuilder(
                                   builder: (BuildContext context, StateSetter setState) {
+                                    Future<void> _pickImageSecond() async {
+                                      final pickedFile =
+                                      await ImagePicker().pickImage(source: ImageSource.gallery);
+                                      if (pickedFile != null) {
+                                        setState(() {
+                                          _imageSecond = File(pickedFile.path);
+                                        });
+                                        _uploadImageSecondToFirebase();
+                                      }
+                                    }
+
                                     return SingleChildScrollView(
                                       child: SizedBox(
                                         width: 337,
@@ -775,7 +776,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                 child: Stack(
                                                   children: [
                                                     GestureDetector(
-                                                      onTap:(){ _pickImageSecond(ImageSource.gallery, setState);},
+                                                      onTap: (){
+                                                        _pickImageSecond();
+                                                      },
                                                       child: CircleAvatar(
                                                         backgroundColor:
                                                         const Color(
@@ -794,7 +797,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
                                                       bottom: 0,
                                                       right: 0,
                                                       child: GestureDetector(
-                                                        onTap: (){ _pickImageSecond(ImageSource.gallery, setState);},
+                                                        onTap: (){
+                                                          _pickImageSecond();
+                                                        },
                                                         child: Container(
                                                           padding:
                                                           const EdgeInsets
