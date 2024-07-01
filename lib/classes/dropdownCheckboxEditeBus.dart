@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,29 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
   bool isDropdownOpened = false;
   String selectedNames='Supervisor';
   TextEditingController _supervisorController = TextEditingController();
+
+  deleteSupervisor(DropdownCheckboxItem item) async {
+    print('deleteSupervisor called');
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('supervisor')
+          .doc(item.docID)
+          .update({'bus_id': ''});
+
+      print('Supervisor deleted successfully');
+
+      // Remove the item from the selectedItems list
+      selectedItems.removeWhere((items) => items.docID == item.docID);
+
+      setState(() {
+        // Trigger a rebuild of the widget tree if necessary
+      });
+    } catch (e) {
+      print('Error deleting supervisor: $e');
+      // Handle specific error cases here
+    }
+  }
   @override
   void initState() {
     if(selectedItems.isNotEmpty){
@@ -120,7 +144,7 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
                                 //  selectedItems.remove(item);
                                 selectedItems.removeWhere((items) => items.docID == item.docID);
 
-
+                                deleteSupervisor(item); // Call the deleteSupervisor function
                                 item.isChecked = false;
 
                                 // Clear text field value when unselecting

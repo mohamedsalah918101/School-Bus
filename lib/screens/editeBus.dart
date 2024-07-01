@@ -273,6 +273,7 @@ class _EditeBusState extends State<EditeBus> {
     QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor')
         .where('schoolid', isEqualTo: _schoolId)
         .where('state', isEqualTo: 1)
+        //.where('bus_id', isEqualTo: '')
         .get();
 
     // data.addAll(querySnapshot.docs);
