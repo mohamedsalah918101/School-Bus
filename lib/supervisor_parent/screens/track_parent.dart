@@ -21,8 +21,6 @@ import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:label_marker/label_marker.dart';
 
-
-
 import '../components/custom_app_bar.dart';
 
 class TrackParent extends StatefulWidget {
@@ -32,6 +30,7 @@ class TrackParent extends StatefulWidget {
 
 class _TrackParentState extends State<TrackParent> {
   late final String title;
+
   // List<ChildDataItem> children = [];
   bool tracking = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -45,22 +44,23 @@ class _TrackParentState extends State<TrackParent> {
   void initState() {
     super.initState();
     loadCustomIcon();
-
   }
+
   //
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
 
   Future<void> loadCustomIcon() async {
     final Uint8List imageData =
-    await getBytesFromAsset("assets/images/bus 1.png", 120);
+        await getBytesFromAsset("assets/images/bus 1.png", 120);
     customIcon = BitmapDescriptor.fromBytes(imageData);
 
-  final Uint8List imageData2 = await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
-  anotherCustomIcon = BitmapDescriptor.fromBytes(imageData2);
+    final Uint8List imageData2 =
+        await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
+    anotherCustomIcon = BitmapDescriptor.fromBytes(imageData2);
 
-  setState(() {});
-}
+    setState(() {});
+  }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     final ByteData data = await rootBundle.load(path);
@@ -74,17 +74,16 @@ class _TrackParentState extends State<TrackParent> {
     return resizedImage;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: ParentDrawer(),
+        endDrawer: ParentDrawer(),
         key: _scaffoldKey,
-        appBar:PreferredSize(
+        appBar: PreferredSize(
           child: Container(
             decoration: BoxDecoration(boxShadow: [
               BoxShadow(
-                color:  Color(0x3F000000),
+                color: Color(0x3F000000),
                 blurRadius: 12,
                 offset: Offset(-1, 4),
                 spreadRadius: 0,
@@ -100,736 +99,786 @@ class _TrackParentState extends State<TrackParent> {
               ),
               elevation: 0.0,
               leading: GestureDetector(
-                onTap: (){
+                onTap: () {
                   Navigator.of(context).pop();
                 },
-                 child: Padding(
-                   padding: (sharedpref?.getString('lang') == 'ar')?
-                    EdgeInsets.all( 23.0):
-                    EdgeInsets.all( 17.0),
-                   child: Image.asset(
-                     (sharedpref?.getString('lang') == 'ar')?
-                     'assets/images/Layer 1.png':
-                     'assets/images/fi-rr-angle-left.png',
-                     width: 10,
-                     height: 22,),
-                 ),
+                child: Padding(
+                  padding: (sharedpref?.getString('lang') == 'ar')
+                      ? EdgeInsets.all(23.0)
+                      : EdgeInsets.all(17.0),
+                  child: Image.asset(
+                    (sharedpref?.getString('lang') == 'ar')
+                        ? 'assets/images/Layer 1.png'
+                        : 'assets/images/fi-rr-angle-left.png',
+                    width: 10,
+                    height: 22,
+                  ),
+                ),
               ),
               actions: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child:
-                  GestureDetector(
-                    onTap: (){
+                  child: GestureDetector(
+                    onTap: () {
                       _scaffoldKey.currentState!.openEndDrawer();
                     },
                     child: const Icon(
-                    Icons.menu_rounded,
-                    color: Color(0xff442B72),
-                    size: 35,
-                  ),
+                      Icons.menu_rounded,
+                      color: Color(0xff442B72),
+                      size: 35,
+                    ),
                   ),
                 ),
               ],
-              title: Text('Tracking Bus'.tr ,
+              title: Text(
+                'Tracking Bus'.tr,
                 style: const TextStyle(
                   color: Color(0xFF993D9A),
                   fontSize: 17,
                   fontFamily: 'Poppins-Bold',
                   fontWeight: FontWeight.w700,
                   height: 1,
-                ),),
-              backgroundColor:  Color(0xffF8F8F8),
+                ),
+              ),
+              backgroundColor: Color(0xffF8F8F8),
               surfaceTintColor: Colors.transparent,
             ),
           ),
           preferredSize: Size.fromHeight(70),
         ),
-        body:Material(
+        body: Material(
             child: ValueListenableBuilder(
                 valueListenable: valueNotifierHome.value,
-                builder: (context, value, child) {return  SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 350,
-                child: GoogleMap(
-                  scrollGesturesEnabled: true,
-                    gestureRecognizers: Set()
-                      ..add(Factory<EagerGestureRecognizer>(() =>
-                              EagerGestureRecognizer())),
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(27.180134, 31.189283),
-                    zoom: 12,
-                  ),
-                  markers: markers,polylines: polyline,
-                  onMapCreated: ((mapController) {
-                    setState(() {
-                      controller = mapController;
-                    });
+                builder: (context, value, child) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 350,
+                          child: GoogleMap(
+                            scrollGesturesEnabled: true,
+                            gestureRecognizers: Set()
+                              ..add(Factory<EagerGestureRecognizer>(
+                                  () => EagerGestureRecognizer())),
+                            initialCameraPosition: const CameraPosition(
+                              target: LatLng(27.180134, 31.189283),
+                              zoom: 12,
+                            ),
+                            markers: markers,
+                            polylines: polyline,
+                            onMapCreated: ((mapController) {
+                              setState(() {
+                                controller = mapController;
+                              });
 
-                markers.add(
-                    Marker(
-                      markerId: const MarkerId('marker_1'),
-                      position: const LatLng(27.1778429, 31.1859626),
-                      icon: customIcon,
-                      infoWindow:
-                      // children.isNotEmpty?
-                      InfoWindow(
-                      title: 'Mariam Tarek'
-            ),
-                        onTap: (){
-                        print('object');
-                        }
-                          //   :
-                          // InfoWindow()
-          ),
-        );
-                    markers.add(
-                      Marker(
-                        // consumeTapEvents: true,
-                        markerId: const MarkerId('marker_2'),
-                        position: const LatLng(27.190000, 31.200000),
-                        icon: anotherCustomIcon,
-                        infoWindow:
-                            // children.isNotEmpty?
-                        InfoWindow(
-                          title: 'Ahmed Tarek'.tr,
-                          // anchor: Offset(0, 0),
-                          // snippet: '',
-                          // backgroundColor: Colors.transparent,
-                        )
-                              // :
-                              //   InfoWindow()
-                      ),
-                    );
-                setState(() {});
-
-                  }),
-                ),
-
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              SizedBox(
-                height: 45,
-                child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: Theme(
-                        data: ThemeData(
-                          splashFactory: NoSplash.splashFactory,
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                        ),
-                        child: ListTile(
-                          onTap: () {
-                            tracking = true;
-                            setState(() {});
-                          },
-                          title: Column(
-                            children: [
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Mariam',
-                                    style: TextStyle(
-                              color: const Color(0xFF432B72),
-                            fontSize: 16,
-                            fontFamily: tracking
-                                ? 'Poppins-SemiBold'
-                                : 'Poppins-Light' ,
-                            fontWeight: tracking
-                                ? FontWeight.w600
-                                : FontWeight.w400),
+                              markers.add(
+                                Marker(
+                                    markerId: const MarkerId('marker_1'),
+                                    position:
+                                        const LatLng(27.1778429, 31.1859626),
+                                    icon: customIcon,
+                                    infoWindow:
+                                        // children.isNotEmpty?
+                                        InfoWindow(title: 'Mariam Tarek'),
+                                    onTap: () {
+                                      print('object');
+                                    }
+                                    //   :
+                                    // InfoWindow()
                                     ),
-                                    TextSpan(
-                                      text: ' Tracking'.tr,
-                                      style: TextStyle(
-                                          color: const Color(0xFF432B72),
-                                          fontSize: 16,
-                                          fontFamily: tracking
-                                              ? 'Poppins-SemiBold'
-                                              : 'Poppins-Light' ,
-                                          fontWeight: tracking
-                                              ? FontWeight.w600
-                                              : FontWeight.w400),
+                              );
+                              markers.add(
+                                Marker(
+                                    // consumeTapEvents: true,
+                                    markerId: const MarkerId('marker_2'),
+                                    position:
+                                        const LatLng(27.190000, 31.200000),
+                                    icon: anotherCustomIcon,
+                                    infoWindow:
+                                        // children.isNotEmpty?
+                                        InfoWindow(
+                                      title: 'Ahmed Tarek'.tr,
+                                      // anchor: Offset(0, 0),
+                                      // snippet: '',
+                                      // backgroundColor: Colors.transparent,
                                     )
-                                  ]
-                                )
-                              ),
-                              // Text(
-                              //   'Mariam Tracking'.tr,
+                                    ),
+                              );
+                              setState(() {});
+                            }),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        SizedBox(
+                          height: 45,
+                          child: Row(
+                            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Flexible(
+                                flex: 5,
+                                child: Theme(
+                                  data: ThemeData(
+                                    splashFactory: NoSplash.splashFactory,
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                  ),
+                                  child: ListTile(
+                                    onTap: () {
+                                      tracking = true;
+                                      setState(() {});
+                                    },
+                                    title: Column(
+                                      children: [
+                                        Text.rich(TextSpan(children: [
+                                          TextSpan(
+                                            text: 'Mariam',
+                                            style: TextStyle(
+                                                color: const Color(0xFF432B72),
+                                                fontSize: 16,
+                                                fontFamily: tracking
+                                                    ? 'Poppins-SemiBold'
+                                                    : 'Poppins-Light',
+                                                fontWeight: tracking
+                                                    ? FontWeight.w600
+                                                    : FontWeight.w400),
+                                          ),
+                                          TextSpan(
+                                            text: ' Tracking'.tr,
+                                            style: TextStyle(
+                                                color: const Color(0xFF432B72),
+                                                fontSize: 16,
+                                                fontFamily: tracking
+                                                    ? 'Poppins-SemiBold'
+                                                    : 'Poppins-Light',
+                                                fontWeight: tracking
+                                                    ? FontWeight.w600
+                                                    : FontWeight.w400),
+                                          )
+                                        ])),
+                                        // Text(
+                                        //   'Mariam Tracking'.tr,
 
-                              // ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                height: 2,
-                                width: tracking ? 75 : 0,
-                                color: const Color(0xFFFFC53E),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: Container(
-                        // height: 32,
-                        width: 1,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Flexible(
-                      flex: 3,
-                      child: Theme(
-                        data: ThemeData(
-                          splashFactory: NoSplash.splashFactory,
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                        ),
-                        child: ListTile(
-                          onTap: () {
-                            tracking = false;
-                            setState(() {});
-                          },
-                          title: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left:7.0),
-                                child: Text(
-                                  'Bus Info'.tr,
-                                  style: TextStyle(
-                                      color: const Color(0xFF432B72),
-                                      fontSize: 17,
-                                      fontFamily: tracking
-                                          ? 'Poppins-Light'
-                                          : 'Poppins-SemiBold' ,
-                                      fontWeight: tracking
-                                          ? FontWeight.w400
-                                          : FontWeight.w600),
+                                        // ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Container(
+                                          height: 2,
+                                          width: tracking ? 75 : 0,
+                                          color: const Color(0xFFFFC53E),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                              Container(
-                                height: 2,
-                                width: tracking ? 0 : 75,
-                                color: const Color(0xFFFFC53E),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              Container(
-                width: double.infinity,
-                height: 1,
-                color: const Color(0xFFD8D8D8),
-              ),
-              const SizedBox(
-                height: 25, //testttttttttttttt
-              ),
-              tracking
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                               Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // children.isNotEmpty?
-                          Text.rich(
-                          TextSpan(
-                          children: [
-                            TextSpan(
-                            text: '25 ',
-                            style: TextStyle(
-                              color: Color(0xFF993D9A),
-                              fontSize: 29.71,
-                              fontFamily: 'Poppins-Medium',
-                              fontWeight: FontWeight.w700,
-                              height: 1.23,
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'Min.'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF993D9A),
-                              fontSize: 29.71,
-                              fontFamily: 'Poppins-Medium',
-                              fontWeight: FontWeight.w700,
-                              height: 1.23,
-                            ),
-                          ),]
-                      ),),
-                                    //     :
-                                    // Text(
-                                    //   '0 Min.'.tr,
-                                    //   style: TextStyle(
-                                    //     color: Color(0xFF993D9A),
-                                    //     fontSize: 29.71,
-                                    //     fontFamily: 'Poppins-Medium',
-                                    //     fontWeight: FontWeight.w700,
-                                    //     height: 1.23,
-                                    //   ),
-                                    // ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      'Arrive to you.'.tr,
-                                      style: TextStyle(
-                                        color: Color(0xFF442B72),
-                                        fontSize: 24.12,
-                                        fontFamily: 'Poppins-Light',
-                                        fontWeight: FontWeight.w300,
-                                        height: 1.23,
-                                      ),
-                                    ),
-                                  ],
+                              Flexible(
+                                flex: 1,
+                                child: Container(
+                                  // height: 32,
+                                  width: 1,
+                                  color: Colors.black,
                                 ),
                               ),
-                              Image.asset(
-                                'assets/images/Vector (13)call.png',
-                                width: 30,
-                                height: 20,
-                              ),
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              Container(
-                                height: 46,
-                                width: 1,
-                                color: Colors.black,
-                              ),
-                              const SizedBox(
-                                width: 30,
-                              ),
-                              Image.asset(
-                                'assets/images/fi-rr-comment-alt (1).png',
-                                width: 20,
-                                height: 20,
+                              Flexible(
+                                flex: 3,
+                                child: Theme(
+                                  data: ThemeData(
+                                    splashFactory: NoSplash.splashFactory,
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                  ),
+                                  child: ListTile(
+                                    onTap: () {
+                                      tracking = false;
+                                      setState(() {});
+                                    },
+                                    title: Column(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 7.0),
+                                          child: Text(
+                                            'Bus Info'.tr,
+                                            style: TextStyle(
+                                                color: const Color(0xFF432B72),
+                                                fontSize: 17,
+                                                fontFamily: tracking
+                                                    ? 'Poppins-Light'
+                                                    : 'Poppins-SemiBold',
+                                                fontWeight: tracking
+                                                    ? FontWeight.w400
+                                                    : FontWeight.w600),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 4,
+                                        ),
+                                        Container(
+                                          height: 2,
+                                          width: tracking ? 0 : 75,
+                                          color: const Color(0xFFFFC53E),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                         // children.isNotEmpty?
-                         Stack(
-                            children: [
-                              ListView.separated(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  if (index == 19 ) {
-                                    return Row(
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 1,
+                          color: const Color(0xFFD8D8D8),
+                        ),
+                        const SizedBox(
+                          height: 25, //testttttttttttttt
+                        ),
+                        tracking
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        (sharedpref?.getString('lang') == 'ar')?
-                                        Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
-                                        Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),),
-                                        Column(
-                                          children: [
-                                            Image.asset(
-                                              'assets/images/Ellipse 6.png',
-                                              width: 50,
-                                              height: 50,
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Manar Ali'.tr,
-                                              style: TextStyle(
-                                                color: Color(0xFF442B72),
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins-SemiBold',
-                                                fontWeight: FontWeight.w600,
-                                                height: 1.07,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 3,
-                                            ),
-                                            Text(
-                                              'arrived : 7:45 AM'.tr,
-                                              style: TextStyle(
-                                                color: Color(0xFF13DB63),
-                                                fontSize: 13,
-                                                fontFamily: 'Poppins-Regular',
-                                                fontWeight: FontWeight.w400,
-                                                height: 1.23,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                  else if (index == 0 ) {
-                                    return Row(
-                                      children: [
-                                        (sharedpref?.getString('lang') == 'ar')?
-                                        Text('- - -' , style: TextStyle(color: Color(0xffFFC53E),),):
-                                        Text(' - - -' , style: TextStyle(color: Color(0xffFFC53E),),),
-                                        Column(
-                                          children: [
-                                            Padding(
-                                              padding: (sharedpref?.getString('lang') == 'ar')?
-                                              EdgeInsets.only(right: 5.0):
-                                              EdgeInsets.only(left: 0.0),
-                                              child: Image.asset(
-                                                'assets/images/Ellipse 6.png',
-                                                width: 50,
-                                                height: 50,
-                                              ),
-                                            ), SizedBox(
-                                              // width: 15,
-                                              height: 20,
-                                              child: Padding(
-                                                padding: (sharedpref?.getString('lang') == 'ar')?
-                                                EdgeInsets.only(right: 1.0):
-                                                EdgeInsets.only(left: 1.0),
-                                                child: DottedLine(
-                                                  direction: Axis.vertical,
-                                                  dashColor: Color(0xFF432B72),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        SizedBox(
-                                          height:50,
+                                        Expanded(
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                'Manar Ali'.tr,
-                                                style: TextStyle(
-                                                  color: Color(0xFF442B72),
-                                                  fontSize: 15,
-                                                  fontFamily: 'Poppins-SemiBold',
-                                                  fontWeight: FontWeight.w600,
-                                                  height: 1.07,
-                                                ),
+                                              // children.isNotEmpty?
+                                              Text.rich(
+                                                TextSpan(children: [
+                                                  TextSpan(
+                                                    text: '25 ',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF993D9A),
+                                                      fontSize: 29.71,
+                                                      fontFamily:
+                                                          'Poppins-Medium',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      height: 1.23,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: 'Min.'.tr,
+                                                    style: TextStyle(
+                                                      color: Color(0xFF993D9A),
+                                                      fontSize: 29.71,
+                                                      fontFamily:
+                                                          'Poppins-Medium',
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      height: 1.23,
+                                                    ),
+                                                  ),
+                                                ]),
                                               ),
                                               SizedBox(
-                                                height: 3,
+                                                height: 5,
                                               ),
                                               Text(
-                                                'arrived : 7:45 AM'.tr,
+                                                'Arrive to you.'.tr,
                                                 style: TextStyle(
-                                                  color: Color(0xFF13DB63),
-                                                  fontSize: 13,
-                                                  fontFamily: 'Poppins-Regular',
-                                                  fontWeight: FontWeight.w400,
+                                                  color: Color(0xFF442B72),
+                                                  fontSize: 24.12,
+                                                  fontFamily: 'Poppins-Light',
+                                                  fontWeight: FontWeight.w300,
                                                   height: 1.23,
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    );
-                                  }
-                                  else {
-                                    return Row(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                    (sharedpref?.getString('lang') == 'ar')?
-                                    EdgeInsets.only(right: 25.0):
-                                    EdgeInsets.only(left: 25.0),
-                                          child: Image.asset(
-                                            'assets/images/Ellipse 6.png',
-                                            width: 50,
-                                            height: 50,
-                                          ),
+                                        Image.asset(
+                                          'assets/images/Vector (13)call.png',
+                                          width: 30,
+                                          height: 20,
                                         ),
                                         const SizedBox(
-                                          width: 15,
+                                          width: 25,
                                         ),
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Manar Ali'.tr,
-                                              style: TextStyle(
-                                                color: Color(0xFF442B72),
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins-SemiBold',
-                                                fontWeight: FontWeight.w600,
-                                                height: 1.07,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 3,
-                                            ),
-                                            Text(
-                                              'arrived : 7:45 AM'.tr,
-                                              style: TextStyle(
-                                                color: Color(0xFF13DB63),
-                                                fontSize: 13,
-                                                fontFamily: 'Poppins-Regular',
-                                                fontWeight: FontWeight.w400,
-                                                height: 1.23,
-                                              ),
-                                            ),
-                                          ],
+                                        Container(
+                                          height: 46,
+                                          width: 1,
+                                          color: Colors.black,
                                         ),
+                                        const SizedBox(
+                                          width: 30,
+                                        ),
+                                        Image.asset(
+                                          'assets/images/fi-rr-comment-alt (1).png',
+                                          width: 20,
+                                          height: 20,
+                                        )
                                       ],
-                                    );
-                                  }
-                                },
-                                separatorBuilder: (context, index) {
-                                  if(index == 0) {return
-                                    SizedBox(
-                                    height: 0,
-                                  );
-                                }else{
-                                  return  SizedBox(
-                                    height: 20,
-                                  );}
-                                },
-                                itemCount: 20,
-                              ),
-                              (sharedpref?.getString('lang') == 'ar')?
-                              Positioned(
-                                left: 299,
-                                top: 35,
-                                bottom: 85,
-                                child: buildDashedLine(),
-                              ):
-                              Positioned(
-                                top: 35,
-                                bottom: 85,
-                                child: buildDashedLine(),
+                                    ),
+                                    const SizedBox(
+                                      height: 30,
+                                    ),
+                                    // children.isNotEmpty?
+                                    Stack(
+                                      children: [
+                                        ListView.separated(
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          itemBuilder: (context, index) {
+                                            if (index == 19) {
+                                              return Row(
+                                                children: [
+                                                  (sharedpref?.getString(
+                                                              'lang') ==
+                                                          'ar')
+                                                      ? Text(
+                                                          '- - -',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xffFFC53E),
+                                                          ),
+                                                        )
+                                                      : Text(
+                                                          '- - -',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xffFFC53E),
+                                                          ),
+                                                        ),
+                                                  Column(
+                                                    children: [
+                                                      Image.asset(
+                                                        'assets/images/Ellipse 6.png',
+                                                        width: 50,
+                                                        height: 50,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Manar Ali'.tr,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF442B72),
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              'Poppins-SemiBold',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          height: 1.07,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 3,
+                                                      ),
+                                                      Text(
+                                                        'arrived : 7:45 AM'.tr,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF13DB63),
+                                                          fontSize: 13,
+                                                          fontFamily:
+                                                              'Poppins-Regular',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          height: 1.23,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            } else if (index == 0) {
+                                              return Row(
+                                                children: [
+                                                  (sharedpref?.getString(
+                                                              'lang') ==
+                                                          'ar')
+                                                      ? Text(
+                                                          '- - -',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xffFFC53E),
+                                                          ),
+                                                        )
+                                                      : Text(
+                                                          ' - - -',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xffFFC53E),
+                                                          ),
+                                                        ),
+                                                  Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding: (sharedpref
+                                                                    ?.getString(
+                                                                        'lang') ==
+                                                                'ar')
+                                                            ? EdgeInsets.only(
+                                                                right: 5.0)
+                                                            : EdgeInsets.only(
+                                                                left: 0.0),
+                                                        child: Image.asset(
+                                                          'assets/images/Ellipse 6.png',
+                                                          width: 50,
+                                                          height: 50,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        // width: 15,
+                                                        height: 20,
+                                                        child: Padding(
+                                                          padding: (sharedpref
+                                                                      ?.getString(
+                                                                          'lang') ==
+                                                                  'ar')
+                                                              ? EdgeInsets.only(
+                                                                  right: 1.0)
+                                                              : EdgeInsets.only(
+                                                                  left: 1.0),
+                                                          child: DottedLine(
+                                                            direction:
+                                                                Axis.vertical,
+                                                            dashColor: Color(
+                                                                0xFF432B72),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 50,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Manar Ali'.tr,
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFF442B72),
+                                                            fontSize: 15,
+                                                            fontFamily:
+                                                                'Poppins-SemiBold',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            height: 1.07,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 3,
+                                                        ),
+                                                        Text(
+                                                          'arrived : 7:45 AM'
+                                                              .tr,
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFF13DB63),
+                                                            fontSize: 13,
+                                                            fontFamily:
+                                                                'Poppins-Regular',
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            height: 1.23,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            } else {
+                                              return Row(
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        (sharedpref?.getString(
+                                                                    'lang') ==
+                                                                'ar')
+                                                            ? EdgeInsets.only(
+                                                                right: 25.0)
+                                                            : EdgeInsets.only(
+                                                                left: 25.0),
+                                                    child: Image.asset(
+                                                      'assets/images/Ellipse 6.png',
+                                                      width: 50,
+                                                      height: 50,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Manar Ali'.tr,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF442B72),
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              'Poppins-SemiBold',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          height: 1.07,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 3,
+                                                      ),
+                                                      Text(
+                                                        'arrived : 7:45 AM'.tr,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF13DB63),
+                                                          fontSize: 13,
+                                                          fontFamily:
+                                                              'Poppins-Regular',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          height: 1.23,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            }
+                                          },
+                                          separatorBuilder: (context, index) {
+                                            if (index == 0) {
+                                              return SizedBox(
+                                                height: 0,
+                                              );
+                                            } else {
+                                              return SizedBox(
+                                                height: 20,
+                                              );
+                                            }
+                                          },
+                                          itemCount: 20,
+                                        ),
+                                        (sharedpref?.getString('lang') == 'ar')
+                                            ? Positioned(
+                                                left: 299,
+                                                top: 35,
+                                                bottom: 85,
+                                                child: buildDashedLine(),
+                                              )
+                                            : Positioned(
+                                                top: 35,
+                                                bottom: 85,
+                                                child: buildDashedLine(),
+                                              )
+                                      ],
+                                    )
+                                    //     :
+                                    // Container()
+                                  ],
+                                ),
                               )
-                            ],
-                          )
-                         //     :
-                         // Container()
-                        ],
-                      ),
-                    )
-                  :
-              // children.isNotEmpty?
-              Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Bus Number'.tr,
-                                      style: TextStyle(
-                                        color: Color(0xFF432B72),
-                                        fontSize: 17,
-                                        fontFamily: 'Poppins-SemiBold',
-                                        fontWeight: FontWeight.w600,
-                                        height: 0.94,
+                            :
+                            // children.isNotEmpty?
+                            Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Bus Number'.tr,
+                                                style: TextStyle(
+                                                  color: Color(0xFF432B72),
+                                                  fontSize: 17,
+                                                  fontFamily:
+                                                      'Poppins-SemiBold',
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 0.94,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 12,
+                                              ),
+                                              Text(
+                                                " 1458 ى ر س ",
+                                                textDirection:
+                                                    _getTextDirection(
+                                                        " 1458ى ر س "),
+                                                style: TextStyle(
+                                                  color: Color(0xFF919191),
+                                                  fontSize: 17,
+                                                  fontFamily: 'Roboto-Regular',
+                                                  fontWeight: FontWeight.w400,
+                                                  height: 0.89,
+                                                ),
+                                                overflow:
+                                                    TextOverflow.ellipsis, //,
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 65,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Driver Name'.tr,
+                                                style: TextStyle(
+                                                  color: Color(0xFF432B72),
+                                                  fontSize: 17,
+                                                  fontFamily:
+                                                      'Poppins-SemiBold',
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 0.94,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 12,
+                                              ),
+                                              Text(
+                                                'Ahmed Emad'.tr,
+                                                style: TextStyle(
+                                                  color: Color(0xFF919191),
+                                                  fontSize: 18,
+                                                  fontFamily: 'Poppins-Regular',
+                                                  fontWeight: FontWeight.w500,
+                                                  height: 0.89,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    Text(
-                                      " 1458 ى ر س ",
-                                      textDirection: _getTextDirection(" 1458ى ر س "),
-                                      style: TextStyle(
-                                        color: Color(0xFF919191),
-                                        fontSize: 17,
-                                        fontFamily: 'Roboto-Regular',
-                                        fontWeight: FontWeight.w400,
-                                        height: 0.89,
+                                      SizedBox(
+                                        height: 30,
                                       ),
-                                      overflow: TextOverflow.ellipsis, //,
-                                    ),
-                                  ],
+                                      Text(
+                                        'Bus photos'.tr,
+                                        style: TextStyle(
+                                          color: Color(0xFF432B72),
+                                          fontSize: 17,
+                                          fontFamily: 'Poppins-SemiBold',
+                                          fontWeight: FontWeight.w600,
+                                          height: 0.94,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 12,
+                                      ),
+                                      Container(
+                                          height: 170,
+                                          child: ListView(
+                                            scrollDirection: Axis.horizontal,
+                                            children: <Widget>[
+                                              Image.asset(
+                                                'assets/images/photo container (1).png',
+                                                width: 144,
+                                                height: 154.42,
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Image.asset(
+                                                'assets/images/photo container.png',
+                                                width: 104,
+                                                height: 111.53,
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Image.asset(
+                                                'assets/images/Property 1=3.png',
+                                                width: 104,
+                                                height: 111.53,
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Image.asset(
+                                                'assets/images/Property 1=4.png',
+                                                width: 104,
+                                                height: 111.53,
+                                              ),
+                                            ],
+                                          )),
+                                      SizedBox(
+                                        height: 44,
+                                      )
+                                    ],
+                                  ),
                                 ),
-                                SizedBox(width: 65,),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Driver Name'.tr,
-                                      style: TextStyle(
-                                        color: Color(0xFF432B72),
-                                        fontSize: 17,
-                                        fontFamily: 'Poppins-SemiBold',
-                                        fontWeight: FontWeight.w600,
-                                        height: 0.94,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    Text(
-                                      'Ahmed Emad'.tr,
-                                      style: TextStyle(
-                                        color: Color(0xFF919191),
-                                        fontSize: 18,
-                                        fontFamily: 'Poppins-Regular',
-                                        fontWeight: FontWeight.w500,
-                                        height: 0.89,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                              ],
-                            ),
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Text(
-                              'Bus photos'.tr,
-                              style: TextStyle(
-                                color: Color(0xFF432B72),
-                                fontSize: 17,
-                                fontFamily: 'Poppins-SemiBold',
-                                fontWeight: FontWeight.w600,
-                                height: 0.94,
                               ),
-                            ),
-                            SizedBox(
-                              height: 12,
-                            ),
-                            Container(
-                                height: 170,
-                                child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: <Widget>[
-                                Image.asset('assets/images/photo container (1).png',
-                                        width: 144, height: 154.42,),
-                                        SizedBox(width: 10,),
-                                        Image.asset('assets/images/photo container.png',
-                                        width: 104, height: 111.53,),
-                                    SizedBox(width: 10,),
-                                    Image.asset('assets/images/Property 1=3.png',
-                                        width: 104, height: 111.53,),
-                                        SizedBox(width: 10,),
-                                        Image.asset('assets/images/Property 1=4.png',
-                                        width:104, height: 111.53,),
-                                  ],
-                                )
-                            ),
-
-                            // Padding(
-                            //   padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                            //   child: Row(
-                            //     children: [
-                            //       Image.asset('assets/images/Frame 135.png',
-                            //       width: 56, height: 51,),
-                            //       SizedBox(width: 10,),
-                            //       Image.asset('assets/images/Frame 136.png',
-                            //       width: 56, height: 51,),
-                            //     ],
-                            //   ),
-                            // ),
-                            SizedBox(height: 44,)
-                          ],
+                        const SizedBox(
+                          height: 90,
                         ),
-                      ),
-                    )
-              //     :
-              // Column(
-              //   children: [
-              //     SizedBox(height: 30,),
-              //     Center(
-              //       child: Image.asset('assets/images/nodata.png',
-              //       width: 235,
-              //       height:149),
-              //     ),
-              //     Text('No data found',
-              //       style: TextStyle(
-              //           color: Color(0xFF442B72),
-              //           fontSize: 19,
-              //           fontFamily: 'Poppins-Regular',
-              //           fontWeight: FontWeight.w500,
-              //           height: 0.38
-              //       ),),
-              //   ],
-              // ),
-              // SizedBox(height: 20,),
-              // const SizedBox(
-              //   height: 25,
-              // ),
-              // ElevatedButton(
-              //     onPressed: (){
-              //       Navigator.of(context).push(MaterialPageRoute(
-              //           builder: (context) => TrackHaveData(
-              //             // onTapMenu: onTapMenu
-              //           )));
-              // //     }, child: Text('if we have data')),
-             , const SizedBox(
-                height: 90,
-              ),
-            ],
-          ),
-        );})),
+                      ],
+                    ),
+                  );
+                })),
         extendBody: true,
         resizeToAvoidBottomInset: false,
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100)),
             backgroundColor: Color(0xff442B72),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ProfileParent(
-                    // onTapMenu: onTapMenu
-                  )));
+                      // onTapMenu: onTapMenu
+                      )));
             },
             child: Image.asset(
               'assets/images/174237 1.png',
               height: 33,
               width: 33,
-            fit: BoxFit.cover,
-          )
-
-        ),
+              fit: BoxFit.cover,
+            )),
         bottomNavigationBar: Directionality(
             textDirection: Get.locale == Locale('ar')
                 ? TextDirection.rtl
@@ -851,7 +900,7 @@ class _TrackParentState extends State<TrackParent> {
                                 topRight: Radius.circular(38.5))),
                         RoundedRectangleBorder(
                             borderRadius:
-                            BorderRadius.all(Radius.circular(50)))),
+                                BorderRadius.all(Radius.circular(50)))),
                     notchMargin: 7,
                     child: SizedBox(
                         height: 10,
@@ -866,23 +915,21 @@ class _TrackParentState extends State<TrackParent> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              HomeParent()),
+                                          builder: (context) => HomeParent()),
                                     );
                                   });
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top:7 , right: 15):
-                                  EdgeInsets.only(left: 15),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(top: 7, right: 15)
+                                          : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (7).png',
                                           height: 20,
-                                          width: 20
-                                      ),
+                                          width: 20),
                                       SizedBox(height: 3),
                                       Text(
                                         "Home".tr,
@@ -910,21 +957,19 @@ class _TrackParentState extends State<TrackParent> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 7, left: 70):
-                                  EdgeInsets.only( right: 70 ),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(top: 7, left: 70)
+                                          : EdgeInsets.only(right: 70),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (2).png',
                                           height: 16.56,
-                                          width: 16.2
-                                      ),
+                                          width: 16.2),
                                       Image.asset(
                                           'assets/images/Vector (5).png',
                                           height: 4,
-                                          width: 6
-                                      ),
+                                          width: 6),
                                       SizedBox(height: 2),
                                       Text(
                                         "Notifications".tr,
@@ -940,28 +985,29 @@ class _TrackParentState extends State<TrackParent> {
                                 ),
                               ),
                               GestureDetector(
-                             onTap: () {
-                    setState(() {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                    builder: (context) =>
-                        AttendanceParent()),
-                    );
-                    });
-                    },
+                                onTap: () {
+                                  setState(() {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AttendanceParent()),
+                                    );
+                                  });
+                                },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                  EdgeInsets.only(top: 10 , bottom:4 ,left: 10),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(
+                                              top: 12, bottom: 4, right: 10)
+                                          : EdgeInsets.only(
+                                              top: 10, bottom: 4, left: 10),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (3).png',
                                           height: 18.75,
-                                          width: 18.75
-                                      ),
+                                          width: 18.75),
                                       SizedBox(height: 3),
                                       Text(
                                         "Calendar".tr,
@@ -977,17 +1023,20 @@ class _TrackParentState extends State<TrackParent> {
                                 ),
                               ),
                               Padding(
-                                padding:
-                                (sharedpref?.getString('lang') == 'ar')?
-                                EdgeInsets.only(top: 10 , bottom: 2 ,right: 12,left: 15):
-                                EdgeInsets.only(top: 10 , bottom: 2 ,left: 12,right: 15),
+                                padding: (sharedpref?.getString('lang') == 'ar')
+                                    ? EdgeInsets.only(
+                                        top: 10, bottom: 2, right: 12, left: 15)
+                                    : EdgeInsets.only(
+                                        top: 10,
+                                        bottom: 2,
+                                        left: 12,
+                                        right: 15),
                                 child: Column(
                                   children: [
                                     Image.asset(
                                         'assets/images/icons8_bus 1 (1).png',
                                         height: 22,
-                                        width: 25
-                                    ),
+                                        width: 25),
                                     SizedBox(height: 3),
                                     Text(
                                       "Track".tr,
@@ -1003,9 +1052,9 @@ class _TrackParentState extends State<TrackParent> {
                               ),
                             ],
                           ),
-                        )))))
-    );
+                        ))))));
   }
+
   TextDirection _getTextDirection(String text) {
     // Determine the text direction based on text content
     if (text.contains(RegExp(
@@ -1017,18 +1066,7 @@ class _TrackParentState extends State<TrackParent> {
       return TextDirection.ltr;
     }
   }
-  // Widget DashedLineInList() {
-  //   // double lineLength = students.length * 5;
-  //   return Padding(
-  //     padding: const EdgeInsets.only( left: 15.0),
-  //     child: DottedLine(
-  //       alignment: WrapAlignment.end,
-  //       // lineLength: lineLength,
-  //       direction: Axis.vertical,
-  //       dashColor: Color(0xFF432B72),
-  //     ),
-  //   );
-  // }
+
   Widget buildDashedLine() {
     // double lineLength = students.length * 40.0;
     return Padding(
