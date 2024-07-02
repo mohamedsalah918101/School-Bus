@@ -59,6 +59,11 @@ class _EditeBusState extends State<EditeBus> {
   TextEditingController _busnumbercontroller = TextEditingController();
   TextEditingController _supervisorController = TextEditingController();
 
+  bool namedrivererror = true;
+  bool drivernumbererror = true;
+  bool busnumbererror = true;
+  bool supervisorerror = true;
+  bool driverphotoerror = true;
 
 
 
@@ -269,24 +274,59 @@ class _EditeBusState extends State<EditeBus> {
   }
   List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> items=[];
-  getData()async{
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor')
+  //old function to get list of supervior
+  // getData()async{
+  //   QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('supervisor')
+  //       .where('schoolid', isEqualTo: _schoolId)
+  //       .where('state', isEqualTo: 1)
+  //       .where('bus_id', isEqualTo: '')
+  //
+  //
+  //       .get();
+  //
+  //   // data.addAll(querySnapshot.docs);
+  //   for(int i=0;i<querySnapshot.docs.length;i++)
+  //   {
+  //     var contain = selectedItems.where((element) => element.docID == querySnapshot.docs[i].id);
+  //     if (contain.isEmpty)
+  //       items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber'),isChecked: false));
+  //
+  //     else
+  //       items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber'),isChecked: true));
+  //
+  //
+  //   }
+  //   setState(() {
+  //
+  //   });
+  // }
+  //this function to get supervior that choosed and that have no bus
+  getData() async {
+    List<QueryDocumentSnapshot> allDocuments = [];
+
+    QuerySnapshot querySnapshot1 = await FirebaseFirestore.instance.collection('supervisor')
         .where('schoolid', isEqualTo: _schoolId)
         .where('state', isEqualTo: 1)
-        //.where('bus_id', isEqualTo: '')
+        .where('bus_id', isEqualTo: '')
         .get();
 
-    // data.addAll(querySnapshot.docs);
-    for(int i=0;i<querySnapshot.docs.length;i++)
+    QuerySnapshot querySnapshot2 = await FirebaseFirestore.instance.collection('supervisor')
+        .where('schoolid', isEqualTo: _schoolId)
+        .where('state', isEqualTo: 1)
+        .where('bus_id', isEqualTo: widget.docid)
+        .get();
+
+    allDocuments.addAll(querySnapshot1.docs);
+    allDocuments.addAll(querySnapshot2.docs);
+
+    for(int i=0;i<allDocuments.length;i++)
     {
-    var contain = selectedItems.where((element) => element.docID == querySnapshot.docs[i].id);
-    if (contain.isEmpty)
-      items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber'),isChecked: false));
+      var contain = selectedItems.where((element) => element.docID == allDocuments[i].id);
+      if (contain.isEmpty)
+        items.add(DropdownCheckboxItem(label:allDocuments[i].get('name'),docID: allDocuments[i].id,phone: allDocuments[i].get('phoneNumber'),isChecked: false));
 
-    else
-      items.add(DropdownCheckboxItem(label:querySnapshot.docs[i].get('name'),docID: querySnapshot.docs[i].id,phone: querySnapshot.docs[i].get('phoneNumber'),isChecked: true));
-
-
+      else
+        items.add(DropdownCheckboxItem(label:allDocuments[i].get('name'),docID: allDocuments[i].id,phone: allDocuments[i].get('phoneNumber'),isChecked: true));
     }
     setState(() {
 
@@ -682,6 +722,23 @@ class _EditeBusState extends State<EditeBus> {
                                           ),
                                         ],
                                       ),
+                                      driverphotoerror
+                                          ? Container()
+                                          : Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 32),
+                                        child: Align(
+                                          alignment:
+                                          AlignmentDirectional
+                                              .topStart,
+                                          child: Text(
+                                            "Please enter driver photo"
+                                                .tr,
+                                            style: TextStyle(
+                                                color: Colors.red),
+                                          ),
+                                        ),
+                                      ),
                                       // Padding(
 
                                       const SizedBox(
@@ -745,6 +802,21 @@ class _EditeBusState extends State<EditeBus> {
                                             focusedBorder: myFocusBorder(),
                                           ),
 
+                                        ),
+                                      ),
+                                      namedrivererror
+                                          ? Container()
+                                          : Padding(
+                                        padding:
+                                        const EdgeInsets.only(left: 32),
+                                        child: Align(
+                                          alignment:
+                                          AlignmentDirectional.topStart,
+                                          child: Text(
+                                            "Please enter your name".tr,
+                                            style: TextStyle(
+                                                color: Colors.red),
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(
@@ -813,6 +885,21 @@ class _EditeBusState extends State<EditeBus> {
                                             focusedBorder: myFocusBorder(),
                                           ),
 
+                                        ),
+                                      ),
+                                      drivernumbererror
+                                          ? Container()
+                                          : Padding(
+                                        padding:
+                                        const EdgeInsets.only(left: 32),
+                                        child: Align(
+                                          alignment:
+                                          AlignmentDirectional.topStart,
+                                          child: Text(
+                                            "Please enter phone number".tr,
+                                            style: TextStyle(
+                                                color: Colors.red),
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(
@@ -1279,6 +1366,21 @@ class _EditeBusState extends State<EditeBus> {
 
                                         ),
                                       ),
+                                      busnumbererror
+                                          ? Container()
+                                          : Padding(
+                                        padding:
+                                        const EdgeInsets.only(left: 32),
+                                        child: Align(
+                                          alignment:
+                                          AlignmentDirectional.topStart,
+                                          child: Text(
+                                            "Please enter bus number".tr,
+                                            style: TextStyle(
+                                                color: Colors.red),
+                                          ),
+                                        ),
+                                      ),
                                       const SizedBox(
                                         height: 25,
                                       ),
@@ -1404,6 +1506,18 @@ class _EditeBusState extends State<EditeBus> {
                                             items:
                                             items
                                         ),),
+                                      supervisorerror
+                                          ? Container()
+                                          : Padding(
+                                        padding: const EdgeInsets.only(left: 32),
+                                        child: Align(
+                                          alignment: AlignmentDirectional.topStart,
+                                          child: Text(
+                                            "Please choose supervisor".tr,
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ),
                                       // Container(child:DropdownCheckboxEditeBus(
                                       //     items: [
                                       //       DropdownCheckboxItem(label: 'Ahmed Atef'),
@@ -1423,16 +1537,77 @@ class _EditeBusState extends State<EditeBus> {
 
                                           child: ElevatedSimpleButton(
                                             txt: "Save".tr,
-                                            onPress: (){
-                                              editAddBus();
-                                              showSnackBarFun(context);
-                                              Navigator.pushReplacement(
-                                                  context ,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>  BusScreen(),
-                                                      maintainState: false)
-                                              );
+                                            onPress: () {
+                                              setState(() {
+                                                if (_namedrivercontroller.text.isEmpty) {
+                                                  namedrivererror = false;
+                                                } else {
+                                                  namedrivererror = true;
+                                                }
+                                                if (_phonedrivercontroller.text.isEmpty) {
+                                                  drivernumbererror = false;
+                                                } else {
+                                                  drivernumbererror = true;
+                                                }
+                                                if (_busnumbercontroller.text.isEmpty) {
+                                                  busnumbererror = false;
+                                                } else {
+                                                  busnumbererror = true;
+                                                }
+                                                if (items.isEmpty) {
+                                                  supervisorerror = false;
+                                                } else {
+                                                  supervisorerror = true;
+                                                }
+                                                if (widget.oldphotodriver== null) {
+                                                  driverphotoerror = false;
+                                                } else {
+                                                  driverphotoerror = true;
+                                                }
+                                              });
+
+                                              if (_phonedrivercontroller.text.length == 11 &&
+                                                  namedrivererror &&
+                                                  drivernumbererror &&
+                                                  busnumbererror &&
+                                                  widget.oldphotodriver != null ||_selectedImagedriverEdite != null &&
+                                                  // driverphotoerror &&
+                                                  items != null && items.isNotEmpty && supervisorerror  ) {
+                                                  editAddBus();
+                                                  Navigator.pushReplacement(
+                                                      context ,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>  BusScreen(),
+                                                          maintainState: false)
+                                                  );
+                                              } else {
+                                                if (items == null || items.isEmpty) {
+                                                  showSnackBarFun(
+                                                      context,
+                                                    //  'You must add a supervisor first',
+                                                      //Colors.red,
+                                                      //'assets/imgs/school/icons8_cancel 2.png'
+                                                  );
+                                                } else {
+                                                  // showSnackBarFun(
+                                                  //     context,
+                                                  //     'Please, enter valid number',
+                                                  //     Colors.red,
+                                                  //     'assets/imgs/school/icons8_cancel 2.png'
+                                                  // );
+                                                }
+                                              }
                                             },
+                                            // onPress: (){
+                                            //   editAddBus();
+                                            //   showSnackBarFun(context);
+                                            //   Navigator.pushReplacement(
+                                            //       context ,
+                                            //       MaterialPageRoute(
+                                            //           builder: (context) =>  BusScreen(),
+                                            //           maintainState: false)
+                                            //   );
+                                            // },
                                             width: constrains.maxWidth /1.2,
                                             hight: 48,
                                             color: const Color(0xFF442B72),

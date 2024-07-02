@@ -64,6 +64,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
 
 
   String busNumber = '';
+  Map<String, String> _busNumbers = {};
   Future<void> getBusNumber(String busId) async {
     DocumentSnapshot busDocument = await FirebaseFirestore.instance
         .collection('busdata')
@@ -80,7 +81,7 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
     if (busDocument.exists) {
       print("exists");
       setState(() {
-
+        _busNumbers[busId] = busDocument['busnumber'];
         busNumber = busDocument['busnumber'];
         print('BUSSS $busNumber');
       });
@@ -664,9 +665,11 @@ bool _isMounted= true;
                                               itemBuilder: (context, index) {
                                                 print("testtttt");
                                                 print(data[index]['bus_id']);
-                                                  getBusNumber(data[index]['bus_id']
-                                                  );
-
+                                                  // getBusNumber(data[index]['bus_id']
+                                                  // );
+                                                filteredData.forEach((data) {
+                                                  getBusNumber(data['bus_id']);
+                                                });
 
                                                 // String supervisorId = data[index]['bus_id']; // Access the ID
                                                 //
@@ -1220,9 +1223,12 @@ bool _isMounted= true;
                                                                     ),
                                                                     SizedBox(width: 10),
                                                                     Text(
-                                                                      'Bus: $busNumber',
+                                                                     // 'Bus: $busNumber',
+                                                                      _busNumbers[filteredData[index]['bus_id']] != null
+                                                                          ? _busNumbers[filteredData[index]['bus_id']]!
+                                                                          : 'No bus number available',
                                                                       //'Bus: 1 2 3 ى س ج',
-                                                                      // data[index]['bus_id'],
+                                                                      //  _busNumbers[filteredData[index]['bus_id']?? '']?? '',
                                                                       style: TextStyle(
                                                                         fontSize: 16,
                                                                         color: Color(0xFF442B72),
