@@ -15,11 +15,13 @@ class UserStatusService {
     }
   }
 
-  void setOnline() {
+  void setOnline(String userId) {
+    _fireStore.collection('users').doc(userId).update({'status': 'online'});
     setUserStatus('Online');
   }
 
-  void setOffline() {
+  void setOffline(String userId) {
+    _fireStore.collection('users').doc(userId).update({'status': 'offline'});
     setUserStatus('Offline');
   }
 }

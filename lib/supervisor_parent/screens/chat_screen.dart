@@ -240,23 +240,17 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> _checkConnectivity() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    setState(() {
-      _isOnline = (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi);
-    });
-  }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkConnectivity();
     initPlayer();
     _player = FlutterSoundPlayer();
     // _player.openAudioSession();
     // initRecorder();
-    WidgetsBinding.instance!.addObserver(this);
-    _userStatusService.setOnline();
+    _userStatusService.setOnline(currentUserID!);
     // _internetConnectionSubscription = InternetConnectionChecker().onStatusChange.listen((InternetConnectionStatus status) {
     //   if (status == InternetConnectionStatus.connected) {
     //     setState(() {
@@ -272,15 +266,18 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    if (widget.receiverId == currentUserID) {
-      _userStatusService.setOffline();
-      setState(() {
-        _connectionStatus = 'Offline';
-      });
-    }
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
+    _userStatusService.setOffline(currentUserID!);
+
     // _internetConnectionSubscription.cancel();
     super.dispose();
+  }
+
+  Future<void> _checkConnectivity() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    setState(() {
+      _isOnline = (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi);
+    });
   }
 
   void playRecordedAudio() async {
@@ -299,19 +296,21 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      if (widget.receiverId == currentUserID) {
-        _userStatusService.setOnline();
+
+        _userStatusService.setOnline(currentUserID!);
         setState(() {
+          _isOnline = true;
           _connectionStatus = 'Online';
         });
-      }
-    } else if (state == AppLifecycleState.paused) {
-      if (widget.receiverId == currentUserID) {
-        _userStatusService.setOffline();
+
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+
+        _userStatusService.setOffline(currentUserID!);
         setState(() {
+          _isOnline = false;
           _connectionStatus = 'Offline';
         });
-      }
+
     }
   }
   void _scrollToBottom() {
