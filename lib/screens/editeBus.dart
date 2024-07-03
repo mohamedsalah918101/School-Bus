@@ -123,6 +123,7 @@ class _EditeBusState extends State<EditeBus> {
       print('formState.currentState is null');
     }
   }
+
   File ? _selectedImagedriverEdite;
   String? imageUrldriver;
 
@@ -139,12 +140,11 @@ class _EditeBusState extends State<EditeBus> {
     Reference referenceDirImages = FirebaseStorage.instance.ref().child('photo');
     // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
     Reference referenceImageToUpload =referenceDirImages.child('driver');
-    // Reference referenceDirImages =
-    // referenceRoot.child('images');
-    //
-    // //Create a reference for the image to be stored
 
-    //Handle errors/success
+
+    // Create a unique file name using user ID and current timestamp
+    // String uniqueFileName = '${FirebaseAuth.instance.currentUser!.uid}_${DateTime.now().millisecondsSinceEpoch}';
+    // Reference referenceImageToUpload = referenceDirImages.child('driver_$uniqueFileName')
     try {
       //Store the file
       await referenceImageToUpload.putFile(File(returnedImage.path));
@@ -1572,7 +1572,7 @@ class _EditeBusState extends State<EditeBus> {
                                                   busnumbererror &&
                                                   widget.oldphotodriver != null ||_selectedImagedriverEdite != null &&
                                                   // driverphotoerror &&
-                                                  items != null && items.isNotEmpty && supervisorerror  ) {
+                                                  items != null && items.isNotEmpty && supervisorerror   ) {
                                                   editAddBus();
                                                   Navigator.pushReplacement(
                                                       context ,

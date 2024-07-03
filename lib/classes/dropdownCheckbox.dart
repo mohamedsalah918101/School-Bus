@@ -61,8 +61,8 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
 
                     Text(selectedNames,
 
-                      style: TextStyle(color: Color(0xFFC2C2C2), fontSize: 12,
-                      fontFamily: 'Poppins-Bold',),),
+                      style: TextStyle(color: Color(0xFF442B72), fontSize: 12,
+                      fontFamily: 'Poppins-Medium',),),
                    Image.asset("assets/imgs/school/Vector (12).png",width: 14,height: 9,),
                    // Icon(Icons.arrow_drop_down),
                   ],
