@@ -46,7 +46,7 @@ class BusComponent extends StatelessWidget {
                   ),
                   children: [
                     TextSpan(
-                        text: '0',
+                        text: '15',
                         style: TextStyle(
                             color: Color(0xFF993D9A)
                         )

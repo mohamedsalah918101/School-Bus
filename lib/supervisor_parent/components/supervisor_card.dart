@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/chat_screen.dart';
+import '../../Functions/functions.dart';
 import '../../model/ParentModel.dart';
 import '../../model/SupervisorsModel.dart';
 import 'elevated_icon_button.dart';
 
 class SupervisorCard extends StatefulWidget {
-  const SupervisorCard({super.key});
+  ParentModel? childrenData;
+  SupervisorCard({this.childrenData, super.key});
 
   @override
   State<SupervisorCard> createState() => _SupervisorCardState();
@@ -179,10 +181,15 @@ class _SupervisorCardState extends State<SupervisorCard> {
                               padding: const EdgeInsets.only(top: 12.0),
                               child: Row(
                                 children: [
-                                  Image.asset(
-                                    'assets/images/icons8_phone 1 (1).png',
-                                    width: 28,
-                                    height: 28,
+                                  GestureDetector(
+                                    onTap: (){
+                                      makePhoneCall( widget.childrenData!.supervisors![0].phone!);
+                            },
+                                    child: Image.asset(
+                                      'assets/images/icons8_phone 1 (1).png',
+                                      width: 28,
+                                      height: 28,
+                                    ),
                                   ),
                                   SizedBox(width: 9),
                                   GestureDetector(
@@ -194,7 +201,8 @@ class _SupervisorCardState extends State<SupervisorCard> {
                                     onTap: () {
                                       // Navigator.of(context).push(
                                       //     MaterialPageRoute(builder: (context) =>
-                                      //         ChatScreen()));
+                                      //         ChatScreen(receiverPhone: widget.childrenData!.supervisors![0].phone!, receiverName: widget.childrenData!.supervisors![0].name!,
+                                      //           receiverId: widget.childrenData!.supervisors![0].id!,)));
                                     },
                                   ),
                                 ],

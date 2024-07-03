@@ -42,26 +42,15 @@ class _TrackParentState extends State<TrackParent> {
   LatLng startLocation = const LatLng(27.1778429, 31.1859626);
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
 
-  // Location location = Location();
-  // StreamSubscription<LocationData>? locationSubscription;
-  // late Timer _timer;
 
   @override
   void initState() {
     super.initState();
     loadCustomIcon();
-    // startTracking();
+
   }
 
 
-  // @override
-  // void dispose() {
-  //   locationSubscription?.cancel();
-  //   _timer.cancel();
-  //   super.dispose();
-  // }
-
-  //
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
 
@@ -89,61 +78,6 @@ class _TrackParentState extends State<TrackParent> {
     return resizedImage;
   }
 
-  // void startTracking() {
-  //   locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) {
-  //     updateMarker(currentLocation);
-  //   });
-  //
-  //   // Fetch Firestore data periodically
-  //   _timer = Timer.periodic(Duration(seconds: 10), (Timer t) => fetchFirestoreData());
-  // }
-  //
-  // void updateMarker(LocationData currentLocation) {
-  //   final LatLng currentLatLng = LatLng(currentLocation.latitude!, currentLocation.longitude!);
-  //
-  //   setState(() {
-  //     markers.add(
-  //       Marker(
-  //         markerId: const MarkerId('current_location'),
-  //         position: currentLatLng,
-  //         icon: myIcon,
-  //         infoWindow: InfoWindow(title: 'Current Location'),
-  //       ),
-  //     );
-  //
-  //     if (controller != null) {
-  //       controller!.animateCamera(CameraUpdate.newLatLng(currentLatLng));
-  //     }
-  //   });
-  // }
-  //
-  // Future<void> fetchFirestoreData() async {
-  //   try {
-  //     final QuerySnapshot supervisorSnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
-  //
-  //     supervisorSnapshot.docs.forEach((doc) {
-  //       final lat = doc['lat'];
-  //       final lng = doc['lang'];
-  //
-  //       setState(() {
-  //         markers.add(
-  //           Marker(
-  //             markerId: MarkerId(doc.id),
-  //             position: LatLng(lat, lng),
-  //             icon: myIcon,
-  //             infoWindow: InfoWindow(title: 'Supervisor ${doc.id}'),
-  //           ),
-  //         );
-  //       });
-  //     });
-  //
-  //     if (controller != null) {
-  //       controller!.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching supervisor data: $e');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
