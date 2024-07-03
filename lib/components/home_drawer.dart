@@ -37,6 +37,7 @@ class _MainDrawerState extends State<HomeDrawer> {
   Widget build(BuildContext context) {
     return Container(
         width: 198,
+        height: 799,
         decoration: const ShapeDecoration(
           color: Color(0xFF442B72),
           shape: RoundedRectangleBorder(
@@ -59,7 +60,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                 padding: const EdgeInsets.only(top: 50),
                 alignment: Alignment.centerRight,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 13.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +74,8 @@ class _MainDrawerState extends State<HomeDrawer> {
                           ),
                         ),
                       ),
-                      const Spacer(),
+                     // const Spacer(),
+                      SizedBox(height:35,),
                       const Padding(
                           padding: EdgeInsets.only(
                             top: 0,
@@ -111,7 +113,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             // Get.offAll(() => const HomeScreen());
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity: const VisualDensity(
@@ -149,7 +151,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             // Get.offAll(() => const HomeScreen());
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity:
@@ -179,7 +181,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             //         (Route<dynamic> route) => false);
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity:
@@ -221,7 +223,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             //         pageBuilder: (_, __, ___) => MainBottomNavigationBar(pageNum: 4),));
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity:
@@ -251,7 +253,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             //         (Route<dynamic> route) => false);
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity:
@@ -280,7 +282,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             //         (Route<dynamic> route) => false);
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity:
@@ -309,7 +311,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             //         (Route<dynamic> route) => false);
                           }),
                       const SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                       ListTile(
                           visualDensity:
@@ -330,7 +332,7 @@ class _MainDrawerState extends State<HomeDrawer> {
                             ),
                           ),
                           onTap: () async {
-                            await sharedpref!.setString('id', '');
+                            // await sharedpref!.setString('id', '');
                             Dialoge.logOutDialog(context);
                             // userData.write('userIsLoggedIn', null);
                             // userData.write('language', null);

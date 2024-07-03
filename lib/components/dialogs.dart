@@ -465,6 +465,7 @@ class Dialoge {
                         txt: 'Log out',
                         width: 120,
                         hight: 38,
+
                         onPress: () => Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const LoginScreen()),

@@ -39,16 +39,28 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
       // Handle specific error cases here
     }
   }
+  void updateSelectedNames() {
+    setState(() {
+      if (selectedItems.isEmpty) {
+        selectedNames = "";
+      } else if (selectedItems.length == 1) {
+        selectedNames = selectedItems[0].label;
+      } else {
+        selectedNames = selectedItems.map((item) => item.label).join(', ');
+      }
+    });
+  }
   @override
   void initState() {
-    if(selectedItems.isNotEmpty){
-      if(selectedItems.length == 2){
-        selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
-      }else {
-        selectedNames = selectedItems[0].label;
-      }
-    }
+    // if(selectedItems.isNotEmpty){
+    //   if(selectedItems.length == 2){
+    //     selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+    //   }else {
+    //     selectedNames = selectedItems[0].label;
+    //   }
+    // }
     super.initState();
+    updateSelectedNames();
   }
 
   @override
@@ -131,20 +143,20 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
                                 if(selectedItems.length < 2){
                                   selectedItems.add(item); // Add to selected items list
                                   item.isChecked = value;
-                                  if(selectedItems.length == 2){
-                                    selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
-                                  }else{
-                                    selectedNames =selectedItems[0].label;
-
-                                  }
+                                  updateSelectedNames();
+                                  // if(selectedItems.length == 2){
+                                  //   selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+                                  // }else{
+                                  //   selectedNames =selectedItems[0].label;
+                                  // }
                                 }
-
-
                               } else {
                                 //  selectedItems.remove(item);
                                 selectedItems.removeWhere((items) => items.docID == item.docID);
 
-                                deleteSupervisor(item); // Call the deleteSupervisor function
+                                deleteSupervisor(item).then((_) {
+                                  updateSelectedNames();
+                                });// Call the deleteSupervisor function
                                 item.isChecked = false;
 
                                 // Clear text field value when unselecting
@@ -152,6 +164,7 @@ class _DropdownCheckboxEditeBusState extends State<DropdownCheckboxEditeBus> {
                                 //selectedItems.remove(item); // Remove from selected items list
                                 // _supervisorController.clear();
                               }
+
                             });
                             // setState(() {
                             //   item.isChecked = value!;

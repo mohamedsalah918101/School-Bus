@@ -102,12 +102,12 @@ class _AddBusState extends State<AddBus> {
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirImages =
         FirebaseStorage.instance.ref().child('photo');
-    // Reference referenceImageToUpload = referenceDirImages.child(returnedImage.path.split('/').last);
+
     Reference referenceImageToUpload = referenceDirImages.child('driver');
-    // Reference referenceDirImages =
-    // referenceRoot.child('images');
-    //
-    // //Create a reference for the image to be stored
+
+// test
+//     String uniqueFileName = '${FirebaseAuth.instance.currentUser!.uid}_${DateTime.now().millisecondsSinceEpoch}';
+//     Reference referenceImageToUpload = referenceDirImages.child('driver_$uniqueFileName');
 
     //Handle errors/success
     try {
