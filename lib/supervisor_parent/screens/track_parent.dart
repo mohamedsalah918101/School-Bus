@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_account/Functions/functions.dart';
 import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
@@ -40,11 +42,24 @@ class _TrackParentState extends State<TrackParent> {
   LatLng startLocation = const LatLng(27.1778429, 31.1859626);
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
 
+  // Location location = Location();
+  // StreamSubscription<LocationData>? locationSubscription;
+  // late Timer _timer;
+
   @override
   void initState() {
     super.initState();
     loadCustomIcon();
+    // startTracking();
   }
+
+
+  // @override
+  // void dispose() {
+  //   locationSubscription?.cancel();
+  //   _timer.cancel();
+  //   super.dispose();
+  // }
 
   //
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
@@ -73,6 +88,62 @@ class _TrackParentState extends State<TrackParent> {
             .asUint8List();
     return resizedImage;
   }
+
+  // void startTracking() {
+  //   locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) {
+  //     updateMarker(currentLocation);
+  //   });
+  //
+  //   // Fetch Firestore data periodically
+  //   _timer = Timer.periodic(Duration(seconds: 10), (Timer t) => fetchFirestoreData());
+  // }
+  //
+  // void updateMarker(LocationData currentLocation) {
+  //   final LatLng currentLatLng = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+  //
+  //   setState(() {
+  //     markers.add(
+  //       Marker(
+  //         markerId: const MarkerId('current_location'),
+  //         position: currentLatLng,
+  //         icon: myIcon,
+  //         infoWindow: InfoWindow(title: 'Current Location'),
+  //       ),
+  //     );
+  //
+  //     if (controller != null) {
+  //       controller!.animateCamera(CameraUpdate.newLatLng(currentLatLng));
+  //     }
+  //   });
+  // }
+  //
+  // Future<void> fetchFirestoreData() async {
+  //   try {
+  //     final QuerySnapshot supervisorSnapshot = await FirebaseFirestore.instance.collection('supervisor').get();
+  //
+  //     supervisorSnapshot.docs.forEach((doc) {
+  //       final lat = doc['lat'];
+  //       final lng = doc['lang'];
+  //
+  //       setState(() {
+  //         markers.add(
+  //           Marker(
+  //             markerId: MarkerId(doc.id),
+  //             position: LatLng(lat, lng),
+  //             icon: myIcon,
+  //             infoWindow: InfoWindow(title: 'Supervisor ${doc.id}'),
+  //           ),
+  //         );
+  //       });
+  //     });
+  //
+  //     if (controller != null) {
+  //       controller!.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching supervisor data: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -204,6 +275,8 @@ class _TrackParentState extends State<TrackParent> {
                                       // snippet: '',
                                       // backgroundColor: Colors.transparent,
                                     )
+                                    // :
+                                    //   InfoWindow()
                                     ),
                               );
                               setState(() {});
@@ -388,6 +461,17 @@ class _TrackParentState extends State<TrackParent> {
                                                   ),
                                                 ]),
                                               ),
+                                              //     :
+                                              // Text(
+                                              //   '0 Min.'.tr,
+                                              //   style: TextStyle(
+                                              //     color: Color(0xFF993D9A),
+                                              //     fontSize: 29.71,
+                                              //     fontFamily: 'Poppins-Medium',
+                                              //     fontWeight: FontWeight.w700,
+                                              //     height: 1.23,
+                                              //   ),
+                                              // ),
                                               SizedBox(
                                                 height: 5,
                                               ),
@@ -846,13 +930,57 @@ class _TrackParentState extends State<TrackParent> {
                                               ),
                                             ],
                                           )),
+
+                                      // Padding(
+                                      //   padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                                      //   child: Row(
+                                      //     children: [
+                                      //       Image.asset('assets/images/Frame 135.png',
+                                      //       width: 56, height: 51,),
+                                      //       SizedBox(width: 10,),
+                                      //       Image.asset('assets/images/Frame 136.png',
+                                      //       width: 56, height: 51,),
+                                      //     ],
+                                      //   ),
+                                      // ),
                                       SizedBox(
                                         height: 44,
                                       )
                                     ],
                                   ),
                                 ),
-                              ),
+                              )
+                        //     :
+                        // Column(
+                        //   children: [
+                        //     SizedBox(height: 30,),
+                        //     Center(
+                        //       child: Image.asset('assets/images/nodata.png',
+                        //       width: 235,
+                        //       height:149),
+                        //     ),
+                        //     Text('No data found',
+                        //       style: TextStyle(
+                        //           color: Color(0xFF442B72),
+                        //           fontSize: 19,
+                        //           fontFamily: 'Poppins-Regular',
+                        //           fontWeight: FontWeight.w500,
+                        //           height: 0.38
+                        //       ),),
+                        //   ],
+                        // ),
+                        // SizedBox(height: 20,),
+                        // const SizedBox(
+                        //   height: 25,
+                        // ),
+                        // ElevatedButton(
+                        //     onPressed: (){
+                        //       Navigator.of(context).push(MaterialPageRoute(
+                        //           builder: (context) => TrackHaveData(
+                        //             // onTapMenu: onTapMenu
+                        //           )));
+                        // //     }, child: Text('if we have data')),
+                        ,
                         const SizedBox(
                           height: 90,
                         ),
@@ -1067,6 +1195,18 @@ class _TrackParentState extends State<TrackParent> {
     }
   }
 
+  // Widget DashedLineInList() {
+  //   // double lineLength = students.length * 5;
+  //   return Padding(
+  //     padding: const EdgeInsets.only( left: 15.0),
+  //     child: DottedLine(
+  //       alignment: WrapAlignment.end,
+  //       // lineLength: lineLength,
+  //       direction: Axis.vertical,
+  //       dashColor: Color(0xFF432B72),
+  //     ),
+  //   );
+  // }
   Widget buildDashedLine() {
     // double lineLength = students.length * 40.0;
     return Padding(
