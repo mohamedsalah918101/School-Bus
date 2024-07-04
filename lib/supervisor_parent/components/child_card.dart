@@ -35,7 +35,7 @@ class _ChildCardState extends State<ChildCard> {
           borderRadius: BorderRadius.circular(14.0),
         ),
         child: Padding(
-            padding: const EdgeInsets.only(top: 7.0 , left: 12, right: 7 , bottom: 0),
+            padding: const EdgeInsets.only(top: 7.0 , left: 10, right: 7 , bottom: 0),
             child: Column(
               children: [
                 Row(

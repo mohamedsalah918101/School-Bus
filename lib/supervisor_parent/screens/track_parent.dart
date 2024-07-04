@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:http/http.dart' as http;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -22,6 +25,7 @@ import 'package:school_account/supervisor_parent/screens/notification_parent.dar
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:label_marker/label_marker.dart';
+import 'dart:convert' as convert;
 
 import '../components/custom_app_bar.dart';
 
@@ -31,9 +35,29 @@ class TrackParent extends StatefulWidget {
 }
 
 class _TrackParentState extends State<TrackParent> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late final String title;
+  final int _limit = 3;
+  DocumentSnapshot? _lastDocument;
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  List<DocumentSnapshot> _documents = [];
+  List<Map<String, dynamic>> childrenData = [];
+  final ScrollController _scrollController = ScrollController();
+  bool hasArrived = false;
+  String arrivalTime = '';
+  int remainingTime = 0;
+  Position? currentPosition;
+  bool dataLoading = false;
+  List<QueryDocumentSnapshot> data = [];
+  String _namedriver = ' ';
+  String _photobus = ' ';
+  String _busnumber = ' ';
+  late DateTime estimatedArrivalTime;
+  late Timer _timer;
+  Timer? locationUpdateTimer;
+  StreamSubscription<Position>? _positionStreamSubscription;
 
-  // List<ChildDataItem> children = [];
   bool tracking = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -41,26 +65,172 @@ class _TrackParentState extends State<TrackParent> {
   GoogleMapController? controller;
   LatLng startLocation = const LatLng(27.1778429, 31.1859626);
   BitmapDescriptor myIcon = BitmapDescriptor.defaultMarker;
+  double targetLatitude = 27.182;
+  double targetLongitude = 31.186;
 
+  Future<List<GeoPoint>> getLocationsFromFirestore() async {
+    List<GeoPoint> locations = [];
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('locations').get();
 
-  @override
-  void initState() {
-    super.initState();
-    loadCustomIcon();
+    snapshot.docs.forEach((doc) {
+      locations.add(doc['location']); // افترض أن لديك حقل اسمه location في المستند
+    });
 
+    return locations;
   }
 
+  Future<int> getRemainingTime(List<GeoPoint> locations) async {
+    String apiKey = 'AIzaSyDid2iv9pn1QZrPDCAbXGM7zTgcg6dWI1E';
+    String origins = '${locations.first.latitude},${locations.first.longitude}';
+    String destinations = '${locations.last.latitude},${locations.last.longitude}';
+
+    String url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=$origins&destinations=$destinations&key=$apiKey';
+
+    http.Response response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      var data = convert.json.decode(response.body);
+      var duration = data['rows'][0]['elements'][0]['duration']['value']; // الوقت بالثواني
+      return (duration / 60).round(); // تحويل الوقت إلى دقائق
+    } else {
+      throw Exception('Failed to fetch distance matrix');
+    }
+  }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        currentPosition = position;
+        arrivalTime = calculateArrivalTime(); // Update arrival time here
+        hasArrived = checkIfArrived(position); // Update arrival status here
+      });
+
+      // Store the latitude and longitude values in Firestore
+      final databaseReference = FirebaseFirestore.instance;
+      databaseReference.collection('users').doc('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<bool> _checkLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  Future<void> updateCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        currentPosition = position;
+      });
+
+      // Store the latitude and longitude values in Realtime Database
+      final databaseReference = FirebaseDatabase.instance.reference();
+      databaseReference.child('users').child('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<int> calculateRemainingTime() async {
+    List<GeoPoint> locations = await getLocationsFromFirestore();
+    return await getRemainingTime(locations);
+  }
+
+  Future<void> fetchRemainingTime() async {
+    int time = await calculateRemainingTime();
+    setState(() {
+      remainingTime = time;
+    });
+  }
+
+  void _startListeningToPositionStream() {
+    Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        currentPosition = position;
+      });
+    }, onError: (error) {
+      print('Error in geolocation stream: $error');
+    });
+  }
+
+  void _stopListeningToPositionStream() {
+    _positionStreamSubscription?.cancel();
+  }
+  //
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) async {
+      if (mounted) { // Check if the widget is still mounted
+        int time = await calculateRemainingTime(); // Await the Future
+        setState(() {
+          remainingTime = time; // Assign the awaited value
+        });
+      }
+    });
+  }
+
+  void initData() async {
+    await getCurrentLocation();
+    if (mounted) { // Check if the widget is still mounted
+      print('Current position: ${currentPosition}');
+      if (await _checkLocationPermission()) {
+        // Enable MyLocation layer
+        print('Location permission granted');
+      } else {
+        // Show message asking user to grant location permissions
+        print('Location permission denied');
+      }
+    }
+  }
+
+  String calculateArrivalTime() {
+    // Your logic to calculate the arrival time
+    // This is just a placeholder example
+    DateTime now = DateTime.now();
+    DateTime arrival = now.add(Duration(minutes: 15)); // Assume bus arrives in 15 minutes
+    return '${arrival.hour}:${arrival.minute}';
+  }
+  //
+  bool checkIfArrived(Position position) {
+    // Your logic to check if the bus has arrived
+    // This is just a placeholder example
+    // Replace this with actual logic to check if the bus has arrived
+    return position.latitude == targetLatitude && position.longitude == targetLongitude;
+  }
 
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor anotherCustomIcon = BitmapDescriptor.defaultMarker;
 
   Future<void> loadCustomIcon() async {
     final Uint8List imageData =
-        await getBytesFromAsset("assets/images/bus 1.png", 120);
+    await getBytesFromAsset("assets/images/bus 1.png", 120);
     customIcon = BitmapDescriptor.fromBytes(imageData);
 
     final Uint8List imageData2 =
-        await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
+    await getBytesFromAsset("assets/images/yellow_bus_2.png", 90);
     anotherCustomIcon = BitmapDescriptor.fromBytes(imageData2);
 
     setState(() {});
@@ -72,15 +242,148 @@ class _TrackParentState extends State<TrackParent> {
         targetWidth: width);
     final FrameInfo frameInfo = await codec.getNextFrame();
     final Uint8List resizedImage =
-        (await frameInfo.image.toByteData(format: ImageByteFormat.png))!
-            .buffer
-            .asUint8List();
+    (await frameInfo.image.toByteData(format: ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
     return resizedImage;
+  }
+
+  Future<void> getDataForBus() async {
+    setState(() {
+      dataLoading = true;
+    });
+
+    DocumentSnapshot supervisorDoc = await FirebaseFirestore.instance
+        .collection('supervisor')
+        .doc(sharedpref?.getString('id'))
+        .get();
+
+    if (supervisorDoc.exists) {
+      String busId = supervisorDoc['bus_id'];
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('busdata')
+          .where(FieldPath.documentId, isEqualTo: busId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var busData = querySnapshot.docs.first;
+        String namedriver = busData['namedriver'];
+        String photobus = busData['busphoto'];
+        String busnumber = busData['busnumber'];
+
+        setState(() {
+          _namedriver = namedriver;
+          _photobus = photobus;
+          _busnumber = busnumber;
+        });
+      }
+      else {
+        print('No bus data found');
+      }
+    }
+    else {
+      print('Supervisor document does not exist');
+    }
+
+    setState(() {
+      dataLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    locationUpdateTimer?.cancel();
+    _stopListeningToPositionStream();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !_isLoading) {
+      _fetchData();
+    }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+    _fetchData();
+    getDataForBus();
+    loadCustomIcon();
+    fetchRemainingTime();
+    _startListeningToPositionStream();
+    estimatedArrivalTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 14, 30);
+    _startTimer();
+    initData();
+    locationUpdateTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      updateCurrentLocation();
+    });
+
+    Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        currentPosition = position;
+      });
+
+
+      // Update Realtime Database with the new position
+      final databaseReference = FirebaseDatabase.instance.ref();
+      databaseReference.child('users').child('current_location').set({
+        'latitude': currentPosition!.latitude,
+        'longitude': currentPosition!.longitude,
+      });
+    });
+  }
+
+  Future<void> _fetchData({String query = ""}) async {
+    if (_isLoading || !_hasMoreData) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    var query = _firestore.collection('parent').limit(_limit);
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    final QuerySnapshot snapshot = await query.get();
+    if (snapshot.docs.isEmpty) {
+      setState(() {
+        _hasMoreData = false;
+      });
+    } else {
+      List<Map<String, dynamic>> allChildren = [];
+      String supervisorId = sharedpref!.getString('id') ?? '';
+
+      for (var parentDoc in snapshot.docs) {
+        List<dynamic> children = parentDoc['children'];
+        List<Map<String, dynamic>> filteredChildren = children
+            .where((child) => child['supervisor'] == supervisorId)
+            .map((child) => child as Map<String, dynamic>)
+            .toList();
+        allChildren.addAll(filteredChildren);
+      }
+
+      setState(() {
+        _lastDocument = snapshot.docs.last;
+        _documents.addAll(snapshot.docs);
+        childrenData.addAll(allChildren);
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         endDrawer: ParentDrawer(),
         key: _scaffoldKey,
@@ -163,6 +466,7 @@ class _TrackParentState extends State<TrackParent> {
                         SizedBox(
                           height: 350,
                           child: GoogleMap(
+                            zoomControlsEnabled: false,
                             scrollGesturesEnabled: true,
                             gestureRecognizers: Set()
                               ..add(Factory<EagerGestureRecognizer>(
@@ -181,8 +485,7 @@ class _TrackParentState extends State<TrackParent> {
                               markers.add(
                                 Marker(
                                     markerId: const MarkerId('marker_1'),
-                                    position:
-                                        const LatLng(27.1778429, 31.1859626),
+                                    position: startLocation,
                                     icon: customIcon,
                                     infoWindow:
                                         // children.isNotEmpty?
@@ -208,10 +511,7 @@ class _TrackParentState extends State<TrackParent> {
                                       // anchor: Offset(0, 0),
                                       // snippet: '',
                                       // backgroundColor: Colors.transparent,
-                                    )
-                                    // :
-                                    //   InfoWindow()
-                                    ),
+                                    )),
                               );
                               setState(() {});
                             }),
