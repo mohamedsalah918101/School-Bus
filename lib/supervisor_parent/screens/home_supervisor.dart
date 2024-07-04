@@ -359,7 +359,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 370, //300
+                                height: 375, //300
                                 width: double.infinity,
                                 child: ListView.builder(
                                   shrinkWrap: true,
@@ -380,7 +380,10 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
 
                                     // Filter the children list based on supervisor ID and state
                                     List<dynamic> filteredChildren = children?.where((child) {
-                                      return child['supervisor'] == sharedpref!.getString('id').toString() && data[index]['state'] == 1;
+                                      return child['supervisor'] == sharedpref!.getString('id').toString() &&
+                                          data[index]['state'] == 1 &&
+                                          (data[index]['address'] != null && data[index]['address'].toString().trim().isNotEmpty);
+
                                     }).toList() ?? [];
 
                                     if (filteredChildren.isEmpty) {
@@ -391,7 +394,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                           for (var child in filteredChildren)
                                             SizedBox(
                                               width: double.infinity,
-                                              height: 115, //92
+                                              height: 120, //92
                                               child: Card(
                                                 elevation: 5,
                                                 color: Colors.white,

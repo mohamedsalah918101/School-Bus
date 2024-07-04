@@ -51,8 +51,10 @@ class _ParentsViewState extends State<ParentsView> {
 
 
   getDataForDeclinedFilter()async{
+    String supervisorId = sharedpref!.getString('id') ?? '';
+
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2).where('supervisor', isEqualTo: supervisorId).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
@@ -62,21 +64,34 @@ class _ParentsViewState extends State<ParentsView> {
       isFiltered = true;
     });
   }
-  getDataForWaitingFilter()async{
+
+  Future<void> getDataForWaitingFilter() async {
+    String supervisorId = sharedpref!.getString('id') ?? '';
+
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
+    QuerySnapshot parentData = await parent.where('state', isEqualTo: 0).where('supervisor', isEqualTo: supervisorId).get();
+
     setState(() {
       _documents = parentData.docs;
       isFiltered = true;
     });
   }
+  // getDataForWaitingFilter()async{
+  //   CollectionReference parent = FirebaseFirestore.instance.collection('parent');
+  //   QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
+  //   // parentData.docs.forEach((element) {
+  //   //   data.add(element);
+  //   // }
+  //   // );
+  //   setState(() {
+  //     _documents = parentData.docs;
+  //     isFiltered = true;
+  //   });
+  // }
   getDataForAcceptFilter()async{
+    String supervisorId = sharedpref!.getString('id') ?? '';
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
+    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).where('supervisor', isEqualTo: supervisorId).get();
     // parentData.docs.forEach((element) {
     //   data.add(element);
     // }
