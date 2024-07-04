@@ -398,178 +398,418 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
+                                      // Container(
+                                      //   width: 135,
+                                      //   height: 129,
+                                      //   decoration: BoxDecoration(
+                                      //     color:blendedColor, // Your desired background color
+                                      //     borderRadius: BorderRadius.circular(5),
+                                      //   ),
+                                      //   child: Align(alignment: AlignmentDirectional.topStart,
+                                      //     child: Column(
+                                      //       children: [
+                                      //         SizedBox(height: 10,),
+                                      //         Row(
+                                      //           children: [
+                                      //             Padding(
+                                      //               padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      //               child: Image.asset("assets/imgs/school/bus 2.png",width: 50,height: 50,),
+                                      //             ),
+                                      //           SizedBox(width: 28,),
+                                      //             GestureDetector(
+                                      //               onTap: (){
+                                      //                 Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
+                                      //               },
+                                      //               child: Container(width: 30,
+                                      //                 height: 30,
+                                      //                 decoration: BoxDecoration(
+                                      //                 color:Color(0xff442B72), // Your desired background color
+                                      //                 borderRadius: BorderRadius.circular(15),
+                                      //               ),child: Icon(Icons.add,color:blendedColor,size: 19,),),
+                                      //             )
+                                      //           ],
+                                      //         ),
+                                      //         Align(alignment: AlignmentDirectional.bottomStart,
+                                      //             child: Padding(
+                                      //               padding: const EdgeInsets.only(left: 10),
+                                      //               child: Text("Buses".tr,style: TextStyle(fontSize: 14,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
+                                      //             )),
+                                      //         Align(alignment: AlignmentDirectional.bottomStart,
+                                      //             child: Padding(
+                                      //               padding: const EdgeInsets.only(left: 10),
+                                      //               child:  FutureBuilder<int>(
+                                      //                 future: _numberOfBuses,
+                                      //                 builder: (context, snapshot) {
+                                      //                   if (snapshot.hasData) {
+                                      //                     return Text('# ${snapshot.data}',style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),);
+                                      //                   } else if (snapshot.hasError) {
+                                      //                     return Text('Error: ${snapshot.error}');
+                                      //                   } else {
+                                      //                     return Text('Loading...');
+                                      //                   }
+                                      //                 },
+                                      //               ),
+                                      //               //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
+                                      //             )),
+                                      //         Align(
+                                      //           alignment: AlignmentDirectional.bottomEnd,
+                                      //           child: GestureDetector(
+                                      //             onTap: (){
+                                      //               Navigator.push(context, MaterialPageRoute(builder: (context)=>BusScreen()));
+                                      //             },
+                                      //             child: Align(alignment: AlignmentDirectional.bottomEnd,
+                                      //               child:
+                                      //               Container(
+                                      //                 width: 57,
+                                      //                 height: 29,
+                                      //                 decoration: BoxDecoration(
+                                      //                     color: Color(0xff442B72),
+                                      //                   borderRadius: BorderRadius.only(
+                                      //                       topLeft: Radius.circular(15),
+                                      //                   bottomRight: Radius.circular(7)),
+                                      //
+                                      //                 ),
+                                      //                 child: Align(
+                                      //                     alignment: AlignmentDirectional.bottomCenter,
+                                      //                   child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
+                                      //               //     FaIcon(
+                                      //               //     FontAwesomeIcons.arrowRight,
+                                      //               //     color: Colors.white,
+                                      //               //     size: 20,
+                                      //               // ),
+                                      //                 ),
+                                      //               ),
+                                      //             ),
+                                      //           ),
+                                      //         ),
+                                      //
+                                      //       ],
+                                      //     ),
+                                      //   ),
+                                      // ),
                                       Container(
                                         width: 135,
                                         height: 129,
                                         decoration: BoxDecoration(
-                                          color:blendedColor, // Your desired background color
+                                          color: blendedColor, // Your desired background color
                                           borderRadius: BorderRadius.circular(5),
                                         ),
-                                        child: Align(alignment: AlignmentDirectional.topStart,
-                                          child: Column(
-                                            children: [
-                                              SizedBox(height: 10,),
-                                              Row(
+                                        child: Stack(
+                                          children: [
+                                            Align(
+                                              alignment: AlignmentDirectional.topStart,
+                                              child: Column(
                                                 children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                    child: Image.asset("assets/imgs/school/bus 2.png",width: 50,height: 50,),
-                                                  ),
-                                                SizedBox(width: 28,),
-                                                  GestureDetector(
-                                                    onTap: (){
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AddBus()));
-                                                    },
-                                                    child: Container(width: 30,
-                                                      height: 30,
-                                                      decoration: BoxDecoration(
-                                                      color:Color(0xff442B72), // Your desired background color
-                                                      borderRadius: BorderRadius.circular(15),
-                                                    ),child: Icon(Icons.add,color:blendedColor,size: 19,),),
-                                                  )
-                                                ],
-                                              ),
-                                              Align(alignment: AlignmentDirectional.bottomStart,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child: Text("Buses".tr,style: TextStyle(fontSize: 14,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
-                                                  )),
-                                              Align(alignment: AlignmentDirectional.bottomStart,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child:  FutureBuilder<int>(
-                                                      future: _numberOfBuses,
-                                                      builder: (context, snapshot) {
-                                                        if (snapshot.hasData) {
-                                                          return Text('# ${snapshot.data}',style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),);
-                                                        } else if (snapshot.hasError) {
-                                                          return Text('Error: ${snapshot.error}');
-                                                        } else {
-                                                          return Text('Loading...');
-                                                        }
-                                                      },
-                                                    ),
-                                                    //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
-                                                  )),
-                                              Align(
-                                                alignment: AlignmentDirectional.bottomEnd,
-                                                child: GestureDetector(
-                                                  onTap: (){
-                                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>BusScreen()));
-                                                  },
-                                                  child: Align(alignment: AlignmentDirectional.bottomEnd,
-                                                    child: Container(
-                                                      width: 57,
-                                                      height: 29,
-                                                      decoration: BoxDecoration(
-                                                          color: Color(0xff442B72),
-                                                        borderRadius: BorderRadius.only(
-                                                            topLeft: Radius.circular(15),
-                                                        bottomRight: Radius.circular(7)),
-
+                                                  SizedBox(height: 10,),
+                                                  Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                        child: Image.asset(
+                                                          "assets/imgs/school/bus 2.png",
+                                                          width: 50,
+                                                          height: 50,
+                                                        ),
                                                       ),
-                                                      child: Align(
-                                                          alignment: AlignmentDirectional.bottomCenter,
-                                                        child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
-                                                    //     FaIcon(
-                                                    //     FontAwesomeIcons.arrowRight,
-                                                    //     color: Colors.white,
-                                                    //     size: 20,
-                                                    // ),
-                                                      ),),
+                                                      SizedBox(width: 28,),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddBus()));
+                                                        },
+                                                        child: Container(
+                                                          width: 30,
+                                                          height: 30,
+                                                          decoration: BoxDecoration(
+                                                            color: Color(0xff442B72), // Your desired background color
+                                                            borderRadius: BorderRadius.circular(15),
+                                                          ),
+                                                          child: Icon(
+                                                            Icons.add,
+                                                            color: blendedColor,
+                                                            size: 19,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Align(
+                                                      alignment: AlignmentDirectional.bottomStart,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(left: 10),
+                                                        child: Text(
+                                                          "Buses".tr,
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontFamily: "Poppins-SemiBold",
+                                                              color: Color(0xff442B72)
+                                                          ),
+                                                        ),
+                                                      )
+                                                  ),
+                                                  Align(
+                                                    alignment: AlignmentDirectional.bottomStart,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(left: 10),
+                                                      child: FutureBuilder<int>(
+                                                        future: _numberOfBuses,
+                                                        builder: (context, snapshot) {
+                                                          if (snapshot.hasData) {
+                                                            return Text(
+                                                              '# ${snapshot.data}',
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  fontFamily: "Poppins-Regular",
+                                                                  color: Color(0xff442B72)
+                                                              ),
+                                                            );
+                                                          } else if (snapshot.hasError) {
+                                                            return Text('Error: ${snapshot.error}');
+                                                          } else {
+                                                            return Text('Loading...');
+                                                          }
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Positioned(
+                                              bottom: 0,
+                                              right: 0,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => BusScreen()));
+                                                },
+                                                child: Container(
+                                                  width: 57,
+                                                  height: 29,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xff442B72),
+                                                    borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(15),
+                                                        bottomRight: Radius.circular(7)
+                                                    ),
+                                                  ),
+                                                  child: Align(
+                                                    alignment: AlignmentDirectional.bottomCenter,
+                                                    child: Icon(
+                                                      Icons.arrow_right_alt_outlined,
+                                                      color: Colors.white,
+                                                      size: 30,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
                                       ),
+// old that arrow not in bottom right
                                       //SizedBox(width: 10,),
+                                      // Container(
+                                      //   width: 135,
+                                      //   height: 129,
+                                      //   decoration: BoxDecoration(
+                                      //     color:blendedColorTwo, // Your desired background color
+                                      //     borderRadius: BorderRadius.circular(5),
+                                      //   ),
+                                      //   child: Align(alignment: AlignmentDirectional.topStart,
+                                      //     child: Column(
+                                      //       children: [
+                                      //         SizedBox(height: 10,),
+                                      //         Row(
+                                      //           children: [
+                                      //             Padding(
+                                      //               padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      //               child: Image.asset("assets/imgs/school/supervisorH.png",width: 50,height: 50,),
+                                      //             ),
+                                      //             SizedBox(width: 28,),
+                                      //             GestureDetector(
+                                      //               onTap: (){
+                                      //                 Navigator.push(context, MaterialPageRoute(builder: (context)=>SendInvitation()));
+                                      //               },
+                                      //               child: Container(width: 30,
+                                      //                 height: 30,
+                                      //                 decoration: BoxDecoration(
+                                      //                   color:Color(0xff442B72), // Your desired background color
+                                      //                   borderRadius: BorderRadius.circular(15),
+                                      //                 ),child: Icon(Icons.add,color:blendedColorTwo,size: 19,),),
+                                      //             )
+                                      //           ],
+                                      //         ),
+                                      //         Align(alignment: AlignmentDirectional.bottomStart,
+                                      //             child: Padding(
+                                      //               padding: const EdgeInsets.only(left: 10),
+                                      //               child: Text("Supervisors".tr,style: TextStyle(fontSize: 14,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
+                                      //             )),
+                                      //         Align(alignment: AlignmentDirectional.bottomStart,
+                                      //             child: Padding(
+                                      //               padding: const EdgeInsets.only(left: 10),
+                                      //               child:
+                                      //               FutureBuilder<int>(
+                                      //                 future: _numberOfSupervisors,
+                                      //                 builder: (context, snapshot) {
+                                      //                   if (snapshot.hasData) {
+                                      //                     return Text('# ${snapshot.data}',style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),);
+                                      //                   } else if (snapshot.hasError) {
+                                      //                     return Text('Error: ${snapshot.error}');
+                                      //                   } else {
+                                      //                     return Text('Loading...');
+                                      //                   }
+                                      //                 },
+                                      //               ),
+                                      //               //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
+                                      //             )),
+                                      //         Align(alignment: AlignmentDirectional.bottomEnd,
+                                      //           child: GestureDetector(
+                                      //             onTap: (){
+                                      //               Navigator.push(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+                                      //             },
+                                      //             child: Container(
+                                      //               width: 57,
+                                      //               height: 29,
+                                      //               decoration: BoxDecoration(
+                                      //                 color: Color(0xff442B72),
+                                      //                 borderRadius: BorderRadius.only(
+                                      //                     topLeft: Radius.circular(15),
+                                      //                     bottomRight: Radius.circular(7)),
+                                      //
+                                      //               ),
+                                      //               child: Align(alignment: AlignmentDirectional.bottomCenter,
+                                      //                   child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
+                                      //                 //     FaIcon(
+                                      //                 //     FontAwesomeIcons.arrowRight,
+                                      //                 //     color: Colors.white,
+                                      //                 //     size: 20,
+                                      //                 // ),
+                                      //               ),),
+                                      //           ),
+                                      //         ),
+                                      //
+                                      //       ],
+                                      //     ),
+                                      //   ),
+                                      // ),
                                       Container(
                                         width: 135,
                                         height: 129,
                                         decoration: BoxDecoration(
-                                          color:blendedColorTwo, // Your desired background color
+                                          color: blendedColorTwo, // Your desired background color
                                           borderRadius: BorderRadius.circular(5),
                                         ),
-                                        child: Align(alignment: AlignmentDirectional.topStart,
-                                          child: Column(
-                                            children: [
-                                              SizedBox(height: 10,),
-                                              Row(
+                                        child: Stack(
+                                          children: [
+                                            Align(
+                                              alignment: AlignmentDirectional.topStart,
+                                              child: Column(
                                                 children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                    child: Image.asset("assets/imgs/school/supervisorH.png",width: 50,height: 50,),
+                                                  SizedBox(height: 10,),
+                                                  Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                        child: Image.asset(
+                                                          "assets/imgs/school/supervisorH.png",
+                                                          width: 50,
+                                                          height: 50,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 28,),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => SendInvitation()));
+                                                        },
+                                                        child: Container(
+                                                          width: 30,
+                                                          height: 30,
+                                                          decoration: BoxDecoration(
+                                                            color: Color(0xff442B72), // Your desired background color
+                                                            borderRadius: BorderRadius.circular(15),
+                                                          ),
+                                                          child: Icon(
+                                                            Icons.add,
+                                                            color: blendedColorTwo,
+                                                            size: 19,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
                                                   ),
-                                                  SizedBox(width: 28,),
-                                                  GestureDetector(
-                                                    onTap: (){
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>SendInvitation()));
-                                                    },
-                                                    child: Container(width: 30,
-                                                      height: 30,
-                                                      decoration: BoxDecoration(
-                                                        color:Color(0xff442B72), // Your desired background color
-                                                        borderRadius: BorderRadius.circular(15),
-                                                      ),child: Icon(Icons.add,color:blendedColorTwo,size: 19,),),
-                                                  )
+                                                  Align(
+                                                      alignment: AlignmentDirectional.bottomStart,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(left: 10),
+                                                        child: Text(
+                                                          "Supervisors".tr,
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontFamily: "Poppins-SemiBold",
+                                                              color: Color(0xff442B72)
+                                                          ),
+                                                        ),
+                                                      )
+                                                  ),
+                                                  Align(
+                                                    alignment: AlignmentDirectional.bottomStart,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(left: 10),
+                                                      child: FutureBuilder<int>(
+                                                        future: _numberOfSupervisors,
+                                                        builder: (context, snapshot) {
+                                                          if (snapshot.hasData) {
+                                                            return Text(
+                                                              '# ${snapshot.data}',
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  fontFamily: "Poppins-Regular",
+                                                                  color: Color(0xff442B72)
+                                                              ),
+                                                            );
+                                                          } else if (snapshot.hasError) {
+                                                            return Text('Error: ${snapshot.error}');
+                                                          } else {
+                                                            return Text('Loading...');
+                                                          }
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
-                                              Align(alignment: AlignmentDirectional.bottomStart,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child: Text("Supervisors".tr,style: TextStyle(fontSize: 14,fontFamily:"Poppins-SemiBold",color: Color(0xff442B72) ),),
-                                                  )),
-                                              Align(alignment: AlignmentDirectional.bottomStart,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child:
-                                                    FutureBuilder<int>(
-                                                      future: _numberOfSupervisors,
-                                                      builder: (context, snapshot) {
-                                                        if (snapshot.hasData) {
-                                                          return Text('# ${snapshot.data}',style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),);
-                                                        } else if (snapshot.hasError) {
-                                                          return Text('Error: ${snapshot.error}');
-                                                        } else {
-                                                          return Text('Loading...');
-                                                        }
-                                                      },
+                                            ),
+                                            Positioned(
+                                              bottom: 0,
+                                              right: 0,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => SupervisorScreen()));
+                                                },
+                                                child: Container(
+                                                  width: 57,
+                                                  height: 29,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xff442B72),
+                                                    borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(15),
+                                                        bottomRight: Radius.circular(7)
                                                     ),
-                                                    //Text("#15",style: TextStyle(fontSize: 12,fontFamily:"Poppins-Regular",color: Color(0xff442B72) ),),
-                                                  )),
-                                              Align(alignment: AlignmentDirectional.bottomEnd,
-                                                child: GestureDetector(
-                                                  onTap: (){
-                                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
-                                                  },
-                                                  child: Container(
-                                                    width: 57,
-                                                    height: 29,
-                                                    decoration: BoxDecoration(
-                                                      color: Color(0xff442B72),
-                                                      borderRadius: BorderRadius.only(
-                                                          topLeft: Radius.circular(15),
-                                                          bottomRight: Radius.circular(7)),
-
+                                                  ),
+                                                  child: Align(
+                                                    alignment: AlignmentDirectional.bottomCenter,
+                                                    child: Icon(
+                                                      Icons.arrow_right_alt_outlined,
+                                                      color: Colors.white,
+                                                      size: 30,
                                                     ),
-                                                    child: Align(alignment: AlignmentDirectional.bottomCenter,
-                                                        child: Icon(Icons.arrow_right_alt_outlined,color: Colors.white,size: 30,)
-                                                      //     FaIcon(
-                                                      //     FontAwesomeIcons.arrowRight,
-                                                      //     color: Colors.white,
-                                                      //     size: 20,
-                                                      // ),
-                                                    ),),
+                                                  ),
                                                 ),
                                               ),
-
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
+                                      )
+
                                     ],
                                   ),
                                   SizedBox(height: 30,),

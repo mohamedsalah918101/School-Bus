@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,19 +14,57 @@ class DropdownCheckbox extends StatefulWidget {
   _DropdownCheckboxState createState() => _DropdownCheckboxState();
 }
 class _DropdownCheckboxState extends State<DropdownCheckbox> {
+
+  deleteSupervisor(DropdownCheckboxItem item) async {
+    print('deleteSupervisor called');
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('supervisor')
+          .doc(item.docID)
+          .update({'bus_id': ''});
+
+      print('Supervisor deleted successfully');
+
+      // Remove the item from the selectedItems list
+      selectedItems.removeWhere((items) => items.docID == item.docID);
+
+      setState(() {
+        // Trigger a rebuild of the widget tree if necessary
+      });
+    } catch (e) {
+      print('Error deleting supervisor: $e');
+      // Handle specific error cases here
+    }
+  }
+
+
+  void updateSelectedNames() {
+    setState(() {
+      if (selectedItems.isEmpty) {
+        selectedNames = "";
+      } else if (selectedItems.length == 1) {
+        selectedNames = selectedItems[0].label;
+      } else {
+        selectedNames = selectedItems.map((item) => item.label).join(', ');
+      }
+      widget.controller.text = selectedNames;
+    });
+  }
   bool isDropdownOpened = false;
   String selectedNames='Supervisor';
   TextEditingController _supervisorController = TextEditingController();
 @override
   void initState() {
-  if(selectedItems.isNotEmpty){
-  if(selectedItems.length == 2){
-    selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
-  }else {
-    selectedNames = selectedItems[0].label;
-  }
-  }
+  // if(selectedItems.isNotEmpty){
+  // if(selectedItems.length == 2){
+  //   selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+  // }else {
+  //   selectedNames = selectedItems[0].label;
+  // }
+  // }
     super.initState();
+    updateSelectedNames();
   }
   @override
   Widget build(BuildContext context) {
@@ -110,12 +149,13 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
                                  if(selectedItems.length < 2){
                                    selectedItems.add(item); // Add to selected items list
                                    item.isChecked = value;
-                                   if(selectedItems.length == 2){
-                                     selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
-                                   }else{
-                                     selectedNames =selectedItems[0].label;
-
-                                   }
+                                   updateSelectedNames();
+                                   // if(selectedItems.length == 2){
+                                   //   selectedNames =selectedItems[0].label+ ','+selectedItems[1].label;
+                                   // }else{
+                                   //   selectedNames =selectedItems[0].label;
+                                   //
+                                   // }
                                  }
 
 
@@ -125,6 +165,9 @@ class _DropdownCheckboxState extends State<DropdownCheckbox> {
 
 
                                 item.isChecked = false;
+                                deleteSupervisor(item).then((_) {
+                                  updateSelectedNames();
+                                });
 
                                 // Clear text field value when unselecting
                                 selectedNames =selectedItems[0].label;

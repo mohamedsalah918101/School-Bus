@@ -98,7 +98,8 @@ class _SchoolDataState extends State<SchoolData> {
       'coordinatorName':_coordinatorName.text,
       'supportNumber':_supportNumber.text,
       'photo': imageUrl,
-      'state':1
+      'state':1,
+      'schoolid':sharedpref!.getString('id')
     };
 
 

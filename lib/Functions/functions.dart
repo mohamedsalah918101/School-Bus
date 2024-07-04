@@ -208,6 +208,60 @@ Future<bool> addSupervisorCheck(String phoneNumber) async {
   }
 }
 
+Future<Map<String, dynamic>> addSupervisorCheckinotherschool(String phoneNumber) async {
+  CollectionReference schooldataCollection = FirebaseFirestore.instance.collection('schooldata');
+  CollectionReference supervisorCollection = FirebaseFirestore.instance.collection('supervisor');
+  CollectionReference parentCollection = FirebaseFirestore.instance.collection('parent');
+
+  try {
+    // Check in schooldata collection
+    Query queryOfNumber = schooldataCollection.where('phoneNumber', isEqualTo: phoneNumber);
+    QuerySnapshot snapshot = await queryOfNumber.get();
+
+    if (snapshot.size > 0) {
+      return {
+        'exists': true,
+        'schoolid': snapshot.docs[0].get('schoolid')
+      };
+    }
+
+    // Check in supervisor collection
+    queryOfNumber = supervisorCollection.where('phoneNumber', isEqualTo: phoneNumber);
+    snapshot = await queryOfNumber.get();
+
+    if (snapshot.size > 0) {
+      return {
+        'exists': true,
+        'schoolid': snapshot.docs[0].get('schoolid')
+      };
+    }
+
+    // Check in parent collection
+    queryOfNumber = parentCollection.where('phoneNumber', isEqualTo: phoneNumber);
+    snapshot = await queryOfNumber.get();
+
+    if (snapshot.size > 0) {
+      return {
+        'exists': true,
+        'schoolid': snapshot.docs[0].get('schoolid')
+      };
+    }
+
+    // If the phone number does not exist in any collection
+    return {
+      'exists': false,
+      'schoolid': null
+    };
+
+  } catch (error) {
+    print('Error: $error');
+    return {
+      'exists': false,
+      'schoolid': null
+    };
+  }
+}
+
 
 
 List<PointLatLng> decodeEncodedPolyline(String encoded) {

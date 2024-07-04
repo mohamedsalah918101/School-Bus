@@ -76,73 +76,128 @@ class _SendInvitationState extends State<SendInvitation> {
     }
   }
   void _addDataToFirestore() async {
-    //if (_formKey.currentState!.validate()) {
-      // Define the data to add
-      Map<String, dynamic> data = {
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'phoneNumber': enteredPhoneNumber,
-        'state':0,
-        'invite':1,
-        'busphoto': '',
-        'schoolid':_schoolId,
-        'schoolname':sharedpref!.getString('nameEnglish')??0,
-         'photo':sharedpref!.getString('photo')?? 0,
-        'bus_id':''
-      };
-      print('phonenum');
-      print( _phoneNumberController.text);
-      // Add the data to the Firestore collection
-      var check =await addSupervisorCheck(enteredPhoneNumber);
-      if(!check) {
-        var res =await checkUpdateSupervisor(enteredPhoneNumber);
-        if(!res) {
+    Map<String, dynamic> data = {
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phoneNumber': enteredPhoneNumber,
+      'state': 0,
+      'invite': 1,
+      'busphoto': '',
+      'schoolid': _schoolId,
+      'schoolname': sharedpref!.getString('nameEnglish') ?? 0,
+      'photo': sharedpref!.getString('photo') ?? 0,
+      'bus_id': ''
+    };
+
+    print('phonenum');
+    print(_phoneNumberController.text);
+
+    // Add the data to the Firestore collection
+    var check = await addSupervisorCheckinotherschool(enteredPhoneNumber);
+
+    if (check['exists']) {
+      if (check['schoolid'] != _schoolId) {
+        // Show dialog if the phone number exists in another school
+        Dialoge.SupervisorAlreadyAddedInOtherSchool(context);
+      } else {
+        Dialoge.SupervisorAlreadyAdded(context);
+        await _firestore.collection('supervisor').doc(docID).update(data);
+        _nameController.clear();
+        _phoneNumberController.clear();
+        _emailController.clear();
+      }
+    } else {
       await _firestore.collection('supervisor').add(data).then((docRef) async {
-        docid=docRef.id;
+        docid = docRef.id;
         print('Data added with document ID: ${docRef.id}');
-        var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+        var res = await createDynamicLink(true, docid, _phoneNumberController.text, 'supervisor');
         if (res == "success") {
           showSnackBarFun(
-              context, 'Invitation sent successfully',Color(0xFF4CAF50),
+              context, 'Invitation sent successfully', Color(0xFF4CAF50),
               'assets/imgs/school/Vector (4).png');
         } else {
           showSnackBarFun(
-              context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+              context, 'Invitation haven\'t sent', Color(0xFFDB4446),
+              'assets/imgs/school/icons8_cancel 2.png');
         }
+      }).catchError((error) {
+        print('Failed to add data: $error');
+      });
 
-
-//when put this code the invitation doesnot appear when phone number already exists but when add new supervisor the snackbar of faild appear
-//         var res =  createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+      _nameController.clear();
+      _phoneNumberController.clear();
+      _emailController.clear();
+    }
+  }
+// function add supervior without dialog of already exsits in other school
+//   void _addDataToFirestore() async {
+//     //if (_formKey.currentState!.validate()) {
+//       // Define the data to add
+//       Map<String, dynamic> data = {
+//         'name': _nameController.text,
+//         'email': _emailController.text,
+//         'phoneNumber': enteredPhoneNumber,
+//         'state':0,
+//         'invite':1,
+//         'busphoto': '',
+//         'schoolid':_schoolId,
+//         'schoolname':sharedpref!.getString('nameEnglish')??0,
+//          'photo':sharedpref!.getString('photo')?? 0,
+//         'bus_id':''
+//       };
+//       print('phonenum');
+//       print( _phoneNumberController.text);
+//       // Add the data to the Firestore collection
+//       var check =await addSupervisorCheck(enteredPhoneNumber);
+//       if(!check) {
+//         var res =await checkUpdateSupervisor(enteredPhoneNumber);
+//         if(!res) {
+//       await _firestore.collection('supervisor').add(data).then((docRef) async {
+//         docid=docRef.id;
+//         print('Data added with document ID: ${docRef.id}');
+//         var res = await createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
 //         if (res == "success") {
 //           showSnackBarFun(
-//               context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
+//               context, 'Invitation sent successfully',Color(0xFF4CAF50),
+//               'assets/imgs/school/Vector (4).png');
 //         } else {
 //           showSnackBarFun(
 //               context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
 //         }
-        // showSnackBarFun(context);
-      }).catchError((error) {
-        print('Failed to add data: $error');
-      });
-      // Clear the text fields
-      _nameController.clear();
-      _phoneNumberController.clear();
-      _emailController.clear();
-    }else{
-          await _firestore.collection('supervisor').doc(docID).update(data);
-          // Clear the text fields
-          _nameController.clear();
-          _phoneNumberController.clear();
-          _emailController.clear();
-        }
-
-      }     // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
-      else {
-        // Show dialog if the phone number is already added
-        Dialoge.SupervisorAlreadyAdded(context);
-      }
-
-  }
+//
+//
+// //when put this code the invitation doesnot appear when phone number already exists but when add new supervisor the snackbar of faild appear
+// //         var res =  createDynamicLink(true,docid,_phoneNumberController.text,'supervisor');
+// //         if (res == "success") {
+// //           showSnackBarFun(
+// //               context, 'Invitation sent successfully',Color(0xFF4CAF50), 'assets/imgs/school/Vector (4).png');
+// //         } else {
+// //           showSnackBarFun(
+// //               context, 'Invitation haven\'t sent',Color(0xFFDB4446) ,'assets/imgs/school/icons8_cancel 2.png');
+// //         }
+//         // showSnackBarFun(context);
+//       }).catchError((error) {
+//         print('Failed to add data: $error');
+//       });
+//       // Clear the text fields
+//       _nameController.clear();
+//       _phoneNumberController.clear();
+//       _emailController.clear();
+//     }else{
+//           await _firestore.collection('supervisor').doc(docID).update(data);
+//           // Clear the text fields
+//           _nameController.clear();
+//           _phoneNumberController.clear();
+//           _emailController.clear();
+//         }
+//
+//       }     // ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text('this phone already added')));
+//       else {
+//         // Show dialog if the phone number is already added
+//         Dialoge.SupervisorAlreadyAdded(context);
+//       }
+//
+//   }
  // }
   bool _validateName = false;
   bool _validatePhone = false;

@@ -1411,9 +1411,21 @@ class _AddBusState extends State<AddBus> {
                                             controller: _supervisorController,
                                             items: items),
                                       ),
-                                      supervisorerror
-                                          ? Container()
-                                          : Padding(
+                                      // supervisorerror
+                                      //     ? Container()
+                                      //     : Padding(
+                                      //   padding: const EdgeInsets.only(left: 32),
+                                      //   child: Align(
+                                      //     alignment: AlignmentDirectional.topStart,
+                                      //     child: Text(
+                                      //       "Please choose supervisor".tr,
+                                      //       style: TextStyle(color: Colors.red),
+                                      //     ),
+                                      //   ),
+                                      // ),
+
+                                      !supervisorerror
+                                          ? Padding(
                                         padding: const EdgeInsets.only(left: 32),
                                         child: Align(
                                           alignment: AlignmentDirectional.topStart,
@@ -1422,17 +1434,8 @@ class _AddBusState extends State<AddBus> {
                                             style: TextStyle(color: Colors.red),
                                           ),
                                         ),
-                                      ),
-
-                                      // supervisorerror?Container(): Padding(
-                                      //   padding: const EdgeInsets.only(left: 32),
-                                      //   child: Align( alignment: AlignmentDirectional.topStart,
-                                      //     child: Text(
-                                      //       "Please choose supervisor".tr,
-                                      //       style: TextStyle(color: Colors.red),
-                                      //     ),
-                                      //   ),
-                                      // ),
+                                      )
+                                          : Container(),
                                       //end empty code
                                       // DropdownButtonFormField(value:null,items: [], onChanged: (value){}),
                                       // DropdownButton<String>(
@@ -1486,7 +1489,7 @@ class _AddBusState extends State<AddBus> {
                                                   busnumbererror &&
                                                   _selectedImagedriver != null &&
                                                   driverphotoerror &&
-                                                  items != null && items.isNotEmpty) {
+                                                  items != null && items.isNotEmpty && _supervisorController.text.isNotEmpty ) {
                                                 _addDataToFirestore();
                                                 Navigator.pushReplacement(
                                                   context,
@@ -1504,6 +1507,18 @@ class _AddBusState extends State<AddBus> {
                                                       'assets/imgs/school/icons8_cancel 2.png'
                                                   );
                                                 } else {
+                                                  if (_supervisorController.text.isEmpty){
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(left: 32),
+                                                      child: Align(
+                                                        alignment: AlignmentDirectional.topStart,
+                                                        child: Text(
+                                                          "Please choose supervisor".tr,
+                                                          style: TextStyle(color: Colors.red),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
                                                   // showSnackBarFun(
                                                   //     context,
                                                   //     'Please, enter valid number',

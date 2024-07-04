@@ -849,7 +849,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                     ? 'Driver Name: ${filteredData[index]['namedriver']}'
                                                                     : selectedFilter == 'Supervisor'
                                                                     ? 'Bus Number: ${filteredData[index]['busnumber']}'
-                                                                    : 'Bus number: ${data[index]['busnumber']}',
+                                                                    : 'Bus number: ${filteredData[index]['busnumber']}',
                                                                 style: TextStyle(fontSize: 12, fontFamily: "Poppins-Regular", color: Color(0xff771F98)),
                                                               ),
 
