@@ -75,6 +75,62 @@ class _SendInvitationState extends State<SendInvitation> {
       print('Error retrieving school ID: $e');
     }
   }
+  //function add supervior with dialog of already exsits in other school
+  // void _addDataToFirestore() async {
+  //   Map<String, dynamic> data = {
+  //     'name': _nameController.text,
+  //     'email': _emailController.text,
+  //     'phoneNumber': enteredPhoneNumber,
+  //     'state': 0,
+  //     'invite': 1,
+  //     'busphoto': '',
+  //     'schoolid': _schoolId,
+  //     'schoolname': sharedpref!.getString('nameEnglish') ?? 0,
+  //     'photo': sharedpref!.getString('photo') ?? 0,
+  //     'bus_id': ''
+  //   };
+  //
+  //   print('phonenum');
+  //   print(_phoneNumberController.text);
+  //
+  //   // Add the data to the Firestore collection
+  //   var check = await addSupervisorCheckinotherschool(enteredPhoneNumber);
+  //
+  //   if (check['exists']) {
+  //     if (check['schoolid'] != _schoolId) {
+  //       // Show dialog if the phone number exists in another school
+  //       Dialoge.SupervisorAlreadyAddedInOtherSchool(context);
+  //     } else {
+  //       Dialoge.SupervisorAlreadyAdded(context);
+  //       await _firestore.collection('supervisor').doc(docID).update(data);
+  //       _nameController.clear();
+  //       _phoneNumberController.clear();
+  //       _emailController.clear();
+  //     }
+  //   } else {
+  //     await _firestore.collection('supervisor').add(data).then((docRef) async {
+  //       docid = docRef.id;
+  //       print('Data added with document ID: ${docRef.id}');
+  //       var res = await createDynamicLink(true, docid, _phoneNumberController.text, 'supervisor');
+  //       if (res == "success") {
+  //         showSnackBarFun(
+  //             context, 'Invitation sent successfully', Color(0xFF4CAF50),
+  //             'assets/imgs/school/Vector (4).png');
+  //       } else {
+  //         showSnackBarFun(
+  //             context, 'Invitation haven\'t sent', Color(0xFFDB4446),
+  //             'assets/imgs/school/icons8_cancel 2.png');
+  //       }
+  //     }).catchError((error) {
+  //       print('Failed to add data: $error');
+  //     });
+  //
+  //     _nameController.clear();
+  //     _phoneNumberController.clear();
+  //     _emailController.clear();
+  //   }
+  // }
+  // this function is to make check if user doesnot sent link succfully not to add document  to firesore
   void _addDataToFirestore() async {
     Map<String, dynamic> data = {
       'name': _nameController.text,
@@ -107,28 +163,35 @@ class _SendInvitationState extends State<SendInvitation> {
         _emailController.clear();
       }
     } else {
-      await _firestore.collection('supervisor').add(data).then((docRef) async {
+      try {
+        DocumentReference docRef = await _firestore.collection('supervisor').add(data);
         docid = docRef.id;
         print('Data added with document ID: ${docRef.id}');
+
         var res = await createDynamicLink(true, docid, _phoneNumberController.text, 'supervisor');
         if (res == "success") {
           showSnackBarFun(
               context, 'Invitation sent successfully', Color(0xFF4CAF50),
               'assets/imgs/school/Vector (4).png');
+          // Update Firestore with the generated document ID only if link sent successfully
+          await _firestore.collection('supervisor').doc(docid).update(data);
         } else {
           showSnackBarFun(
               context, 'Invitation haven\'t sent', Color(0xFFDB4446),
               'assets/imgs/school/icons8_cancel 2.png');
+          // Optionally, you can delete the document if the link wasn't sent successfully
+          await _firestore.collection('supervisor').doc(docid).delete();
         }
-      }).catchError((error) {
+      } catch (error) {
         print('Failed to add data: $error');
-      });
+      }
 
       _nameController.clear();
       _phoneNumberController.clear();
       _emailController.clear();
     }
   }
+
 // function add supervior without dialog of already exsits in other school
 //   void _addDataToFirestore() async {
 //     //if (_formKey.currentState!.validate()) {
