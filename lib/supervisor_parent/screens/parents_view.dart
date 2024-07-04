@@ -26,8 +26,6 @@ class ParentsView extends StatefulWidget {
 
 
 class _ParentsViewState extends State<ParentsView> {
-
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -37,8 +35,18 @@ class _ParentsViewState extends State<ParentsView> {
   String? selectedValueAccept;
   String? selectedValueDecline;
   String? selectedValueWaiting;
-
-
+  String? currentFilter;
+  bool isAcceptFiltered = false;
+  bool isDeclineFiltered = false;
+  bool isWaitingFiltered = false;
+  bool isFiltered  = false;
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  DocumentSnapshot? _lastDocument;
+  int _limit = 8;
+  String searchQuery = "";
+  List<DocumentSnapshot> _documents = [];
+  List<Map<String, dynamic>> childrenData = [];
 
 
 
@@ -54,7 +62,6 @@ class _ParentsViewState extends State<ParentsView> {
       isFiltered = true;
     });
   }
-
   getDataForWaitingFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
     QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0).get();
@@ -67,7 +74,6 @@ class _ParentsViewState extends State<ParentsView> {
       isFiltered = true;
     });
   }
-
   getDataForAcceptFilter()async{
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
     QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1 ).get();
@@ -80,13 +86,6 @@ class _ParentsViewState extends State<ParentsView> {
       isFiltered = true;
     });
   }
-
-  String? currentFilter;
-  bool isAcceptFiltered = false;
-  bool isDeclineFiltered = false;
-  bool isWaitingFiltered = false;
-  bool isFiltered  = false;
-
   void _deleteSupervisorDocument(String documentId) {
     FirebaseFirestore.instance
         .collection('parent')
@@ -108,8 +107,6 @@ class _ParentsViewState extends State<ParentsView> {
       );
     });
   }
-
-
   String getJoinText(Timestamp joinDate) {
     final now = DateTime.now();
     final joinDateTime = joinDate.toDate();
@@ -125,18 +122,6 @@ class _ParentsViewState extends State<ParentsView> {
       return '${joinDateTime.day}/${joinDateTime.month}/${joinDateTime.year}';
     }
   }
-
-
-  bool _isLoading = false;
-  bool _hasMoreData = true;
-  DocumentSnapshot? _lastDocument;
-  int _limit = 8;
-  String searchQuery = "";
-
-  List<DocumentSnapshot> _documents = [];
-  List<Map<String, dynamic>> childrenData = [];
-  List<bool> checkin = [];
-
   @override
   void initState() {
     super.initState();
@@ -147,7 +132,6 @@ class _ParentsViewState extends State<ParentsView> {
     });
 
   }
-
   Future<void> _fetchMoreData() async {
     if (_isLoading || !_hasMoreData) return;
 
@@ -187,7 +171,7 @@ class _ParentsViewState extends State<ParentsView> {
         setState(() {
           _documents.addAll(querySnapshot.docs);
           childrenData.addAll(allChildren);
-          checkin = List.filled(_documents.length, false);
+          // checkin = List.filled(_documents.length, false);
           print('Total documents: ${_documents.length}');
           if (querySnapshot.docs.length < _limit) {
             _hasMoreData = false;
@@ -208,7 +192,6 @@ class _ParentsViewState extends State<ParentsView> {
       });
     }
   }
-
   Future<void> getData({String query = ""}) async {
     try {
       String? supervisorId = sharedpref!.getString('id');
@@ -250,7 +233,6 @@ class _ParentsViewState extends State<ParentsView> {
       });
     }
   }
-
   Future<void> _fetchData({String query = ""}) async {
     if (_isLoading || !_hasMoreData) return;
 
@@ -307,7 +289,7 @@ class _ParentsViewState extends State<ParentsView> {
         _documents.addAll(snapshot.docs);
         childrenData.clear(); // Clear the existing childrenData
         childrenData.addAll(filteredChildrenData);
-        checkin = List.filled(_documents.length, false);
+        // checkin = List.filled(_documents.length, false);
       });
     }
 
@@ -599,14 +581,56 @@ class _ParentsViewState extends State<ParentsView> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(top: 12.0),
-                                        child: CircleAvatar(
-                                          radius: 25,
-                                          backgroundColor: Color(0xff442B72),
-                                          child: CircleAvatar(
-                                            backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
-                                            radius: 25,
-                                          ),
+                                        child:
+                                        FutureBuilder(
+                                          future: FirebaseFirestore.instance.collection('parent').where('phoneNumber', isEqualTo: data['phoneNumber']).get(),
+                                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                            if (snapshot.hasError) {
+                                              return Text('Something went wrong');
+                                            }
+
+                                            if (snapshot.connectionState == ConnectionState.done) {
+                                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.docs.isEmpty) {
+                                                return Text('No data available'); // Handle case where no data is found
+                                              }
+
+                                              // Safely access the first document's data
+                                              var data = snapshot.data!.docs.first.data() as Map<String, dynamic>?;
+
+                                              if (data == null || data.isEmpty || data['parentImage'] == null || data['parentImage'].toString().trim().isEmpty) {
+                                                return CircleAvatar(
+                                                  radius: 25,
+                                                  backgroundColor: Color(0xff442B72),
+                                                  child: CircleAvatar(
+                                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                                    radius: 25,
+                                                  ),
+                                                );
+                                              }
+
+                                              // Display the retrieved image if available
+                                              return CircleAvatar(
+                                                radius: 25,
+                                                backgroundColor: Color(0xff442B72),
+                                                child: CircleAvatar(
+                                                  backgroundImage: NetworkImage(data['parentImage']),
+                                                  radius: 25,
+                                                ),
+                                              );
+                                            }
+
+                                            // Display a loading indicator while fetching data
+                                            return CircularProgressIndicator();
+                                          },
                                         ),
+                                        // CircleAvatar(
+                                        //   radius: 25,
+                                        //   backgroundColor: Color(0xff442B72),
+                                        //   child: CircleAvatar(
+                                        //     backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                        //     radius: 25,
+                                        //   ),
+                                        // ),
                                       ),
                                       const SizedBox(width: 5),
                                       Column(

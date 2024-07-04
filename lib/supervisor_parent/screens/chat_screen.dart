@@ -358,14 +358,47 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                       CircleAvatar(
-                       radius: 25,
-                       backgroundColor: Color(0xff442B72),
-                       child: CircleAvatar(
-                         backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                         radius: 25,
-                       ),
-                     ),
+                        FutureBuilder(
+                          future: FirebaseFirestore.instance.collection('parent').where('phoneNumber', isEqualTo: widget.receiverPhone).get(),
+                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              return Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.docs.isEmpty) {
+                                return Text('No data available'); // Handle case where no data is found
+                              }
+
+                              // Safely access the first document's data
+                              var data = snapshot.data!.docs.first.data() as Map<String, dynamic>?;
+
+                              if (data == null || data.isEmpty || data['parentImage'] == null || data['parentImage'].toString().trim().isEmpty) {
+                                return CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: Color(0xff442B72),
+                                  child: CircleAvatar(
+                                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                    radius: 25,
+                                  ),
+                                );
+                              }
+
+                              // Display the retrieved image if available
+                              return CircleAvatar(
+                                radius: 25,
+                                backgroundColor: Color(0xff442B72),
+                                child: CircleAvatar(
+                                  backgroundImage: NetworkImage(data['parentImage']),
+                                  radius: 25,
+                                ),
+                              );
+                            }
+
+                            // Display a loading indicator while fetching data
+                            return CircularProgressIndicator();
+                          },
+                        ),
                         // FutureBuilder(
                         //   future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
                         //   builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {

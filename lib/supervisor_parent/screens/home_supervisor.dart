@@ -319,7 +319,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     onTap: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => ShowAllStudents()),
+                                        MaterialPageRoute(builder: (context) =>
+                                            ShowAllStudents()
+                                        ),
                                       );
                                     },
                                     child: Column(
@@ -357,7 +359,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 325, //300
+                                height: 370, //300
                                 width: double.infinity,
                                 child: ListView.builder(
                                   shrinkWrap: true,
@@ -371,8 +373,10 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     List<dynamic>? children = data[index]['children'];
                                     String address = data[index]['address'];
                                     List<String> words = address.split(' ');
+
                                     String firstLine = words.take(3).join(' ');
-                                    String secondLine = words.skip(3).join(' ');
+                                    String secondLine = words.skip(3).take(5).join(' ');  // تأخذ الثلاث كلمات التالية بعد الثلاث الأولى
+                                    String thirdLine = words.skip(6).join(' ');  // تأخذ بقية الكلمات بعد الست الأولى
 
                                     // Filter the children list based on supervisor ID and state
                                     List<dynamic> filteredChildren = children?.where((child) {
@@ -387,7 +391,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                           for (var child in filteredChildren)
                                             SizedBox(
                                               width: double.infinity,
-                                              height: 98, //92
+                                              height: 115, //92
                                               child: Card(
                                                 elevation: 5,
                                                 color: Colors.white,
@@ -405,7 +409,9 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                           phonenumber: data[index]['phoneNumber'],
                                                           ParentName: data[index]['name'],
                                                           grade: child['grade'],
-                                                          address: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
+                                                          // address: secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine,
+                                                          address: thirdLine.isNotEmpty ? '$firstLine\n$secondLine\n$thirdLine' : (secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine),
+
                                                         ),
                                                       ),
                                                     );
@@ -481,9 +487,7 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                                                     ),
                                                                   ),
                                                                   TextSpan(
-                                                                    text: secondLine.isNotEmpty
-                                                                        ? '$firstLine\n$secondLine'
-                                                                        : firstLine,
+                                                                    text:  '${thirdLine.isNotEmpty ? '$firstLine\n$secondLine\n$thirdLine' : (secondLine.isNotEmpty ? '$firstLine\n$secondLine' : firstLine)}',
                                                                     style: TextStyle(
                                                                       color: Color(0xFF442B72),
                                                                       fontSize: 12,

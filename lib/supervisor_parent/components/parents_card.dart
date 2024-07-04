@@ -258,7 +258,7 @@ class _ParentsCardState extends State<ParentsCard> {
                                         ),
                                       ),
                                       child: SizedBox(
-                                        height: 210,
+                                        height: 155,
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                                           child: Column(

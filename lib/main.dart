@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,9 @@ void main()async {
         measurementId: "G-3YG0J7RYWM"
     ),
   );
+  // final databaseReference = FirebaseDatabase.instance.ref();
+  // await databaseReference.child('path/to/data').set({'key': 'value'});
+
   sharedpref = await SharedPreferences.getInstance();
   var token = await FirebaseMessaging.instance.getToken();
   var fcm = token.toString();

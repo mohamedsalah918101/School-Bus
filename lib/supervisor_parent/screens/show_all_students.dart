@@ -43,6 +43,13 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   bool isDeclineFiltered = false;
   bool isWaitingFiltered = false;
   bool isFiltered  = false;
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  DocumentSnapshot? _lastDocument;
+  int _limit = 8;
+  String searchQuery = "";
+  List<DocumentSnapshot> _documents = [];
+  List<Map<String, dynamic>> childrenData = [];
 
   String getJoinText(Timestamp joinDate) {
     final now = DateTime.now();
@@ -61,15 +68,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   }
 
 
-  bool _isLoading = false;
-  bool _hasMoreData = true;
-  DocumentSnapshot? _lastDocument;
-  int _limit = 8;
-  String searchQuery = "";
-  List<DocumentSnapshot> _documents = [];
-  List<Map<String, dynamic>> childrenData = [];
-  List<bool> checkin = [];
-
   @override
   void initState() {
     super.initState();
@@ -82,35 +80,24 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   }
 
   Future<void> _fetchMoreData() async {
-    if (_isLoading || !_hasMoreData) return;
+    if (_isLoading ||!_hasMoreData) return;
 
     setState(() {
       _isLoading = true;
     });
-
-    print('Fetching data...');
-    String? supervisorId = sharedpref!.getString('id');
-    if (supervisorId == null) {
-      print('Supervisor ID is null');
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
+      String? supervisorId = sharedpref!.getString('id');
 
     Query query = _firestore.collection('parent')
         .where('supervisor', isEqualTo: supervisorId)
-        .where('state', isEqualTo: 1) // شرط الحقل state يساوي 1
+        .where('state', isEqualTo: 1)
         .limit(_limit);
 
-    if (_lastDocument != null) {
+    if (_lastDocument!= null) {
       query = query.startAfterDocument(_lastDocument!);
-      print('Starting after document: ${_lastDocument!.id}');
     }
 
     try {
       QuerySnapshot querySnapshot = await query.get();
-      print('Fetched ${querySnapshot.docs.length} documents');
       if (querySnapshot.docs.isNotEmpty) {
         _lastDocument = querySnapshot.docs.last;
         List<Map<String, dynamic>> allChildren = [];
@@ -121,16 +108,13 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
         setState(() {
           _documents.addAll(querySnapshot.docs);
           childrenData.addAll(allChildren);
-          print('Total documents: ${_documents.length}');
           if (querySnapshot.docs.length < _limit) {
             _hasMoreData = false;
-            print('No more data to fetch');
           }
         });
       } else {
         setState(() {
           _hasMoreData = false;
-          print('No more data to fetch');
         });
       }
     } catch (e) {
@@ -140,7 +124,67 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
         _isLoading = false;
       });
     }
-  }
+  }  // Future<void> _fetchMoreData() async {
+  //   if (_isLoading || !_hasMoreData) return;
+  //
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   print('Fetching data...');
+  //   String? supervisorId = sharedpref!.getString('id');
+  //   if (supervisorId == null) {
+  //     print('Supervisor ID is null');
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     return;
+  //   }
+  //
+  //   Query query = _firestore.collection('parent')
+  //       .where('supervisor', isEqualTo: supervisorId)
+  //       .where('state', isEqualTo: 1) // شرط الحقل state يساوي 1
+  //       .limit(_limit);
+  //
+  //   if (_lastDocument != null) {
+  //     query = query.startAfterDocument(_lastDocument!);
+  //     print('Starting after document: ${_lastDocument!.id}');
+  //   }
+  //
+  //   try {
+  //     QuerySnapshot querySnapshot = await query.get();
+  //     print('Fetched ${querySnapshot.docs.length} documents');
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       _lastDocument = querySnapshot.docs.last;
+  //       List<Map<String, dynamic>> allChildren = [];
+  //       for (var parentDoc in querySnapshot.docs) {
+  //         List<dynamic> children = parentDoc['children'];
+  //         allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
+  //       }
+  //       setState(() {
+  //         _documents.addAll(querySnapshot.docs);
+  //         childrenData.addAll(allChildren);
+  //         print('Total documents: ${_documents.length}');
+  //         print('Total children: ${childrenData.length}');
+  //         if (querySnapshot.docs.length < _limit) {
+  //           _hasMoreData = false;
+  //           print('No more data to fetch');
+  //         }
+  //       });
+  //     } else {
+  //       setState(() {
+  //         _hasMoreData = false;
+  //         print('No more data to fetch');
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching data: $e');
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
 
   Future<void> getData({String query = ""}) async {
     try {
@@ -250,7 +294,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
         _documents.addAll(snapshot.docs);
         childrenData.clear(); // Clear the existing childrenData
         childrenData.addAll(filteredChildrenData);
-        checkin = List.filled(_documents.length, false);
       });
     }
 
@@ -382,6 +425,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
               ),
               // Add your AppBar and other UI elements here
               Expanded(
+                flex: 4,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: ListView.builder(

@@ -88,8 +88,7 @@ class _EditAddParentsState extends State<EditAddParents> {
   List<String> genderSelection = [];
   final _firestore = FirebaseFirestore.instance;
 
-
-  editAddParent() async {
+  Future<void> editAddParent() async {
     print('editAddParent called');
     if (formState.currentState != null) {
       print('formState.currentState is not null');
@@ -97,14 +96,8 @@ class _EditAddParentsState extends State<EditAddParents> {
         print('form is valid');
         try {
           print('updating document...');
-
           int numberOfChildren = int.parse(_numberOfChildrenController.text);
 
-          // Check if the number of children and the length of the nameChildControllers and gradeControllers lists match
-          // if (nameChildControllers.length != numberOfChildren || gradeControllers.length != numberOfChildren) {
-          //   print('Mismatch in number of children and controllers length');
-          //   return;
-          // }
           String busID = '';
           DocumentSnapshot documentSnapshot = await _firestore
               .collection('supervisor')
@@ -113,6 +106,19 @@ class _EditAddParentsState extends State<EditAddParents> {
           if (documentSnapshot.exists) {
             busID = documentSnapshot.get('bus_id');
           }
+
+          // Create a dummy document to get the server timestamp
+          DocumentReference dummyRef = _firestore.collection('dummy').doc();
+          await dummyRef.set({
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          DocumentSnapshot dummySnapshot = await dummyRef.get();
+          Timestamp serverTimestamp = dummySnapshot['createdAt'] as Timestamp;
+
+          // Delete the dummy document
+          await dummyRef.delete();
+
           List<Map<String, dynamic>> childrenData = List.generate(
             numberOfChildren,
                 (index) => {
@@ -122,12 +128,11 @@ class _EditAddParentsState extends State<EditAddParents> {
               'bus_id': busID,
               'name': nameChildControllers[index].text,
               'grade': gradeControllers[index].text,
-              'joinDate': FieldValue.serverTimestamp(),
-
-                },
+              'joinDate': serverTimestamp,
+            },
           );
 
-          await Parent.doc(widget.docid).update({
+          await _firestore.collection('parent').doc(widget.docid).update({
             'phoneNumber': _phoneNumberController.text,
             'typeOfParent': selectedValue,
             'name': _nameController.text,
@@ -150,7 +155,68 @@ class _EditAddParentsState extends State<EditAddParents> {
     } else {
       print('formState.currentState is null');
     }
-  }
+  }  // editAddParent() async {
+  //   print('editAddParent called');
+  //   if (formState.currentState != null) {
+  //     print('formState.currentState is not null');
+  //     if (formState.currentState!.validate()) {
+  //       print('form is valid');
+  //       try {
+  //         print('updating document...');
+  //
+  //         int numberOfChildren = int.parse(_numberOfChildrenController.text);
+  //
+  //         // Check if the number of children and the length of the nameChildControllers and gradeControllers lists match
+  //         // if (nameChildControllers.length != numberOfChildren || gradeControllers.length != numberOfChildren) {
+  //         //   print('Mismatch in number of children and controllers length');
+  //         //   return;
+  //         // }
+  //         String busID = '';
+  //         DocumentSnapshot documentSnapshot = await _firestore
+  //             .collection('supervisor')
+  //             .doc(sharedpref!.getString('id'))
+  //             .get();
+  //         if (documentSnapshot.exists) {
+  //           busID = documentSnapshot.get('bus_id');
+  //         }
+  //         List<Map<String, dynamic>> childrenData = List.generate(
+  //           numberOfChildren,
+  //               (index) => {
+  //             'gender': genderSelection[index],
+  //             'supervisor': sharedpref!.getString('id'),
+  //             'supervisor_name': sharedpref!.getString('name'),
+  //             'bus_id': busID,
+  //             'name': nameChildControllers[index].text,
+  //             'grade': gradeControllers[index].text,
+  //             'joinDate': FieldValue.serverTimestamp(),
+  //
+  //               },
+  //         );
+  //
+  //         await Parent.doc(widget.docid).update({
+  //           'phoneNumber': _phoneNumberController.text,
+  //           'typeOfParent': selectedValue,
+  //           'name': _nameController.text,
+  //           'numberOfChildren': _numberOfChildrenController.text,
+  //           'children': childrenData,
+  //         });
+  //
+  //         print('document updated successfully');
+  //
+  //         // Check if the widget is still mounted before calling setState
+  //         if (mounted) {
+  //           setState(() {});
+  //         }
+  //       } catch (e) {
+  //         print('Error updating document: $e');
+  //       }
+  //     } else {
+  //       print('form is not valid');
+  //     }
+  //   } else {
+  //     print('formState.currentState is null');
+  //   }
+  // }
 
 
   @override

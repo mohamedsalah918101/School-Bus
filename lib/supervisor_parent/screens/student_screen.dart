@@ -30,16 +30,17 @@ class StudentScreen extends StatefulWidget {
   final String phonenumber;
   final String? ParentName;
 
-  StudentScreen({ this.name,  this.grade,  this.address , required this.phonenumber , this.ParentName});
+  StudentScreen({this.name, this.grade, this.address, required this.phonenumber, this.ParentName});
 
   @override
   _StudentScreen createState() => _StudentScreen();
 }
+
 class _StudentScreen extends State<StudentScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<QueryDocumentSnapshot> data = [];
+  DocumentSnapshot? parentData;
+  bool dataLoading = false;
   final _firestore = FirebaseFirestore.instance;
-  bool dataLoading=false;
 
   void _makePhoneCall() async {
     bool? res = await FlutterPhoneDirectCaller.callNumber(widget.phonenumber);
@@ -48,121 +49,110 @@ class _StudentScreen extends State<StudentScreen> {
     }
   }
 
-  getData()async{
+  getParentData() async {
     setState(() {
-      dataLoading =true;
-
+      dataLoading = true;
     });
-    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection('parent').get();
-    data.addAll(querySnapshot.docs);
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('parent').where('phoneNumber', isEqualTo: widget.phonenumber).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      parentData = querySnapshot.docs.first;
+    }
     setState(() {
-      dataLoading =false;
-
+      dataLoading = false;
     });
   }
 
   @override
   void initState() {
-
-    getData();
+    getParentData();
     super.initState();
-
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        endDrawer: SupervisorDrawer(),
-        body: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: Column(
-            children: [
-              SizedBox(
-                height: 35,
+      key: _scaffoldKey,
+      endDrawer: SupervisorDrawer(),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Column(
+          children: [
+            SizedBox(height: 35),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 17.0),
+                      child: Image.asset(
+                        (sharedpref?.getString('lang') == 'ar') ? 'assets/images/Layer 1.png' : 'assets/images/fi-rr-angle-left.png',
+                        width: 20,
+                        height: 22,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Student'.tr,
+                    style: TextStyle(
+                      color: Color(0xFF993D9A),
+                      fontSize: 16,
+                      fontFamily: 'Poppins-Bold',
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    icon: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: const Icon(
+                        Icons.menu_rounded,
+                        color: Color(0xff442B72),
+                        size: 35,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: (){
-                        Navigator.of(context).pop();
-                      },
-                      child:  Padding(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 17.0),
-                        child: Image.asset(
-                          (sharedpref?.getString('lang') == 'ar')?
-                          'assets/images/Layer 1.png':
-                          'assets/images/fi-rr-angle-left.png',
-                          width: 20,
-                          height: 22,),
-                      ),
-                    ),
-                    Text(
-                      'Student'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF993D9A),
-                        fontSize: 16,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        _scaffoldKey.currentState!.openEndDrawer();
-                      },
-                      icon: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: const Icon(
-                          Icons.menu_rounded,
-                          color: Color(0xff442B72),
-                          size: 35,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                      child: Text(
+                        'Child'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF771F98),
+                          fontSize: 19,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // if(children.isEmpty)
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                          child: Text('Child'.tr,
-                            style: TextStyle(
-                              color: Color(0xFF771F98),
-                              fontSize: 19,
-                              fontFamily: 'Poppins-Bold',
-                              fontWeight: FontWeight.w700,
-                            ),),
-                        ),
-
-
-                        // Text('Gender: ${childData['gender']}'),
-
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: 1,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Column(
-                                children: [
-                                SizedBox(
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 1,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              SizedBox(
                                 width: double.infinity,
-                                height:  92,
+                                height: 115,
                                 child: Card(
                                   elevation: 10,
                                   color: Colors.white,
@@ -171,9 +161,179 @@ class _StudentScreen extends State<StudentScreen> {
                                     borderRadius: BorderRadius.circular(14.0),
                                   ),
                                   child: Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')?
-                                      EdgeInsets.only(right: 10.0 , bottom: 0):
-                                      EdgeInsets.only(left: 10.0 , bottom: 0),
+                                    padding: (sharedpref?.getString('lang') == 'ar')
+                                        ? EdgeInsets.only(right: 10.0, bottom: 0)
+                                        : EdgeInsets.only(left: 10.0, bottom: 0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            FutureBuilder(
+                                              future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
+                                              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                if (snapshot.hasError) {
+                                                  return Text('Something went wrong');
+                                                }
+
+                                                if (snapshot.connectionState == ConnectionState.done) {
+                                                  if (!snapshot.hasData ||
+                                                      snapshot.data == null ||
+                                                      snapshot.data!.data() == null ||
+                                                      snapshot.data!.data()!['busphoto'] == null ||
+                                                      snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                    return CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundColor: Color(0xff442B72),
+                                                      child: CircleAvatar(
+                                                        backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                        radius: 25,
+                                                      ),
+                                                    );
+                                                  }
+
+                                                  Map<String, dynamic>? data = snapshot.data?.data();
+                                                  if (data != null && data['busphoto'] != null) {
+                                                    return CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundColor: Color(0xff442B72),
+                                                      child: CircleAvatar(
+                                                        backgroundImage: NetworkImage('${data['busphoto']}'),
+                                                        radius: 25,
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+
+                                                return Container();
+                                              },
+                                            ),
+                                            const SizedBox(width: 15),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 0.0),
+                                                  child: Text(
+                                                    '${widget.name}',
+                                                    style: TextStyle(
+                                                      color: Color(0xff442B72),
+                                                      fontSize: 17,
+                                                      fontFamily: 'Poppins-SemiBold',
+                                                      fontWeight: FontWeight.w600,
+                                                      height: 0.94,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 4),
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: 'Grade: '.tr,
+                                                        style: TextStyle(
+                                                          color: Color(0xFF919191),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '${widget.grade}',
+                                                        style: TextStyle(
+                                                          color: Color(0xFF442B72),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.33,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: 'Address: '.tr,
+                                                        style: TextStyle(
+                                                          color: Color(0xFF919191),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.33,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '${widget.address}',
+                                                        style: TextStyle(
+                                                          color: Color(0xFF442B72),
+                                                          fontSize: 12,
+                                                          fontFamily: 'Poppins-Light',
+                                                          fontWeight: FontWeight.w400,
+                                                          height: 1.33,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 50),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                      child: Text(
+                        'Parent'.tr,
+                        style: TextStyle(
+                          color: Color(0xFF771F98),
+                          fontSize: 19,
+                          fontFamily: 'Poppins-Bold',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 1,
+                        itemBuilder: (BuildContext context, int index) {
+                          if (parentData == null) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 145,
+                                  child: Card(
+                                    elevation: 10,
+                                    color: Colors.white,
+                                    surfaceTintColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14.0),
+                                    ),
+                                    child: Padding(
+                                      padding: (sharedpref?.getString('lang') == 'ar') ? EdgeInsets.only(right: 10.0) : EdgeInsets.only(left: 10.0),
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
@@ -182,52 +342,55 @@ class _StudentScreen extends State<StudentScreen> {
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             children: [
                                               FutureBuilder(
-                                                future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                                future: FirebaseFirestore.instance.collection('parent').where('phoneNumber', isEqualTo: widget.phonenumber).get(),
+                                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                                                   if (snapshot.hasError) {
                                                     return Text('Something went wrong');
                                                   }
 
                                                   if (snapshot.connectionState == ConnectionState.done) {
-                                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                                    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.docs.isEmpty) {
+                                                      return Text('No data available'); // Handle case where no data is found
+                                                    }
+
+                                                    // Safely access the first document's data
+                                                    var data = snapshot.data!.docs.first.data() as Map<String, dynamic>?;
+
+                                                    if (data == null || data.isEmpty || data['parentImage'] == null || data['parentImage'].toString().trim().isEmpty) {
                                                       return CircleAvatar(
                                                         radius: 25,
                                                         backgroundColor: Color(0xff442B72),
                                                         child: CircleAvatar(
-                                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
+                                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
                                                           radius: 25,
                                                         ),
                                                       );
                                                     }
 
-                                                    Map<String, dynamic>? data = snapshot.data?.data();
-                                                    if (data != null && data['busphoto'] != null) {
-                                                      return CircleAvatar(
+                                                    // Display the retrieved image if available
+                                                    return CircleAvatar(
+                                                      radius: 25,
+                                                      backgroundColor: Color(0xff442B72),
+                                                      child: CircleAvatar(
+                                                        backgroundImage: NetworkImage(data['parentImage']),
                                                         radius: 25,
-                                                        backgroundColor: Color(0xff442B72),
-                                                        child: CircleAvatar(
-                                                          backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                          radius:25,
-                                                        ),
-                                                      );
-                                                    }
+                                                      ),
+                                                    );
                                                   }
 
-                                                  return Container();
+                                                  // Display a loading indicator while fetching data
+                                                  return CircularProgressIndicator();
                                                 },
                                               ),
-                                              const SizedBox(
-                                                width: 15,
-                                              ),
+                                              const SizedBox(width: 15),
                                               Column(
                                                 mainAxisAlignment: MainAxisAlignment.start,
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Padding(
-                                                    padding: const EdgeInsets.only(top: 0.0),
+                                                    padding: const EdgeInsets.only(top: 8.0),
                                                     child: Text(
-                                                      // 'Gender: ${childData['gender']}',
-                                                     '${widget.name}',
+                                                      '${widget.ParentName}',
                                                       style: TextStyle(
                                                         color: Color(0xff442B72),
                                                         fontSize: 17,
@@ -237,30 +400,26 @@ class _StudentScreen extends State<StudentScreen> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 4,
-                                                  ),
+                                                  SizedBox(height: 4),
                                                   Text.rich(
                                                     TextSpan(
                                                       children: [
                                                         TextSpan(
-                                                          text: 'Grade: '.tr,
+                                                          text: 'Number: '.tr,
                                                           style: TextStyle(
                                                             color: Color(0xFF919191),
                                                             fontSize: 12,
                                                             fontFamily: 'Poppins-Light',
                                                             fontWeight: FontWeight.w400,
-                                                            // height: 1.33,
                                                           ),
                                                         ),
                                                         TextSpan(
-                                                          text:'${widget.grade}',
+                                                          text: '${widget.phonenumber}',
                                                           style: TextStyle(
                                                             color: Color(0xFF442B72),
                                                             fontSize: 12,
                                                             fontFamily: 'Poppins-Light',
                                                             fontWeight: FontWeight.w400,
-                                                            height: 1.33,
                                                           ),
                                                         ),
                                                       ],
@@ -292,250 +451,74 @@ class _StudentScreen extends State<StudentScreen> {
                                                       ],
                                                     ),
                                                   ),
-
                                                 ],
                                               ),
-
                                             ],
                                           ),
-                                        ],
-                                      )),
-                                ),
-                              ),
-                                  // StudentCardInStudent(childData: {},),
-                                  SizedBox(height:10),
-                                ],
-                              );
-                            },
-                          )
-
-                        ),
-                        SizedBox(height: 50,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                      child: Text('Parent'.tr,
-                        style: TextStyle(
-                          color: Color(0xFF771F98),
-                          fontSize: 19,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                        ),),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: 1,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Column(
-                            children: [
-                            SizedBox(
-                            width: double.infinity,
-                            height:125,
-                            child: Card(
-                              elevation: 10,
-                              color: Colors.white,
-                              surfaceTintColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.0),
-                              ),
-                              child: Padding(
-                                  padding:(sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(right: 10.0 ):
-                                  EdgeInsets.only(left: 10.0 ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          FutureBuilder(
-                                            future: _firestore.collection('supervisor').doc(sharedpref!.getString('id')).get(),
-                                            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                              if (snapshot.hasError) {
-                                                return Text('Something went wrong');
-                                              }
-
-                                              if (snapshot.connectionState == ConnectionState.done) {
-                                                if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] == null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                                  return CircleAvatar(
-                                                    radius: 25,
-                                                    backgroundColor: Color(0xff442B72),
-                                                    child: CircleAvatar(
-                                                      backgroundImage: AssetImage('assets/images/Group 237679 (2).png'), // Replace with your default image path
-                                                      radius: 25,
-                                                    ),
-                                                  );
-                                                }
-
-                                                Map<String, dynamic>? data = snapshot.data?.data();
-                                                if (data != null && data['busphoto'] != null) {
-                                                  return CircleAvatar(
-                                                    radius: 25,
-                                                    backgroundColor: Color(0xff442B72),
-                                                    child: CircleAvatar(
-                                                      backgroundImage: NetworkImage('${data['busphoto']}'),
-                                                      radius:25,
-                                                    ),
-                                                  );
-                                                }
-                                              }
-
-                                              return Container();
-                                            },
-                                          ),
-                                          const SizedBox(
-                                            width: 15,
-                                          ),
-                                          Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 8.0),
-                                                child: Text(
-                                                  '${widget.ParentName}',
-                                                  style: TextStyle(
+                                          Padding(
+                                            padding: (sharedpref?.getString('lang') == 'ar') ? EdgeInsets.only(top: 8.0, right: 0) : EdgeInsets.only(top: 8.0, right: 20),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    _makePhoneCall();
+                                                  },
+                                                  child: Image.asset(
+                                                    'assets/images/icons8_phone 1 (1).png',
                                                     color: Color(0xff442B72),
-                                                    fontSize: 17,
-                                                    fontFamily: 'Poppins-SemiBold',
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 0.94,
+                                                    width: 28,
+                                                    height: 28,
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                height: 4,
-                                              ),
-                                              Text.rich(
-                                                TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text: 'Number: '.tr,
-                                                      style: TextStyle(
-                                                        color: Color(0xFF919191),
-                                                        fontSize: 12,
-                                                        fontFamily: 'Poppins-Light',
-                                                        fontWeight: FontWeight.w400,
-                                                        // height: 1.33,
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '${widget.phonenumber}',
-                                                      style: TextStyle(
-                                                        color: Color(0xFF442B72),
-                                                        fontSize: 12,
-                                                        fontFamily: 'Poppins-Light',
-                                                        fontWeight: FontWeight.w400,
-                                                        // height: 1.33,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                SizedBox(width: 9),
+                                                GestureDetector(
+                                                  child: Image.asset(
+                                                    'assets/images/icons8_chat 1 (1).png',
+                                                    color: Color(0xff442B72),
+                                                    width: 26,
+                                                    height: 26,
+                                                  ),
+                                                  onTap: () {
+                                                    if (parentData != null) {
+                                                      Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                          builder: (context) => ChatScreen(
+                                                            receiverName: widget.ParentName!,
+                                                            receiverPhone: parentData!['phoneNumber'],
+                                                            receiverId: parentData!.id,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
                                                 ),
-                                              ),
-                                              Text.rich(
-                                                TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text: 'Address: '.tr,
-                                                      style: TextStyle(
-                                                        color: Color(0xFF919191),
-                                                        fontSize: 12,
-                                                        fontFamily: 'Poppins-Light',
-                                                        fontWeight: FontWeight.w400,
-                                                        height: 1.33,
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '${widget.address}',
-                                                      style: TextStyle(
-                                                        color: Color(0xFF442B72),
-                                                        fontSize: 12,
-                                                        fontFamily: 'Poppins-Light',
-                                                        fontWeight: FontWeight.w400,
-                                                        height: 1.33,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-
-                                            ],
+                                              ],
+                                            ),
                                           ),
-
                                         ],
                                       ),
-
-                                      Padding(
-                                        padding: (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(top: 8.0 , right: 0):
-                                        EdgeInsets.only(top: 8.0 , right: 20),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: (){
-                                                _makePhoneCall();
-                                              },
-
-
-                                              child: Image.asset('assets/images/icons8_phone 1 (1).png' ,
-                                                color: Color(0xff442B72),
-                                                width: 28,
-                                                height: 28,),
-                                            ),
-                                            SizedBox(width: 9),
-                                            GestureDetector(
-                                              child: Image.asset('assets/images/icons8_chat 1 (1).png' ,
-                                                color: Color(0xff442B72),
-                                                width: 26,
-                                                height: 26,),
-                                              onTap: () {
-                                                print('object');
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(builder: (context) =>
-                                                        ChatScreen(
-                                                          receiverName: widget.ParentName!,
-                                                          receiverPhone: data[index]['phoneNumber'],
-                                                          receiverId : data[index].id,
-                                                        )));
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-
-                                    ],
-                                  )),
-                            ),
-                          ),
-                              // ParentCardInStudent(),
-                              SizedBox(height:10),
-                            ],
-                          );
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                              ],
+                            );
+                          }
                         },
-                      ),),
-
-
-                        const SizedBox(
-                          height: 44,
-                        ),
-
-                      ],
-                    )
+                      ),
+                    ),
+                    const SizedBox(height: 44),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        // extendBody: true,
+      ),
+        extendBody: true,
         resizeToAvoidBottomInset: false,
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(100)),
@@ -551,9 +534,7 @@ class _StudentScreen extends State<StudentScreen> {
               height: 33,
               width: 33,
               fit: BoxFit.cover,
-            )
-
-        ),
+            )),
         bottomNavigationBar: Directionality(
             textDirection: Get.locale == Locale('ar')
                 ? TextDirection.rtl
@@ -597,16 +578,15 @@ class _StudentScreen extends State<StudentScreen> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top:7 , right: 15):
-                                  EdgeInsets.only(left: 15),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 7, right: 15)
+                                      : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (7).png',
                                           height: 20,
-                                          width: 20
-                                      ),
+                                          width: 20),
                                       SizedBox(height: 3),
                                       Text(
                                         "Home".tr,
@@ -634,16 +614,15 @@ class _StudentScreen extends State<StudentScreen> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 9, left: 50):
-                                  EdgeInsets.only( right: 50, top: 2 ),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(top: 9, left: 50)
+                                      : EdgeInsets.only(right: 50, top: 2),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/icons8_checklist_1 1.png',
                                           height: 19,
-                                          width: 19
-                                      ),
+                                          width: 19),
                                       SizedBox(height: 3),
                                       Text(
                                         "Attendance".tr,
@@ -671,21 +650,21 @@ class _StudentScreen extends State<StudentScreen> {
                                 },
                                 child: Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                  EdgeInsets.only(top: 8 , bottom:4 ,left: 20),
+                                  (sharedpref?.getString('lang') == 'ar')
+                                      ? EdgeInsets.only(
+                                      top: 12, bottom: 4, right: 10)
+                                      : EdgeInsets.only(
+                                      top: 8, bottom: 4, left: 20),
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/Vector (2).png',
                                           height: 17,
-                                          width: 16.2
-                                      ),
+                                          width: 16.2),
                                       Image.asset(
                                           'assets/images/Vector (5).png',
                                           height: 4,
-                                          width: 6
-                                      ),
+                                          width: 6),
                                       SizedBox(height: 2),
                                       Text(
                                         "Notifications".tr,
@@ -700,46 +679,35 @@ class _StudentScreen extends State<StudentScreen> {
                                   ),
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TrackSupervisor()),
-                                    );
-                                  });
-                                },
-                                child: Padding(
-                                  padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                  EdgeInsets.only(top: 10 , bottom: 2 ,right: 10,left: 0):
-                                  EdgeInsets.only(top: 8 , bottom: 2 ,left: 0,right: 10),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/Vector (4).png',
-                                          height: 18.36,
-                                          width: 23.5
+                              Padding(
+                                padding: (sharedpref?.getString('lang') == 'ar')
+                                    ? EdgeInsets.only(
+                                    top: 10, bottom: 2, right: 10, left: 0)
+                                    : EdgeInsets.only(
+                                    top: 8, bottom: 2, left: 0, right: 10),
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                        'assets/images/icons8_bus 1 (1).png',
+                                        height: 22,
+                                        width: 25),
+                                    SizedBox(height: 3),
+                                    Text(
+                                      "Buses".tr,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins-Regular',
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                        fontSize: 8,
                                       ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "Buses".tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         )))))
+
     );
   }
 }

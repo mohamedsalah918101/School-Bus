@@ -2397,852 +2397,249 @@
 // // }
 // //
 // //
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttercontactpicker/fluttercontactpicker.dart';
-import 'package:get/get.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:school_account/Functions/functions.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
-import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
-import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
-import 'package:school_account/supervisor_parent/screens/add_parents.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../main.dart';
 
-
-class CardPage extends StatefulWidget {
+class YourWidget extends StatefulWidget {
   @override
-  _CardPageState createState() => _CardPageState();
+  _YourWidgetState createState() => _YourWidgetState();
 }
-class _CardPageState extends State<CardPage> {
-  int numberOfCards = 0;
-  bool showCards = true;
-  bool isFirstImage = true;
-  bool typeOfParentError = true;
-  List<TextEditingController> nameChildControllers = [];
-  List<TextEditingController> gradeControllers = [];
-  List<String> genderSelection = [];
-  final _firestore = FirebaseFirestore.instance;
-  String enteredPhoneNumber = '';
-  bool _isLoading = false;
-  bool phoneAdded = true;
-  final _phoneNumberController = TextEditingController();
+
+class _YourWidgetState extends State<YourWidget> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String kPickerNumber='';
-  String kPickerName='';
-  PhoneContact? _phoneContact;
-  final _nameController = TextEditingController();
-  bool nameError = false;
-  // bool typeOfParentError = true;
-  bool showList = false;
-  String selectedValue = '';
-  bool numberOfChildrenError = false;
-  bool childNameError = false;
-  bool childGradeError = false;
-  List<bool> childNameErrors = [];
-  List<bool> childGradeErrors = [];
-  bool _phoneNumberEntered = true;
 
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  DocumentSnapshot? _lastDocument;
+  int _limit = 10;
+  List<DocumentSnapshot> _documents = [];
+  List<Map<String, dynamic>> childrenData = [];
 
-  void _addDataToFirestore() async {
-    int numberOfChildren = numberOfCards;
-    String busID = '';
-    String SchoolID = '';
-    // Assuming sharedpref is already defined somewhere
-    DocumentSnapshot documentSnapshot = await _firestore
-        .collection('supervisor')
-        .doc(sharedpref!.getString('id'))
-        .get();
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+    _searchController.addListener(_onSearchChanged);
+    _fetchMoreData();
+  }
 
-    if (documentSnapshot.exists) {
-      SchoolID = documentSnapshot.get('schoolid');
-      busID = documentSnapshot.get('bus_id');
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      _fetchMoreData();
     }
+  }
 
-    Timestamp currentTimestamp = Timestamp.now();
-    for (int i = 0; i < numberOfCards; i++) {
-      if (nameChildControllers[i].text.isEmpty) {
-        setState(() {
-          childNameErrors[i] = true;
-        });
-      }else {
-        setState(() {
-          childNameErrors[i] = false;
-        });
-      }
-      if (gradeControllers[i].text.isEmpty) {
-        setState(() {
-          childGradeErrors[i] = true;
-        });
-      }else {
-        setState(() {
-          childGradeErrors[i] = false;
-        });
-      }
-    }
+  void _onSearchChanged() {
+    // Handle search logic
+  }
 
-    if (_nameController.text.isEmpty) {
-      setState(() {
-        nameError = true;
-      });
-    }else {
-      setState(() {
-        nameError = false;
-      });
-    }
+  Future<void> _fetchMoreData() async {
+    if (_isLoading || !_hasMoreData) return;
 
-    if (numberOfCards == 0 || numberOfCards == null) {
-      setState(() {
-        numberOfChildrenError = true;
-      });
-    }else {
-      setState(() {
-        numberOfChildrenError = false;
-      });
-    }
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (childNameError || childGradeError || numberOfChildrenError || nameError) {
+    print('Fetching data...');
+    String? supervisorId = sharedpref!.getString('id').toString(); // Replace with actual supervisor ID retrieval logic
+    if (supervisorId == null) {
+      print('Supervisor ID is null');
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
-    List<Map<String, dynamic>> childrenData = List.generate(
-      numberOfChildren,
-          (index) => {
-        'name': nameChildControllers[index].text,
-        'grade': gradeControllers[index].text,
-        'gender': genderSelection[index],
-        'supervisor': sharedpref!.getString('id'),
-        'supervisor_name': sharedpref!.getString('name'),
-        'bus_id': busID,
-        'schoolid': SchoolID,
-        'joinDateChild': currentTimestamp,
-      },
-    );
+    Query query = _firestore.collection('parent')
+        .where('supervisor', isEqualTo: supervisorId)
+        .where('state', isEqualTo: 1)
+        .limit(_limit);
 
-    Map<String, dynamic> data = {
-      'name': _nameController.text,
-      'schoolid': SchoolID,
-      'address': '',
-      'children': childrenData,
-      'state': 0,
-      'invite': 0,
-      'supervisor': sharedpref!.getString('id'),
-      'supervisor_name': sharedpref!.getString('name'),
-      'joinDate': FieldValue.serverTimestamp(),
-    };
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+      print('Starting after document: ${_lastDocument!.id}');
+    }
 
     try {
-      var check = await addParentCheck(enteredPhoneNumber);
-      if (!check) {
-        var res = await checkUpdate(enteredPhoneNumber);
-        if (!res) {
-          await _firestore.collection('parent').add(data).then((docRef) async {
-            String docid = docRef.id;
-            var res = await createDynamicLink(false, docid, enteredPhoneNumber, 'parent');
-
-            if (res == "success") {
-              InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
-
-              await _firestore.collection('notification').add({
-                'item': 'You have Invitation',
-                'timestamp': FieldValue.serverTimestamp(),
-                'parentId': docid,
-                'phoneNumber': enteredPhoneNumber,
-              });
-
-              await _firestore.collection('parent').doc(docid).update({'invite': 1});
-
-              setState(() {
-                _isLoading = false;
-                showCards = false;
-                nameChildControllers.clear();
-                gradeControllers.clear();
-                _phoneNumberController.clear();
-                _nameController.clear();
-
-              });
-            } else {
-              InvitationNotSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFFFF3C3C));
-            }
-          }).catchError((error) {
-            print('Failed to add data: $error');
-          });
-        } else {
-          if (childNum == 0) {
-            await _firestore.collection('parent').doc(docID).update(data);
-          } else {
-            await _firestore.collection('parent').doc(docID).update({
-              'children': FieldValue.arrayUnion(childrenData),
-              'numberOfChildren': childNum + numberOfChildren,
-              'supervisor': sharedpref!.getString('id'),
-              'supervisor_name': sharedpref!.getString('name'),
-              'joinDate': FieldValue.serverTimestamp(),
-              'bus_id': busID,
-              'schoolid': SchoolID
-            });
-          }
-          if (invitCheck == 0) {
-            var res = await createDynamicLink(false, docID, enteredPhoneNumber, 'parent');
-            if (res == "success") {
-              InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
-              await _firestore.collection('notification').add({
-                'item': 'You have Invitation',
-                'timestamp': FieldValue.serverTimestamp(),
-                'parentId': docID,
-              });
-              await _firestore.collection('parent').doc(docID).update({'invite': 1});
-            }
-          } else {
-            Dialoge.CantAddNewParent(context);
-          }
+      QuerySnapshot querySnapshot = await query.get();
+      print('Fetched ${querySnapshot.docs.length} documents');
+      if (querySnapshot.docs.isNotEmpty) {
+        _lastDocument = querySnapshot.docs.last;
+        List<Map<String, dynamic>> allChildren = [];
+        for (var parentDoc in querySnapshot.docs) {
+          List<dynamic> children = parentDoc['children'];
+          allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
         }
+        setState(() {
+          _documents.addAll(querySnapshot.docs);
+          childrenData.addAll(allChildren);
+          print('Total documents: ${_documents.length}');
+          print('Total children: ${childrenData.length}');
+          if (querySnapshot.docs.length < _limit) {
+            _hasMoreData = false;
+            print('No more data to fetch');
+          }
+        });
       } else {
-        phoneAdded = false;
+        setState(() {
+          _hasMoreData = false;
+          print('No more data to fetch');
+        });
       }
     } catch (e) {
-      print('Error: $e');
+      print('Error fetching data: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
-  void toggleCardsVisibility() {
-    setState(() {
-      showCards = !showCards;
-    });
-  }
-  void toggleImage() {
-    setState(() {
-      isFirstImage = !isFirstImage;
-    });
-  }
-  void updateControllers(int newCount) {
-    if (newCount > nameChildControllers.length) {
-      for (int i = nameChildControllers.length; i < newCount; i++) {
-        nameChildControllers.add(TextEditingController());
-        gradeControllers.add(TextEditingController());
-        genderSelection.add('');
-        childNameErrors.add(false); // Add this line
-        childGradeErrors.add(false); // Add this line
-      }
-    } else {
-      nameChildControllers = nameChildControllers.sublist(0, newCount);
-      gradeControllers = gradeControllers.sublist(0, newCount);
-      genderSelection = genderSelection.sublist(0, newCount);
-      childNameErrors = childNameErrors.sublist(0, newCount); // Add this line
-      childGradeErrors = childGradeErrors.sublist(0, newCount); // Add this line
-    }
-  }
-  // void updateControllers(int newCount) {
-  //   if (newCount > nameChildControllers.length) {
-  //     for (int i = nameChildControllers.length; i < newCount; i++) {
-  //       nameChildControllers.add(TextEditingController());
-  //       gradeControllers.add(TextEditingController());
-  //       genderSelection.add('');
-  //     }
-  //   } else {
-  //     nameChildControllers = nameChildControllers.sublist(0, newCount);
-  //     gradeControllers = gradeControllers.sublist(0, newCount);
-  //     genderSelection = genderSelection.sublist(0, newCount);
-  //   }
-  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      endDrawer: SupervisorDrawer(),
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 35,
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 17.0),
-                      child: Image.asset(
-                        (sharedpref?.getString('lang') == 'ar')
-                            ? 'assets/images/Layer 1.png'
-                            : 'assets/images/fi-rr-angle-left.png',
-                        width: 20,
-                        height: 22,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: (sharedpref?.getString('lang') == 'ar')
-                        ? EdgeInsets.only(right: 40)
-                        : EdgeInsets.only(left: 40),
-                    child: Text(
-                      'Parents'.tr,
-                      style: TextStyle(
-                        color: Color(0xFF993D9A),
-                        fontSize: 16,
-                        fontFamily: 'Poppins-Bold',
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () async{
-                            bool permission = await FlutterContactPicker.requestPermission();
-                            if(permission){
-                              if(await FlutterContactPicker.hasPermission()){
-                                _phoneContact=await FlutterContactPicker.pickPhoneContact();
-                                if(_phoneContact!=null){
-                                  if(_phoneContact!.fullName!.isNotEmpty){
-                                    setState(() {
-                                      kPickerName=_phoneContact!.fullName.toString();
-                                      _nameController.text=kPickerName;
-                                    });
-                                  }
-                                  if (_phoneContact!.phoneNumber != null &&
-                                      _phoneContact!.phoneNumber!.number != null &&
-                                      _phoneContact!.phoneNumber!.number!.isNotEmpty) {
-                                    setState(() {
-                                      kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
-                                      if (kPickerNumber.startsWith('0')) {
-                                        kPickerNumber = kPickerNumber.substring(1);
-
-                                      }
-                                      kPickerNumber = kPickerNumber.replaceAll(' ', '');
-                                      _phoneNumberController.text = kPickerNumber;
-                                    });
-                                  }
-                                  // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
-                                  //   setState(() {
-                                  //     kPickerNumber=_phoneContact!.phoneNumber.toString();
-                                  //     _phoneNumberController.text=kPickerNumber;
-                                  //   });
-                                  // }
-                                }
-
-                              }
-                            }
-                          },
-                          child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
-                            color: Color(0xff442B72),),
+      body: Expanded(
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: childrenData.length + 1,
+          itemBuilder: (context, index) {
+            if (index == childrenData.length) {
+              return _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : !_hasMoreData
+                  ? Center(child: Text('No more data'))
+                  : SizedBox.shrink();
+            }
+        
+            final childData = childrenData[index];
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundColor: Color(0xff442B72),
+                        child: CircleAvatar(
+                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                          radius: 25,
                         ),
-                        // Image.asset(
-                        //   'assets/images/icons8_Add_Male_User_Group 1.png',
-                        //   width: 27,
-                        //   height: 27,
-                        // ),
-                        IconButton(
-                          onPressed: () {
-                            _scaffoldKey.currentState!.openEndDrawer();
-                          },
-                          icon: const Icon(
-                            Icons.menu_rounded,
-                            color: Color(0xff442B72),
-                            size: 35,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          childData['name'] ?? '',
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 17,
+                            fontFamily: 'Poppins-SemiBold',
+                            fontWeight: FontWeight.w600,
+                            height: 1.07,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Padding(
+                          padding: EdgeInsets.only(right: 3.0),
+                          child: Text(
+                            'Added from ${getJoinText(childData['joinDate'] ?? DateTime.now())}',
+                            style: TextStyle(
+                              color: Color(0xFF0E8113).withOpacity(0.7),
+                              fontSize: 13,
+                              fontFamily: 'Poppins-Regular',
+                              fontWeight: FontWeight.w400,
+                              height: 1.23,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: (sharedpref?.getString('lang') == 'ar')
-                          ? EdgeInsets.only(right: 25.0)
-                          : EdgeInsets.only(left: 25.0),
-                      child: Text(
-                        'Parent'.tr,
-                        style: TextStyle(
-                          fontSize: 19,
-                          // height:  0.94,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xff771F98),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Padding(
-                      padding: (sharedpref?.getString('lang') == 'ar')
-                          ? EdgeInsets.only(right: 42.0)
-                          : EdgeInsets.only(left: 42.0),
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Parent'.tr,
-                              style: TextStyle(
-                                color: Color(0xFF442B72),
-                                fontSize: 15,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.07,
-                              ),
-                            ),
-                            TextSpan(
-                              text: ' *',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 15,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.07,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 13,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 42.0),
-                      child: SizedBox(
-                        // width: 277,
-                        height: 40,
-                        child: TextFormField(
-                            controller: _nameController,
-
-                            // cursorRadius: Radius.circular(300),
-                            style: TextStyle(
-                              color: Color(0xFF442B72),
-                            ),
-                            cursorColor: const Color(0xFF442B72),
-                            textDirection: (sharedpref?.getString('lang') == 'ar')
-                                ? TextDirection.rtl
-                                : TextDirection.ltr,
-                            // selectionHeightStyle: 20,
-                            autofocus: true,
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.text,
-                            textAlign: (sharedpref?.getString('lang') == 'ar')
-                                ? TextAlign.right
-                                : TextAlign.left,
-                            scrollPadding: EdgeInsets.symmetric(vertical: 30),
-                            decoration: InputDecoration(
-                              alignLabelWithHint: false,
-                              counterText: "",
-                              fillColor: const Color(0xFFF1F1F1),
-                              filled: true,
-                              contentPadding:
-                              (sharedpref?.getString('lang') == 'ar')
-                                  ? EdgeInsets.fromLTRB(166, 0, 17, 10)
-                                  : EdgeInsets.fromLTRB(17, 0, 0, 10),
-                              hintText: 'Please enter your name'.tr,
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                                fontFamily: 'Poppins-Bold',
-                                fontWeight: FontWeight.w700,
-                                height: 1.33,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(7)),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFFFFC53E),
-                                    width: 0.5,
-                                  )),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(7)),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFFFC53E),
-                                  width: 0.5,
-                                ),
-                              ),
-
-                              // enabledBorder: myInputBorder(),
-                              // focusedBorder: myFocusBorder(),
-                            )),
-                      ),
-                    ),
-                    nameError
-                        ?Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 48),
-                      child: Text(
-                        "Please enter your name".tr,
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ):
-                        Container(),
-              
-                    //testttttt
-                    TextField(
-                      controller: _phoneNumberController,
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: 'Enter phone number',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        enteredPhoneNumber = value;
-                      },
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        setState(() {
-                          numberOfCards = int.tryParse(value) ?? 0;
-                          updateControllers(numberOfCards);
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Enter number of cards',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    numberOfChildrenError
-                        ? Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 48),
-                      child: Text(
-                        "Please enter your number of children".tr,
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ):Container(),
                   ],
                 ),
-              ),
-            ),
-
-
-            GestureDetector(
-              onTap: () {
-                toggleCardsVisibility();
-                toggleImage();
-              },
-              child: Image.asset(
-                isFirstImage
-                    ? 'assets/images/iconamoon_arrow-up-2-thin (1).png'
-                    : 'assets/images/iconamoon_arrow-up-2-thin.png',
-                width: 34,
-                height: 34,
-              ),
-            ),
-            Expanded(
-              child: showCards
-                  ? ListView.builder(
-                itemCount: numberOfCards,
-                itemBuilder: (context, index) {
-                  return Center(
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: 296,
-                          height: 310,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color(0xff771F98).withOpacity(0.03),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 10),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 12.0)
-                                          : EdgeInsets.only(left: 12.0),
-                                      child: Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Child '.tr,
-                                              style: TextStyle(
-                                                color: Color(0xff771F98),
-                                                fontSize: 16,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: '${index + 1}',
-                                              style: TextStyle(
-                                                color: Color(0xff771F98),
-                                                fontSize: 16,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 18.0)
-                                          : EdgeInsets.only(left: 18.0),
-                                      child: Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Name'.tr,
-                                              style: TextStyle(
-                                                color: Color(0xFF442B72),
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                                height: 1.07,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: ' *',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                                height: 1.07,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 6),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 12.0)
-                                          : EdgeInsets.only(left: 12.0),
-                                      child: TextField(
-                                        controller: nameChildControllers[index],
-                                        decoration: InputDecoration(
-                                          errorText: childNameErrors[index] ? 'Please enter child name' : null,
-                                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                          hintText: 'Enter child name',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-
-                                        ),
-
-                                      ),
-                                    ),
-                                    SizedBox(height: 14),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 18.0)
-                                          : EdgeInsets.only(left: 18.0),
-                                      child: Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Grade'.tr,
-                                              style: TextStyle(
-                                                color: Color(0xFF442B72),
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                                height: 1.07,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: ' *',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins-Bold',
-                                                fontWeight: FontWeight.w700,
-                                                height: 1.07,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 6),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 12.0)
-                                          : EdgeInsets.only(left: 12.0),
-                                      child: TextField(
-                                        controller: gradeControllers[index],
-                                        decoration: InputDecoration(
-                                          errorText: childGradeErrors[index] ? 'Please enter grade name' : null,
-                                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                          hintText: 'Enter child grade',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                        ),
-
-                                      ),
-                                    ),
-                                    SizedBox(height: 14),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 18.0)
-                                          : EdgeInsets.only(left: 18.0),
-                                      child: Text(
-                                        'Gender',
-                                        style: TextStyle(
-                                          color: Color(0xFF442B72),
-                                          fontSize: 15,
-                                          fontFamily: 'Poppins-Bold',
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.07,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 6),
-                                    Padding(
-                                      padding: (sharedpref?.getString('lang') == 'ar')
-                                          ? EdgeInsets.only(right: 12.0)
-                                          : EdgeInsets.only(left: 12.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: RadioListTile<String>(
-                                              title: Text('Male'),
-                                              value: 'male',
-                                              groupValue: genderSelection[index],
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  genderSelection[index] = value!;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: RadioListTile<String>(
-                                              title: Text('Female'),
-                                              value: 'female',
-                                              groupValue: genderSelection[index],
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  genderSelection[index] = value!;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              )
-                  : Container(),
-            ),
-            SizedBox(height: 20),
-
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  bool isValid = true;
-                  if (numberOfCards == 0 || numberOfCards == null) {
-                    numberOfChildrenError = true;
-                    isValid = false;
-                  } else {
-                    numberOfChildrenError = false;
-                  }
-
-                  if (_nameController.text.isEmpty ) {
-                    nameError = true;
-                    isValid = false;
-                  } else {
-                    nameError = false;
-                  }
-                  // if (_phoneNumberController.text.isEmpty) {
-                  //   phoneError = true;
-                  //   isValid = false;
-                  // } else {
-                  //   phoneError = false;
-                  // }
-
-                  for (int i = 0; i < nameChildControllers.length; i++) {
-                    if (nameChildControllers[i].text.isEmpty) {
-                      childNameErrors[i] = true;
-                      isValid = false;
-                    } else {
-                      childNameErrors[i] = false;
-                    }
-
-                    if (gradeControllers[i].text.isEmpty) {
-                      childGradeErrors[i] = true;
-                      isValid = false;
-                    } else {
-                      childGradeErrors[i] = false;
-                    }
-                  }
-
-                  if (isValid) {
-                    _addDataToFirestore();
-                  }
-                });
-              },
-              // onPressed:  _addDataToFirestore,
-              child: Text('Save'),
-            ),
-            SizedBox(height: 20),
-          ],
+                SizedBox(height: 25),
+              ],
+            );
+          },
         ),
       ),
     );
   }
+
+  String getJoinText(DateTime dateTime) {
+    // Return formatted date string
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
 }
 
+// addparent
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+// import 'package:get/get.dart';
+// import 'package:intl_phone_field/intl_phone_field.dart';
+// import 'package:school_account/Functions/functions.dart';
+// import 'package:school_account/supervisor_parent/components/dialogs.dart';
+// import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
+// import 'package:school_account/supervisor_parent/components/supervisor_drawer.dart';
+// import 'package:school_account/supervisor_parent/screens/add_parents.dart';
+//
+// import '../../main.dart';
+//
+//
+// class CardPage extends StatefulWidget {
+//   @override
+//   _CardPageState createState() => _CardPageState();
+// }
 // class _CardPageState extends State<CardPage> {
 //   int numberOfCards = 0;
 //   bool showCards = true;
 //   bool isFirstImage = true;
-//   bool nameChildeError = true;
-//   bool gradeError = true;
-//   bool typeOfParentError = true;
+//   bool typeOfParentError = false;
 //   List<TextEditingController> nameChildControllers = [];
 //   List<TextEditingController> gradeControllers = [];
 //   List<String> genderSelection = [];
 //   final _firestore = FirebaseFirestore.instance;
 //   String enteredPhoneNumber = '';
 //   bool _isLoading = false;
-//   bool phoneAdded = true;
+//   bool phoneAdded = false;
+//   bool phoneError = false;
 //   final _phoneNumberController = TextEditingController();
-//   void _addDataToFirestore() async {
-//     setState(() {
-//       // _isLoading = true;
-//     });
+//   final _numberOfChildrenController = TextEditingController();
+//   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+//   String kPickerNumber='';
+//   String kPickerName='';
+//   PhoneContact? _phoneContact;
+//   final _nameController = TextEditingController();
+//   bool nameError = false;
+//   // bool typeOfParentError = true;
+//   bool showList = false;
+//   String selectedValue = '';
+//   bool numberOfChildrenError = false;
+//   bool childNameError = false;
+//   bool childGradeError = false;
+//   List<bool> childNameErrors = [];
+//   List<bool> childGradeErrors = [];
+//   bool _phoneNumberEntered = true;
 //
-//     int numberOfChildren = int.parse(_numberOfChildrenController.text);
+//
+//   void _addDataToFirestore() async {
+//     int numberOfChildren = numberOfCards;
 //     String busID = '';
 //     String SchoolID = '';
+//     // Assuming sharedpref is already defined somewhere
 //     DocumentSnapshot documentSnapshot = await _firestore
 //         .collection('supervisor')
 //         .doc(sharedpref!.getString('id'))
@@ -3250,13 +2647,74 @@ class _CardPageState extends State<CardPage> {
 //
 //     if (documentSnapshot.exists) {
 //       SchoolID = documentSnapshot.get('schoolid');
-//     }
-//
-//     if (documentSnapshot.exists) {
 //       busID = documentSnapshot.get('bus_id');
 //     }
 //
 //     Timestamp currentTimestamp = Timestamp.now();
+//     for (int i = 0; i < numberOfCards; i++) {
+//       if (nameChildControllers[i].text.isEmpty) {
+//         setState(() {
+//           childNameErrors[i] = true;
+//         });
+//       }else {
+//         setState(() {
+//           childNameErrors[i] = false;
+//         });
+//       }
+//       if (gradeControllers[i].text.isEmpty) {
+//         setState(() {
+//           childGradeErrors[i] = true;
+//         });
+//       }else {
+//         setState(() {
+//           childGradeErrors[i] = false;
+//         });
+//       }
+//     }
+//
+//     if (_nameController.text.isEmpty) {
+//       setState(() {
+//         nameError = true;
+//       });
+//     }else {
+//       setState(() {
+//         nameError = false;
+//       });
+//     }
+//
+//     if (selectedValue.isEmpty) {
+//       setState(() {
+//         typeOfParentError = true;
+//       });
+//     }else {
+//       setState(() {
+//         typeOfParentError = false;
+//       });
+//     }
+//
+//     if (_phoneNumberController.text.isEmpty) {
+//       setState(() {
+//         phoneError = true;
+//       });
+//     }else {
+//       setState(() {
+//         phoneError = false;
+//       });
+//     }
+//
+//     if (numberOfCards == 0 || numberOfCards == null) {
+//       setState(() {
+//         numberOfChildrenError = true;
+//       });
+//     }else {
+//       setState(() {
+//         numberOfChildrenError = false;
+//       });
+//     }
+//
+//     if (childNameError || childGradeError || numberOfChildrenError || nameError || phoneError || typeOfParentError) {
+//       return;
+//     }
 //
 //     List<Map<String, dynamic>> childrenData = List.generate(
 //       numberOfChildren,
@@ -3273,11 +2731,11 @@ class _CardPageState extends State<CardPage> {
 //     );
 //
 //     Map<String, dynamic> data = {
-//       // 'typeOfParent': selectedValue,
+//       'name': _nameController.text,
+//       'typeOfParent': selectedValue,
+//       'phoneNumber': enteredPhoneNumber,
+//       'numberOfChildren': _numberOfChildrenController.text,
 //       'schoolid': SchoolID,
-//       // 'name': _nameController.text,
-//       // 'numberOfChildren': _numberOfChildrenController.text,
-//       // 'phoneNumber': enteredPhoneNumber,
 //       'address': '',
 //       'children': childrenData,
 //       'state': 0,
@@ -3298,11 +2756,10 @@ class _CardPageState extends State<CardPage> {
 //           await _firestore.collection('parent').add(data).then((docRef) async {
 //             print('Data added with document ID: ${docRef.id}');
 //             String docid = docRef.id;
-//             setState(() {
-//               _isLoading = false;
-//             });
-//             var res = await createDynamicLink(
-//                 false, docid, enteredPhoneNumber, 'parent');
+//             // setState(() {
+//             //   _isLoading = false;
+//             // });
+//             var res = await createDynamicLink(false, docid, enteredPhoneNumber, 'parent');
 //
 //             if (res == "success") {
 //               InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
@@ -3314,19 +2771,22 @@ class _CardPageState extends State<CardPage> {
 //                 'phoneNumber': enteredPhoneNumber,
 //               });
 //
-//               await _firestore
-//                   .collection('parent')
-//                   .doc(docid)
-//                   .update({'invite': 1});
+//               await _firestore.collection('parent').doc(docid).update({'invite': 1});
 //
-//               count = 0;
-//               showCards = false;
-//               setState(() {});
-//               // _nameController.clear();
-//               _phoneNumberController.clear();
-//               // _numberOfChildrenController.clear();
-//               nameChildControllers.clear();
-//               gradeControllers.clear();
+//               setState(() {
+//                 // count = 0;
+//                 // showList = false;
+//                 _isLoading = false;
+//                 showCards = false;
+//                 nameChildControllers.clear();
+//                 gradeControllers.clear();
+//                 _phoneNumberController.clear();
+//                 _nameController.clear();
+//                 selectedValue = '';
+//                 _numberOfChildrenController.clear();
+//                 _phoneNumberController.clear();
+//
+//               });
 //             } else {
 //               InvitationNotSendSnackBar(context, 'Invitation doesn\'t sent', Color(0xFFFF3C3C));
 //             }
@@ -3339,7 +2799,7 @@ class _CardPageState extends State<CardPage> {
 //           } else {
 //             await _firestore.collection('parent').doc(docID).update({
 //               'children': FieldValue.arrayUnion(childrenData),
-//               'numberOfChildren': childNum + int.parse(_numberOfChildrenController.text),
+//               'numberOfChildren': childNum + numberOfChildren,
 //               'supervisor': sharedpref!.getString('id'),
 //               'supervisor_name': sharedpref!.getString('name'),
 //               'joinDate': FieldValue.serverTimestamp(),
@@ -3348,36 +2808,29 @@ class _CardPageState extends State<CardPage> {
 //             });
 //           }
 //           if (invitCheck == 0) {
-//             var res = await createDynamicLink(
-//                 false, docID, _phoneNumberController.text, 'parent');
-//             setState(() {
-//               _isLoading = false;
-//             });
+//             var res = await createDynamicLink(false, docID, enteredPhoneNumber, 'parent');
 //             if (res == "success") {
 //               InvitationSendSnackBar(context, 'Invitation sent successfully', Color(0xFF4CAF50));
 //               await _firestore.collection('notification').add({
 //                 'item': 'You have Invitation',
 //                 'timestamp': FieldValue.serverTimestamp(),
 //                 'parentId': docID,
-//                 // 'phoneNumber': _phoneNumberController.text,
+//                 'phoneNumber': _phoneNumberController.text,
 //               });
-//               await _firestore
-//                   .collection('parent')
-//                   .doc(docID)
-//                   .update({'invite': 1});
-//               count = 0;
-//               showCards = false;
-//               setState(() {});
-//               // _nameController.clear();
-//               // _phoneNumberController.clear();
-//               // _numberOfChildrenController.clear();
-//               nameChildControllers.clear();
-//               gradeControllers.clear();
+//               await _firestore.collection('parent').doc(docID).update({'invite': 1});
+//               setState(() {
+//                 _isLoading = false;
+//                 showCards = false;
+//                 nameChildControllers.clear();
+//                 gradeControllers.clear();
+//                 _phoneNumberController.clear();
+//                 _nameController.clear();
+//                 selectedValue = '';
+//                 _numberOfChildrenController.clear();
+//               //  count = 0;
+//               });
 //             }
 //           } else {
-//             setState(() {
-//               _isLoading = false;
-//             });
 //             Dialoge.CantAddNewParent(context);
 //           }
 //         }
@@ -3390,462 +2843,1544 @@ class _CardPageState extends State<CardPage> {
 //   }
 //   void toggleCardsVisibility() {
 //     setState(() {
-//       showCards = !showCards;});}
+//       showCards = !showCards;
+//     });
+//   }
 //   void toggleImage() {
 //     setState(() {
 //       isFirstImage = !isFirstImage;
-//     });}
+//     });
+//   }
 //   void updateControllers(int newCount) {
 //     if (newCount > nameChildControllers.length) {
 //       for (int i = nameChildControllers.length; i < newCount; i++) {
 //         nameChildControllers.add(TextEditingController());
 //         gradeControllers.add(TextEditingController());
 //         genderSelection.add('');
+//         childNameErrors.add(false); // Add this line
+//         childGradeErrors.add(false); // Add this line
 //       }
 //     } else {
 //       nameChildControllers = nameChildControllers.sublist(0, newCount);
 //       gradeControllers = gradeControllers.sublist(0, newCount);
 //       genderSelection = genderSelection.sublist(0, newCount);
+//       childNameErrors = childNameErrors.sublist(0, newCount); // Add this line
+//       childGradeErrors = childGradeErrors.sublist(0, newCount); // Add this line
 //     }
 //   }
+//   // void updateControllers(int newCount) {
+//   //   if (newCount > nameChildControllers.length) {
+//   //     for (int i = nameChildControllers.length; i < newCount; i++) {
+//   //       nameChildControllers.add(TextEditingController());
+//   //       gradeControllers.add(TextEditingController());
+//   //       genderSelection.add('');
+//   //     }
+//   //   } else {
+//   //     nameChildControllers = nameChildControllers.sublist(0, newCount);
+//   //     gradeControllers = gradeControllers.sublist(0, newCount);
+//   //     genderSelection = genderSelection.sublist(0, newCount);
+//   //   }
+//   // }
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       body: Column(
-//         children: <Widget>[
-//           TextField(
-//             keyboardType: TextInputType.number,
-//             onChanged: (value) {
-//               setState(() {
-//                 numberOfCards = int.tryParse(value) ?? 0;
-//                 updateControllers(numberOfCards);
-//               });
-//             },
-//             decoration: InputDecoration(
-//               labelText: 'Enter number of cards',
-//               border: OutlineInputBorder(),
+//       key: _scaffoldKey,
+//       endDrawer: SupervisorDrawer(),
+//       body: GestureDetector(
+//         onTap: () {
+//           FocusScope.of(context).unfocus();
+//         },
+//         child: Column(
+//           children: <Widget>[
+//             SizedBox(
+//               height: 35,
 //             ),
-//           ),
-//           GestureDetector(
-//             onTap: () {
-//               toggleCardsVisibility();
-//               toggleImage();
-//             },
-//             child: Image.asset(
-//               isFirstImage
-//                   ? 'assets/images/iconamoon_arrow-up-2-thin (1).png'
-//                   : 'assets/images/iconamoon_arrow-up-2-thin.png',
-//               width: 34,
-//               height: 34,
+//             Container(
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   GestureDetector(
+//                     onTap: () {
+//                       Navigator.of(context).pop();
+//                     },
+//                     child: Padding(
+//                       padding: EdgeInsets.symmetric(horizontal: 17.0),
+//                       child: Image.asset(
+//                         (sharedpref?.getString('lang') == 'ar')
+//                             ? 'assets/images/Layer 1.png'
+//                             : 'assets/images/fi-rr-angle-left.png',
+//                         width: 20,
+//                         height: 22,
+//                       ),
+//                     ),
+//                   ),
+//                   Padding(
+//                     padding: (sharedpref?.getString('lang') == 'ar')
+//                         ? EdgeInsets.only(right: 40)
+//                         : EdgeInsets.only(left: 40),
+//                     child: Text(
+//                       'Parents'.tr,
+//                       style: TextStyle(
+//                         color: Color(0xFF993D9A),
+//                         fontSize: 16,
+//                         fontFamily: 'Poppins-Bold',
+//                         fontWeight: FontWeight.w700,
+//                         height: 1,
+//                       ),
+//                     ),
+//                   ),
+//                   Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
+//                     child: Row(
+//                       children: [
+//                         GestureDetector(
+//                           onTap: () async{
+//                             bool permission = await FlutterContactPicker.requestPermission();
+//                             if(permission){
+//                               if(await FlutterContactPicker.hasPermission()){
+//                                 _phoneContact=await FlutterContactPicker.pickPhoneContact();
+//                                 if(_phoneContact!=null){
+//                                   if(_phoneContact!.fullName!.isNotEmpty){
+//                                     setState(() {
+//                                       kPickerName=_phoneContact!.fullName.toString();
+//                                       _nameController.text=kPickerName;
+//                                     });
+//                                   }
+//                                   if (_phoneContact!.phoneNumber != null &&
+//                                       _phoneContact!.phoneNumber!.number != null &&
+//                                       _phoneContact!.phoneNumber!.number!.isNotEmpty) {
+//                                     setState(() {
+//                                       kPickerNumber = _phoneContact!.phoneNumber!.number!; // Extract only the phone number
+//                                       if (kPickerNumber.startsWith('0')) {
+//                                         kPickerNumber = kPickerNumber.substring(1);
+//
+//                                       }
+//                                       kPickerNumber = kPickerNumber.replaceAll(' ', '');
+//                                       _phoneNumberController.text = kPickerNumber;
+//                                     });
+//                                   }
+//                                   // if(_phoneContact!.phoneNumber!.number!.isNotEmpty){
+//                                   //   setState(() {
+//                                   //     kPickerNumber=_phoneContact!.phoneNumber.toString();
+//                                   //     _phoneNumberController.text=kPickerNumber;
+//                                   //   });
+//                                   // }
+//                                 }
+//
+//                               }
+//                             }
+//                           },
+//                           child: Image(image: AssetImage("assets/imgs/school/icons8_Add_Male_User_Group 1.png"),width: 27,height: 27,
+//                             color: Color(0xff442B72),),
+//                         ),
+//                         // Image.asset(
+//                         //   'assets/images/icons8_Add_Male_User_Group 1.png',
+//                         //   width: 27,
+//                         //   height: 27,
+//                         // ),
+//                         IconButton(
+//                           onPressed: () {
+//                             _scaffoldKey.currentState!.openEndDrawer();
+//                           },
+//                           icon: const Icon(
+//                             Icons.menu_rounded,
+//                             color: Color(0xff442B72),
+//                             size: 35,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
 //             ),
-//           ),
-//           Expanded(
-//             child: showCards
-//                 ? ListView.builder(
-//               itemCount: numberOfCards,
-//               itemBuilder: (context, index) {
-//                 return Center(
-//                   child: Column(
-//                     children: [
-//                       SizedBox(
-//                         width: 296,
-//                         height: 310,
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.center,
+//             Expanded(
+//               child: SingleChildScrollView(
+//                 child: Column(
+//                   mainAxisAlignment: MainAxisAlignment.start,
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     SizedBox(
+//                       height: 20,
+//                     ),
+//                     Padding(
+//                       padding: (sharedpref?.getString('lang') == 'ar')
+//                           ? EdgeInsets.only(right: 25.0)
+//                           : EdgeInsets.only(left: 25.0),
+//                       child: Text(
+//                         'Parent'.tr,
+//                         style: TextStyle(
+//                           fontSize: 19,
+//                           // height:  0.94,
+//                           fontFamily: 'Poppins-Bold',
+//                           fontWeight: FontWeight.w700,
+//                           color: Color(0xff771F98),
+//                         ),
+//                       ),
+//                     ),
+//                     SizedBox(
+//                       height: 15,
+//                     ),
+//                     Padding(
+//                       padding: (sharedpref?.getString('lang') == 'ar')
+//                           ? EdgeInsets.only(right: 42.0)
+//                           : EdgeInsets.only(left: 42.0),
+//                       child: Text.rich(
+//                         TextSpan(
 //                           children: [
-//                             Container(
-//                               decoration: BoxDecoration(
-//                                 color: Color(0xff771F98).withOpacity(0.03),
-//                                 borderRadius: BorderRadius.circular(14),
+//                             TextSpan(
+//                               text: 'Parent'.tr,
+//                               style: TextStyle(
+//                                 color: Color(0xFF442B72),
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
 //                               ),
-//                               child: Column(
-//                                 mainAxisAlignment: MainAxisAlignment.start,
-//                                 crossAxisAlignment: CrossAxisAlignment.start,
-//                                 children: [
-//                                   SizedBox(height: 10),
-//                                   Padding(
-//                                     padding: (sharedpref?.getString('lang') == 'ar')
-//                                         ? EdgeInsets.only(right: 12.0)
-//                                         : EdgeInsets.only(left: 12.0),
-//                                     child: Text.rich(
-//                                       TextSpan(
-//                                         children: [
-//                                           TextSpan(
-//                                             text: 'Child '.tr,
-//                                             style: TextStyle(
-//                                               color: Color(0xff771F98),
-//                                               fontSize: 16,
-//                                               fontFamily: 'Poppins-Bold',
-//                                               fontWeight: FontWeight.w700,
-//                                             ),
-//                                           ),
-//                                           TextSpan(
-//                                             text: '${index + 1}',
-//                                             style: TextStyle(
-//                                               color: Color(0xff771F98),
-//                                               fontSize: 16,
-//                                               fontFamily: 'Poppins-Bold',
-//                                               fontWeight: FontWeight.w700,
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   SizedBox(height: 8),
-//                                   Padding(
-//                                     padding: (sharedpref?.getString('lang') == 'ar')
-//                                         ? EdgeInsets.only(right: 18.0)
-//                                         : EdgeInsets.only(left: 18.0),
-//                                     child: Text.rich(
-//                                       TextSpan(
-//                                         children: [
-//                                           TextSpan(
-//                                             text: 'Name'.tr,
-//                                             style: TextStyle(
-//                                               color: Color(0xFF442B72),
-//                                               fontSize: 15,
-//                                               fontFamily: 'Poppins-Bold',
-//                                               fontWeight: FontWeight.w700,
-//                                               height: 1.07,
-//                                             ),
-//                                           ),
-//                                           TextSpan(
-//                                             text: ' *',
-//                                             style: TextStyle(
-//                                               color: Colors.red,
-//                                               fontSize: 15,
-//                                               fontFamily: 'Poppins-Bold',
-//                                               fontWeight: FontWeight.w700,
-//                                               height: 1.07,
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   SizedBox(height: 8),
-//                                   Padding(
-//                                     padding: EdgeInsets.symmetric(horizontal: 18.0),
-//                                     child: SizedBox(
-//                                       width: 277,
-//                                       height: 38,
-//                                       child: TextFormField(
-//                                         controller: nameChildControllers[index],
-//                                         onChanged: (value) {
-//                                           setState(() {});
-//                                         },
-//                                         style: TextStyle(
-//                                           color: Color(0xFF442B72),
-//                                           fontSize: 12,
-//                                           fontFamily: 'Poppins-Light',
-//                                           fontWeight: FontWeight.w400,
-//                                           height: 1.33,
-//                                         ),
-//                                         cursorColor: const Color(0xFF442B72),
-//                                         textDirection: (sharedpref?.getString('lang') == 'ar')
-//                                             ? TextDirection.rtl
-//                                             : TextDirection.ltr,
-//                                         textInputAction: TextInputAction.next,
-//                                         keyboardType: TextInputType.text,
-//                                         textAlign: (sharedpref?.getString('lang') == 'ar')
-//                                             ? TextAlign.right
-//                                             : TextAlign.left,
-//                                         scrollPadding: EdgeInsets.symmetric(vertical: 30),
-//                                         decoration: InputDecoration(
-//                                           alignLabelWithHint: true,
-//                                           counterText: "",
-//                                           fillColor: const Color(0xFFF1F1F1),
-//                                           filled: true,
-//                                           contentPadding: (sharedpref?.getString('lang') == 'ar')
-//                                               ? EdgeInsets.fromLTRB(0, 0, 17, 10)
-//                                               : EdgeInsets.fromLTRB(17, 0, 0, 10),
-//                                           hintText: 'Please enter your child name'.tr,
-//                                           floatingLabelBehavior: FloatingLabelBehavior.never,
-//                                           hintStyle: const TextStyle(
-//                                             color: Color(0xFF9E9E9E),
-//                                             fontSize: 12,
-//                                             fontFamily: 'Poppins-Bold',
-//                                             fontWeight: FontWeight.w700,
-//                                             height: 1.33,
-//                                           ),
-//                                           focusedBorder: OutlineInputBorder(
-//                                             borderRadius: BorderRadius.all(Radius.circular(7)),
-//                                             borderSide: BorderSide(
-//                                               color: Color(0xFFFFC53E),
-//                                               width: 0.5,
-//                                             ),
-//                                           ),
-//                                           enabledBorder: OutlineInputBorder(
-//                                             borderRadius: BorderRadius.all(Radius.circular(7)),
-//                                             borderSide: BorderSide(
-//                                               color: Color(0xFFFFC53E),
-//                                               width: 0.5,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   nameChildeError
-//                                       ? Container()
-//                                       : Padding(
-//                                     padding: const EdgeInsets.symmetric(horizontal: 20),
-//                                     child: nameChildControllers[index].text.isEmpty
-//                                         ? Text("Please enter your child name",
-//                                         style: TextStyle(color: Colors.red))
-//                                         : SizedBox(),
-//                                   ),
-//                                   SizedBox(height: 8),
-//                                   Padding(
-//                                     padding: (sharedpref?.getString('lang') == 'ar')
-//                                         ? EdgeInsets.only(right: 18.0)
-//                                         : EdgeInsets.only(left: 18.0),
-//                                     child: Text.rich(
-//                                       TextSpan(
-//                                         children: [
-//                                           TextSpan(
-//                                             text: 'Class'.tr,
-//                                             style: TextStyle(
-//                                               color: Color(0xFF442B72),
-//                                               fontSize: 15,
-//                                               fontFamily: 'Poppins-Bold',
-//                                               fontWeight: FontWeight.w700,
-//                                               height: 1.07,
-//                                             ),
-//                                           ),
-//                                           TextSpan(
-//                                             text: ' *',
-//                                             style: TextStyle(
-//                                               color: Colors.red,
-//                                               fontSize: 15,
-//                                               fontFamily: 'Poppins-Bold',
-//                                               fontWeight: FontWeight.w700,
-//                                               height: 1.07,
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   SizedBox(height: 8),
-//                                   Padding(
-//                                     padding: EdgeInsets.symmetric(horizontal: 18.0),
-//                                     child: SizedBox(
-//                                       width: 277,
-//                                       height: 38,
-//                                       child: TextFormField(
-//                                         controller: gradeControllers[index],
-//                                         onChanged: (value) {
-//                                           setState(() {});
-//                                         },
-//                                         style: TextStyle(
-//                                           color: Color(0xFF442B72),
-//                                           fontSize: 12,
-//                                           fontFamily: 'Poppins-Light',
-//                                           fontWeight: FontWeight.w400,
-//                                           height: 1.33,
-//                                         ),
-//                                         cursorColor: const Color(0xFF442B72),
-//                                         textDirection: (sharedpref?.getString('lang') == 'ar')
-//                                             ? TextDirection.rtl
-//                                             : TextDirection.ltr,
-//                                         textInputAction: TextInputAction.done,
-//                                         keyboardType: TextInputType.number,
-//                                         inputFormatters: <TextInputFormatter>[
-//                                           FilteringTextInputFormatter.digitsOnly
-//                                         ],
-//                                         textAlign: (sharedpref?.getString('lang') == 'ar')
-//                                             ? TextAlign.right
-//                                             : TextAlign.left,
-//                                         scrollPadding: EdgeInsets.symmetric(vertical: 30),
-//                                         decoration: InputDecoration(
-//                                           alignLabelWithHint: true,
-//                                           counterText: "",
-//                                           fillColor: const Color(0xFFF1F1F1),
-//                                           filled: true,
-//                                           contentPadding: (sharedpref?.getString('lang') == 'ar')
-//                                               ? EdgeInsets.fromLTRB(0, 0, 17, 10)
-//                                               : EdgeInsets.fromLTRB(17, 0, 0, 10),
-//                                           hintText: 'Please enter your child grade'.tr,
-//                                           floatingLabelBehavior: FloatingLabelBehavior.never,
-//                                           hintStyle: const TextStyle(
-//                                             color: Color(0xFF9E9E9E),
-//                                             fontSize: 12,
-//                                             fontFamily: 'Poppins-Bold',
-//                                             fontWeight: FontWeight.w700,
-//                                             height: 1.33,
-//                                           ),
-//                                           focusedBorder: OutlineInputBorder(
-//                                             borderRadius: BorderRadius.all(Radius.circular(7)),
-//                                             borderSide: BorderSide(
-//                                               color: Color(0xFFFFC53E),
-//                                               width: 0.5,
-//                                             ),
-//                                           ),
-//                                           enabledBorder: OutlineInputBorder(
-//                                             borderRadius: BorderRadius.all(Radius.circular(7)),
-//                                             borderSide: BorderSide(
-//                                               color: Color(0xFFFFC53E),
-//                                               width: 0.5,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   gradeError
-//                                       ? Container()
-//                                       : Padding(
-//                                     padding: const EdgeInsets.symmetric(horizontal: 20),
-//                                     child: gradeControllers[index].text.isEmpty
-//                                         ? Text("Please enter your child grade",
-//                                         style: TextStyle(color: Colors.red))
-//                                         : SizedBox(),
-//                                   ),
-//                                   SizedBox(height: 12),
-//                                   Padding(
-//                                     padding: (sharedpref?.getString('lang') == 'ar')
-//                                         ? EdgeInsets.only(right: 18.0)
-//                                         : EdgeInsets.only(left: 18.0),
-//                                     child: Text(
-//                                       'Gender'.tr,
-//                                       style: TextStyle(
-//                                         color: Color(0xFF442B72),
-//                                         fontSize: 15,
-//                                         fontFamily: 'Poppins-Bold',
-//                                         fontWeight: FontWeight.w700,
-//                                         height: 1.07,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   Padding(
-//                                     padding: (sharedpref?.getString('lang') == 'ar')
-//                                         ? EdgeInsets.only(right: 15.0)
-//                                         : EdgeInsets.only(left: 15.0),
-//                                     child: Row(
-//                                       children: [
-//                                         Row(
-//                                           children: [
-//                                             Radio(
-//                                               value: 'female',
-//                                               groupValue: genderSelection[index],
-//                                               onChanged: (value) {
-//                                                 setState(() {
-//                                                   genderSelection[index] = 'female';
-//                                                 });
-//                                               },
-//                                               fillColor: MaterialStateProperty.resolveWith((states) {
-//                                                 if (states.contains(MaterialState.selected)) {
-//                                                   return Color(0xff442B72);
-//                                                 }
-//                                                 return Color(0xff442B72);
-//                                               }),
-//                                               activeColor: Color(0xff442B72), // Set the color of the selected radio button
-//                                             ),
-//                                             Text(
-//                                               "Female".tr,
-//                                               style: TextStyle(
-//                                                 fontSize: 15,
-//                                                 fontFamily: 'Poppins-Regular',
-//                                                 fontWeight: FontWeight.w500,
-//                                                 color: Color(0xff442B72),
-//                                               ),
-//                                             ),
-//                                             SizedBox(
-//                                               width: 50, //115
-//                                             ),
-//                                             Radio(
-//                                               fillColor: MaterialStateProperty.resolveWith((states) {
-//                                                 if (states.contains(MaterialState.selected)) {
-//                                                   return Color(0xff442B72);
-//                                                 }
-//                                                 return Color(0xff442B72);
-//                                               }),
-//                                               value: 'male',
-//                                               groupValue: genderSelection[index],
-//                                               onChanged: (value) {
-//                                                 setState(() {
-//                                                   genderSelection[index] = 'male';
-//                                                 });
-//                                               },
-//                                               activeColor: Color(0xff442B72),
-//                                             ),
-//                                             Text(
-//                                               "Male".tr,
-//                                               style: TextStyle(
-//                                                 fontSize: 15,
-//                                                 fontFamily: 'Poppins-Regular',
-//                                                 fontWeight: FontWeight.w500,
-//                                                 color: Color(0xff442B72),
-//                                               ),
-//                                             ),
-//                                           ],
-//                                         ),
-//                                         SizedBox(
-//                                           height: 10,
-//                                         )
-//                                       ],
-//                                     ),
-//                                   ),
-//                                 ],
+//                             ),
+//                             TextSpan(
+//                               text: ' *',
+//                               style: TextStyle(
+//                                 color: Colors.red,
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
 //                               ),
 //                             ),
 //                           ],
 //                         ),
 //                       ),
-//                     ],
-//                   ),
-//                 );
-//               },
-//             )
-//                 : Container(),
-//           ),
-//         ],
+//                     ),
+//                     SizedBox(
+//                       height: 13,
+//                     ),
+//                     Padding(
+//                       padding: const EdgeInsets.symmetric(horizontal: 42),
+//                       child: Stack(
+//                         children: [
+//                           Container(
+//                             // width: 300,
+//                             height: 40,
+//                             decoration: BoxDecoration(
+//                               borderRadius: BorderRadius.circular(7),
+//                               color: Color(0xFFF1F1F1),
+//                               border: Border.all(
+//                                 color: Color(0xFFFFC53E),
+//                                 width: 0.5,
+//                               ),
+//                             ),
+//                             child: Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               children: [
+//                                 InkWell(
+//                                   onTap: () {
+//                                     setState(() {
+//                                       showList = !showList;
+//                                     });
+//                                   },
+//                                   child: Container(
+//                                     child: Padding(
+//                                       padding: const EdgeInsets.only(left: 17.0),
+//                                       child: GestureDetector(
+//                                         onTap: () {
+//                                           setState(() {
+//                                             showList = !showList;
+//                                           });
+//                                         },
+//                                         child: Row(
+//                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                           children: <Widget>[
+//                                             GestureDetector(
+//                                               onTap: () {
+//                                                 setState(() {
+//                                                   showList = !showList;
+//                                                 });
+//                                               },
+//                                               child: Padding(padding: const EdgeInsets.only(right: 0.0),
+//                                                 child: Text(
+//                                                   selectedValue!.isNotEmpty
+//                                                       ? selectedValue
+//                                                       : 'Choose your type',
+//                                                   style: TextStyle(
+//                                                     color: Color(0xFF9E9E9E),
+//                                                     fontSize: 12,
+//                                                     fontFamily: 'Poppins-Bold',
+//                                                     fontWeight: FontWeight.w700,
+//                                                     height: 1.33,
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                             SizedBox(
+//                                               width: selectedValue!.isNotEmpty
+//                                                   ? 160
+//                                                   : 90,
+//                                             ),
+//                                             GestureDetector(
+//                                               onTap: () {
+//                                                 setState(() {
+//                                                   showList =
+//                                                   !showList; // Toggle the visibility of the list
+//                                                 });
+//                                               },
+//                                               child: Container(
+//                                                 child: Padding(
+//                                                   padding:
+//                                                   const EdgeInsets.only(top: 14.0 , bottom: 14, left: 30,
+//                                                       right:0),
+//                                                   child: Image.asset(
+//                                                     'assets/images/Vectorbottom (12).png',
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ],
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                           if (showList)
+//                             Container(
+//                               height: 140,
+//                               child: Card(
+//                                 surfaceTintColor: Colors.transparent,
+//                                 color: Colors.white,
+//                                 child: ListView(
+//                                   shrinkWrap: true,
+//                                   children: [
+//                                     ListTile(
+//                                       title: Text(
+//                                         'Father',
+//                                         textAlign: TextAlign.start,
+//                                         style: TextStyle(
+//                                           color: Color(0xFF9E9E9E),
+//                                           fontSize: 12,
+//                                           fontFamily: 'Poppins-Bold',
+//                                           fontWeight: FontWeight.w700,
+//                                           height: 1.33,
+//                                         ),
+//                                       ),
+//                                       onTap: () {
+//                                         setState(() {
+//                                           selectedValue = 'Father';
+//                                           showList = false;
+//                                         });
+//                                       },
+//                                     ),
+//                                     Padding(
+//                                       padding: EdgeInsets.zero,
+//                                       child: ListTile(
+//                                         title: Text(
+//                                           'Mother',
+//                                           textAlign: TextAlign.start,
+//                                           style: TextStyle(
+//                                             color: Color(0xFF9E9E9E),
+//                                             fontSize: 12,
+//                                             fontFamily: 'Poppins-Bold',
+//                                             fontWeight: FontWeight.w700,
+//                                             height: 1.33,
+//                                           ),
+//                                         ),
+//                                         onTap: () {
+//                                           setState(() {
+//                                             selectedValue = 'Mother';
+//                                             showList = false;
+//                                           });
+//                                         },
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             ),
+//                         ],
+//                       ),
+//                     ),
+//                     typeOfParentError
+//                         ? Padding(
+//                       padding: const EdgeInsets.symmetric(horizontal: 48),
+//                       child: Text(
+//                         "Please enter your type".tr,
+//                         style: TextStyle(color: Colors.red),
+//                       ),
+//                     ): Container(),
+//                     SizedBox(
+//                       height: 11,
+//                     ),
+//                     Padding(
+//                       padding: (sharedpref?.getString('lang') == 'ar')
+//                           ? EdgeInsets.only(right: 42.0)
+//                           : EdgeInsets.only(left: 42.0),
+//                       child: Text.rich(
+//                         TextSpan(
+//                           children: [
+//                             TextSpan(
+//                               text: 'Name'.tr,
+//                               style: TextStyle(
+//                                 color: Color(0xFF442B72),
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
+//                               ),
+//                             ),
+//                             TextSpan(
+//                               text: ' *',
+//                               style: TextStyle(
+//                                 color: Colors.red,
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                     SizedBox(
+//                       height: 13,
+//                     ),
+//                     Padding(
+//                       padding: EdgeInsets.symmetric(horizontal: 42.0),
+//                       child: SizedBox(
+//                         // width: 277,
+//                         height: 40,
+//                         child: TextFormField(
+//                             controller: _nameController,
+//
+//                             // cursorRadius: Radius.circular(300),
+//                             style: TextStyle(
+//                               color: Color(0xFF442B72),
+//                             ),
+//                             cursorColor: const Color(0xFF442B72),
+//                             textDirection: (sharedpref?.getString('lang') == 'ar')
+//                                 ? TextDirection.rtl
+//                                 : TextDirection.ltr,
+//                             // selectionHeightStyle: 20,
+//                             autofocus: true,
+//                             textInputAction: TextInputAction.next,
+//                             keyboardType: TextInputType.text,
+//                             textAlign: (sharedpref?.getString('lang') == 'ar')
+//                                 ? TextAlign.right
+//                                 : TextAlign.left,
+//                             scrollPadding: EdgeInsets.symmetric(vertical: 30),
+//                             decoration: InputDecoration(
+//                               alignLabelWithHint: false,
+//                               counterText: "",
+//                               fillColor: const Color(0xFFF1F1F1),
+//                               filled: true,
+//                               contentPadding:
+//                               (sharedpref?.getString('lang') == 'ar')
+//                                   ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+//                                   : EdgeInsets.fromLTRB(17, 0, 0, 10),
+//                               hintText: 'Please enter your name'.tr,
+//                               floatingLabelBehavior: FloatingLabelBehavior.never,
+//                               hintStyle: const TextStyle(
+//                                 color: Color(0xFF9E9E9E),
+//                                 fontSize: 12,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.33,
+//                               ),
+//                               focusedBorder: OutlineInputBorder(
+//                                   borderRadius:
+//                                   BorderRadius.all(Radius.circular(7)),
+//                                   borderSide: BorderSide(
+//                                     color: Color(0xFFFFC53E),
+//                                     width: 0.5,
+//                                   )),
+//                               enabledBorder: OutlineInputBorder(
+//                                 borderRadius:
+//                                 BorderRadius.all(Radius.circular(7)),
+//                                 borderSide: BorderSide(
+//                                   color: Color(0xFFFFC53E),
+//                                   width: 0.5,
+//                                 ),
+//                               ),
+//
+//                               // enabledBorder: myInputBorder(),
+//                               // focusedBorder: myFocusBorder(),
+//                             )),
+//                       ),
+//                     ),
+//                     nameError
+//                         ?Padding(
+//                       padding: const EdgeInsets.symmetric(horizontal: 48),
+//                       child: Text(
+//                         "Please enter your name".tr,
+//                         style: TextStyle(color: Colors.red),
+//                       ),
+//                     ):
+//                         Container(),
+//                     SizedBox(
+//                       height: 17,
+//                     ),
+//                     Padding(
+//                       padding: (sharedpref?.getString('lang') == 'ar')
+//                           ? EdgeInsets.only(right: 42.0)
+//                           : EdgeInsets.only(left: 42.0),
+//                       child: Text.rich(
+//                         TextSpan(
+//                           children: [
+//                             TextSpan(
+//                               text: 'Phone Number'.tr,
+//                               style: TextStyle(
+//                                 color: Color(0xFF442B72),
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
+//                               ),
+//                             ),
+//                             TextSpan(
+//                               text: ' *',
+//                               style: TextStyle(
+//                                 color: Colors.red,
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                     SizedBox(
+//                       height: 13,
+//                     ),
+//                     Padding(
+//                       padding: EdgeInsets.symmetric(horizontal: 42.0),
+//                       child: SizedBox(
+//                         // width: 277,
+//                         height: 65,
+//                         child: IntlPhoneField(
+//
+//                           textInputAction: TextInputAction.next,
+//                           // Move to the next field when "Done" is pressed
+//                           cursorColor: Color(0xFF442B72),
+//                           controller: _phoneNumberController,
+//                           dropdownIconPosition: IconPosition.trailing,
+//                           invalidNumberMessage: " ",
+//                           style: TextStyle(color: Color(0xFF442B72), height: 1.5),
+//                           dropdownIcon: Icon(
+//                             Icons.keyboard_arrow_down,
+//                             color: Color(0xff442B72),
+//                           ),
+//                           decoration: InputDecoration(
+//                             fillColor: Color(0xffF1F1F1),
+//                             filled: true,
+//                             hintText: 'Phone Number'.tr,
+//                             hintStyle: TextStyle(
+//                                 color: Color(0xFFC2C2C2),
+//                                 fontSize: 12,
+//                                 fontFamily: "Poppins-Bold"),
+//                             border: OutlineInputBorder(
+//                               borderRadius: BorderRadius.all(Radius.circular(7)),
+//                               borderSide: BorderSide(
+//                                 color: !_phoneNumberEntered
+//                                     ? Colors
+//                                     .red // Red border if phone number not entered
+//                                     : Color(0xFFFFC53E),
+//                               ),
+//                             ),
+//                             focusedErrorBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.all(Radius.circular(7)),
+//                               borderSide: BorderSide(color: Colors.red, width: 2),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.all(Radius.circular(7)),
+//                               borderSide: BorderSide(
+//                                 color: Color(0xFFFFC53E),
+//                                 width: 0.5,
+//                               ),
+//                             ),
+//                             errorBorder: OutlineInputBorder(
+//                                 borderRadius:
+//                                 BorderRadius.all(Radius.circular(7)),
+//                                 borderSide:
+//                                 BorderSide(color: Colors.red, width: 2)),
+//                             focusedBorder: OutlineInputBorder(
+//                               // Set border color when the text field is focused
+//                               borderRadius: BorderRadius.circular(10.0),
+//                               borderSide: BorderSide(
+//                                 color: Color(0xFFFFC53E),
+//                               ),
+//                             ),
+//                             contentPadding: EdgeInsets.symmetric(
+//                                 vertical: 12.0, horizontal: 16.0),
+//                           ),
+//
+//                           initialCountryCode: 'EG',
+//                           // Set initial country code if needed
+//                           onChanged: (phone) {
+//                             enteredPhoneNumber = phone.completeNumber;
+//                             // Update the enteredPhoneNumber variable with the entered phone number
+//                           },
+//                         ),
+//                       ),
+//                     ),
+//                     phoneAdded
+//                         ?  Padding(
+//                       padding: const EdgeInsets.symmetric(
+//                         horizontal: 48,
+//                       ),
+//                       child: Text(
+//                         "This phone number is already added".tr,
+//                         style: TextStyle(color: Colors.red),
+//                       ),
+//                     ): Container(),
+//                     phoneError
+//                         ?  Padding(
+//                       padding: const EdgeInsets.symmetric(
+//                         horizontal: 48,
+//                       ),
+//                       child: Text(
+//                         "Please enter your phone number".tr,
+//                         style: TextStyle(color: Colors.red),
+//                       ),
+//                     ): Container(),
+//                     SizedBox(
+//                       height: 17,
+//                     ),
+//                     Padding(
+//                       padding: (sharedpref?.getString('lang') == 'ar')
+//                           ? EdgeInsets.only(right: 42.0)
+//                           : EdgeInsets.only(left: 42.0),
+//                       child: Text.rich(
+//                         TextSpan(
+//                           children: [
+//                             TextSpan(
+//                               text: 'Number of children'.tr,
+//                               style: TextStyle(
+//                                 color: Color(0xFF442B72),
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
+//                               ),
+//                             ),
+//                             TextSpan(
+//                               text: ' *',
+//                               style: TextStyle(
+//                                 color: Colors.red,
+//                                 fontSize: 15,
+//                                 fontFamily: 'Poppins-Bold',
+//                                 fontWeight: FontWeight.w700,
+//                                 height: 1.07,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                     SizedBox(
+//                       height: 13,
+//                     ),
+//                     Padding(
+//                       padding: EdgeInsets.symmetric(horizontal: 42.0),
+//                       child: SizedBox(
+//                         // width: 277,
+//                         height: 40,
+//                         child: TextFormField(
+//                           onChanged: (value) {
+//                                               setState(() {
+//                                                 numberOfCards = int.tryParse(value) ?? 0;
+//                                                 updateControllers(numberOfCards);
+//                                               });
+//                                             },
+//                           controller: _numberOfChildrenController,
+//                           style: TextStyle(
+//                             color: Color(0xFF442B72),
+//                           ),
+//                           cursorColor: Color(0xFF442B72),
+//                           textDirection: (sharedpref?.getString('lang') == 'ar')
+//                               ? TextDirection.rtl
+//                               : TextDirection.ltr,
+//                           // autofocus: true,
+//                           textInputAction: TextInputAction.done,
+//                           keyboardType: TextInputType.number,
+//                           inputFormatters: <TextInputFormatter>[
+//                             FilteringTextInputFormatter.digitsOnly
+//                           ],
+//                           textAlign: (sharedpref?.getString('lang') == 'ar')
+//                               ? TextAlign.right
+//                               : TextAlign.left,
+//                           scrollPadding: EdgeInsets.symmetric(vertical: 30),
+//                           decoration: InputDecoration(
+//                             alignLabelWithHint: true,
+//                             counterText: "",
+//                             fillColor: const Color(0xFFF1F1F1),
+//                             filled: true,
+//                             contentPadding:
+//                             (sharedpref?.getString('lang') == 'ar')
+//                                 ? EdgeInsets.fromLTRB(166, 0, 17, 10)
+//                                 : EdgeInsets.fromLTRB(17, 0, 0, 10),
+//                             hintText: 'Please enter your number children'.tr,
+//                             floatingLabelBehavior: FloatingLabelBehavior.never,
+//                             hintStyle: const TextStyle(
+//                               color: Color(0xFF9E9E9E),
+//                               fontSize: 12,
+//                               fontFamily: 'Poppins-Bold',
+//                               fontWeight: FontWeight.w700,
+//                               height: 1.33,
+//                             ),
+//                             focusedBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.all(Radius.circular(7)),
+//                               borderSide: BorderSide(
+//                                 color: Color(0xFFFFC53E),
+//                                 width: 0.5,
+//                               ),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.all(Radius.circular(7)),
+//                               borderSide: BorderSide(
+//                                 color: Color(0xFFFFC53E),
+//                                 width: 0.5,
+//                               ),
+//                             ),
+//                             // enabledBorder: myInputBorder(),
+//                             // focusedBorder: myFocusBorder(),
+//                           ),
+//                           maxLength: 1,
+//                         ),
+//                       ),
+//                     ),
+//                     numberOfChildrenError
+//                         ? Padding(
+//                       padding: const EdgeInsets.symmetric(horizontal: 48),
+//                       child: Text(
+//                         "Please enter your number of children".tr,
+//                         style: TextStyle(color: Colors.red),
+//                       ),
+//                     ):Container(),
+//                     SizedBox(
+//                       height: 20,
+//                     ),
+//                     Padding(
+//                       padding: (sharedpref?.getString('lang') == 'ar')
+//                           ? EdgeInsets.only(right: 25.0, left: 30)
+//                           : EdgeInsets.only(left: 25.0, right: 30),
+//                       child: Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Text(
+//                             'Children'.tr,
+//                             style: TextStyle(
+//                               fontSize: 19,
+//                               // height:  0.94,
+//                               fontFamily: 'Poppins-Bold',
+//                               fontWeight: FontWeight.w700,
+//                               color: Color(0xff771F98),
+//                             ),
+//                           ),
+//                           GestureDetector(
+//                             onTap: () {
+//                               toggleCardsVisibility();
+//                               toggleImage();
+//                             },
+//                             child: Image.asset(
+//                               isFirstImage
+//                                   ? 'assets/images/iconamoon_arrow-up-2-thin (1).png'
+//                                   : 'assets/images/iconamoon_arrow-up-2-thin.png',
+//                               width: 34,
+//                               height: 34,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                     SizedBox(height: 20,),
+//                     showCards
+//                         ? Column(
+//                       children: List.generate(numberOfCards, (index) {
+//                         return Center(
+//                           child: Column(
+//                             children: [
+//                               SizedBox(
+//                                 width: 296,
+//                                 height: 310,
+//                                 child: Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.center,
+//                                   children: [
+//                                     Container(
+//                                       decoration: BoxDecoration(
+//                                         color: Color(0xff771F98).withOpacity(0.03),
+//                                         borderRadius: BorderRadius.circular(14),
+//                                       ),
+//                                       child: Column(
+//                                         mainAxisAlignment: MainAxisAlignment.start,
+//                                         crossAxisAlignment: CrossAxisAlignment.start,
+//                                         children: [
+//                                           SizedBox(height: 10),
+//                                           Padding(
+//                                             padding: (sharedpref?.getString('lang') == 'ar')
+//                                                 ? EdgeInsets.only(right: 12.0)
+//                                                 : EdgeInsets.only(left: 12.0),
+//                                             child: Text.rich(
+//                                               TextSpan(
+//                                                 children: [
+//                                                   TextSpan(
+//                                                     text: 'Child '.tr,
+//                                                     style: TextStyle(
+//                                                       color: Color(0xff771F98),
+//                                                       fontSize: 16,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                     ),
+//                                                   ),
+//                                                   TextSpan(
+//                                                     text: '${index + 1}',
+//                                                     style: TextStyle(
+//                                                       color: Color(0xff771F98),
+//                                                       fontSize: 16,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                     ),
+//                                                   ),
+//                                                 ],
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 8),
+//                                           Padding(
+//                                             padding: (sharedpref?.getString('lang') == 'ar')
+//                                                 ? EdgeInsets.only(right: 18.0)
+//                                                 : EdgeInsets.only(left: 18.0),
+//                                             child: Text.rich(
+//                                               TextSpan(
+//                                                 children: [
+//                                                   TextSpan(
+//                                                     text: 'Name'.tr,
+//                                                     style: TextStyle(
+//                                                       color: Color(0xFF442B72),
+//                                                       fontSize: 15,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                       height: 1.07,
+//                                                     ),
+//                                                   ),
+//                                                   TextSpan(
+//                                                     text: ' *',
+//                                                     style: TextStyle(
+//                                                       color: Colors.red,
+//                                                       fontSize: 15,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                       height: 1.07,
+//                                                     ),
+//                                                   ),
+//                                                 ],
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 8),
+//                                           Padding(
+//                                             padding: EdgeInsets.symmetric(horizontal: 18.0),
+//                                             child: SizedBox(
+//                                               width: 277,
+//                                               height: 38,
+//                                               child: TextField(
+//                                                 controller: nameChildControllers[index],
+//                                                 style: TextStyle(
+//                                                   color: Color(0xFF442B72),
+//                                                   fontSize: 12,
+//                                                   fontFamily: 'Poppins-Light',
+//                                                   fontWeight: FontWeight.w400,
+//                                                   height: 1.33,
+//                                                 ),
+//                                                 cursorColor: const Color(0xFF442B72),
+//                                                 textDirection: (sharedpref?.getString('lang') == 'ar')
+//                                                     ? TextDirection.rtl
+//                                                     : TextDirection.ltr,
+//                                                 textInputAction: TextInputAction.next,
+//                                                 keyboardType: TextInputType.text,
+//                                                 textAlign: (sharedpref?.getString('lang') == 'ar')
+//                                                     ? TextAlign.right
+//                                                     : TextAlign.left,
+//                                                 scrollPadding: EdgeInsets.symmetric(vertical: 30),
+//                                                 decoration: InputDecoration(
+//                                                    alignLabelWithHint: true,
+//                                                    counterText: "",
+//                                                    fillColor: const Color( 0xFFF1F1F1),
+//                                                    filled: true,
+//                                                   contentPadding: (sharedpref ?.getString( 'lang') == 'ar') ? EdgeInsets.fromLTRB( 0, 0, 17, 10)
+//                                                   : EdgeInsets.fromLTRB(17, 0, 0, 10),
+//                                                    hintText:'Please enter your child name'.tr,
+//                                                   floatingLabelBehavior: FloatingLabelBehavior.never,
+//                                                   hintStyle: const TextStyle(color:Color(0xFF9E9E9E),
+//                                                   fontSize: 12,
+//                                                   fontFamily:'Poppins-Bold',
+//                                                   fontWeight: FontWeight.w700,
+//                                                   height: 1.33,
+//                                                   ),
+//                                                   errorText: childNameErrors[index] ? 'Please enter child name' : null,
+//                                                   focusedBorder: OutlineInputBorder(
+//                                                    borderRadius: BorderRadius.all( Radius.circular(7)),
+//                                                    borderSide: BorderSide(
+//                                                     color: Color(0xFFFFC53E),
+//                                                     width: 0.5, ),),
+//                                                    enabledBorder: OutlineInputBorder(
+//                                                      borderRadius: BorderRadius.all(
+//                                                          Radius.circular(7)),
+//                                                      borderSide: BorderSide(
+//                                                        color: Color(0xFFFFC53E),
+//                                                        width: 0.5,),),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 12),
+//                                           Padding(
+//                                             padding: (sharedpref?.getString('lang') == 'ar')
+//                                                 ? EdgeInsets.only(right: 18.0)
+//                                                 : EdgeInsets.only(left: 18.0),
+//                                             child: Text.rich(
+//                                               TextSpan(
+//                                                 children: [
+//                                                   TextSpan(
+//                                                     text: 'Grade'.tr,
+//                                                     style: TextStyle(
+//                                                       color: Color(0xFF442B72),
+//                                                       fontSize: 15,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                       height: 1.07,
+//                                                     ),
+//                                                   ),
+//                                                   TextSpan(
+//                                                     text: ' *',
+//                                                     style: TextStyle(
+//                                                       color: Colors.red,
+//                                                       fontSize: 15,
+//                                                       fontFamily: 'Poppins-Bold',
+//                                                       fontWeight: FontWeight.w700,
+//                                                       height: 1.07,
+//                                                     ),
+//                                                   ),
+//                                                 ],
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 8),
+//                                           Padding(
+//                                             padding:  EdgeInsets.symmetric(horizontal: 18.0),
+//                                             child: SizedBox(
+//                                               width: 277,
+//                                               height: 38,
+//                                               child: TextField(
+//                                                 controller: gradeControllers[index],
+//                                                 style: TextStyle(
+//                                                   color: Color(0xFF442B72),
+//                                                   fontSize: 12,
+//                                                   fontFamily: 'Poppins-Light',
+//                                                   fontWeight: FontWeight.w400,
+//                                                   height: 1.33,
+//                                                 ),
+//                                                 cursorColor: const Color(0xFF442B72),
+//                                                 textDirection: (sharedpref?.getString('lang') == 'ar') ? TextDirection.rtl : TextDirection.ltr,
+//                                                 textInputAction: TextInputAction.done,
+//                                                 keyboardType: TextInputType.number,
+//                                                 inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+//                                                 textAlign:(sharedpref?.getString('lang') == 'ar') ? TextAlign.right : TextAlign.left,
+//                                                 scrollPadding: EdgeInsets.symmetric(vertical: 30),
+//                                                 decoration: InputDecoration(
+//                                                   alignLabelWithHint: true,
+//                                                   counterText: "",
+//                                                   fillColor: const Color(0xFFF1F1F1),
+//                                                   filled: true,
+//                                                   contentPadding: (sharedpref?.getString('lang') == 'ar') ? EdgeInsets.fromLTRB(0, 0, 17, 10)
+//                                                       : EdgeInsets.fromLTRB(17, 0, 0, 10),
+//                                                   errorText: childGradeErrors[index] ? 'Please enter grade name' : null,
+//                                                   hintText: 'Please enter your child grade'.tr,
+//                                                   floatingLabelBehavior: FloatingLabelBehavior.never,
+//                                                   hintStyle: const TextStyle(
+//                                                     color: Color(0xFF9E9E9E),
+//                                                     fontSize: 12,
+//                                                     fontFamily: 'Poppins-Bold',
+//                                                     fontWeight: FontWeight.w700,
+//                                                     height: 1.33,
+//                                                   ),
+//                                                     focusedBorder: OutlineInputBorder(
+//                                                       borderRadius: BorderRadius.all(
+//                                                           Radius.circular(7)),
+//                                                       borderSide: BorderSide(
+//                                                         color: Color(0xFFFFC53E),
+//                                                         width: 0.5,),),
+//                                                     enabledBorder: OutlineInputBorder(borderRadius:
+//                                                     BorderRadius.all(
+//                                                         Radius.circular(7)),
+//                                                       borderSide: BorderSide(
+//                                                         color: Color(0xFFFFC53E),
+//                                                         width: 0.5,),),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 12),
+//                                           Padding(
+//                                             padding: (sharedpref?.getString('lang') == 'ar')
+//                                                 ? EdgeInsets.only(right: 18.0)
+//                                                 : EdgeInsets.only(left: 18.0),
+//                                             child: Text(
+//                                               'Gender',
+//                                               style: TextStyle(
+//                                                 color: Color(0xFF442B72),
+//                                                 fontSize: 15,
+//                                                 fontFamily: 'Poppins-Bold',
+//                                                 fontWeight: FontWeight.w700,
+//                                                 height: 1.07,
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           // SizedBox(height: 6),
+//                                           // Padding(
+//                                           //   padding: (sharedpref?.getString('lang') == 'ar')
+//                                           //       ? EdgeInsets.only(right: 15.0)
+//                                           //       : EdgeInsets.only(left: 15.0),
+//                                           //   child: Row(
+//                                           //     children: [
+//                                           //       Expanded(
+//                                           //         child: RadioListTile<String>(
+//                                           //           title: Text('Male'),
+//                                           //           value: 'male',
+//                                           //           groupValue: genderSelection[index],
+//                                           //           onChanged: (value) {
+//                                           //             setState(() {
+//                                           //               genderSelection[index] = value!;
+//                                           //             });
+//                                           //           },
+//                                           //         ),
+//                                           //       ),
+//                                           //       Expanded(
+//                                           //         child: RadioListTile<String>(
+//                                           //           title: Text('Female'),
+//                                           //           value: 'female',
+//                                           //           groupValue: genderSelection[index],
+//                                           //           onChanged: (value) {
+//                                           //             setState(() {
+//                                           //               genderSelection[index] = value!;
+//                                           //             });
+//                                           //           },
+//                                           //         ),
+//                                           //       ),
+//                                           //     ],
+//                                           //   ),
+//                                           // ),
+//                                           Padding(
+//                                               padding: (sharedpref?.getString('lang') == 'ar') ?
+//                                               EdgeInsets.only(right: 15.0)
+//                                               : EdgeInsets.only(left: 15.0),
+//                                               child: Row(children: [
+//                                                 Row(
+//                                                   children: [
+//                                                     Radio(
+//                                                       value: 'female',
+//                                                       groupValue: genderSelection[index],
+//                                                       onChanged: (value) {
+//                                                         setState(() {
+//                                                           genderSelection[index] = 'female';
+//                                                         });
+//                                                       },
+//                                                       fillColor: MaterialStateProperty.resolveWith((states) {
+//                                                                 if (states.contains(MaterialState.selected)) {
+//                                                               return Color(0xff442B72);}
+//                                                               return Color(0xff442B72);}),
+//                                                       activeColor: Color(0xff442B72), ),// Set the color of the selected radio button
+//                                                     Text(
+//                                                       "Female".tr,
+//                                                       style: TextStyle(
+//                                                         fontSize: 15,
+//                                                         fontFamily: 'Poppins-Regular',
+//                                                         fontWeight: FontWeight.w500,
+//                                                         color: Color(0xff442B72),
+//                                                       ),
+//                                                     ),
+//                                                     SizedBox(width: 50, ), //115
+//                                                     Radio(
+//                                                       fillColor: MaterialStateProperty.resolveWith(
+//                                                               (states) {
+//                                                                 if (states.contains(MaterialState.selected)) {
+//                                                               return Color(0xff442B72);}
+//                                                             return Color(0xff442B72);}),
+//                                                       value: 'male',
+//                                                       groupValue: genderSelection[index],
+//                                                       onChanged: (value) {
+//                                                         setState(() {genderSelection[index] = 'male';});},
+//                                                       activeColor: Color(0xff442B72),),
+//                                                     Text(
+//                                                       "Male".tr,
+//                                                       style: TextStyle(
+//                                                         fontSize: 15,
+//                                                         fontFamily: 'Poppins-Regular',
+//                                                         fontWeight: FontWeight.w500,
+//                                                         color: Color(0xff442B72),
+//                                                       ),
+//                                                     ),
+//                                                   ],
+//                                                 ),
+//                                                 SizedBox(
+//                                                   height: 10,
+//                                                 )
+//                                               ])),
+//                                         ],
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         );
+//                       }),
+//                     ) : Container(),
+//                     // SizedBox(height: 10),
+//                     Center(
+//                       child: ElevatedSimpleButton(
+//                           txt: 'Send invitation'.tr,
+//                           fontFamily: 'Poppins-Regular',
+//                           width: 277,
+//                           hight: 48,
+//                           color: Color(0xFF442B72),
+//                           fontSize: 16,
+//                           onPress: () {
+//                           setState(() {
+//                             bool isValid = true;
+//                             if (numberOfCards == 0 || numberOfCards == null) {
+//                               numberOfChildrenError = true;
+//                               isValid = false;
+//                             } else {
+//                               numberOfChildrenError = false;
+//                             }
+//
+//                             if (_nameController.text.isEmpty ) {
+//                               nameError = true;
+//                               isValid = false;
+//                             } else {
+//                               nameError = false;
+//                             }
+//
+//                             if (selectedValue.isEmpty ) {
+//                               typeOfParentError = true;
+//                               isValid = false;
+//                             } else {
+//                               typeOfParentError = false;
+//                             }
+//
+//                             if (_phoneNumberController.text.isEmpty ) {
+//                               phoneError = true;
+//                               isValid = false;
+//                             } else {
+//                               phoneError = false;
+//                             }
+//                             // if (_phoneNumberController.text.isEmpty) {
+//                             //   phoneError = true;
+//                             //   isValid = false;
+//                             // } else {
+//                             //   phoneError = false;
+//                             // }
+//
+//                             for (int i = 0; i < nameChildControllers.length; i++) {
+//                               if (nameChildControllers[i].text.isEmpty) {
+//                                 childNameErrors[i] = true;
+//                                 isValid = false;
+//                               } else {
+//                                 childNameErrors[i] = false;
+//                               }
+//
+//                               if (gradeControllers[i].text.isEmpty) {
+//                                 childGradeErrors[i] = true;
+//                                 isValid = false;
+//                               } else {
+//                                 childGradeErrors[i] = false;
+//                               }
+//                             }
+//
+//                             if (isValid) {
+//                               _addDataToFirestore();
+//                             }
+//                           });
+//                         },
+//                         // onPressed:  _addDataToFirestore,
+//
+//                       ),
+//                     ),
+//
+//                     //  Padding(
+//                     //                               padding: EdgeInsets.symmetric(horizontal: 44.0),
+//                     //                               child: Center(
+//                     //                                 child: ElevatedSimpleButton(
+//
+//                     //                               ),
+//                     //                             ),
+//                     SizedBox(height: 70),
+//                     //testttttt
+//                     // TextField(
+//                     //   controller: _phoneNumberController,
+//                     //   keyboardType: TextInputType.phone,
+//                     //   decoration: InputDecoration(
+//                     //     labelText: 'Enter phone number',
+//                     //     border: OutlineInputBorder(),
+//                     //   ),
+//                     //   onChanged: (value) {
+//                     //     enteredPhoneNumber = value;
+//                     //   },
+//                     // ),
+//                     // TextField(
+//                     //   keyboardType: TextInputType.number,
+//                     //   onChanged: (value) {
+//                     //     setState(() {
+//                     //       numberOfCards = int.tryParse(value) ?? 0;
+//                     //       updateControllers(numberOfCards);
+//                     //     });
+//                     //   },
+//                     //   decoration: InputDecoration(
+//                     //     labelText: 'Enter number of cards',
+//                     //     border: OutlineInputBorder(),
+//                     //   ),
+//                     // ),
+//                     // numberOfChildrenError
+//                     //     ? Padding(
+//                     //   padding: const EdgeInsets.symmetric(horizontal: 48),
+//                     //   child: Text(
+//                     //     "Please enter your number of children".tr,
+//                     //     style: TextStyle(color: Colors.red),
+//                     //   ),
+//                     // ):Container(),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//
+//
+//
+//             // Expanded(
+//             //   child: showCards
+//             //       ? ListView.builder(
+//             //     itemCount: numberOfCards,
+//             //     itemBuilder: (context, index) {
+//             //       return Center(
+//             //         child: Column(
+//             //           children: [
+//             //             SizedBox(
+//             //               width: 296,
+//             //               height: 310,
+//             //               child: Column(
+//             //                 crossAxisAlignment: CrossAxisAlignment.center,
+//             //                 children: [
+//             //                   Container(
+//             //                     decoration: BoxDecoration(
+//             //                       color: Color(0xff771F98).withOpacity(0.03),
+//             //                       borderRadius: BorderRadius.circular(14),
+//             //                     ),
+//             //                     child: Column(
+//             //                       mainAxisAlignment: MainAxisAlignment.start,
+//             //                       crossAxisAlignment: CrossAxisAlignment.start,
+//             //                       children: [
+//             //                         SizedBox(height: 10),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 12.0)
+//             //                               : EdgeInsets.only(left: 12.0),
+//             //                           child: Text.rich(
+//             //                             TextSpan(
+//             //                               children: [
+//             //                                 TextSpan(
+//             //                                   text: 'Child '.tr,
+//             //                                   style: TextStyle(
+//             //                                     color: Color(0xff771F98),
+//             //                                     fontSize: 16,
+//             //                                     fontFamily: 'Poppins-Bold',
+//             //                                     fontWeight: FontWeight.w700,
+//             //                                   ),
+//             //                                 ),
+//             //                                 TextSpan(
+//             //                                   text: '${index + 1}',
+//             //                                   style: TextStyle(
+//             //                                     color: Color(0xff771F98),
+//             //                                     fontSize: 16,
+//             //                                     fontFamily: 'Poppins-Bold',
+//             //                                     fontWeight: FontWeight.w700,
+//             //                                   ),
+//             //                                 ),
+//             //                               ],
+//             //                             ),
+//             //                           ),
+//             //                         ),
+//             //                         SizedBox(height: 8),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 18.0)
+//             //                               : EdgeInsets.only(left: 18.0),
+//             //                           child: Text.rich(
+//             //                             TextSpan(
+//             //                               children: [
+//             //                                 TextSpan(
+//             //                                   text: 'Name'.tr,
+//             //                                   style: TextStyle(
+//             //                                     color: Color(0xFF442B72),
+//             //                                     fontSize: 15,
+//             //                                     fontFamily: 'Poppins-Bold',
+//             //                                     fontWeight: FontWeight.w700,
+//             //                                     height: 1.07,
+//             //                                   ),
+//             //                                 ),
+//             //                                 TextSpan(
+//             //                                   text: ' *',
+//             //                                   style: TextStyle(
+//             //                                     color: Colors.red,
+//             //                                     fontSize: 15,
+//             //                                     fontFamily: 'Poppins-Bold',
+//             //                                     fontWeight: FontWeight.w700,
+//             //                                     height: 1.07,
+//             //                                   ),
+//             //                                 ),
+//             //                               ],
+//             //                             ),
+//             //                           ),
+//             //                         ),
+//             //                         SizedBox(height: 6),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 12.0)
+//             //                               : EdgeInsets.only(left: 12.0),
+//             //                           child: TextField(
+//             //                             controller: nameChildControllers[index],
+//             //                             decoration: InputDecoration(
+//             //                               errorText: childNameErrors[index] ? 'Please enter child name' : null,
+//             //                               contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+//             //                               hintText: 'Enter child name',
+//             //                               border: OutlineInputBorder(
+//             //                                 borderRadius: BorderRadius.circular(10),
+//             //                               ),
+//             //
+//             //                             ),
+//             //
+//             //                           ),
+//             //                         ),
+//             //                         SizedBox(height: 14),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 18.0)
+//             //                               : EdgeInsets.only(left: 18.0),
+//             //                           child: Text.rich(
+//             //                             TextSpan(
+//             //                               children: [
+//             //                                 TextSpan(
+//             //                                   text: 'Grade'.tr,
+//             //                                   style: TextStyle(
+//             //                                     color: Color(0xFF442B72),
+//             //                                     fontSize: 15,
+//             //                                     fontFamily: 'Poppins-Bold',
+//             //                                     fontWeight: FontWeight.w700,
+//             //                                     height: 1.07,
+//             //                                   ),
+//             //                                 ),
+//             //                                 TextSpan(
+//             //                                   text: ' *',
+//             //                                   style: TextStyle(
+//             //                                     color: Colors.red,
+//             //                                     fontSize: 15,
+//             //                                     fontFamily: 'Poppins-Bold',
+//             //                                     fontWeight: FontWeight.w700,
+//             //                                     height: 1.07,
+//             //                                   ),
+//             //                                 ),
+//             //                               ],
+//             //                             ),
+//             //                           ),
+//             //                         ),
+//             //                         SizedBox(height: 6),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 12.0)
+//             //                               : EdgeInsets.only(left: 12.0),
+//             //                           child: TextField(
+//             //                             controller: gradeControllers[index],
+//             //                             decoration: InputDecoration(
+//             //                               errorText: childGradeErrors[index] ? 'Please enter grade name' : null,
+//             //                               contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+//             //                               hintText: 'Enter child grade',
+//             //                               border: OutlineInputBorder(
+//             //                                 borderRadius: BorderRadius.circular(10),
+//             //                               ),
+//             //                             ),
+//             //
+//             //                           ),
+//             //                         ),
+//             //                         SizedBox(height: 14),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 18.0)
+//             //                               : EdgeInsets.only(left: 18.0),
+//             //                           child: Text(
+//             //                             'Gender',
+//             //                             style: TextStyle(
+//             //                               color: Color(0xFF442B72),
+//             //                               fontSize: 15,
+//             //                               fontFamily: 'Poppins-Bold',
+//             //                               fontWeight: FontWeight.w700,
+//             //                               height: 1.07,
+//             //                             ),
+//             //                           ),
+//             //                         ),
+//             //                         SizedBox(height: 6),
+//             //                         Padding(
+//             //                           padding: (sharedpref?.getString('lang') == 'ar')
+//             //                               ? EdgeInsets.only(right: 12.0)
+//             //                               : EdgeInsets.only(left: 12.0),
+//             //                           child: Row(
+//             //                             children: [
+//             //                               Expanded(
+//             //                                 child: RadioListTile<String>(
+//             //                                   title: Text('Male'),
+//             //                                   value: 'male',
+//             //                                   groupValue: genderSelection[index],
+//             //                                   onChanged: (value) {
+//             //                                     setState(() {
+//             //                                       genderSelection[index] = value!;
+//             //                                     });
+//             //                                   },
+//             //                                 ),
+//             //                               ),
+//             //                               Expanded(
+//             //                                 child: RadioListTile<String>(
+//             //                                   title: Text('Female'),
+//             //                                   value: 'female',
+//             //                                   groupValue: genderSelection[index],
+//             //                                   onChanged: (value) {
+//             //                                     setState(() {
+//             //                                       genderSelection[index] = value!;
+//             //                                     });
+//             //                                   },
+//             //                                 ),
+//             //                               ),
+//             //                             ],
+//             //                           ),
+//             //                         ),
+//             //                       ],
+//             //                     ),
+//             //                   ),
+//             //                 ],
+//             //               ),
+//             //             ),
+//             //           ],
+//             //         ),
+//             //       );
+//             //     },
+//             //   )
+//             //       : Container(),
+//             // ),
+//             // SizedBox(height: 20),
+//             //
+//             // SizedBox(height: 10),
+//             // ElevatedButton(
+//             //   onPressed: () {
+//             //     setState(() {
+//             //       bool isValid = true;
+//             //       if (numberOfCards == 0 || numberOfCards == null) {
+//             //         numberOfChildrenError = true;
+//             //         isValid = false;
+//             //       } else {
+//             //         numberOfChildrenError = false;
+//             //       }
+//             //
+//             //       if (_nameController.text.isEmpty ) {
+//             //         nameError = true;
+//             //         isValid = false;
+//             //       } else {
+//             //         nameError = false;
+//             //       }
+//             //
+//             //       if (_phoneNumberController.text.isEmpty ) {
+//             //         phoneError = true;
+//             //         isValid = false;
+//             //       } else {
+//             //         phoneError = false;
+//             //       }
+//             //       // if (_phoneNumberController.text.isEmpty) {
+//             //       //   phoneError = true;
+//             //       //   isValid = false;
+//             //       // } else {
+//             //       //   phoneError = false;
+//             //       // }
+//             //
+//             //       for (int i = 0; i < nameChildControllers.length; i++) {
+//             //         if (nameChildControllers[i].text.isEmpty) {
+//             //           childNameErrors[i] = true;
+//             //           isValid = false;
+//             //         } else {
+//             //           childNameErrors[i] = false;
+//             //         }
+//             //
+//             //         if (gradeControllers[i].text.isEmpty) {
+//             //           childGradeErrors[i] = true;
+//             //           isValid = false;
+//             //         } else {
+//             //           childGradeErrors[i] = false;
+//             //         }
+//             //       }
+//             //
+//             //       if (isValid) {
+//             //         _addDataToFirestore();
+//             //       }
+//             //     });
+//             //   },
+//             //   // onPressed:  _addDataToFirestore,
+//             //   child: Text('Save'),
+//             // ),
+//             // SizedBox(height: 20),
+//           ],
+//         ),
 //       ),
 //     );
 //   }
 // }
-
-void InvitationSendSnackBar(context, String message, color,
-    {Duration? duration}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      dismissDirection: DismissDirection.up,
-      duration: duration ?? const Duration(milliseconds: 2000),
-      backgroundColor: Colors.white,
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).size.height - 150,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      behavior: SnackBarBehavior.floating,
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/saved.png',
-            width: 30,
-            height: 30,
-          ),
-          SizedBox(
-            width: 15,
-          ),
-          Text(
-            message,
-            style: TextStyle(
-              color: color,
-              fontSize: 16,
-              fontFamily: 'Poppins-Bold',
-              fontWeight: FontWeight.w700,
-              height: 1.23,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+// void InvitationSendSnackBar(context, String message, color,
+//     {Duration? duration}) {
+//   ScaffoldMessenger.of(context).showSnackBar(
+//     SnackBar(
+//       dismissDirection: DismissDirection.up,
+//       duration: duration ?? const Duration(milliseconds: 2000),
+//       backgroundColor: Colors.white,
+//       margin: EdgeInsets.only(
+//         bottom: MediaQuery.of(context).size.height - 150,
+//       ),
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(10),
+//       ),
+//       behavior: SnackBarBehavior.floating,
+//       content: Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         crossAxisAlignment: CrossAxisAlignment.center,
+//         children: [
+//           Image.asset(
+//             'assets/images/saved.png',
+//             width: 30,
+//             height: 30,
+//           ),
+//           SizedBox(
+//             width: 15,
+//           ),
+//           Text(
+//             message,
+//             style: TextStyle(
+//               color: color,
+//               fontSize: 16,
+//               fontFamily: 'Poppins-Bold',
+//               fontWeight: FontWeight.w700,
+//               height: 1.23,
+//             ),
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }
 
