@@ -681,6 +681,103 @@ class Dialoge {
           )),
     );
   }
+  static SupervisorAlreadyAddedInOtherSchool(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        // contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30,),
+          ),
+          child: Container(
+            height: 220,
+            width: 430,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Align(alignment:AlignmentDirectional.topStart,
+                        child: Image.asset("assets/imgs/school/Vertical container (2).png",width: 25,height: 25,)
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+
+
+                      const Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Alert',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF442B72),
+                            fontSize: 18,
+                            fontFamily: 'Poppins-SemiBold',
+                            fontWeight: FontWeight.w600,
+                            height: 1.23,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: Text(
+                      'This number already exists ',
+                      style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Regular',
+                        fontWeight: FontWeight.w400,
+                        height: 2,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'in other school',
+                      style: TextStyle(
+                        color: Color(0xFF442B72),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Regular',
+                        fontWeight: FontWeight.w400,
+                        height: 2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  // Center(
+                  //   child: ElevatedSimpleButton(
+                  //     txt: 'Go to supervisors',
+                  //     width: 180,
+                  //     hight: 45,
+                  //     onPress: () {
+                  //       Navigator.push(context, MaterialPageRoute(builder: (context)=>SupervisorScreen()));
+                  //
+                  //     },
+                  //     color: const Color(0xFF442B72),
+                  //     fontSize: 16,
+                  //   ),
+                  // ),
+
+                ],
+              ),
+            ),
+          )),
+    );
+  }
   static deleteBusDialog(context) {
     showDialog(
       context: context,

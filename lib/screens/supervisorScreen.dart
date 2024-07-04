@@ -1225,7 +1225,8 @@ bool _isMounted= true;
                                                                     Text(
                                                                      // 'Bus: $busNumber',
                                                                       _busNumbers[filteredData[index]['bus_id']] != null
-                                                                          ? _busNumbers[filteredData[index]['bus_id']]!
+
+                                                                          ? 'Bus: '+ _busNumbers[filteredData[index]['bus_id']]!
                                                                           : 'No bus number available',
                                                                       //'Bus: 1 2 3 ى س ج',
                                                                       //  _busNumbers[filteredData[index]['bus_id']?? '']?? '',

@@ -17,7 +17,12 @@ import 'Functions/notifications.dart';
 import 'controller/local_controller.dart';
 
 SharedPreferences? sharedpref;
-
+// FirebaseMessaging _fcm = FirebaseMessaging.instance;
+// Future<String?> getToken() async {
+//   String? token = await _fcm.getToken();
+//   print('Token: $token');
+//   return token;
+// }
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
