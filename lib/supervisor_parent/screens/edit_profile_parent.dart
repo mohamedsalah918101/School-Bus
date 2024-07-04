@@ -61,6 +61,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
   String _phoneNumber2 = '';
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   final _yourGoogleAPIKey = 'AIzaSyAk-SGMMrKO6ZawG4OzaCSmJK5zAduv1NA';
+  bool _isLoading = true;
 
 
   // List<Widget> cards = [];
@@ -98,6 +99,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        _isLoading = true;
       });
       _uploadImageToFirebase();
     }
@@ -113,10 +115,14 @@ class _EditProfileParentState extends State<EditProfileParent> {
         final imageUrl = await storageRef.getDownloadURL();
         setState(() {
           _imageUrl = imageUrl;
+          _isLoading = false;
         });
         await _updateUserProfilePhoto(imageUrl);
       } catch (e) {
         print('Error uploading image: $e');
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -176,6 +182,7 @@ class _EditProfileParentState extends State<EditProfileParent> {
           _phoneNumber = userDoc['phoneNumber'];
           _address = userDoc['address'];
           _imageUrl = userDoc['parentImage'];
+          _isLoading = false;
           nameController.text = _name;
           numberController.text = _phoneNumber;
           locationController.text = _address;
@@ -206,6 +213,9 @@ class _EditProfileParentState extends State<EditProfileParent> {
       }
     } catch (e) {
       print('Error fetching user data: $e');
+      setState(() {
+        _isLoading = false;  // Set loading to false if there's an error
+      });
     }
   }
 
@@ -389,11 +399,13 @@ class _EditProfileParentState extends State<EditProfileParent> {
                             onTap: _pickImage,
                             child: CircleAvatar(
                                 radius: 52.5,
-                                backgroundColor: const Color(0xff442B72),
-                                child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: _isLoading
+                                    ? CircularProgressIndicator(color: Color(0xFF993D9A),)
+                                    : CircleAvatar(
                                   backgroundImage: _imageUrl.isEmpty
                                       ? const AssetImage(
-                                          "assets/images/Ellipse 1.png")
+                                          "assets/images/add_additional_data.png")
                                       : NetworkImage(_imageUrl)
                                           as ImageProvider,
                                   radius: 50.5,

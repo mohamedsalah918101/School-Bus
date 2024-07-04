@@ -35,7 +35,7 @@ class _ProfileParentState extends State<ProfileParent> {
   String _imageUrl2 = '';
   TextEditingController secondParentNameController = TextEditingController();
   TextEditingController secondParentNumberController = TextEditingController();
-
+  bool _isLoading = true;
   // List<ChildDataItem> children = [];
 
   @override
@@ -51,6 +51,7 @@ class _ProfileParentState extends State<ProfileParent> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        _isLoading = true;
       });
       _uploadImageToFirebase();
     }
@@ -66,12 +67,16 @@ class _ProfileParentState extends State<ProfileParent> {
         final imageUrl = await storageRef.getDownloadURL();
         setState(() {
           _imageUrl = imageUrl;
+          _isLoading = false;
         });
         await _updateUserProfilePhoto(imageUrl);
         // Optionally, update Firestore with the new image URL
         // await FirebaseFirestore.instance.collection('users').doc('user_id').update({'profilePhotoUrl': imageUrl});
       } catch (e) {
         print('Error uploading image: $e');
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -100,10 +105,14 @@ class _ProfileParentState extends State<ProfileParent> {
           _phoneNumber = userDoc['phoneNumber'];
           _address = userDoc['address'];
           _imageUrl = userDoc['parentImage'];
+          _isLoading = false;
         });
       }
     } catch (e) {
       print('Error fetching user data: $e');
+      setState(() {
+        _isLoading = false;  // Set loading to false if there's an error
+      });
     }
   }
 
@@ -289,11 +298,13 @@ class _ProfileParentState extends State<ProfileParent> {
                               onTap: _pickImage,
                               child: CircleAvatar(
                                   radius: 52.5,
-                                  backgroundColor: const Color(0xff442B72),
-                                  child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  child: _isLoading
+                                      ? CircularProgressIndicator(color: Color(0xff442B72),)
+                                      : CircleAvatar(
                                     backgroundImage: _imageUrl.isEmpty
                                         ? const AssetImage(
-                                            "assets/images/Ellipse 1.png")
+                                            "assets/images/add_additional_data.png")
                                         : NetworkImage(_imageUrl)
                                             as ImageProvider,
                                     radius: 50.5,

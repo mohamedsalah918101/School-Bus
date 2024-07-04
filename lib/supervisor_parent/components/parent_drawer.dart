@@ -373,7 +373,7 @@ class _MainDrawerState extends State<ParentDrawer> {
                             CircleAvatar(
                               backgroundImage: _imageUrl.isEmpty
                                   ? const AssetImage(
-                                  "assets/images/Ellipse 1.png")
+                                  "assets/images/add_additional_data.png")
                                   : NetworkImage(_imageUrl)
                               as ImageProvider,
                               radius: 35.5,
