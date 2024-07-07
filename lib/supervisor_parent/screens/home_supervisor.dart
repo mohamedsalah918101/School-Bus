@@ -387,7 +387,31 @@ class _HomeForSupervisor extends State<HomeForSupervisor> {
                                     }).toList() ?? [];
 
                                     if (filteredChildren.isEmpty) {
-                                      return Container();
+                                      return Column(
+                                        children: [
+                                          Image.asset('assets/images/Group 237684.png',
+
+                                          ),
+                                          Text('No Data Found'.tr,
+                                            style: TextStyle(
+                                              color: Color(0xff442B72),
+                                              fontFamily: 'Poppins-Regular',
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 19,
+                                            ),
+                                          ),
+                                          Text('You haven’t added any \n '
+                                              'children yet'.tr,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Color(0xffBE7FBF),
+                                              fontFamily: 'Poppins-Light',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                            ),),
+                                          SizedBox(height: 80,)
+                                        ],
+                                      );
                                     } else {
                                       return Column(
                                         children: [

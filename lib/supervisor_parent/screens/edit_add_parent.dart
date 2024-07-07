@@ -155,7 +155,8 @@ class _EditAddParentsState extends State<EditAddParents> {
     } else {
       print('formState.currentState is null');
     }
-  }  // editAddParent() async {
+  }  //
+  // editAddParent() async {
   //   print('editAddParent called');
   //   if (formState.currentState != null) {
   //     print('formState.currentState is not null');
@@ -220,6 +221,7 @@ class _EditAddParentsState extends State<EditAddParents> {
 
 
   @override
+  @override
   void initState() {
     super.initState();
     selectedValue = widget.oldType!;
@@ -235,6 +237,9 @@ class _EditAddParentsState extends State<EditAddParents> {
       gradeControllers.add(TextEditingController(text: children[i]['grade']));
       genderSelection.add(children[i]['gender'] ?? ''); // Initialize with existing gender or empty string
     }
+
+    // Add the listener to _numberOfChildrenController
+    _numberOfChildrenController.addListener(_updateNumberOfChildren);
   }
 
   @override
@@ -264,8 +269,7 @@ class _EditAddParentsState extends State<EditAddParents> {
         genderSelection.removeRange(newNumber, genderSelection.length); // Remove extra gender selection
       }
     });
-  }
-  @override
+  }  @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
@@ -878,7 +882,7 @@ class _EditAddParentsState extends State<EditAddParents> {
                               padding: EdgeInsets.symmetric(horizontal: 42.0),
                               child: SizedBox(
                                 height: 40,
-                                child: TextFormField(
+                                child:TextFormField(
                                   controller: _numberOfChildrenController,
                                   style: TextStyle(
                                     color: Color(0xFF442B72),
