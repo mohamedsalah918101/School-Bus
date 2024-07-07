@@ -1235,20 +1235,20 @@ print(selectedItems);
                                               space: 5.0,
                                               corner: FDottedLineCorner.all(4.0),
                                               child: Container(
-                                                width: 150,
+                                                width: 130,
                                                 height: 75,
                                                 alignment: Alignment.center,
                                                 child: Row(
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.only(left: 8),
+                                                      padding: const EdgeInsets.only(left: 6),
                                                       child: Icon(
                                                         Icons.image,
                                                         color: Color(0xFF442B72),
                                                         size: 20,
                                                       ),
                                                     ),
-                                                    SizedBox(width:6),
+                                                    SizedBox(width: 6),
                                                     Text(
                                                       "Upload image",
                                                       style: TextStyle(
@@ -1277,7 +1277,7 @@ print(selectedItems);
                                   space: 5.0,
                                   corner: FDottedLineCorner.all(6.0),
                                   child: Container(
-                                      width: 150,
+                                      width: 275,
                                       height: 75,
                                       alignment: Alignment.center,
                                       child: Row(
