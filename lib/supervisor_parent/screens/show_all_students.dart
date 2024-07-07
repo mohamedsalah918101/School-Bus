@@ -25,23 +25,14 @@ import 'package:school_account/supervisor_parent/screens/notification_supervisor
 import 'package:school_account/supervisor_parent/screens/profile_supervisor.dart';
 import 'package:school_account/supervisor_parent/screens/track_supervisor.dart';
 class ShowAllStudents extends StatefulWidget {
-  // int? numberOfNames;
-
-
   @override
   _ShowAllStudentsState createState() => _ShowAllStudentsState();
 }
 
-
-
-
 class _ShowAllStudentsState extends State<ShowAllStudents> {
-
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  // List<QueryDocumentSnapshot> data = [];
   List<DropdownCheckboxItem> selectedItems = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String? selectedValueAccept;
@@ -95,6 +86,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   bool isAcceptFiltered = false;
   bool isDeclineFiltered = false;
   bool isWaitingFiltered = false;
+<<<<<<< HEAD
   bool isFiltered  = false;
 
   void _deleteSupervisorDocument(String documentId) {
@@ -119,6 +111,16 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     });
   }
 
+=======
+  bool isFiltered = false;
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  DocumentSnapshot? _lastDocument;
+  int _limit = 8;
+  String searchQuery = "";
+  List<DocumentSnapshot> _documents = [];
+  List<Map<String, dynamic>> childrenData = [];
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
 
   String getJoinText(Timestamp joinDate) {
     final now = DateTime.now();
@@ -136,6 +138,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     }
   }
 
+<<<<<<< HEAD
 
   bool _isLoading = false;
   bool _hasMoreData = true;
@@ -146,15 +149,14 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   List<Map<String, dynamic>> childrenData = [];
   List<bool> checkin = [];
 
+=======
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _scrollController.addListener(_scrollListener);
-      _searchController.addListener(_onSearchChanged);
-      _fetchMoreData();
-    });
-
+    _scrollController.addListener(_scrollListener);
+    _searchController.addListener(_onSearchChanged);
+    _fetchMoreData();
   }
 
   Future<void> _fetchMoreData() async {
@@ -163,6 +165,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     setState(() {
       _isLoading = true;
     });
+<<<<<<< HEAD
 
     print('Fetching data...');
     String? supervisorId = sharedpref!.getString('id');
@@ -177,6 +180,14 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     Query query = _firestore.collection('parent')
         .where('supervisor', isEqualTo: supervisorId)
         .where('state', isEqualTo: 1) // شرط الحقل state يساوي 1
+=======
+    String? supervisorId = sharedpref!.getString('id');
+
+    Query query = _firestore.collection('parent')
+        .where('supervisor', isEqualTo: supervisorId)
+        .where('state', isEqualTo: 1)
+        .where('address', isNull: false)
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
         .limit(_limit);
 
     if (_lastDocument != null) {
@@ -235,24 +246,28 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
           .where('supervisor', isEqualTo: supervisorId)
           .get();
 
-      List<QueryDocumentSnapshot> filteredDocuments;
+      List<QueryDocumentSnapshot> filteredDocuments = [];
 
-      if (query.isNotEmpty) {
-        print('Filtering documents by children.name');
-        filteredDocuments = querySnapshot.docs.where((doc) {
-          var data = doc.data() as Map<String, dynamic>;
-          var children = data['children'] as List<dynamic>?;
-          if (children != null) {
-            return children.any((child) {
-              var childData = child as Map<String, dynamic>;
-              var name = childData['name'] as String?;
-              return name != null && name.toLowerCase().contains(query.toLowerCase());
-            });
+      for (var doc in querySnapshot.docs) {
+        var data = doc.data() as Map<String, dynamic>;
+        var state = data['state'];
+        var address = data['address'];
+        var children = data['children'] as List<dynamic>?;
+
+        if (state == 1 && address != null && address.isNotEmpty) {
+          // Check if there's a query and filter by children's names
+          if (query.isEmpty || (query.isNotEmpty && children != null && children.any((child) {
+            var childData = child as Map<String, dynamic>;
+            var name = childData['name'] as String?;
+            return name != null && name.toLowerCase().contains(query.toLowerCase());
+          }))) {
+            filteredDocuments.add(doc);
+            // Add children data to childrenData
+            if (children != null) {
+              childrenData.addAll(children.map((child) => child as Map<String, dynamic>).toList());
+            }
           }
-          return false;
-        }).toList();
-      } else {
-        filteredDocuments = querySnapshot.docs;
+        }
       }
 
       setState(() {
@@ -266,10 +281,11 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     } catch (e) {
       print('Error: $e');
       setState(() {
-        // errorMessage = e.toString();
+        // Handle error state if needed
       });
     }
   }
+<<<<<<< HEAD
   Future<void> _fetchData({String query = ""}) async {
     if (_isLoading || !_hasMoreData) return;
 
@@ -335,6 +351,8 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     });
   }
 
+=======
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
   void _onSearchChanged() {
     setState(() {
       searchQuery = _searchController.text.trim();
@@ -359,7 +377,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
         body: PopScope(
@@ -367,6 +385,7 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
           onPopInvoked: (didPop) {
             Navigator.pop(context);
           },
+<<<<<<< HEAD
           child: GestureDetector(
             onTap: () {
               FocusScope.of(context).unfocus();
@@ -456,9 +475,164 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                           child: Image.asset(
                             'assets/images/Vector (12)search.png',
                           ),
+=======
+          child: Column(
+            children: [
+              SizedBox(height: 35),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 17.0),
+                        child: Image.asset(
+                          (sharedpref?.getString('lang') == 'ar')
+                              ? 'assets/images/Layer 1.png'
+                              : 'assets/images/fi-rr-angle-left.png',
+                          width: 20,
+                          height: 22,
                         ),
                       ),
                     ),
+                    Text(
+                      'Students'.tr,
+                      style: TextStyle(
+                        color: Color(0xFF993D9A),
+                        fontSize: 16,
+                        fontFamily: 'Poppins-Bold',
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          _scaffoldKey.currentState!.openEndDrawer();
+                        },
+                        child: const Icon(
+                          Icons.menu_rounded,
+                          color: Color(0xff442B72),
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+               SizedBox(height: 20,),
+              //                     onChanged: (value) {
+              //                       _onSearchChanged();
+              //                     },
+              Container(
+                height: 42,
+                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xffF1F1F1),
+                    hintText: 'Search Name'.tr,
+                    hintStyle: TextStyle(
+                                              color: const Color(0xffC2C2C2),
+                                              fontSize: 12,
+                                              fontFamily: 'Poppins-Bold',
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                    prefixIcon: Padding(
+                                              padding: (sharedpref?.getString('lang') ==
+                                                  'ar')
+                                                  ? EdgeInsets.only(
+                                                  right: 6, top: 14.0, bottom: 9)
+                                                  : EdgeInsets.only(
+                                                  left: 3, top: 14.0, bottom: 9),
+                                              child: Image.asset(
+                                                'assets/images/Vector (12)search.png',
+                                              ),),
+                    border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(21),
+                                              borderSide: BorderSide.none,
+                                            ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: childrenData.isEmpty
+                    ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/Group 237684.png',
+
+                      ),
+                      Text('No Data Found'.tr,
+                        style: TextStyle(
+                          color: Color(0xff442B72),
+                          fontFamily: 'Poppins-Regular',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 19,
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
+                        ),
+                      ),
+                      Text('You haven’t added any \n '
+                          'children yet'.tr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xffBE7FBF),
+                          fontFamily: 'Poppins-Light',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                        ),),
+                      SizedBox(height: 80,)
+                    ],
+                  ),
+                )
+                    : ListView.builder(
+                  controller: _scrollController,
+                  itemCount: childrenData.length,
+                  itemBuilder: (context, index) {
+                    print('Building item for index: $index, List length: ${childrenData.length}');
+
+                    if (index < 0 || index >= childrenData.length) {
+                      print('Index $index is out of bounds');
+                      return SizedBox.shrink();
+                    }
+
+                    var child = childrenData[index];
+                    var parent = _documents[index % _documents.length];
+
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // Handle item tap
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 28.0,),
+
+                 child:   Column(
+                    children: [
+                    Row(
+                    children: [
+                    Padding(
+                    padding:
+                    const EdgeInsets.only(top: 0.0),
+                    child:
+                    CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Color(
+                    0xff442B72),
+                    child: CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                    // Replace with your default image path
+                    radius: 25,
+                    ),
+<<<<<<< HEAD
                   ),
                 ),
                 // Add your AppBar and other UI elements here
@@ -610,8 +784,125 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                 ),
               ],
             ),
+=======
+                    ),
+                    // FutureBuilder(future: _firestore.collection(
+                    //       'supervisor').doc(sharedpref!.getString('id')).get(),
+                    //   builder: (BuildContext context,
+                    //       AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                    //     if (snapshot.hasError) {
+                    //       return Text('Something went wrong');
+                    //     }
+                    //
+                    //     if (snapshot.connectionState == ConnectionState.done) {
+                    //       if (!snapshot.hasData || snapshot.data == null ||
+                    //           snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] ==
+                    //           null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                    //         return CircleAvatar(
+                    //           radius: 25,
+                    //           backgroundColor: Color(
+                    //               0xff442B72),
+                    //           child: CircleAvatar(
+                    //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                    //             // Replace with your default image path
+                    //             radius: 25,
+                    //           ),
+                    //         );
+                    //       }
+                    //
+                    //       Map<String, dynamic>? data = snapshot.data?.data();
+                    //       if (data != null && data['busphoto'] != null) {
+                    //         return CircleAvatar(radius: 25,
+                    //           backgroundColor: Color(
+                    //               0xff442B72),
+                    //           child: CircleAvatar(
+                    //             backgroundImage: NetworkImage('${data['busphoto']}'),
+                    //             radius: 25,
+                    //           ),
+                    //         );
+                    //       }
+                    //     }
+                    //
+                    //     return Container();
+                    //   },
+                    // ),
+                    ),
+                    const SizedBox(
+                    width: 5,
+                    ),
+                    Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    children: [
+                    Text(
+                    child['name'] ?? 'Unknown',
+
+                    // '${_documents[index]['name'] ??
+                    //   '' }'
+
+                    style: TextStyle(
+                    color: Color(0xFF442B72),
+                    fontSize: 17,
+                    fontFamily: 'Poppins-SemiBold',
+                    fontWeight: FontWeight
+                        .w600,
+                    height: 1.07,
+                    ),
+                    ),
+                    SizedBox(
+                    height: 8,
+                    ),
+                    Padding(
+                    padding: (sharedpref
+                        ?.getString('lang') == 'ar')
+                    ? EdgeInsets.only(right: 3.0) : EdgeInsets.all(0.0),
+                    child:
+                    Text(
+                    // state == 'waiting'
+                    // ? 'Waiting'
+                    //     :
+                    // getJoinText(parent['joinDate']),
+
+    'Added from ${   getJoinText(parent['joinDate'])}',
+
+    style: TextStyle(
+                    color: Color(0xFF0E8113).withOpacity(0.7),
+                    fontSize: 13,
+                    fontFamily: 'Poppins-Regular',
+                    fontWeight: FontWeight
+                        .w400,
+                    height: 1.23,
+                    ),),
+                    // Text(
+                    //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                    //  // '${data[index]['joinDate']}',
+                    //
+                    //   style: TextStyle(
+                    //     color: Color(0xFF0E8113),
+                    //     fontSize: 13,
+                    //     fontFamily: 'Poppins-Regular',
+                    //     fontWeight: FontWeight.w400,
+                    //     height: 1.23,),),
+                    ),
+                    ],),
+                    // SizedBox(width: 103,),
+                    ],),
+                    SizedBox(height: 25,)  ],
+                 ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              if (_isLoading) Center(child: CircularProgressIndicator()),
+            ],
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
           ),
         ),
+
 
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

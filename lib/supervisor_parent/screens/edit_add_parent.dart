@@ -150,9 +150,76 @@ class _EditAddParentsState extends State<EditAddParents> {
     } else {
       print('formState.currentState is null');
     }
+<<<<<<< HEAD
   }
+=======
+  }  //
+  // editAddParent() async {
+  //   print('editAddParent called');
+  //   if (formState.currentState != null) {
+  //     print('formState.currentState is not null');
+  //     if (formState.currentState!.validate()) {
+  //       print('form is valid');
+  //       try {
+  //         print('updating document...');
+  //
+  //         int numberOfChildren = int.parse(_numberOfChildrenController.text);
+  //
+  //         // Check if the number of children and the length of the nameChildControllers and gradeControllers lists match
+  //         // if (nameChildControllers.length != numberOfChildren || gradeControllers.length != numberOfChildren) {
+  //         //   print('Mismatch in number of children and controllers length');
+  //         //   return;
+  //         // }
+  //         String busID = '';
+  //         DocumentSnapshot documentSnapshot = await _firestore
+  //             .collection('supervisor')
+  //             .doc(sharedpref!.getString('id'))
+  //             .get();
+  //         if (documentSnapshot.exists) {
+  //           busID = documentSnapshot.get('bus_id');
+  //         }
+  //         List<Map<String, dynamic>> childrenData = List.generate(
+  //           numberOfChildren,
+  //               (index) => {
+  //             'gender': genderSelection[index],
+  //             'supervisor': sharedpref!.getString('id'),
+  //             'supervisor_name': sharedpref!.getString('name'),
+  //             'bus_id': busID,
+  //             'name': nameChildControllers[index].text,
+  //             'grade': gradeControllers[index].text,
+  //             'joinDate': FieldValue.serverTimestamp(),
+  //
+  //               },
+  //         );
+  //
+  //         await Parent.doc(widget.docid).update({
+  //           'phoneNumber': _phoneNumberController.text,
+  //           'typeOfParent': selectedValue,
+  //           'name': _nameController.text,
+  //           'numberOfChildren': _numberOfChildrenController.text,
+  //           'children': childrenData,
+  //         });
+  //
+  //         print('document updated successfully');
+  //
+  //         // Check if the widget is still mounted before calling setState
+  //         if (mounted) {
+  //           setState(() {});
+  //         }
+  //       } catch (e) {
+  //         print('Error updating document: $e');
+  //       }
+  //     } else {
+  //       print('form is not valid');
+  //     }
+  //   } else {
+  //     print('formState.currentState is null');
+  //   }
+  // }
+>>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
 
 
+  @override
   @override
   void initState() {
     super.initState();
@@ -169,6 +236,9 @@ class _EditAddParentsState extends State<EditAddParents> {
       gradeControllers.add(TextEditingController(text: children[i]['grade']));
       genderSelection.add(children[i]['gender'] ?? ''); // Initialize with existing gender or empty string
     }
+
+    // Add the listener to _numberOfChildrenController
+    _numberOfChildrenController.addListener(_updateNumberOfChildren);
   }
 
   @override
@@ -198,8 +268,7 @@ class _EditAddParentsState extends State<EditAddParents> {
         genderSelection.removeRange(newNumber, genderSelection.length); // Remove extra gender selection
       }
     });
-  }
-  @override
+  }  @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
@@ -812,7 +881,7 @@ class _EditAddParentsState extends State<EditAddParents> {
                               padding: EdgeInsets.symmetric(horizontal: 42.0),
                               child: SizedBox(
                                 height: 40,
-                                child: TextFormField(
+                                child:TextFormField(
                                   controller: _numberOfChildrenController,
                                   style: TextStyle(
                                     color: Color(0xFF442B72),

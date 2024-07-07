@@ -64,13 +64,10 @@ class _ParentsViewState extends State<ParentsView> {
       isFiltered = true;
     });
   }
-
   Future<void> getDataForWaitingFilter() async {
     String supervisorId = sharedpref!.getString('id') ?? '';
-
     CollectionReference parent = FirebaseFirestore.instance.collection('parent');
     QuerySnapshot parentData = await parent.where('state', isEqualTo: 0).where('supervisor', isEqualTo: supervisorId).get();
-
     setState(() {
       _documents = parentData.docs;
       isFiltered = true;
@@ -126,7 +123,6 @@ class _ParentsViewState extends State<ParentsView> {
     final now = DateTime.now();
     final joinDateTime = joinDate.toDate();
     final difference = now.difference(joinDateTime).inDays;
-
     if (difference == 0) {
       return 'Today';
     } else if (difference == 1) {
@@ -877,7 +873,7 @@ class _ParentsViewState extends State<ParentsView> {
                                                             hight: 38,
                                                             onPress: () async {
                                                               setState(() {
-                                                                _deleteSupervisorDocument(data[index].id);
+                                                                _deleteSupervisorDocument(_documents[index].id);
                                                               });
                                                               DeleteParentSnackBar(context, 'message');
                                                               Navigator.pop(context);
