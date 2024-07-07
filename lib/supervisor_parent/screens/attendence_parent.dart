@@ -33,6 +33,7 @@ class _AttendanceParentState extends State<AttendanceParent> {
   bool ShowCalendar = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  List<DateTime> selectedAbsentDays = [];
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +132,8 @@ class _AttendanceParentState extends State<AttendanceParent> {
                             Column(
                               children: [
                                 CalendarCard(),
-                                SizedBox(height: 10,)
+                                SizedBox(height: 10,),
+                                // CalendarCard()
                               ],
                             );
                         },
@@ -396,6 +398,13 @@ class _AttendanceParentState extends State<AttendanceParent> {
                                       fontFamily: 'Poppins-Bold',
                                       // fontWeight: FontWeight.w400,
                                     ),
+                                    onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                                      if(args.value is List<DateTime>) {
+                                        setState(() {
+                                          selectedAbsentDays = args.value;
+                                        });
+                                      }
+                                    },
                                     // initialSelectedRange: PickerDateRange(
                                     //     DateTime.now().subtract(const Duration(days: 2)),
                                     //     DateTime.now().add(const Duration(days: 3))),

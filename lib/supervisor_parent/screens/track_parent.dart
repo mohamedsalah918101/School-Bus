@@ -411,7 +411,7 @@ class _TrackParentState extends State<TrackParent> {
         position: startLocation,
         icon: anotherCustomIcon,
         infoWindow: InfoWindow(
-          title: "child 1",
+          title: "jessy",
         ),
       ),
     };

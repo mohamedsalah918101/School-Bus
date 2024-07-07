@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
@@ -15,6 +16,32 @@ class CalendarCard extends StatefulWidget {
 
 class _CalendarCardState extends State<CalendarCard> {
   bool takeBus = false;
+  String _name = '';
+  String _imageUrl = '';
+  final _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final userDoc = await _firestore
+          .collection('parent')
+          .doc(sharedpref!.getString('id'))
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          _name = userDoc['name'];
+          _imageUrl = userDoc['parentImage'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +64,17 @@ class _CalendarCardState extends State<CalendarCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Image.asset(
-                    'assets/images/Ellipse 1.png',
-                    height: 50,
-                    width: 50,
+                  padding: const EdgeInsets.only( bottom: 4.0),
+                  child: CircleAvatar(
+                    backgroundImage: _imageUrl.isEmpty
+                        ? const AssetImage(
+                        "assets/images/add_additional_data.png")
+                        : NetworkImage(_imageUrl)
+                    as ImageProvider,
+                    radius: 32.5,
+                    // 'assets/images/Ellipse 1.png',
+                    // height: 50,
+                    // width: 50,
                   ),
                 ),
                 const SizedBox(
@@ -52,7 +85,7 @@ class _CalendarCardState extends State<CalendarCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Shady Ayman'.tr,
+                      _name.tr,
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                         color: Color(0xFF432B72),
                         fontSize: 17,
