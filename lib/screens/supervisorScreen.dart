@@ -41,6 +41,21 @@ class SupervisorScreen extends StatefulWidget {
 }
 
 class SupervisorScreenSate extends State<SupervisorScreen> {
+  // String getJoinText(Timestamp joinDate) {
+  //   final now = DateTime.now();
+  //   final joinDateTime = joinDate.toDate();
+  //   final difference = now.difference(joinDateTime).inDays;
+  //
+  //   if (difference == 0) {
+  //     return 'Today';
+  //   } else if (difference == 1) {
+  //     return 'Yesterday';
+  //   } else if (difference < 7) {
+  //     return '${difference} days ago';
+  //   } else {
+  //     return '${joinDateTime.day}/${joinDateTime.month}/${joinDateTime.year}';
+  //   }
+  // }
 //fun to get current schoolid
   String? _schoolId;
   Future<void> getSchoolId() async {
@@ -206,8 +221,41 @@ class SupervisorScreenSate extends State<SupervisorScreen> {
   }
 
 
-  //fun sarch
+  Map<String, String> timeCache = {};
 
+  Future<String> fetchAcceptanceTimestamp(String supervisorID) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('notification')
+          .where('SupervisorId', isEqualTo: supervisorID)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        Timestamp notificationTimestamp = querySnapshot.docs.first['timestamp'];
+        DateTime now = DateTime.now();
+        DateTime notificationDate = notificationTimestamp.toDate();
+        String formattedTime;
+
+        if (notificationDate.year == now.year &&
+            notificationDate.month == now.month &&
+            notificationDate.day == now.day) {
+          formattedTime = 'Today';
+        } else {
+          formattedTime = timeago.format(notificationDate, locale: 'en_short');
+        }
+
+        // Cache the formatted time
+        timeCache[supervisorID] = formattedTime;
+        return formattedTime;
+      } else {
+        return 'No notification';
+      }
+    } catch (e) {
+      print('Error fetching acceptance timestamp: $e');
+      return 'Error';
+    }
+  }
 
   @override
   void initState() {
@@ -663,6 +711,9 @@ bool _isMounted= true;
                                               //data.length,
                                               //itemCount: filteredData.length,
                                               itemBuilder: (context, index) {
+                                                var supervisorData = filteredData[index].data() as Map<String, dynamic>;
+                                                var supervisorID = filteredData[index].id;
+
                                                 print("testtttt");
                                                 print(data[index]['bus_id']);
                                                   // getBusNumber(data[index]['bus_id']
@@ -685,6 +736,10 @@ bool _isMounted= true;
 
                                                 Color statusColor;
                                                 String statusText;
+
+                                                // var supervisorData = filteredData[index].data() as Map<String, dynamic>;
+                                                // var joinDate = supervisorData['joinDate'] ?? Timestamp.now();
+                                                // var joinDateText = getJoinText(joinDate as Timestamp);
 
                                                 // Determine status color and text based on state
                                                 switch (state) {
@@ -871,6 +926,7 @@ bool _isMounted= true;
                                                   //   ),
                                                   // ),
                                                        ): Text(
+                                                        //'$statusText : $joinDateText' ,
                                                         statusText,
                                                         style: TextStyle(
                                                           color: statusColor,
@@ -1395,7 +1451,7 @@ bool _isMounted= true;
                             onTap: () {
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => HomeScreen(),
@@ -1420,7 +1476,7 @@ bool _isMounted= true;
                             onTap: () {
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
@@ -1447,7 +1503,7 @@ bool _isMounted= true;
                             onTap: () {
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => SupervisorScreen(),
@@ -1474,7 +1530,7 @@ bool _isMounted= true;
                             onTap: () {
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => BusScreen(),

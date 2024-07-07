@@ -1077,7 +1077,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                                 ],
                                                                               ),
                                                                             ),
-                                                                            SizedBox(height:20,),
+                                                                            SizedBox(height:10,),
                                                                             //
                                                                             // ListView.builder(
                                                                             //   shrinkWrap: true,
@@ -1086,10 +1086,10 @@ class BusScreenSate extends State<BusScreen> {
                                                                             //     return
                                                                                   Center(
                                                                                     child: Padding(
-                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                    padding: const EdgeInsets.all(4.0),
                                                                                     child: SizedBox(
                                                                                       width: 250,
-                                                                                      height: 100,
+                                                                                      height: 90,
                                                                                       child: data[index]['busphoto'] != null && data[index]['busphoto'] is List && data[index]['busphoto'].isNotEmpty
                                                                                           ?
                                                                                       // ListView.builder(
@@ -1305,7 +1305,7 @@ class BusScreenSate extends State<BusScreen> {
                                                                             ),
                                                                             SizedBox(height: 30),
                                                                             Text('Supervisors', style: TextStyle(color: Color(0xff442B72), fontSize: 20, fontWeight: FontWeight.bold)),
-                                                                            SizedBox(height: 10),
+                                                                            SizedBox(height: 5),
 
                                                                         for(int i=0;i<data[index]['supervisors'].length;i++)
                                                                             Padding(

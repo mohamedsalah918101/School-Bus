@@ -71,6 +71,7 @@ class _EditeBusState extends State<EditeBus> {
   String? _selectedSupervisor;
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   CollectionReference Bus = FirebaseFirestore.instance.collection('busdata');
+  List<Map<String, dynamic>> supervisorsList=[];
   editAddBus() async {
     print('editAddBus called');
 
@@ -82,7 +83,8 @@ class _EditeBusState extends State<EditeBus> {
 
         try {
           print('updating document...');
-          List<Map<String, dynamic>> supervisorsList = List.generate(
+        //  List<Map<String, dynamic>>
+          supervisorsList = List.generate(
             selectedItems.length,
                 (index) {
               FirebaseFirestore.instance
@@ -97,7 +99,10 @@ class _EditeBusState extends State<EditeBus> {
               };
             },
           );
-
+print("Listttt");
+print(supervisorsList);
+print("selectttt");
+print(selectedItems);
           await Bus.doc(widget.docid).update({
              'busnumber': _busnumbercontroller.text,
             'supervisors':supervisorsList,
@@ -150,16 +155,16 @@ class _EditeBusState extends State<EditeBus> {
       await referenceImageToUpload.putFile(File(returnedImage.path));
       //Success: get the download URL
       imageUrldriver = await referenceImageToUpload.getDownloadURL();
-      print('Image uploaded successfully. URL: $imageUrldriver');
+      print('Image uploaded successfully. URL:imageUrldriver $imageUrldriver');
 
       print('Image uploaded successfully. URL: $imageUrldbus');
       // await Bus.doc(widget.docid).update({
       //   'imagedriver': imageUrldriver,
       // });
 
-      setState(() {
-        _selectedImagedriverEdite = File(returnedImage.path);
-      });
+      // setState(() {
+      //   _selectedImagedriverEdite = File(returnedImage.path);
+      // });
       return imageUrldriver;
     } catch (error) {
       print('Error uploading image: $error');
@@ -1228,7 +1233,7 @@ class _EditeBusState extends State<EditeBus> {
                                               strokeWidth: 0.8,
                                               dottedLength: 10,
                                               space: 5.0,
-                                              corner: FDottedLineCorner.all(6.0),
+                                              corner: FDottedLineCorner.all(4.0),
                                               child: Container(
                                                 width: 150,
                                                 height: 75,
@@ -1236,19 +1241,19 @@ class _EditeBusState extends State<EditeBus> {
                                                 child: Row(
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.only(left: 10),
+                                                      padding: const EdgeInsets.only(left: 8),
                                                       child: Icon(
                                                         Icons.image,
                                                         color: Color(0xFF442B72),
-                                                        size: 24,
+                                                        size: 20,
                                                       ),
                                                     ),
-                                                    SizedBox(width: 10),
+                                                    SizedBox(width:6),
                                                     Text(
                                                       "Upload image",
                                                       style: TextStyle(
                                                         color: Color(0xFF442B72),
-                                                        fontSize: 14,
+                                                        fontSize: 12,
                                                         fontFamily: 'Poppins-Regular',
                                                       ),
                                                     ),
@@ -1272,7 +1277,7 @@ class _EditeBusState extends State<EditeBus> {
                                   space: 5.0,
                                   corner: FDottedLineCorner.all(6.0),
                                   child: Container(
-                                      width: 275,
+                                      width: 150,
                                       height: 75,
                                       alignment: Alignment.center,
                                       child: Row(
@@ -1554,7 +1559,7 @@ class _EditeBusState extends State<EditeBus> {
                                                 } else {
                                                   busnumbererror = true;
                                                 }
-                                                if (items.isEmpty) {
+                                                if (supervisorsList.isEmpty) {
                                                   supervisorerror = false;
                                                 } else {
                                                   supervisorerror = true;
@@ -1572,13 +1577,14 @@ class _EditeBusState extends State<EditeBus> {
                                                   busnumbererror &&
                                                   widget.oldphotodriver != null ||_selectedImagedriverEdite != null &&
                                                   // driverphotoerror &&
-                                                  items != null && items.isNotEmpty && supervisorerror   ) {
+                                                  items != null && items.isNotEmpty && supervisorsList.isNotEmpty && supervisorerror  ) {
                                                   editAddBus();
                                                   Navigator.pushReplacement(
                                                       context ,
                                                       MaterialPageRoute(
                                                           builder: (context) =>  BusScreen(),
-                                                          maintainState: false)
+                                                          maintainState: false
+                                                      )
                                                   );
                                               } else {
                                                 if (items == null || items.isEmpty) {

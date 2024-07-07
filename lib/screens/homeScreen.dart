@@ -1221,7 +1221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical:5),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context ,
                                   MaterialPageRoute(
                                       builder: (context) =>  HomeScreen(),
@@ -1267,7 +1267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.only(left:100),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context ,
                                   MaterialPageRoute(
                                       builder: (context) =>  SupervisorScreen(),
@@ -1291,7 +1291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context ,
                                   MaterialPageRoute(
                                       builder: (context) => BusScreen(),
