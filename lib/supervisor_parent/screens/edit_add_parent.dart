@@ -88,8 +88,7 @@ class _EditAddParentsState extends State<EditAddParents> {
   List<String> genderSelection = [];
   final _firestore = FirebaseFirestore.instance;
 
-
-  editAddParent() async {
+  Future<void> editAddParent() async {
     print('editAddParent called');
     if (formState.currentState != null) {
       print('formState.currentState is not null');
@@ -97,14 +96,8 @@ class _EditAddParentsState extends State<EditAddParents> {
         print('form is valid');
         try {
           print('updating document...');
-
           int numberOfChildren = int.parse(_numberOfChildrenController.text);
 
-          // Check if the number of children and the length of the nameChildControllers and gradeControllers lists match
-          // if (nameChildControllers.length != numberOfChildren || gradeControllers.length != numberOfChildren) {
-          //   print('Mismatch in number of children and controllers length');
-          //   return;
-          // }
           String busID = '';
           DocumentSnapshot documentSnapshot = await _firestore
               .collection('supervisor')
@@ -113,6 +106,19 @@ class _EditAddParentsState extends State<EditAddParents> {
           if (documentSnapshot.exists) {
             busID = documentSnapshot.get('bus_id');
           }
+
+          // Create a dummy document to get the server timestamp
+          DocumentReference dummyRef = _firestore.collection('dummy').doc();
+          await dummyRef.set({
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          DocumentSnapshot dummySnapshot = await dummyRef.get();
+          Timestamp serverTimestamp = dummySnapshot['createdAt'] as Timestamp;
+
+          // Delete the dummy document
+          await dummyRef.delete();
+
           List<Map<String, dynamic>> childrenData = List.generate(
             numberOfChildren,
                 (index) => {
@@ -122,12 +128,11 @@ class _EditAddParentsState extends State<EditAddParents> {
               'bus_id': busID,
               'name': nameChildControllers[index].text,
               'grade': gradeControllers[index].text,
-              'joinDate': FieldValue.serverTimestamp(),
-
-                },
+              'joinDate': serverTimestamp,
+            },
           );
 
-          await Parent.doc(widget.docid).update({
+          await _firestore.collection('parent').doc(widget.docid).update({
             'phoneNumber': _phoneNumberController.text,
             'typeOfParent': selectedValue,
             'name': _nameController.text,
@@ -150,9 +155,6 @@ class _EditAddParentsState extends State<EditAddParents> {
     } else {
       print('formState.currentState is null');
     }
-<<<<<<< HEAD
-  }
-=======
   }  //
   // editAddParent() async {
   //   print('editAddParent called');
@@ -216,7 +218,6 @@ class _EditAddParentsState extends State<EditAddParents> {
   //     print('formState.currentState is null');
   //   }
   // }
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
 
 
   @override

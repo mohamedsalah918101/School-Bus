@@ -1,13 +1,4 @@
 
-
-
-
-
-
-
-
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -38,80 +29,10 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   String? selectedValueAccept;
   String? selectedValueDecline;
   String? selectedValueWaiting;
-
-
-
-
-
-  getDataForDeclinedFilter()async{
-    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 1).get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
-    setState(() {
-      _documents = parentData.docs;
-      isFiltered = true;
-    });
-  }
-
-  getDataForWaitingFilter()async{
-    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 2).get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
-    setState(() {
-      _documents = parentData.docs;
-      isFiltered = true;
-    });
-  }
-
-  getDataForAcceptFilter()async{
-    CollectionReference parent = FirebaseFirestore.instance.collection('parent');
-    QuerySnapshot parentData = await parent.where('state' , isEqualTo: 0 ).get();
-    // parentData.docs.forEach((element) {
-    //   data.add(element);
-    // }
-    // );
-    setState(() {
-      _documents = parentData.docs;
-      isFiltered = true;
-    });
-  }
-
   String? currentFilter;
   bool isAcceptFiltered = false;
   bool isDeclineFiltered = false;
   bool isWaitingFiltered = false;
-<<<<<<< HEAD
-  bool isFiltered  = false;
-
-  void _deleteSupervisorDocument(String documentId) {
-    FirebaseFirestore.instance
-        .collection('parent')
-        .doc(documentId)
-        .delete()
-        .then((_) {
-      setState(() {
-        // Update UI by removing the deleted document from the data list
-        _documents.removeWhere((document) => document.id == documentId);
-      });
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   showSnackBarFun(context),
-      //   // SnackBar(content: Text('Document deleted successfully')),
-      // );
-    })
-        .catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete document: $error')),
-      );
-    });
-  }
-
-=======
   bool isFiltered = false;
   bool _isLoading = false;
   bool _hasMoreData = true;
@@ -120,7 +41,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
   String searchQuery = "";
   List<DocumentSnapshot> _documents = [];
   List<Map<String, dynamic>> childrenData = [];
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
 
   String getJoinText(Timestamp joinDate) {
     final now = DateTime.now();
@@ -138,19 +58,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     }
   }
 
-<<<<<<< HEAD
-
-  bool _isLoading = false;
-  bool _hasMoreData = true;
-  DocumentSnapshot? _lastDocument;
-  int _limit = 8;
-  String searchQuery = "";
-  List<DocumentSnapshot> _documents = [];
-  List<Map<String, dynamic>> childrenData = [];
-  List<bool> checkin = [];
-
-=======
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
   @override
   void initState() {
     super.initState();
@@ -165,39 +72,20 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     setState(() {
       _isLoading = true;
     });
-<<<<<<< HEAD
-
-    print('Fetching data...');
-    String? supervisorId = sharedpref!.getString('id');
-    if (supervisorId == null) {
-      print('Supervisor ID is null');
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
-    Query query = _firestore.collection('parent')
-        .where('supervisor', isEqualTo: supervisorId)
-        .where('state', isEqualTo: 1) // شرط الحقل state يساوي 1
-=======
     String? supervisorId = sharedpref!.getString('id');
 
     Query query = _firestore.collection('parent')
         .where('supervisor', isEqualTo: supervisorId)
         .where('state', isEqualTo: 1)
         .where('address', isNull: false)
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
         .limit(_limit);
 
     if (_lastDocument != null) {
       query = query.startAfterDocument(_lastDocument!);
-      print('Starting after document: ${_lastDocument!.id}');
     }
 
     try {
       QuerySnapshot querySnapshot = await query.get();
-      print('Fetched ${querySnapshot.docs.length} documents');
       if (querySnapshot.docs.isNotEmpty) {
         _lastDocument = querySnapshot.docs.last;
         List<Map<String, dynamic>> allChildren = [];
@@ -208,16 +96,13 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
         setState(() {
           _documents.addAll(querySnapshot.docs);
           childrenData.addAll(allChildren);
-          print('Total documents: ${_documents.length}');
           if (querySnapshot.docs.length < _limit) {
             _hasMoreData = false;
-            print('No more data to fetch');
           }
         });
       } else {
         setState(() {
           _hasMoreData = false;
-          print('No more data to fetch');
         });
       }
     } catch (e) {
@@ -285,74 +170,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
       });
     }
   }
-<<<<<<< HEAD
-  Future<void> _fetchData({String query = ""}) async {
-    if (_isLoading || !_hasMoreData) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    String? supervisorId = sharedpref!.getString('id');
-    if (supervisorId == null) {
-      print('Supervisor ID is null');
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
-    Query baseQuery = _firestore.collection('parent')
-        .where('supervisor', isEqualTo: supervisorId)
-        .limit(_limit);
-
-    if (_lastDocument != null) {
-      baseQuery = baseQuery.startAfterDocument(_lastDocument!);
-    }
-
-    QuerySnapshot snapshot;
-    if (query.isNotEmpty) {
-      // Filter the data based on the search query
-      snapshot = await baseQuery.where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
-          .get();
-    } else {
-      // Fetch all the data
-      snapshot = await baseQuery.get();
-    }
-
-    if (snapshot.docs.isEmpty) {
-      setState(() {
-        _hasMoreData = false;
-      });
-    } else {
-      List<Map<String, dynamic>> allChildren = [];
-      for (var parentDoc in snapshot.docs) {
-        List<dynamic> children = parentDoc['children'];
-        allChildren.addAll(children.map((child) => child as Map<String, dynamic>).toList());
-      }
-
-      // Filter the childrenData list based on the search query
-      List<Map<String, dynamic>> filteredChildrenData = allChildren.where((child) {
-        return child['name'].toLowerCase().contains(query.toLowerCase());
-      }).toList();
-
-      setState(() {
-        _lastDocument = snapshot.docs.last;
-        _documents.addAll(snapshot.docs);
-        childrenData.clear(); // Clear the existing childrenData
-        childrenData.addAll(filteredChildrenData);
-        checkin = List.filled(_documents.length, false);
-      });
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-=======
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
   void _onSearchChanged() {
     setState(() {
       searchQuery = _searchController.text.trim();
@@ -380,102 +197,10 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: SupervisorDrawer(),
-        body: PopScope(
-          canPop: true,
-          onPopInvoked: (didPop) {
-            Navigator.pop(context);
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
           },
-<<<<<<< HEAD
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 35,
-                ),
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 17.0),
-                          child: Image.asset(
-                            (sharedpref?.getString('lang') == 'ar')
-                                ? 'assets/images/Layer 1.png'
-                                : 'assets/images/fi-rr-angle-left.png',
-                            width: 20,
-                            height: 22,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'Students'.tr,
-                        style: TextStyle(
-                          color: Color(0xFF993D9A),
-                          fontSize: 16,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                          height: 1,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          _scaffoldKey.currentState!.openEndDrawer();
-                        },
-                        icon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                          child: const Icon(
-                            Icons.menu_rounded,
-                            color: Color(0xff442B72),
-                            size: 35,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: SizedBox(
-                    // width: 271,
-                    height: 42,
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        _onSearchChanged();
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xffF1F1F1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(21),
-                          borderSide: BorderSide.none,
-                        ),
-                        hintText: "Search Name".tr,
-                        hintStyle: TextStyle(
-                          color: const Color(0xffC2C2C2),
-                          fontSize: 12,
-                          fontFamily: 'Poppins-Bold',
-                          fontWeight: FontWeight.w700,
-                        ),
-                        prefixIcon: Padding(
-                          padding: (sharedpref?.getString('lang') ==
-                              'ar')
-                              ? EdgeInsets.only(
-                              right: 6, top: 14.0, bottom: 9)
-                              : EdgeInsets.only(
-                              left: 3, top: 14.0, bottom: 9),
-                          child: Image.asset(
-                            'assets/images/Vector (12)search.png',
-                          ),
-=======
           child: Column(
             children: [
               SizedBox(height: 35),
@@ -524,13 +249,13 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                   ],
                 ),
               ),
-               SizedBox(height: 20,),
+              SizedBox(height: 20,),
               //                     onChanged: (value) {
               //                       _onSearchChanged();
               //                     },
               Container(
                 height: 42,
-                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
@@ -538,25 +263,25 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                     fillColor: Color(0xffF1F1F1),
                     hintText: 'Search Name'.tr,
                     hintStyle: TextStyle(
-                                              color: const Color(0xffC2C2C2),
-                                              fontSize: 12,
-                                              fontFamily: 'Poppins-Bold',
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                      color: const Color(0xffC2C2C2),
+                      fontSize: 12,
+                      fontFamily: 'Poppins-Bold',
+                      fontWeight: FontWeight.w700,
+                    ),
                     prefixIcon: Padding(
-                                              padding: (sharedpref?.getString('lang') ==
-                                                  'ar')
-                                                  ? EdgeInsets.only(
-                                                  right: 6, top: 14.0, bottom: 9)
-                                                  : EdgeInsets.only(
-                                                  left: 3, top: 14.0, bottom: 9),
-                                              child: Image.asset(
-                                                'assets/images/Vector (12)search.png',
-                                              ),),
+                      padding: (sharedpref?.getString('lang') ==
+                          'ar')
+                          ? EdgeInsets.only(
+                          right: 6, top: 14.0, bottom: 9)
+                          : EdgeInsets.only(
+                          left: 3, top: 14.0, bottom: 9),
+                      child: Image.asset(
+                        'assets/images/Vector (12)search.png',
+                      ),),
                     border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(21),
-                                              borderSide: BorderSide.none,
-                                            ),
+                      borderRadius: BorderRadius.circular(21),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
@@ -576,7 +301,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                           fontFamily: 'Poppins-Regular',
                           fontWeight: FontWeight.w500,
                           fontSize: 19,
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
                         ),
                       ),
                       Text('You haven’t added any \n '
@@ -615,281 +339,128 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 28.0,),
 
-                 child:   Column(
-                    children: [
-                    Row(
-                    children: [
-                    Padding(
-                    padding:
-                    const EdgeInsets.only(top: 0.0),
-                    child:
-                    CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Color(
-                    0xff442B72),
-                    child: CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
-                    // Replace with your default image path
-                    radius: 25,
-                    ),
-<<<<<<< HEAD
-                  ),
-                ),
-                // Add your AppBar and other UI elements here
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: _documents.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == _documents.length) {
-                          return _isLoading
-                              ? Center(child: CircularProgressIndicator())
-                              : _hasMoreData
-                              ? SizedBox.shrink()
-                              : Center(child: Text('No more data'));
-                        }
-                        final DocumentSnapshot doc = _documents[index];
-                        final data = doc.data() as Map<String, dynamic>;
-                        // var child = childrenData[index];
-                        String childName = childrenData[index]['name'] ?? '';
-          
-                        return    Column(
-                          children: [
-                            Row(
+                            child:   Column(
                               children: [
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.only(top: 12.0),
-                                  child:
-                                  CircleAvatar(
-                                    radius: 25,
-                                    backgroundColor: Color(
-                                        0xff442B72),
-                                    child: CircleAvatar(
-                                      backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
-                                      // Replace with your default image path
-                                      radius: 25,
-                                    ),
-                                  ),
-                                  // FutureBuilder(future: _firestore.collection(
-                                  //       'supervisor').doc(sharedpref!.getString('id')).get(),
-                                  //   builder: (BuildContext context,
-                                  //       AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                                  //     if (snapshot.hasError) {
-                                  //       return Text('Something went wrong');
-                                  //     }
-                                  //
-                                  //     if (snapshot.connectionState == ConnectionState.done) {
-                                  //       if (!snapshot.hasData || snapshot.data == null ||
-                                  //           snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] ==
-                                  //           null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                                  //         return CircleAvatar(
-                                  //           radius: 25,
-                                  //           backgroundColor: Color(
-                                  //               0xff442B72),
-                                  //           child: CircleAvatar(
-                                  //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
-                                  //             // Replace with your default image path
-                                  //             radius: 25,
-                                  //           ),
-                                  //         );
-                                  //       }
-                                  //
-                                  //       Map<String, dynamic>? data = snapshot.data?.data();
-                                  //       if (data != null && data['busphoto'] != null) {
-                                  //         return CircleAvatar(radius: 25,
-                                  //           backgroundColor: Color(
-                                  //               0xff442B72),
-                                  //           child: CircleAvatar(
-                                  //             backgroundImage: NetworkImage('${data['busphoto']}'),
-                                  //             radius: 25,
-                                  //           ),
-                                  //         );
-                                  //       }
-                                  //     }
-                                  //
-                                  //     return Container();
-                                  //   },
-                                  // ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .start,
-                                  crossAxisAlignment: CrossAxisAlignment
-                                      .start,
-          
+                                Row(
                                   children: [
-                                    Text(childName
-                                      // '${_documents[index]['name'] ??
-                                      //   '' }'
-                                      ,
-                                      style: TextStyle(
-                                        color: Color(0xFF442B72),
-                                        fontSize: 17,
-                                        fontFamily: 'Poppins-SemiBold',
-                                        fontWeight: FontWeight
-                                            .w600,
-                                        height: 1.07,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
                                     Padding(
-                                      padding: (sharedpref
-                                          ?.getString('lang') ==
-                                          'ar')
-                                          ? EdgeInsets.only(
-                                          right: 3.0)
-                                          : EdgeInsets.all(0.0),
+                                      padding:
+                                      const EdgeInsets.only(top: 0.0),
                                       child:
-                                      Text(
-                                        // state == 'waiting'
-                                        // ? 'Waiting'
-                                        //     :
-                                        'Added from ${getJoinText(
-                                            _documents[index]['joinDate'] ??
-                                                DateTime.now())}',
-                                        style: TextStyle(
-                                          color: Color(0xFF0E8113).withOpacity(0.7),
-                                          fontSize: 13,
-                                          fontFamily: 'Poppins-Regular',
-                                          fontWeight: FontWeight
-                                              .w400,
-                                          height: 1.23,
-                                        ),),
-                                      // Text(
-                                      //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
-                                      //  // '${data[index]['joinDate']}',
+                                      CircleAvatar(
+                                        radius: 25,
+                                        backgroundColor: Color(
+                                            0xff442B72),
+                                        child: CircleAvatar(
+                                          backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                          // Replace with your default image path
+                                          radius: 25,
+                                        ),
+                                      ),
+                                      // FutureBuilder(future: _firestore.collection(
+                                      //       'supervisor').doc(sharedpref!.getString('id')).get(),
+                                      //   builder: (BuildContext context,
+                                      //       AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                                      //     if (snapshot.hasError) {
+                                      //       return Text('Something went wrong');
+                                      //     }
                                       //
-                                      //   style: TextStyle(
-                                      //     color: Color(0xFF0E8113),
-                                      //     fontSize: 13,
-                                      //     fontFamily: 'Poppins-Regular',
-                                      //     fontWeight: FontWeight.w400,
-                                      //     height: 1.23,),),
+                                      //     if (snapshot.connectionState == ConnectionState.done) {
+                                      //       if (!snapshot.hasData || snapshot.data == null ||
+                                      //           snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] ==
+                                      //           null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
+                                      //         return CircleAvatar(
+                                      //           radius: 25,
+                                      //           backgroundColor: Color(
+                                      //               0xff442B72),
+                                      //           child: CircleAvatar(
+                                      //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
+                                      //             // Replace with your default image path
+                                      //             radius: 25,
+                                      //           ),
+                                      //         );
+                                      //       }
+                                      //
+                                      //       Map<String, dynamic>? data = snapshot.data?.data();
+                                      //       if (data != null && data['busphoto'] != null) {
+                                      //         return CircleAvatar(radius: 25,
+                                      //           backgroundColor: Color(
+                                      //               0xff442B72),
+                                      //           child: CircleAvatar(
+                                      //             backgroundImage: NetworkImage('${data['busphoto']}'),
+                                      //             radius: 25,
+                                      //           ),
+                                      //         );
+                                      //       }
+                                      //     }
+                                      //
+                                      //     return Container();
+                                      //   },
+                                      // ),
                                     ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                                      children: [
+                                        Text(
+                                          child['name'] ?? 'Unknown',
+
+                                          // '${_documents[index]['name'] ??
+                                          //   '' }'
+
+                                          style: TextStyle(
+                                            color: Color(0xFF442B72),
+                                            fontSize: 17,
+                                            fontFamily: 'Poppins-SemiBold',
+                                            fontWeight: FontWeight
+                                                .w600,
+                                            height: 1.07,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Padding(
+                                          padding: (sharedpref
+                                              ?.getString('lang') == 'ar')
+                                              ? EdgeInsets.only(right: 3.0) : EdgeInsets.all(0.0),
+                                          child:
+                                          Text(
+                                            // state == 'waiting'
+                                            // ? 'Waiting'
+                                            //     :
+                                            // getJoinText(parent['joinDate']),
+
+                                            'Added from ${   getJoinText(parent['joinDate'])}',
+
+                                            style: TextStyle(
+                                              color: Color(0xFF0E8113).withOpacity(0.7),
+                                              fontSize: 13,
+                                              fontFamily: 'Poppins-Regular',
+                                              fontWeight: FontWeight
+                                                  .w400,
+                                              height: 1.23,
+                                            ),),
+                                          // Text(
+                                          //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
+                                          //  // '${data[index]['joinDate']}',
+                                          //
+                                          //   style: TextStyle(
+                                          //     color: Color(0xFF0E8113),
+                                          //     fontSize: 13,
+                                          //     fontFamily: 'Poppins-Regular',
+                                          //     fontWeight: FontWeight.w400,
+                                          //     height: 1.23,),),
+                                        ),
+                                      ],),
+                                    // SizedBox(width: 103,),
                                   ],),
-                                // SizedBox(width: 103,),
-                              ],),
-                            SizedBox(height: 25,)],);
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-=======
-                    ),
-                    // FutureBuilder(future: _firestore.collection(
-                    //       'supervisor').doc(sharedpref!.getString('id')).get(),
-                    //   builder: (BuildContext context,
-                    //       AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-                    //     if (snapshot.hasError) {
-                    //       return Text('Something went wrong');
-                    //     }
-                    //
-                    //     if (snapshot.connectionState == ConnectionState.done) {
-                    //       if (!snapshot.hasData || snapshot.data == null ||
-                    //           snapshot.data!.data() == null || snapshot.data!.data()!['busphoto'] ==
-                    //           null || snapshot.data!.data()!['busphoto'].toString().trim().isEmpty) {
-                    //         return CircleAvatar(
-                    //           radius: 25,
-                    //           backgroundColor: Color(
-                    //               0xff442B72),
-                    //           child: CircleAvatar(
-                    //             backgroundImage: AssetImage('assets/images/Group 237679 (2).png'),
-                    //             // Replace with your default image path
-                    //             radius: 25,
-                    //           ),
-                    //         );
-                    //       }
-                    //
-                    //       Map<String, dynamic>? data = snapshot.data?.data();
-                    //       if (data != null && data['busphoto'] != null) {
-                    //         return CircleAvatar(radius: 25,
-                    //           backgroundColor: Color(
-                    //               0xff442B72),
-                    //           child: CircleAvatar(
-                    //             backgroundImage: NetworkImage('${data['busphoto']}'),
-                    //             radius: 25,
-                    //           ),
-                    //         );
-                    //       }
-                    //     }
-                    //
-                    //     return Container();
-                    //   },
-                    // ),
-                    ),
-                    const SizedBox(
-                    width: 5,
-                    ),
-                    Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                    Text(
-                    child['name'] ?? 'Unknown',
-
-                    // '${_documents[index]['name'] ??
-                    //   '' }'
-
-                    style: TextStyle(
-                    color: Color(0xFF442B72),
-                    fontSize: 17,
-                    fontFamily: 'Poppins-SemiBold',
-                    fontWeight: FontWeight
-                        .w600,
-                    height: 1.07,
-                    ),
-                    ),
-                    SizedBox(
-                    height: 8,
-                    ),
-                    Padding(
-                    padding: (sharedpref
-                        ?.getString('lang') == 'ar')
-                    ? EdgeInsets.only(right: 3.0) : EdgeInsets.all(0.0),
-                    child:
-                    Text(
-                    // state == 'waiting'
-                    // ? 'Waiting'
-                    //     :
-                    // getJoinText(parent['joinDate']),
-
-    'Added from ${   getJoinText(parent['joinDate'])}',
-
-    style: TextStyle(
-                    color: Color(0xFF0E8113).withOpacity(0.7),
-                    fontSize: 13,
-                    fontFamily: 'Poppins-Regular',
-                    fontWeight: FontWeight
-                        .w400,
-                    height: 1.23,
-                    ),),
-                    // Text(
-                    //   'Joined ${getJoinText(data[index]['joinDate'] ?? DateTime.now())}',
-                    //  // '${data[index]['joinDate']}',
-                    //
-                    //   style: TextStyle(
-                    //     color: Color(0xFF0E8113),
-                    //     fontSize: 13,
-                    //     fontFamily: 'Poppins-Regular',
-                    //     fontWeight: FontWeight.w400,
-                    //     height: 1.23,),),
-                    ),
-                    ],),
-                    // SizedBox(width: 103,),
-                    ],),
-                    SizedBox(height: 25,)  ],
-                 ),
+                                SizedBox(height: 25,)  ],
+                            ),
                           ),
                         ),
                       ],
@@ -899,7 +470,6 @@ class _ShowAllStudentsState extends State<ShowAllStudents> {
               ),
               if (_isLoading) Center(child: CircularProgressIndicator()),
             ],
->>>>>>> ba5da59cf981f4347cad0c66d618ebadf081fbfe
           ),
         ),
 
