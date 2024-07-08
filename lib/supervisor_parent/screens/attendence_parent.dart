@@ -506,9 +506,25 @@ class _AttendanceParentState extends State<AttendanceParent> {
                                       return false;
                                     },
                                     selectionMode: DateRangePickerSelectionMode.multiple,
-                                    initialSelectedRange: PickerDateRange(
-                                        DateTime.now().subtract(const Duration(days: 4)),
-                                        DateTime.now().add(const Duration(days: 3))),
+                                    selectionColor: const Color(0xFF7A12FF),
+                                    rangeSelectionColor: const Color(0xFF7A12FF),
+                                    rangeTextStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins-SemiBold',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    startRangeSelectionColor: const Color(0xFF7A12FF),
+                                    endRangeSelectionColor: const Color(0xFF7A12FF),
+                                    selectionTextStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins-Bold',
+                                    ),
+                                    initialSelectedDates: selectedAbsentDays,
+                                    // initialSelectedRange: PickerDateRange(
+                                    //     DateTime.now().subtract(const Duration(days: 4)),
+                                    //     DateTime.now().add(const Duration(days: 3))),
                                   ),
                                 ),
                               ),
