@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui';
@@ -14,19 +13,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:school_account/Functions/functions.dart';
-import 'package:school_account/supervisor_parent/components/child_data_item.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/home_parent.dart';
 import 'package:school_account/supervisor_parent/screens/notification_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:label_marker/label_marker.dart';
 import 'dart:convert' as convert;
 
-import '../components/custom_app_bar.dart';
 
 class TrackParent extends StatefulWidget {
   @override
@@ -201,7 +196,7 @@ class _TrackParentState extends State<TrackParent> {
       });
 
       // Store the latitude and longitude values in Realtime Database
-      final databaseReference = FirebaseDatabase.instance.reference();
+      final databaseReference = FirebaseDatabase.instance.ref();
       databaseReference.child('users').child('current_location').set({
         'latitude': currentPosition!.latitude,
         'longitude': currentPosition!.longitude,
@@ -350,8 +345,8 @@ class _TrackParentState extends State<TrackParent> {
 
   @override
   Widget build(BuildContext context) {
-    String currentLatitude = currentPosition?.latitude?.toString() ?? '';
-    String currentLongitude = currentPosition?.longitude?.toString() ?? '';
+    String currentLatitude = currentPosition?.latitude.toString() ?? '';
+    String currentLongitude = currentPosition?.longitude.toString() ?? '';
 
     LatLng startLocation = LatLng(
         currentPosition?.latitude ?? 0.0, currentPosition?.longitude ?? 0.0);
@@ -368,44 +363,44 @@ class _TrackParentState extends State<TrackParent> {
       ),
     };
 
-    for (var doc in data) {
-      var childData = doc.data() as Map<String, dynamic>;
-      var latString = childData['lat'];
-      var lngString = childData['lng'];
-
-      if (latString != null && lngString != null) {
-        try {
-          var lat = double.parse(latString.toString());
-          var lng = double.parse(lngString.toString());
-          var childLocation = LatLng(lat, lng);
-
-          markers.add(
-            Marker(
-              markerId: MarkerId(doc.id),
-              position: childLocation,
-              icon: anotherCustomIcon,
-              infoWindow: InfoWindow(
-                title: childData['name'],
-              ),
-            ),
-          );
-
-          // Check if the bus has reached the child location (e.g., within 50 meters)
-          double distanceInMeters = Geolocator.distanceBetween(
-            currentPosition!.latitude,
-            currentPosition!.longitude,
-            lat,
-            lng,
-          );
-
-          if (distanceInMeters <= 50) {
-            polylineCoordinates.add(childLocation);
-          }
-        } catch (e) {
-          print('Invalid double: $e');
-        }
-      }
-    }
+    // for (var doc in data) {
+    //   var childData = doc.data() as Map<String, dynamic>;
+    //   var latString = childData['lat'];
+    //   var lngString = childData['lng'];
+    //
+    //   if (latString != null && lngString != null) {
+    //     try {
+    //       var lat = double.parse(latString.toString());
+    //       var lng = double.parse(lngString.toString());
+    //       var childLocation = LatLng(lat, lng);
+    //
+    //       markers.add(
+    //         Marker(
+    //           markerId: MarkerId(doc.id),
+    //           position: childLocation,
+    //           icon: anotherCustomIcon,
+    //           infoWindow: InfoWindow(
+    //             title: childData['name'],
+    //           ),
+    //         ),
+    //       );
+    //
+    //       // Check if the bus has reached the child location (e.g., within 50 meters)
+    //       double distanceInMeters = Geolocator.distanceBetween(
+    //         currentPosition!.latitude,
+    //         currentPosition!.longitude,
+    //         lat,
+    //         lng,
+    //       );
+    //
+    //       if (distanceInMeters <= 50) {
+    //         polylineCoordinates.add(childLocation);
+    //       }
+    //     } catch (e) {
+    //       print('Invalid double: $e');
+    //     }
+    //   }
+    // }
 
     return Scaffold(
         endDrawer: ParentDrawer(),
@@ -535,27 +530,6 @@ class _TrackParentState extends State<TrackParent> {
                                           },
                                         );
                                 }
-                                //   GoogleMap(
-                                //   scrollGesturesEnabled: true,
-                                //   gestureRecognizers: Set()
-                                //     ..add(Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
-                                //   initialCameraPosition: CameraPosition(
-                                //     target: targetLocation,
-                                //     zoom: 12,
-                                //   ),
-                                //   markers: {
-                                //     Marker(
-                                //       markerId: MarkerId('current_location'),
-                                //       position: targetLocation,
-                                //       icon: anotherCustomIcon,
-                                //     ),
-                                //   },
-                                //   onMapCreated: (mapController) {
-                                //     setState(() {
-                                //       controller = mapController;
-                                //     });
-                                //   },
-                                // );
                                 else if (snapshot.hasError) {
                                   return Center(
                                       child: Text('Error: ${snapshot.error}'));
@@ -614,10 +588,6 @@ class _TrackParentState extends State<TrackParent> {
                                                     : FontWeight.w400),
                                           )
                                         ])),
-                                        // Text(
-                                        //   'Mariam Tracking'.tr,
-
-                                        // ),
                                         const SizedBox(
                                           height: 5,
                                         ),
@@ -743,17 +713,6 @@ class _TrackParentState extends State<TrackParent> {
                                                   ),
                                                 ]),
                                               ),
-                                              //     :
-                                              // Text(
-                                              //   '0 Min.'.tr,
-                                              //   style: TextStyle(
-                                              //     color: Color(0xFF993D9A),
-                                              //     fontSize: 29.71,
-                                              //     fontFamily: 'Poppins-Medium',
-                                              //     fontWeight: FontWeight.w700,
-                                              //     height: 1.23,
-                                              //   ),
-                                              // ),
                                               SizedBox(
                                                 height: 5,
                                               ),
@@ -881,11 +840,6 @@ class _TrackParentState extends State<TrackParent> {
                                                                 return Container();
                                                               },
                                                             ),
-                                                            // Image.asset(
-                                                            //   'assets/images/Ellipse 6.png',
-                                                            //   width: 50,
-                                                            //   height: 50,
-                                                            // ),
                                                             SizedBox(
                                                               width: 15,
                                                             ),
@@ -1033,11 +987,6 @@ class _TrackParentState extends State<TrackParent> {
                                                                   return Container();
                                                                 },
                                                               ),
-                                                              // Image.asset(
-                                                              //   'assets/images/Ellipse 6.png',
-                                                              //   width: 50,
-                                                              //   height: 50,
-                                                              // ),
                                                               SizedBox(
                                                                 width: 15,
                                                               ),
@@ -1318,38 +1267,7 @@ class _TrackParentState extends State<TrackParent> {
                                     ],
                                   ),
                                 ),
-                              )
-                        //     :
-                        // Column(
-                        //   children: [
-                        //     SizedBox(height: 30,),
-                        //     Center(
-                        //       child: Image.asset('assets/images/nodata.png',
-                        //       width: 235,
-                        //       height:149),
-                        //     ),
-                        //     Text('No data found',
-                        //       style: TextStyle(
-                        //           color: Color(0xFF442B72),
-                        //           fontSize: 19,
-                        //           fontFamily: 'Poppins-Regular',
-                        //           fontWeight: FontWeight.w500,
-                        //           height: 0.38
-                        //       ),),
-                        //   ],
-                        // ),
-                        // SizedBox(height: 20,),
-                        // const SizedBox(
-                        //   height: 25,
-                        // ),
-                        // ElevatedButton(
-                        //     onPressed: (){
-                        //       Navigator.of(context).push(MaterialPageRoute(
-                        //           builder: (context) => TrackHaveData(
-                        //             // onTapMenu: onTapMenu
-                        //           )));
-                        // //     }, child: Text('if we have data')),
-                        ,
+                              ),
                         const SizedBox(
                           height: 90,
                         ),
@@ -1564,18 +1482,6 @@ class _TrackParentState extends State<TrackParent> {
     }
   }
 
-  // Widget DashedLineInList() {
-  //   // double lineLength = students.length * 5;
-  //   return Padding(
-  //     padding: const EdgeInsets.only( left: 15.0),
-  //     child: DottedLine(
-  //       alignment: WrapAlignment.end,
-  //       // lineLength: lineLength,
-  //       direction: Axis.vertical,
-  //       dashColor: Color(0xFF432B72),
-  //     ),
-  //   );
-  // }
   Widget buildDashedLine() {
     // double lineLength = students.length * 40.0;
     return Padding(

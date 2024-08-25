@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
-import 'package:school_account/supervisor_parent/components/supervisor_card.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/edit_children.dart';
-import '../../Functions/functions.dart';
 import '../../model/ParentModel.dart';
-import '../screens/chat_screen.dart';
-import '../screens/home_parent_takebus.dart';
-import 'elevated_simple_button.dart';
 
 class ChildrenCard extends StatefulWidget {
   ParentModel? childrenData;
@@ -69,7 +63,7 @@ class _ChildrenCardState extends State<ChildrenCard> {
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
                                     widget.childrenData!.child_name!,
-                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                                       color: Color(0xFF432B72),
                                       fontSize: 15,
                                       fontFamily: 'Poppins-Bold',
@@ -84,7 +78,7 @@ class _ChildrenCardState extends State<ChildrenCard> {
                                 Text(
                                   'Class: '.tr+widget.childrenData!.class_name!,
                                   style:
-                                  Theme.of(context).textTheme.headline6!.copyWith(
+                                  Theme.of(context).textTheme.headlineSmall!.copyWith(
                                     color: Color(0xFF919191),
                                     fontSize: 12,
                                     fontFamily: 'Poppins-Light',

@@ -1,4 +1,4 @@
-import 'dart:io';
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -7,17 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:school_account/screens/otp_login.dart';
 import 'package:school_account/screens/signUpScreen.dart';
 import '../Functions/functions.dart';
 import '../classes/loading.dart';
-import '../components/country_phonenumber_field.dart';
 import '../components/elevated_simple_button.dart';
-import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
-import '../supervisor_parent/screens/sign_up.dart';
-import 'otpScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget{
@@ -271,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> with  WidgetsBindingObserver 
                                           // Example: change the background color and text style
                                           canvasColor: Colors.white,
                                           textTheme: Theme.of(context).textTheme.copyWith(
-                                            subtitle1: TextStyle(color: Color(0xFF442B72)),
+                                            titleLarge: TextStyle(color: Color(0xFF442B72)),
                                           ),
                                         ),
                                         child: Padding(

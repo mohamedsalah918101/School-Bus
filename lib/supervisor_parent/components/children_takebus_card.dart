@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:school_account/supervisor_parent/components/main_bottom_bar.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import '../../Functions/functions.dart';
@@ -99,7 +98,7 @@ class _ChildrenTakeBusCardState extends State<ChildrenTakeBusCard> {
                       children: [
                         Text(
                           'Shady Ayman'.tr,
-                          style: Theme.of(context).textTheme.headline6!.copyWith(
+                          style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                             color: Color(0xFF432B72),
                             fontSize: 17,
                             fontFamily: 'Poppins-SemiBold',
@@ -113,7 +112,7 @@ class _ChildrenTakeBusCardState extends State<ChildrenTakeBusCard> {
                         Text(
                           'Class: 1A'.tr,
                           style:
-                          Theme.of(context).textTheme.headline6!.copyWith(
+                          Theme.of(context).textTheme.headlineSmall!.copyWith(
                             color: Color(0xFF919191),
                             fontSize: 12,
                             fontFamily: 'Poppins-Light',
@@ -171,7 +170,7 @@ class _ChildrenTakeBusCardState extends State<ChildrenTakeBusCard> {
                               'Available Today'.tr,
                               style: Theme.of(context)
                                   .textTheme
-                                  .headline6!
+                                  .headlineSmall!
                                   .copyWith(
                                 color: Color(0xFF919191),
                                 fontSize: 12,

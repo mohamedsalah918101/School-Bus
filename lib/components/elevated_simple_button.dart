@@ -25,10 +25,8 @@ class ElevatedSimpleButton extends StatelessWidget {
     return ElevatedButton(
         onPressed: onPress,
         style: ElevatedButton.styleFrom(
-            fixedSize: Size(width, hight),
-            padding: const EdgeInsets.all(0),
-            primary: color,
-            onPrimary: Colors.transparent, // Background color
+            foregroundColor: Colors.transparent, backgroundColor: color, fixedSize: Size(width, hight),
+            padding: const EdgeInsets.all(0), // Background color
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               side: BorderSide(color: Color(0xFF442B72)),

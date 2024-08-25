@@ -1,4 +1,4 @@
-import 'dart:io';
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:school_account/screens/loginScreen.dart';
 
 import '../Functions/functions.dart';
 import '../classes/loading.dart';
 import '../components/elevated_simple_button.dart';
-import '../components/text_from_field_login_custom.dart';
 import '../controller/local_controller.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'otpScreen.dart';
@@ -414,7 +412,7 @@ String typeAccount='';
                                                     // Example: change the background color and text style
                                                     canvasColor: Colors.white,
                                                     textTheme: Theme.of(context).textTheme.copyWith(
-                                                      subtitle1: TextStyle(color: Color(0xFF442B72)),
+                                                      titleLarge: TextStyle(color: Color(0xFF442B72)),
                                                     ),
                                                   ),
                                                   child:Padding(

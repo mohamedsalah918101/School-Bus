@@ -24,10 +24,8 @@ class ElevatedIconButton extends StatelessWidget {
     return ElevatedButton(
         onPressed: onPress,
         style: ElevatedButton.styleFrom(
-            fixedSize: Size(width, hight),
-            padding: const EdgeInsets.all(0),
-            primary: color,
-            onPrimary: Colors.transparent // Background color
+            foregroundColor: Colors.transparent, backgroundColor: color, fixedSize: Size(width, hight),
+            padding: const EdgeInsets.all(0) // Background color
 
         ),
         child: Row(

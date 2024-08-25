@@ -4,20 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:school_account/model/ParentModel.dart';
 import 'package:school_account/model/SupervisorsModel.dart';
-import 'package:school_account/supervisor_parent/components/child_data_item.dart';
-import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
 import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
-import 'package:school_account/supervisor_parent/screens/home_parent_takebus.dart';
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
 import '../../Functions/functions.dart';
 import '../components/bus_component.dart';
 import '../components/child_card.dart';
-import '../components/main_bottom_bar.dart';
-import '../components/supervisor_card.dart';
 import 'notification_parent.dart';
 
 class HomeParent extends StatefulWidget {
@@ -37,8 +32,10 @@ class HomeParentState extends State<HomeParent> {
   int minutes = 15;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   // List<ChildDataItem> children = [];
   String parentName = '';
+
   // late Function() onTapMenu;
 
   @override
@@ -47,35 +44,50 @@ class HomeParentState extends State<HomeParent> {
     getData();
   }
 
-  getData()async{
+  getData() async {
     try {
-      DocumentSnapshot documentSnapshot = await _firestore.collection('parent').doc(sharedpref!.getString('id')).get();
+      DocumentSnapshot documentSnapshot = await _firestore
+          .collection('parent')
+          .doc(sharedpref!.getString('id'))
+          .get();
       if (documentSnapshot.exists) {
         setState(() {
           parentName = documentSnapshot.get('name');
         });
-      List<dynamic> children =  documentSnapshot.get('children');
-      for(int i =0; i<children.length ;i++){
-        DocumentSnapshot busSnapshot = await _firestore.collection('busdata').doc(children[i]['bus_id']).get();
-        if (busSnapshot.exists) {
-          List<dynamic> supervisors =  busSnapshot.get('supervisors');
-          List<SupervisorsModel> supervisorsData =[];
-          String busNumber='';
-          busNumber =  busSnapshot.get('busnumber');
+        List<dynamic> children = documentSnapshot.get('children');
+        for (int i = 0; i < children.length; i++) {
+          DocumentSnapshot busSnapshot = await _firestore
+              .collection('busdata')
+              .doc(children[i]['bus_id'])
+              .get();
+          if (busSnapshot.exists) {
+            List<dynamic> supervisors = busSnapshot.get('supervisors');
+            List<SupervisorsModel> supervisorsData = [];
+            String busNumber = '';
+            busNumber = busSnapshot.get('busnumber');
 
-          for(int x =0; x<supervisors.length ;x++){
-          supervisorsData.add(SupervisorsModel(name: supervisors[x]['name'],phone: supervisors[x]['phone'],id: supervisors[x]['id'],lat: supervisors[x]['lat'],lang:supervisors[x]['lang']));
+            for (int x = 0; x < supervisors.length; x++) {
+              supervisorsData.add(SupervisorsModel(
+                  name: supervisors[x]['name'],
+                  phone: supervisors[x]['phone'],
+                  id: supervisors[x]['id'],
+                  lat: supervisors[x]['lat'],
+                  lang: supervisors[x]['lang']));
+            }
+            childrenData.add(ParentModel(
+                child_name: children[i]['name'],
+                class_name: children[i]['grade'],
+                bus_number: busNumber,
+                supervisors: supervisorsData));
+          } else {
+            childrenData.add(ParentModel(
+                child_name: children[i]['name'],
+                class_name: children[i]['grade'],
+                bus_number: '',
+                supervisors: []));
           }
-          childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: busNumber,supervisors: supervisorsData));
-
-        }else{
-          childrenData.add(ParentModel(child_name: children[i]['name'],class_name: children[i]['grade'],bus_number: '',supervisors: []));
-
         }
-
-      }
-
-       } else {
+      } else {
         print("Document does not exist");
         return null;
       }
@@ -85,7 +97,6 @@ class HomeParentState extends State<HomeParent> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -94,7 +105,7 @@ class HomeParentState extends State<HomeParent> {
         return false;
       },
       child: Scaffold(
-        key: _scaffoldKey,
+          key: _scaffoldKey,
           endDrawer: ParentDrawer(),
           body: Column(
             children: [
@@ -123,18 +134,22 @@ class HomeParentState extends State<HomeParent> {
                                   ),
                                 ),
                                 child: StatefulBuilder(
-                                  builder: (BuildContext context, StateSetter setState){
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
                                     return SizedBox(
                                       width: 304,
                                       height: 295,
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
                                               children: [
                                                 const SizedBox(
                                                   width: 8,
@@ -143,7 +158,9 @@ class HomeParentState extends State<HomeParent> {
                                                   child: Column(
                                                     children: [
                                                       GestureDetector(
-                                                        onTap: () => Navigator.pop(context),
+                                                        onTap: () =>
+                                                            Navigator.pop(
+                                                                context),
                                                         child: Image.asset(
                                                           'assets/images/Vertical container.png',
                                                           width: 27,
@@ -164,8 +181,10 @@ class HomeParentState extends State<HomeParent> {
                                                     style: TextStyle(
                                                       color: Color(0xFF442B72),
                                                       fontSize: 18,
-                                                      fontFamily: 'Poppins-SemiBold',
-                                                      fontWeight: FontWeight.w600,
+                                                      fontFamily:
+                                                          'Poppins-SemiBold',
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                       height: 1.23,
                                                     ),
                                                   ),
@@ -173,11 +192,11 @@ class HomeParentState extends State<HomeParent> {
                                               ],
                                             ),
                                             const SizedBox(
-                                              height: 15
-                                              ,
+                                              height: 15,
                                             ),
                                             Text(
-                                              'You Set Reminder Before Bus Arrive'.tr,
+                                              'You Set Reminder Before Bus Arrive'
+                                                  .tr,
                                               style: TextStyle(
                                                 color: Color(0xFF442B72),
                                                 fontSize: 13,
@@ -190,7 +209,8 @@ class HomeParentState extends State<HomeParent> {
                                               height: 15,
                                             ),
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 GestureDetector(
                                                   onTap: () {
@@ -203,23 +223,35 @@ class HomeParentState extends State<HomeParent> {
                                                   child: Container(
                                                     width: 62.56,
                                                     height: 76.58,
-                                                    decoration:  BoxDecoration(
-                                                      borderRadius:
-                                                      (sharedpref?.getString('lang') == 'ar') ?
-                                                      BorderRadius.only(
-                                                          topRight: Radius.circular(13),
-                                                          bottomRight: Radius.circular(13)) :
-                                                      BorderRadius.only(
-                                                          topLeft: Radius.circular(13),
-                                                          bottomLeft: Radius.circular(13)),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: (sharedpref
+                                                                  ?.getString(
+                                                                      'lang') ==
+                                                              'ar')
+                                                          ? BorderRadius.only(
+                                                              topRight: Radius
+                                                                  .circular(13),
+                                                              bottomRight: Radius
+                                                                  .circular(13))
+                                                          : BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(13),
+                                                              bottomLeft: Radius
+                                                                  .circular(
+                                                                      13)),
                                                       color: Color(0xFF9889B4),
                                                     ),
-                                                    child:  Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Icon(
-                                                          Icons.minimize_rounded,
+                                                          Icons
+                                                              .minimize_rounded,
                                                           size: 45,
                                                           color: Colors.white,
                                                         ),
@@ -241,16 +273,22 @@ class HomeParentState extends State<HomeParent> {
                                                     color: Colors.white,
                                                   ),
                                                   child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Text(
                                                         '$minutes',
                                                         style: TextStyle(
                                                           color: Colors.black,
                                                           fontSize: 40.22,
-                                                          fontFamily: 'Poppins-Light',
-                                                          fontWeight: FontWeight.w400,
+                                                          fontFamily:
+                                                              'Poppins-Light',
+                                                          fontWeight:
+                                                              FontWeight.w400,
                                                           height: 1.23,
                                                         ),
                                                       ),
@@ -266,15 +304,23 @@ class HomeParentState extends State<HomeParent> {
                                                   child: Container(
                                                     width: 62.56,
                                                     height: 76.58,
-                                                    decoration:  BoxDecoration(
-                                                      borderRadius:
-                                                      (sharedpref?.getString('lang') == 'ar') ?
-                                                      BorderRadius.only(
-                                                          topLeft: Radius.circular(13),
-                                                          bottomLeft: Radius.circular(13)):
-                                                      BorderRadius.only(
-                                                          topRight: Radius.circular(13),
-                                                          bottomRight: Radius.circular(13)),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: (sharedpref
+                                                                  ?.getString(
+                                                                      'lang') ==
+                                                              'ar')
+                                                          ? BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(13),
+                                                              bottomLeft: Radius
+                                                                  .circular(13))
+                                                          : BorderRadius.only(
+                                                              topRight: Radius
+                                                                  .circular(13),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          13)),
                                                       color: Color(0xFF442B72),
                                                     ),
                                                     child: const Center(
@@ -405,6 +451,7 @@ class HomeParentState extends State<HomeParent> {
                       const SizedBox(
                         height: 7,
                       ),
+
                       sharedpref!.getInt('invit') == 1 ?
 
                       Padding(
@@ -510,16 +557,15 @@ class HomeParentState extends State<HomeParent> {
                               children: [
                                 Padding(
                                   padding:
-                                  (sharedpref?.getString('lang') == 'ar')?
-                                      EdgeInsets.only(top:7 , right: 15):
-                                      EdgeInsets.only(left: 15),
+                                      (sharedpref?.getString('lang') == 'ar')
+                                          ? EdgeInsets.only(top: 7, right: 15)
+                                          : EdgeInsets.only(left: 15),
                                   child: Column(
                                     children: [
                                       Image.asset(
-                                        'assets/images/Vector (6).png',
-                                        height: 20,
-                                        width: 20
-                                      ),
+                                          'assets/images/Vector (6).png',
+                                          height: 20,
+                                          width: 20),
                                       SizedBox(height: 3),
                                       Text(
                                         "Home".tr,
@@ -546,21 +592,19 @@ class HomeParentState extends State<HomeParent> {
                                   },
                                   child: Padding(
                                     padding:
-                                    (sharedpref?.getString('lang') == 'ar')?
-                                        EdgeInsets.only(top: 7, left: 70):
-                                        EdgeInsets.only( right: 70 ),
+                                        (sharedpref?.getString('lang') == 'ar')
+                                            ? EdgeInsets.only(top: 7, left: 70)
+                                            : EdgeInsets.only(right: 70),
                                     child: Column(
                                       children: [
                                         Image.asset(
                                             'assets/images/Vector (2).png',
                                             height: 16.56,
-                                            width: 16.2
-                                        ),
+                                            width: 16.2),
                                         Image.asset(
                                             'assets/images/Vector (5).png',
                                             height: 4,
-                                            width: 6
-                                        ),
+                                            width: 6),
                                         SizedBox(height: 2),
                                         Text(
                                           "Notifications".tr,
@@ -588,16 +632,17 @@ class HomeParentState extends State<HomeParent> {
                                   },
                                   child: Padding(
                                     padding:
-                                    (sharedpref?.getString('lang') == 'ar')?
-                                    EdgeInsets.only(top: 12 , bottom:4 ,right: 10):
-                                    EdgeInsets.only(top: 10 , bottom:4 ,left: 10),
+                                        (sharedpref?.getString('lang') == 'ar')
+                                            ? EdgeInsets.only(
+                                                top: 12, bottom: 4, right: 10)
+                                            : EdgeInsets.only(
+                                                top: 10, bottom: 4, left: 10),
                                     child: Column(
                                       children: [
                                         Image.asset(
                                             'assets/images/Vector (3).png',
                                             height: 18.75,
-                                            width: 18.75
-                                        ),
+                                            width: 18.75),
                                         SizedBox(height: 3),
                                         Text(
                                           "Calendar".tr,
@@ -625,16 +670,23 @@ class HomeParentState extends State<HomeParent> {
                                   },
                                   child: Padding(
                                     padding:
-                                    (sharedpref?.getString('lang') == 'ar')?
-                                    EdgeInsets.only(top: 10 , bottom: 2 ,right: 12,left: 15):
-                                    EdgeInsets.only(top: 10 , bottom: 2 ,left: 12,right: 15),
+                                        (sharedpref?.getString('lang') == 'ar')
+                                            ? EdgeInsets.only(
+                                                top: 10,
+                                                bottom: 2,
+                                                right: 12,
+                                                left: 15)
+                                            : EdgeInsets.only(
+                                                top: 10,
+                                                bottom: 2,
+                                                left: 12,
+                                                right: 15),
                                     child: Column(
                                       children: [
                                         Image.asset(
                                             'assets/images/Vector (4).png',
                                             height: 18.36,
-                                            width: 23.5
-                                        ),
+                                            width: 23.5),
                                         SizedBox(height: 3),
                                         Text(
                                           "Track".tr,
@@ -651,8 +703,7 @@ class HomeParentState extends State<HomeParent> {
                                 ),
                               ],
                             ),
-                          )))))
-      ),
+                          )))))),
     );
   }
 }

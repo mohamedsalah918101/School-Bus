@@ -84,7 +84,7 @@ class _AddedChildCardState extends State<AddedChildCard> {
                               data['name'],
                               style: Theme.of(context)
                                   .textTheme
-                                  .headline6!
+                                  .headlineSmall!
                                   .copyWith(
                                     color: const Color(0xFF432B72),
                                     fontSize: 17,
@@ -111,7 +111,7 @@ class _AddedChildCardState extends State<AddedChildCard> {
                                     data['phoneNumber'],
                                     style: Theme.of(context)
                                         .textTheme
-                                        .headline6!
+                                        .headlineSmall!
                                         .copyWith(
                                           color: const Color(0xFF919191),
                                           fontSize: 12,

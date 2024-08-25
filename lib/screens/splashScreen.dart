@@ -10,8 +10,6 @@ import '../components/custom_switch.dart';
 import '../main.dart';
 import '../supervisor_parent/screens/accept_invitation_parent.dart';
 import '../supervisor_parent/screens/accept_invitation_supervisor.dart';
-import '../supervisor_parent/screens/final_invitation_parent.dart';
-import '../supervisor_parent/screens/final_invitation_supervisor.dart';
 import '../supervisor_parent/screens/home_parent.dart';
 import '../supervisor_parent/screens/map_parent.dart';
 import 'homeScreen.dart';
@@ -125,38 +123,6 @@ class _SplashScreenState extends State<SplashScreen>
           repeat: ImageRepeat.noRepeat,
         ),
       ),
-
-      // body: Stack(
-      //   children: [
-      //     Center(
-      //       child: Image.asset(
-      //         'assets/images/Layer_1.png',
-      //         width: 290,
-      //       ),
-      //     ),
-      //     Column(
-      //       mainAxisAlignment: MainAxisAlignment.center,
-      //       children: [
-      //         Center(
-      //           child: FadeAndTranslate(
-      //             duration: Duration(milliseconds: 1500),
-      //             visible: true,
-      //             autoStart: true,
-      //             translate: Offset(0, height!),
-      //             child: Image.asset(
-      //               'assets/images/animated.png',
-      //               width: 200,
-      //             ),
-      //           ),
-      //         ),
-      //         SizedBox(
-      //           height: 60,
-      //         )
-      //       ],
-      //     ),
-      //   ],
-      // )
-      //
     );
   }
 

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:school_account/supervisor_parent/components/children_takebus_card.dart';
 import 'package:school_account/supervisor_parent/components/dialogs.dart';
 import 'package:school_account/supervisor_parent/components/elevated_simple_button.dart';
 import 'package:school_account/supervisor_parent/components/parent_drawer.dart';
@@ -9,12 +8,9 @@ import 'package:school_account/main.dart';
 import 'package:school_account/supervisor_parent/screens/attendence_parent.dart';
 import 'package:school_account/supervisor_parent/screens/profile_parent.dart';
 import 'package:school_account/supervisor_parent/screens/track_parent.dart';
-import '../../Functions/functions.dart';
 import '../../model/ParentModel.dart';
 import '../../model/SupervisorsModel.dart';
 import '../components/bus_component.dart';
-import '../components/child_card.dart';
-import '../components/main_bottom_bar.dart';
 import '../components/supervisor_card.dart';
 import 'notification_parent.dart';
 
@@ -257,7 +253,7 @@ class _HomeParentTakeBusState extends State<HomeParentTakeBus> {
                                                           style: Theme.of(
                                                                   context)
                                                               .textTheme
-                                                              .headline6!
+                                                              .headlineSmall!
                                                               .copyWith(
                                                                 color: Color(
                                                                     0xFF432B72),
@@ -278,7 +274,7 @@ class _HomeParentTakeBusState extends State<HomeParentTakeBus> {
                                                           style: Theme.of(
                                                                   context)
                                                               .textTheme
-                                                              .headline6!
+                                                              .headlineSmall!
                                                               .copyWith(
                                                                 color: Color(
                                                                     0xFF919191),
@@ -364,7 +360,7 @@ class _HomeParentTakeBusState extends State<HomeParentTakeBus> {
                                                               style: Theme.of(
                                                                       context)
                                                                   .textTheme
-                                                                  .headline6!
+                                                                  .headlineSmall!
                                                                   .copyWith(
                                                                     color: Color(
                                                                         0xFF919191),
