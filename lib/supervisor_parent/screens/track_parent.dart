@@ -483,20 +483,16 @@ class _TrackParentState extends State<TrackParent> {
                       children: [
                         SizedBox(
                             height: 350,
-                            child: StreamBuilder<DatabaseEvent>(
-                              stream: FirebaseDatabase.instance
-                                  .ref()
-                                  .child('users')
-                                  .child('current_location')
-                                  .onValue,
+                            child: StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc('current_location')
+                                  .snapshots(),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  var data = snapshot.data!.snapshot.value
-                                      as Map<dynamic, dynamic>;
-                                  var latitude = data['latitude'] ??
-                                      startLocation.latitude;
-                                  var longitude = data['longitude'] ??
-                                      startLocation.longitude;
+                                  var data = snapshot.data!.data() as Map<String, dynamic>;
+                                  var latitude = data['latitude'] ?? startLocation.latitude;
+                                  var longitude = data['longitude'] ?? startLocation.longitude;
                                   var targetLocation =
                                       LatLng(latitude, longitude);
 

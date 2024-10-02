@@ -118,7 +118,7 @@ class _SupervisorCardState extends State<SupervisorCard> {
           borderRadius: BorderRadius.circular(14.0),
         ),
         child: Padding(
-            padding: const EdgeInsets.all(17.0),
+            padding: const EdgeInsets.all(15.0),
             child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

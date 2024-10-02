@@ -35,6 +35,7 @@ class HomeParentState extends State<HomeParent> {
 
   // List<ChildDataItem> children = [];
   String parentName = '';
+  bool loading = true;
 
   // late Function() onTapMenu;
 
@@ -45,6 +46,9 @@ class HomeParentState extends State<HomeParent> {
   }
 
   getData() async {
+    setState(() {
+      childrenData.clear(); // Clear the list before loading data
+    });
     try {
       DocumentSnapshot documentSnapshot = await _firestore
           .collection('parent')
@@ -94,6 +98,10 @@ class HomeParentState extends State<HomeParent> {
     } catch (e) {
       print("Error getting document: $e");
       return null;
+    } finally {
+      setState(() {
+        loading = false; // Data loaded
+      });
     }
   }
 
@@ -451,50 +459,61 @@ class HomeParentState extends State<HomeParent> {
                       const SizedBox(
                         height: 7,
                       ),
-
-                      sharedpref!.getInt('invit') == 1 ?
-
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                          child:  ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: childrenData.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return
-                                Column(
+                      loading
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : sharedpref!.getInt('invit') == 1
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 19.0),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: childrenData.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Column(
+                                        children: [
+                                          ChildCard(childrenData[index]),
+                                          SizedBox(
+                                            height: 15,
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Column(
                                   children: [
-                                    ChildCard(childrenData[index]),
-                                    SizedBox(height: 15,)
+                                    SizedBox(
+                                      height: 45,
+                                    ),
+                                    Image.asset(
+                                      'assets/images/Group 237684.png',
+                                    ),
+                                    Text(
+                                      'No Data Found'.tr,
+                                      style: TextStyle(
+                                        color: Color(0xff442B72),
+                                        fontFamily: 'Poppins-Regular',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 19,
+                                      ),
+                                    ),
+                                    Text(
+                                      'You haven’t added any \n '
+                                              'data yet'
+                                          .tr,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Color(0xffBE7FBF),
+                                        fontFamily: 'Poppins-Light',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12,
+                                      ),
+                                    )
                                   ],
-                                );
-                            },
-                          ),)
-                          :
-                          Column(
-                            children: [
-                              SizedBox(height: 45,),
-                              Image.asset('assets/images/Group 237684.png',
-                              ),
-                              Text('No Data Found'.tr,
-                                style: TextStyle(
-                                  color: Color(0xff442B72),
-                                  fontFamily: 'Poppins-Regular',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 19,
                                 ),
-                              ),
-                              Text('You haven’t added any \n '
-                                  'data yet'.tr,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xffBE7FBF),
-                                  fontFamily: 'Poppins-Light',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                ),)
-                            ],
-                          ),
                       const SizedBox(
                         height: 44,
                       ),
